@@ -9,7 +9,7 @@
     "packages/*"
   ],
   "engines": {
-    "node": ">=24"
+    "node": "24.20.0"
   },
   "scripts": {
     "typecheck": "npm run typecheck --workspaces",

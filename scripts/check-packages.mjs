@@ -1,6 +1,7 @@
 // Guards the package boxes. Run by `npm test` and so by CI.
 //   - every package is marked private (nothing goes to npm yet) and Apache-2.0
 //   - every package carries a copy of the root LICENSE, a NOTICE and a README that says it is empty
+//   - the copyright line is in the root LICENSE and every NOTICE; root engines.node is one exact version
 //   - names are the four from the plan, and nothing else sits in packages/
 // When a package is first released, Amy rules on it and this file changes in the same lane 3 pull request.
 import { readdirSync, readFileSync, existsSync } from "node:fs";
@@ -11,6 +12,10 @@ const EXPECTED = ["bridget", "calvin", "core", "phoebe"];
 const root = fileURLToPath(new URL("..", import.meta.url));
 const licence = readFileSync(join(root, "LICENSE"), "utf8");
 const errors = [];
+const COPYRIGHT = "Copyright 2026 WaterBots AI, LLC";
+if (!licence.includes(COPYRIGHT)) errors.push(`root LICENSE must carry "${COPYRIGHT}"`);
+const rootPkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
+if (!/^\d+\.\d+\.\d+$/.test(rootPkg.engines?.node ?? "")) errors.push("root engines.node must be one exact version");
 
 const found = readdirSync(join(root, "packages"), { withFileTypes: true })
   .filter((e) => e.isDirectory())
@@ -29,6 +34,9 @@ for (const name of found) {
   }
   if (existsSync(join(dir, "LICENSE")) && readFileSync(join(dir, "LICENSE"), "utf8") !== licence) {
     errors.push(`${name}: LICENSE differs from the root LICENSE`);
+  }
+  if (existsSync(join(dir, "NOTICE")) && !readFileSync(join(dir, "NOTICE"), "utf8").includes(COPYRIGHT)) {
+    errors.push(`${name}: NOTICE must carry "${COPYRIGHT}"`);
   }
   if (existsSync(join(dir, "README.md")) && !/empty for now/i.test(readFileSync(join(dir, "README.md"), "utf8"))) {
     errors.push(`${name}: README must say it is empty for now`);
