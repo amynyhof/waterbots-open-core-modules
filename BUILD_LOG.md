@@ -4,6 +4,18 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-10-19 — M1.1 Amy's answers on the pull request
+
+**Done (same branch, `m1-ci-guards`):**
+- `CLAUDE.md`: the word rules — "golden" banned (say "reference"); WaterBots never says it validates ("validate" and
+  "validation" only when explaining what validation is and that external auditors do it); never call the site or a
+  module a demo. No other words are banned.
+- `BUILD_PLAN.md`: Amy's hand-steps (branch protection, npm scope, `NPM_TOKEN`) marked blocked until Amy, due before
+  the first release (M2.2).
+
+**Accepted by Amy as built:** the number gate placeholder passes with a warning; the package skeleton is its own pull
+request (M1.3); TruffleHog is the second scanner; the `CLAUDE.md` commit is `Grant: open`.
+
 ## 2026-10-19 — M1.1 Guards and rules
 
 **Done (open pull request, branch `m1-ci-guards`):**

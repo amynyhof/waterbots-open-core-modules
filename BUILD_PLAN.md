@@ -1,7 +1,8 @@
 # Build plan — the open core modules, steps M1 to M9
 
 Each step is one coherent, testable thing Amy can check in one sitting and undo in one motion. Each step is a family;
-its items are the pull requests or checks inside it. `[x]` done (merged), `[~]` open pull request, `[ ]` not started.
+its items are the pull requests or checks inside it. `[x]` done (merged), `[~]` open pull request, `[ ]` not started,
+`[!]` blocked until Amy acts.
 
 **Every engine change is published first as a release candidate** (a trial version). The private side installs it,
 runs its real-filing tests, and reports back through Amy: pass or fail and the reference line, never a figure. Only
@@ -30,8 +31,11 @@ gate's design before the real gate is built.
 - [ ] **M1.3 Package skeleton:** root workspace, `packages/core` (the shared plug points: `ModuleProject`,
       `StandardId`, `SaveOutcome`, the agent contract, design tokens and base stylesheet), and stubs for `calvin`,
       `phoebe`, `bridget`. No calculator code.
-- [ ] **M1.4 Amy's settings checks** (hers, not Session C's): branch protection on `main` requiring every check;
-      `NPM_TOKEN` secret and the `npm-publish` environment's approval; the npm scope (N13).
+- **M1.4 Amy's hand-steps** — blocked until Amy; Session C cannot do these. **Due before the first release (M2.2).**
+  - [!] Branch protection on `main`, requiring every check (also needed before lane 1 auto-merge can ever be on)
+  - [!] The npm scope: create the npm organisation or confirm Amy owns it (N13)
+  - [!] The `NPM_TOKEN` Actions secret
+  - [ ] Optional: Amy as required reviewer on the `npm-publish` environment, to approve each release
 - [x] Secret scanning with push protection — already on in the repo settings.
 
 ## M2 — The seed lands
@@ -39,7 +43,7 @@ gate's design before the real gate is built.
 *Stop for Amy:* the private side confirms the package matches the seed. *Waits on:* the seed (Amy's one-time carry).
 
 - [ ] **M2.1** Seed arrives unchanged, with its reviewed-version ledger kept exactly as it arrives
-- [ ] **M2.2** Publish `0.1.0` with no changes to what arrived
+- [ ] **M2.2** Publish `0.1.0` with no changes to what arrived. *Blocked until* Amy's hand-steps in M1.4 are done.
 
 ## M3 — The method registry (no look change)
 
@@ -103,4 +107,3 @@ The first release does not wait for this.
 - **N5:** whether a higher litres cap applies with true meters — affects the cap only.
 - **N6:** whether further gates stand on D-3.
 - **N13:** the npm scope.
-- The banned-word list for public copy (not in the brief).
