@@ -7,7 +7,7 @@ Write as if a stranger is reading — because one will.
 
 | Who | Does | Never does |
 |---|---|---|
-| **Amy** | Decides. Merges every pull request. Owns the repo settings, the GitHub secrets and the npm scope. | — |
+| **Amy** | Decides. Merges every pull request (lane 1 may auto-merge only after Amy switches it on). Owns the repo settings, the GitHub secrets and the npm scope. | — |
 | **Session C** (the Claude session that owns this repo) | Builds here: code, tests, CI, docs. Works on a branch and opens a pull request. | Merges. Pushes to `main`. Changes repo settings. Works in any other repo. |
 | **The private session** | Installs the **published** packages and runs its own real-filing tests against them. | Reads or works in this repo. |
 | **Outside AI review** | Reviews lane 3 pull requests (see below). | Merges. |
@@ -39,13 +39,16 @@ in `.github/lanes/lane-rule.mjs`.
 
 | Lane | Files | How it merges |
 |---|---|---|
-| **1** | Only `BUILD_PLAN.md`, `BUILD_LOG.md`, `docs/**/*.md` | All checks green. Amy merges with one click. Auto-merge is built but **off** until the keyed-fingerprint number gate is real. |
+| **1** | Only `BUILD_PLAN.md`, `BUILD_LOG.md`, `docs/**/*.md` | All checks green, then Amy merges with one click. There is no auto-merge. It may be built only after the keyed-fingerprint number gate exists, and runs only after Amy switches it on. |
 | **2** | What visitors see or read: `README.md` for now; screens and copy when they exist | Amy merges, then checks the live site. |
-| **3** | Everything else: calculator, engine, data, tests, packages, CI, rules files, the lane rule itself, and anything that could leak a real figure | Amy reviews, plus outside AI review. |
+| **3** | Everything else: calculator, engine, data, tests, packages, CI, rules files, the lane rule itself, and anything that could leak a real figure | Outside AI review, then Amy reviews and merges. |
 
 - A file on no list → lane 3.
 - A pull request touching more than one lane takes the highest.
 - A pull request that changes the lane rule, CI or a rules file (`CLAUDE.md`, `.claude/**`) → lane 3.
+
+**The number gate is a placeholder for now.** It passes with a warning and checks nothing. Until the real
+keyed-fingerprint gate exists, lane 3 — Amy's review plus outside AI review — is what catches real figures and names.
 
 ## The grant line
 
@@ -88,6 +91,6 @@ Everything here is public: README, docs, cards, screen text, commit messages, PR
 
 - **"golden" is banned.** Always say "reference" instead (a reference case, a reference value).
 - **WaterBots never says it validates.** "Validate" and "validation" may appear only when explaining what validation
-  is and who does it: external auditors.
+  is and who does it: external auditors. This covers code names too: `checkInput`, not `validateInput`.
 - **Never call the site or any module a demo.** It is the real thing.
 - No other words are banned.
