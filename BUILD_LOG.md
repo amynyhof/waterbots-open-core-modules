@@ -4,6 +4,19 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-10-19 — M1.1 Fixes after the outside review
+
+**Done (same branch, `m1-ci-guards`):**
+- `lanes.yml`: the dormant lane 1 auto-merge job is removed. Labelling stays. The design is kept as plan item M1.5.
+- `CLAUDE.md`: every merge line now agrees — Amy merges every pull request; lane 1 may auto-merge only after Amy
+  switches it on. Added: until the real number gate exists, lane 3 covers figures and names. Added: no "validate"
+  in code names either.
+- `publish.yml`, `number-gate.yml`: comments brought in line.
+- `BUILD_PLAN.md`: Amy's approval on every release (environment reviewer) and a `v*` tag rule are now
+  blocked-until-Amy items, due before the first release, with branch protection, the npm scope and `NPM_TOKEN`.
+
+**Kept by Amy:** the broad local deny rule; quoting banned words inside the rules.
+
 ## 2026-10-19 — M1.1 Amy's answers on the pull request
 
 **Done (same branch, `m1-ci-guards`):**

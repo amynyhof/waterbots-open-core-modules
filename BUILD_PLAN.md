@@ -20,7 +20,7 @@ gate's design before the real gate is built.
 - [~] **M1.1 Guards and rules** (this pull request)
   - [~] `CLAUDE.md`: who does what, hard rules, merge lanes, the grant line, plain-English copy
   - [~] Session deny rules in `.claude/settings.local.json` (local, not committed)
-  - [~] Lane labelling job (`lanes.yml`) and the lane rule with tests; lane 1 auto-merge built but off
+  - [~] Lane labelling job (`lanes.yml`) and the lane rule with tests. It labels only; it never merges.
   - [~] Typecheck, test and build jobs (`ci.yml`), ready for when code lands
   - [~] Gitleaks and a second secrets scan (`secrets.yml`)
   - [~] Number gate placeholder (`number-gate.yml`)
@@ -32,10 +32,15 @@ gate's design before the real gate is built.
       `StandardId`, `SaveOutcome`, the agent contract, design tokens and base stylesheet), and stubs for `calvin`,
       `phoebe`, `bridget`. No calculator code.
 - **M1.4 Amy's hand-steps** — blocked until Amy; Session C cannot do these. **Due before the first release (M2.2).**
-  - [!] Branch protection on `main`, requiring every check (also needed before lane 1 auto-merge can ever be on)
+  - [!] Branch protection on `main`: a pull request before merging, every check required, no force pushes or
+        deletions, applied to admins too. Can be done now; steps are in pull request #1.
   - [!] The npm scope: create the npm organisation or confirm Amy owns it (N13)
   - [!] The `NPM_TOKEN` Actions secret
-  - [ ] Optional: Amy as required reviewer on the `npm-publish` environment, to approve each release
+  - [!] Amy as required reviewer on the `npm-publish` environment, so every release needs her approval
+  - [!] A tag rule so only Amy can create `v*` tags
+- [ ] **M1.5 Lane 1 auto-merge** — not built; the earlier dormant job was removed. Rebuild only when the real
+      number gate (M1.2) exists and Amy says to switch it on. Design: lane 1 and not a draft → arm GitHub's
+      auto-merge; any other lane → disarm it. Needs the branch protection above, or it would merge at once.
 - [x] Secret scanning with push protection — already on in the repo settings.
 
 ## M2 — The seed lands
