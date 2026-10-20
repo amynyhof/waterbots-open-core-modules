@@ -1,0 +1,9 @@
+# Session-local Claude settings (deny rules live here; never committed)
+.claude/settings.local.json
+CLAUDE.local.md
+
+node_modules/
+dist/
+*.tgz
+.env
+.env.*
