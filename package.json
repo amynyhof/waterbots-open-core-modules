@@ -1,0 +1,24 @@
+{
+  "name": "waterbots-open-core-modules",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Open core modules for WaterBots. Workspace root; nothing here is published.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "typecheck": "npm run typecheck --workspaces",
+    "test": "node scripts/check-packages.mjs && node --test .github/lanes/lane-rule.test.mjs && npm run test --workspaces",
+    "build": "npm run build --workspaces"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.5",
+    "typescript": "7.0.2",
+    "vitest": "5.0.5"
+  }
+}
