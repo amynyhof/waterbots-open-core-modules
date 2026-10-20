@@ -1,0 +1,57 @@
+# Typecheck, test and build. In place before any code lands (step M1).
+# Until the root package.json arrives these jobs have nothing to check and say so.
+# A packages/ folder without a root package.json fails, so code cannot slip in unchecked.
+
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  lane-rule:
+    name: lane rule tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - run: node --test .github/lanes/lane-rule.test.mjs
+
+  check:
+    name: ${{ matrix.task }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        task: [typecheck, test, build]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - name: Is there code yet?
+        id: code
+        run: |
+          if [ -f package.json ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          elif [ -d packages ]; then
+            echo "::error::packages/ exists but there is no root package.json, so nothing can be checked."
+            exit 1
+          else
+            echo "::notice::No packages yet. Nothing to ${{ matrix.task }}."
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          fi
+      - if: steps.code.outputs.present == 'true'
+        run: npm ci --ignore-scripts
+      - if: steps.code.outputs.present == 'true'
+        run: npm run ${{ matrix.task }}
