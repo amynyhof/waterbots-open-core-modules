@@ -29,9 +29,10 @@ gate's design before the real gate is built.
 - [ ] **M1.2 Real number gate:** keyed fingerprints (HMAC-SHA256); key and list as Actions secrets; a missing key
       fails the run. *Waits on:* Amy's go on the design (N2), then the private side's first fingerprint list.
 - [~] **M1.3 Package skeleton** (open pull request): the empty boxes. No calculator code, no data.
-  - [~] Workspace root with TypeScript, vitest and a build; versions pinned, lockfile committed
+  - [~] Workspace root with TypeScript, vitest and a build; versions pinned, lockfile committed; Node pinned to one
+        exact version (24.20.0) in the workflows and `engines`
   - [~] Four stubs: `@waterbots/core`, `calvin`, `phoebe`, `bridget`. Each builds, has one trivial test, an Apache 2.0
-        `LICENSE` and `NOTICE`, and a README that says it is empty for now. All marked `private`: nothing goes to npm.
+        `LICENSE` and `NOTICE` (copyright line: WaterBots AI, LLC), and a README that says it is empty for now. All marked `private`: nothing goes to npm.
   - [~] `scripts/check-packages.mjs`, run by the test job: keeps every package private, licensed and empty-for-now
   - [ ] Later, own pull requests: the real plug points in `core` (`ModuleProject`, `StandardId`, `SaveOutcome`, the
         agent contract, design tokens and base stylesheet); Calvin's folders arrive with the seed (M2).
@@ -51,7 +52,9 @@ gate's design before the real gate is built.
 
 *Stop for Amy:* the private side confirms the package matches the seed. *Waits on:* the seed (Amy's one-time carry).
 
-- [ ] **M2.1** Seed arrives unchanged, with its reviewed-version ledger kept exactly as it arrives
+- [ ] **M2.1** Seed arrives unchanged, with its reviewed-version ledger kept exactly as it arrives. Show that the
+      carried calculator builds and tests the same under this repo's tool versions (TypeScript 7.0.2, vitest 5.0.5,
+      Node 24.20.0), and say so in the pull request.
 - [ ] **M2.2** Publish `0.1.0` with no changes to what arrived. *Blocked until* Amy's hand-steps in M1.4 are done.
 
 ## M3 — The method registry (no look change)

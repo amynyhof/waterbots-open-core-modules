@@ -4,6 +4,17 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-10-20 — M1.3 Amy's answers on the pull request
+
+**Done (same branch, `m1-3-package-skeleton`):**
+- Copyright line "Copyright 2026 WaterBots AI, LLC" in the root `LICENSE` and in every package's `LICENSE` and `NOTICE`.
+- Node pinned to one exact version, 24.20.0, in `ci.yml`, `publish.yml` and the root `engines` field.
+- `scripts/check-packages.mjs` now also checks the copyright line and the exact Node version.
+- `BUILD_PLAN.md`: at the seed (M2.1), show the carried calculator builds and tests the same under these versions.
+
+**Kept by Amy:** the `@waterbots` names (the scope is her open step N13); the tools; `publish.yml` left alone, since
+the `private` flag and the check are the lock.
+
 ## 2026-10-20 — M1.3 Package skeleton
 
 **Done (open pull request, branch `m1-3-package-skeleton`):**
