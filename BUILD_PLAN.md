@@ -17,20 +17,24 @@ All of M1 to M9 is `Grant: open`. Edits to this plan and the build log are `Gran
 *Stop for Amy:* read the CI run. *Waits on:* the npm scope (N13) — for publishing only. Amy may revisit the number
 gate's design before the real gate is built.
 
-- [~] **M1.1 Guards and rules** (this pull request)
-  - [~] `CLAUDE.md`: who does what, hard rules, merge lanes, the grant line, plain-English copy
-  - [~] Session deny rules in `.claude/settings.local.json` (local, not committed)
-  - [~] Lane labelling job (`lanes.yml`) and the lane rule with tests. It labels only; it never merges.
-  - [~] Typecheck, test and build jobs (`ci.yml`), ready for when code lands
-  - [~] Gitleaks and a second secrets scan (`secrets.yml`)
-  - [~] Number gate placeholder (`number-gate.yml`)
-  - [~] Publish with provenance on a tag (`publish.yml`), refusing until the scope is real
-  - [~] This plan and the build log
+- [x] **M1.1 Guards and rules**
+  - [x] `CLAUDE.md`: who does what, hard rules, merge lanes, the grant line, plain-English copy
+  - [x] Session deny rules in `.claude/settings.local.json` (local, not committed)
+  - [x] Lane labelling job (`lanes.yml`) and the lane rule with tests. It labels only; it never merges.
+  - [x] Typecheck, test and build jobs (`ci.yml`) (they now run for real: see M1.3)
+  - [x] Gitleaks and a second secrets scan (`secrets.yml`)
+  - [x] Number gate placeholder (`number-gate.yml`)
+  - [x] Publish with provenance on a tag (`publish.yml`), refusing until the scope is real
+  - [x] This plan and the build log
 - [ ] **M1.2 Real number gate:** keyed fingerprints (HMAC-SHA256); key and list as Actions secrets; a missing key
       fails the run. *Waits on:* Amy's go on the design (N2), then the private side's first fingerprint list.
-- [ ] **M1.3 Package skeleton:** root workspace, `packages/core` (the shared plug points: `ModuleProject`,
-      `StandardId`, `SaveOutcome`, the agent contract, design tokens and base stylesheet), and stubs for `calvin`,
-      `phoebe`, `bridget`. No calculator code.
+- [~] **M1.3 Package skeleton** (open pull request): the empty boxes. No calculator code, no data.
+  - [~] Workspace root with TypeScript, vitest and a build; versions pinned, lockfile committed
+  - [~] Four stubs: `@waterbots/core`, `calvin`, `phoebe`, `bridget`. Each builds, has one trivial test, an Apache 2.0
+        `LICENSE` and `NOTICE`, and a README that says it is empty for now. All marked `private`: nothing goes to npm.
+  - [~] `scripts/check-packages.mjs`, run by the test job: keeps every package private, licensed and empty-for-now
+  - [ ] Later, own pull requests: the real plug points in `core` (`ModuleProject`, `StandardId`, `SaveOutcome`, the
+        agent contract, design tokens and base stylesheet); Calvin's folders arrive with the seed (M2).
 - **M1.4 Amy's hand-steps** — blocked until Amy; Session C cannot do these. **Due before the first release (M2.2).**
   - [!] Branch protection on `main`: a pull request before merging, every check required, no force pushes or
         deletions, applied to admins too. Can be done now; steps are in pull request #1.
