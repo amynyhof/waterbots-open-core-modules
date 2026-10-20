@@ -84,6 +84,10 @@ Everything here is public: README, docs, cards, screen text, commit messages, PR
 - A credit price. It was removed from the module and appears nowhere.
 - Any key, token or password.
 
-### Banned words
+### Words (Amy, 19 Oct 2026)
 
-Waiting on Amy: the brief Session C received does not include a banned-word list. Add it here when she supplies it.
+- **"golden" is banned.** Always say "reference" instead (a reference case, a reference value).
+- **WaterBots never says it validates.** "Validate" and "validation" may appear only when explaining what validation
+  is and who does it: external auditors.
+- **Never call the site or any module a demo.** It is the real thing.
+- No other words are banned.
