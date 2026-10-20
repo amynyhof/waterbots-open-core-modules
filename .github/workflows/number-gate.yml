@@ -1,0 +1,47 @@
+# The public number gate (ruling N2). PLACEHOLDER: it does not look for figures yet.
+#
+# The real gate, still to come:
+#   - The private side makes a keyed fingerprint (HMAC-SHA256) of every figure and word to hunt.
+#   - The key and the fingerprint list are GitHub Actions secrets set by Amy:
+#     NUMBER_GATE_KEY and NUMBER_GATE_FINGERPRINTS. They never sit in a file.
+#   - CI fingerprints every number and word in the tree with the same key. Any match fails.
+#   - A missing key FAILS the run. It never skips. Fork pull requests get no secrets, so they
+#     fail until a maintainer reruns them.
+#   - Figures under three significant digits cannot be told apart by value; they are read by eye
+#     at every release.
+#
+# Until then this job passes with a warning, so its name ("number gate") can already be made a
+# required check. Meanwhile, lane 3 (Amy plus outside AI review) is what catches figures and names.
+
+name: number gate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  number-gate:
+    name: number gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Placeholder
+        env:
+          GATE_MODE: placeholder
+          HAS_KEY: ${{ secrets.NUMBER_GATE_KEY != '' }}
+          HAS_LIST: ${{ secrets.NUMBER_GATE_FINGERPRINTS != '' }}
+        run: |
+          if [ "$GATE_MODE" != "placeholder" ]; then
+            echo "::error::GATE_MODE is not 'placeholder' but the keyed-fingerprint gate is not built."
+            exit 1
+          fi
+          echo "::warning title=Number gate is a placeholder::This run did not check for real figures. The keyed-fingerprint gate comes later."
+          {
+            echo "## Number gate: placeholder"
+            echo "Nothing was checked for real figures."
+            echo "- key secret set: $HAS_KEY"
+            echo "- fingerprint list secret set: $HAS_LIST"
+          } >> "$GITHUB_STEP_SUMMARY"
