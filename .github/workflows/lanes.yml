@@ -1,0 +1,112 @@
+# Merge lanes: labels every pull request "lane 1", "lane 2" or "lane 3" from the files it changes.
+# The rule is .github/lanes/lane-rule.mjs. Changing this file or the rule is a lane 3 change.
+#
+# Why pull_request_target: it runs the copy of this workflow and the rule that is already on main,
+# so a pull request cannot change the rule and relabel itself. It never checks out or runs the
+# pull request's code; it only asks GitHub for the list of changed file names.
+
+name: lanes
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, edited, ready_for_review, labeled, unlabeled]
+
+permissions: {}
+
+concurrency:
+  group: lanes-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  label:
+    name: lane label
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    outputs:
+      lane: ${{ steps.lane.outputs.lane }}
+    steps:
+      # The base branch (main), never the pull request's code.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: List the changed files
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          gh api --paginate --slurp "repos/$REPO/pulls/$PR/files?per_page=100" \
+            | jq '[.[][] | {filename, previous_filename}]' > "$RUNNER_TEMP/files.json"
+          jq -r '.[] | .filename' "$RUNNER_TEMP/files.json"
+
+      - name: Decide the lane
+        id: lane
+        run: |
+          lane=$(node .github/lanes/lane-rule.mjs "$RUNNER_TEMP/files.json" || true)
+          case "$lane" in 1|2|3) ;; *) lane=3 ;; esac
+          echo "lane=$lane" >> "$GITHUB_OUTPUT"
+          echo "This pull request is **lane $lane**." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Apply the label
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          LANE: ${{ steps.lane.outputs.lane }}
+        run: |
+          set -euo pipefail
+          declare -A colour=([1]=0e8a16 [2]=fbca04 [3]=d93f0b)
+          declare -A about=([1]="Plain-writing files only. Amy merges with one click." \
+                            [2]="Visitors see it. Amy merges, then checks the live site." \
+                            [3]="Amy reviews, plus outside AI review.")
+          for n in 1 2 3; do
+            if ! gh api "repos/$REPO/labels/lane%20$n" --silent 2>/dev/null; then
+              gh api -X POST "repos/$REPO/labels" -f name="lane $n" -f color="${colour[$n]}" \
+                -f description="${about[$n]}" --silent
+            fi
+          done
+          current=$(gh api "repos/$REPO/issues/$PR/labels" --jq '.[].name')
+          for n in 1 2 3; do
+            if [ "$n" != "$LANE" ] && grep -qx "lane $n" <<<"$current"; then
+              gh api -X DELETE "repos/$REPO/issues/$PR/labels/lane%20$n" --silent
+            fi
+          done
+          if ! grep -qx "lane $LANE" <<<"$current"; then
+            gh api -X POST "repos/$REPO/issues/$PR/labels" -f "labels[]=lane $LANE" --silent
+          fi
+
+  # Lane 1 auto-merge: built, and OFF.
+  # It stays off until the keyed-fingerprint number gate is real (ruling N2). Two switches must both
+  # be on: the repo variable LANE1_AUTO_MERGE (Amy sets it) and AUTO_MERGE below (a lane 3 change).
+  # It also needs branch protection on main that requires every check, or it would merge at once.
+  auto-merge:
+    name: lane 1 auto-merge (off)
+    needs: label
+    if: vars.LANE1_AUTO_MERGE == 'on'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Arm or disarm auto-merge
+        env:
+          AUTO_MERGE: "off"
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          LANE: ${{ needs.label.outputs.lane }}
+          DRAFT: ${{ github.event.pull_request.draft }}
+        run: |
+          if [ "$AUTO_MERGE" != "on" ]; then
+            echo "Auto-merge is off. Amy merges by hand."
+            exit 0
+          fi
+          if [ "$LANE" = "1" ] && [ "$DRAFT" != "true" ]; then
+            gh pr merge "$PR" -R "$REPO" --auto --squash
+          else
+            gh pr merge "$PR" -R "$REPO" --disable-auto || true
+          fi
