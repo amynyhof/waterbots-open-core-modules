@@ -11,7 +11,7 @@
 #     at every release.
 #
 # Until then this job passes with a warning, so its name ("number gate") can already be made a
-# required check. Lane 1 auto-merge stays off while GATE_MODE is "placeholder".
+# required check. Meanwhile, lane 3 (Amy plus outside AI review) is what catches figures and names.
 
 name: number gate
 

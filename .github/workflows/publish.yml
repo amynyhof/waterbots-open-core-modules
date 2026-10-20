@@ -3,7 +3,8 @@
 #
 # It refuses to run unless: the tagged commit is on main; there are packages to publish; the npm
 # scope is real (not the "@<scope>" placeholder); and the NPM_TOKEN secret is set.
-# It runs in the "npm-publish" environment, so Amy can require her own approval for each release.
+# It runs in the "npm-publish" environment. Amy's approval is required for every release: she is the
+# environment's required reviewer, and only she may create v* tags.
 
 name: publish
 
