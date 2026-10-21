@@ -4,6 +4,37 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-10-20 — M1.3 Amy's answers on the pull request
+
+**Done (same branch, `m1-3-package-skeleton`):**
+- Copyright line "Copyright 2026 WaterBots AI, LLC" in the root `LICENSE` and in every package's `LICENSE` and `NOTICE`.
+- Node pinned to one exact version, 24.20.0, in `ci.yml`, `publish.yml` and the root `engines` field.
+- `scripts/check-packages.mjs` now also checks the copyright line and the exact Node version.
+- `BUILD_PLAN.md`: at the seed (M2.1), show the carried calculator builds and tests the same under these versions.
+
+**Kept by Amy:** the `@waterbots` names (the scope is her open step N13); the tools; `publish.yml` left alone, since
+the `private` flag and the check are the lock.
+
+## 2026-10-20 — M1.3 Package skeleton
+
+**Done (open pull request, branch `m1-3-package-skeleton`):**
+- Workspace root: `package.json` (private), `tsconfig.base.json`, `package-lock.json`. TypeScript 7.0.2, vitest 5.0.5
+  and `@types/node` 26.6.5, pinned exactly.
+- Four stub packages under `packages/`: `@waterbots/core`, `calvin`, `phoebe`, `bridget`. Each is marked `private` and
+  version `0.0.0`, builds with `tsc`, has one trivial test, an Apache 2.0 `LICENSE` and `NOTICE`, and a README that says
+  "empty for now — Calvin arrives by a one-time seed".
+- `scripts/check-packages.mjs`, run by `npm test`: every package stays private, Apache-2.0, carries a copy of the root
+  `LICENSE`, and says it is empty for now.
+- The typecheck, test and build checks in CI now run for real.
+
+**Checked locally:** clean `npm ci --ignore-scripts`, typecheck, test and build all pass. `npm publish --dry-run` skips
+the packages as private. The guard fails when a package is made public.
+
+**Open:** the real plug points in `core` (later pull request). The `NOTICE` files name no copyright holder; Amy to say
+what they should carry.
+
+---
+
 ## 2026-10-19 — M1.1 Fixes after the outside review
 
 **Done (same branch, `m1-ci-guards`):**
