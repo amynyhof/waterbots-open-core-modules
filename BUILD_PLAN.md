@@ -112,6 +112,24 @@ The first release does not wait for this.
 
 ---
 
+## Safety passes
+
+Amy's safety passes cover all three repos. This repo's own parts are listed here.
+
+- [ ] **SP6 — Human engineer review of the structure**, covering all three repos. A human engineer reads how the
+      repos are laid out and how they fit together, and reports. Do it now. It does **not** block any M step.
+
+## Code standards
+
+- **Strict typing is on from day one.** `tsconfig.base.json` sets `strict` plus extra checks (unchecked indexed
+  access, exact optional properties, no implicit override, verbatim module syntax). Every package extends it, and the
+  `typecheck` check must pass on every pull request.
+- **Linting is not set up yet.** Only strict typing is on today. Adding a linter is its own pull request (lane 3).
+- [ ] **M1.6 Linting:** add a linter that runs as part of CI, with the strictest settings that fit. Ahead of the seed
+      (M2) so the carried calculator is held to it from the start.
+
+---
+
 ## Open questions
 
 - **N2:** Amy may revisit the number gate's design before M1.2.
