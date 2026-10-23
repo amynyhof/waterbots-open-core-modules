@@ -68,6 +68,10 @@ A commit that mixes kinds of work is split into two commits. Every pull request'
   bucket, and anything that needs her decision.
 - Update `BUILD_LOG.md` with what was done; tick items in `BUILD_PLAN.md`.
 
+## Close-out
+
+At each family close, tidy what you touched (dead code, stale notes, duplicate logic) as part of close-out.
+
 ## Plain-English public copy
 
 Everything here is public: README, docs, cards, screen text, commit messages, PR descriptions.
