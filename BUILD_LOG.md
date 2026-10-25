@@ -4,6 +4,16 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-10-25 — Tidy paths and comments
+
+**Done (open pull request, branch `tidy-paths-and-comments`):**
+- Checked every tracked file, every file name, the git history and the pull request text against Amy's private list.
+  The list stayed where it is and was not copied. Nothing needed changing.
+- `CLAUDE.md`: two rules. Never write a person's folder path or Windows username into the repo. Pull request titles,
+  commit messages and descriptions never name what is being removed.
+
+**Checked:** counts only, no names. Whole-word matches found nothing in files, file names, history or pull requests.
+
 ## 2026-10-20 — M1.3 Amy's answers on the pull request
 
 **Done (same branch, `m1-3-package-skeleton`):**
