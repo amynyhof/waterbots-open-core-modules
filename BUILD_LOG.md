@@ -4,6 +4,30 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-10-25 — M2.1 Add calculator module (the Calvin seed)
+
+**Done (open pull request, branch `add-calculator-module`):**
+- The Calvin seed, read from Amy's handoff folder and installed into `packages/core` and `packages/calvin`. 65 of the
+  seed's 67 listed files are installed and match their fingerprints. `README.md` and `MANIFEST.md` are not installed.
+  Both packages stay private, version 0.0.0, unpublished.
+- `SEEDS.md`: the ledger row (seal tag `calculator-seal-2026-10-25`, commit `c94ccc1`, 2026-10-25, the list's
+  fingerprint), each check's result, and the known gaps.
+- `seeds/calvin/carry-hashes.sha256`: the seed's own list, kept as it arrived. `scripts/check-seed.mjs` checks the
+  installed files against it on every `npm test`.
+- Two scans, with tests on invented inputs: `scripts/check-names.mjs` (reads the private list in place, matches whole
+  words, fails closed, never prints a name; run by hand, not in CI) and `scripts/check-paid-code.mjs` (runs in `npm test`).
+- Six small files in `packages/calvin/src/modules/core/` pass the seed's shared imports on to `@waterbots/core`, so no
+  seed file was edited. `.gitattributes` keeps seeded files' line endings as they are.
+- `BUILD_PLAN.md`: linting moved from M1.6 to M2.3, after the seed.
+
+**Checked:** fingerprints 67 of 67; the folder holds exactly the files `MANIFEST.md` lists; rights; both scans on the
+seed (no finding); typecheck passes; the seed's own tests pass (13 files, 84 tests); the prove-the-numbers test passes
+(48 of 48).
+
+**Open:** the number gate and the copied-text check could not run here and rest on Session A's results (known gap).
+Two extra typing checks are off for `calvin`. No reviewed-version ledger file came with the seed. Some comments in the
+seed use words the word rules restrict. All four are in `SEEDS.md`.
+
 ## 2026-10-23 — Safety pass SP6 and the close-out rule
 
 **Done (open pull request, branch `sp6-review-and-closeout`):**
