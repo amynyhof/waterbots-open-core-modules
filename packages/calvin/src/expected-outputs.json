@@ -1,0 +1,2522 @@
+{
+  "about": "The engine's results on made-up test cases only. No case here is a real filing, and no figure here comes from one. Each case gives the inputs and what the engine returned for them.",
+  "engine": "gs4gg-carbon",
+  "engineVersion": "0.19.0",
+  "sealTag": "calculator-seal-2026-10-25",
+  "commit": "c94ccc1c9f099cd118e1d5e80884bb7a9db73f14",
+  "generatedWith": {
+    "node": "24.20.0",
+    "vitest": "5.0.5",
+    "typescript": "7.0.2"
+  },
+  "compare": "Exact. Every output is a JavaScript number as the engine returned it, or a refusal message. The prove-the-numbers test in README.md re-runs every case and expects the same values.",
+  "howEachCaseRuns": {
+    "cases": "If baselineEdit is present, resolveBaselineEdit(baselineEdit, calc) supplies stoveStrata and fuelMix. If quantityInputs is present, computeQuantity(quantityInputs) supplies Q_pop and Q_m, and its own outputs are recorded. Then computePaaEr(inputs) when calc is paa, else computeLegacyEr(inputs). Only finite numeric outputs are recorded.",
+    "fnrbCases": "computeScenario(scenarioInput). The recorded output is fNRB and the multi-national region, or the refusal message when the engine refuses with FnrbUnavailableError."
+  },
+  "counts": {
+    "cases": 45,
+    "fnrbCases": 2
+  },
+  "cases": [
+    {
+      "id": "synthetic-inst-01",
+      "kind": "synthetic",
+      "calc": "paa",
+      "inputs": {
+        "method": 2,
+        "SE_o": 360,
+        "fNRB": 0.5,
+        "stoveStrata": [
+          {
+            "share": 1,
+            "eta": 0.2
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 1,
+            "ef_co2": 100,
+            "ef_nonco2": 10
+          }
+        ],
+        "Q_pop": 4000000,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 0.95,
+        "U_p": 0.9,
+        "DAF": 0.0345,
+        "PE": 0,
+        "leakage": {
+          "option": 1
+        }
+      },
+      "outputs": {
+        "EF_b": 0.000108,
+        "Q_y": 4000000,
+        "Q_adj": 3420000,
+        "BE_unadj": 410.3999999999999,
+        "BE_u": 350.89199999999994,
+        "BE_downadj": 338.78622599999994,
+        "BE_BAU": 350.89199999999994,
+        "BE_CB": 338.78622599999994,
+        "MC": 12.105773999999997,
+        "PE": 0,
+        "leakageOption": 1,
+        "LE_market": 6.775724519999999,
+        "LE_embodied": 0,
+        "LE": 6.775724519999999,
+        "ER": 332.01050147999996
+      }
+    },
+    {
+      "id": "synthetic-embodied-upfront-01",
+      "kind": "synthetic",
+      "calc": "paa",
+      "inputs": {
+        "method": 2,
+        "SE_o": 360,
+        "fNRB": 0.5,
+        "stoveStrata": [
+          {
+            "share": 1,
+            "eta": 0.2
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 1,
+            "ef_co2": 100,
+            "ef_nonco2": 10
+          }
+        ],
+        "Q_pop": 4000000,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 0.95,
+        "U_p": 0.9,
+        "DAF": 0.0345,
+        "PE": 0,
+        "leakage": {
+          "option": 1
+        },
+        "embodied": {
+          "unitsInYear": 10000,
+          "factor": 0.008,
+          "route": "upfront"
+        }
+      },
+      "outputs": {
+        "EF_b": 0.000108,
+        "Q_y": 4000000,
+        "Q_adj": 3420000,
+        "BE_unadj": 410.3999999999999,
+        "BE_u": 350.89199999999994,
+        "BE_downadj": 338.78622599999994,
+        "BE_BAU": 350.89199999999994,
+        "BE_CB": 338.78622599999994,
+        "MC": 12.105773999999997,
+        "PE": 0,
+        "leakageOption": 1,
+        "LE_market": 6.775724519999999,
+        "LE_embodied": 80,
+        "LE": 86.77572452,
+        "ER": 252.01050147999996
+      }
+    },
+    {
+      "id": "synthetic-embodied-amortised-01",
+      "kind": "synthetic",
+      "calc": "paa",
+      "inputs": {
+        "method": 2,
+        "SE_o": 360,
+        "fNRB": 0.5,
+        "stoveStrata": [
+          {
+            "share": 1,
+            "eta": 0.2
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 1,
+            "ef_co2": 100,
+            "ef_nonco2": 10
+          }
+        ],
+        "Q_pop": 4000000,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 0.95,
+        "U_p": 0.9,
+        "DAF": 0.0345,
+        "PE": 0,
+        "leakage": {
+          "option": 1
+        },
+        "embodied": {
+          "unitsInYear": 10000,
+          "factor": 0.008,
+          "route": "amortised"
+        }
+      },
+      "outputs": {
+        "EF_b": 0.000108,
+        "Q_y": 4000000,
+        "Q_adj": 3420000,
+        "BE_unadj": 410.3999999999999,
+        "BE_u": 350.89199999999994,
+        "BE_downadj": 338.78622599999994,
+        "BE_BAU": 350.89199999999994,
+        "BE_CB": 338.78622599999994,
+        "MC": 12.105773999999997,
+        "PE": 0,
+        "leakageOption": 1,
+        "LE_market": 6.775724519999999,
+        "LE_embodied": 16,
+        "LE": 22.775724519999997,
+        "ER": 316.01050147999996
+      }
+    },
+    {
+      "id": "synthetic-hwt-eq7-device-binds-01",
+      "kind": "synthetic",
+      "calc": "paa",
+      "inputs": {
+        "method": 2,
+        "SE_o": 360,
+        "fNRB": 0.5,
+        "stoveStrata": [
+          {
+            "share": 1,
+            "eta": 0.2
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 1,
+            "ef_co2": 100,
+            "ef_nonco2": 10
+          }
+        ],
+        "Q_pop": 0,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "U_p": 0.9,
+        "DAF": 0.0345,
+        "PE": 0,
+        "leakage": {
+          "option": 1
+        }
+      },
+      "quantityInputs": {
+        "version": "paa",
+        "method": 2,
+        "people": 5000,
+        "litresPerPersonPerDay": 4,
+        "operationalDays": 365,
+        "meteredVolumeL": null,
+        "usageRate": 0.9,
+        "premises": 1000,
+        "deviceCapacityLPerHour": 1.7,
+        "usageHoursPerDay": 5,
+        "devicesPerPremises": 1
+      },
+      "outputs": {
+        "qpwPerPremises": 8.5,
+        "Q_pop": 3102500,
+        "deviceMinApplied": 1,
+        "EF_b": 0.000108,
+        "Q_y": 3102500,
+        "Q_adj": 2792250,
+        "BE_unadj": 318.31649999999996,
+        "BE_u": 286.48484999999994,
+        "BE_downadj": 276.60112267499994,
+        "BE_BAU": 286.48484999999994,
+        "BE_CB": 276.60112267499994,
+        "MC": 9.883727324999995,
+        "PE": 0,
+        "leakageOption": 1,
+        "LE_market": 5.532022453499999,
+        "LE_embodied": 0,
+        "LE": 5.532022453499999,
+        "ER": 271.0691002214999
+      }
+    },
+    {
+      "id": "synthetic-hwt-eq7-people-binds-01",
+      "kind": "synthetic",
+      "calc": "paa",
+      "inputs": {
+        "method": 2,
+        "SE_o": 360,
+        "fNRB": 0.5,
+        "stoveStrata": [
+          {
+            "share": 1,
+            "eta": 0.2
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 1,
+            "ef_co2": 100,
+            "ef_nonco2": 10
+          }
+        ],
+        "Q_pop": 0,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "U_p": 0.9,
+        "DAF": 0.0345,
+        "PE": 0,
+        "leakage": {
+          "option": 1
+        }
+      },
+      "quantityInputs": {
+        "version": "paa",
+        "method": 2,
+        "people": 5000,
+        "litresPerPersonPerDay": 4,
+        "operationalDays": 365,
+        "meteredVolumeL": null,
+        "usageRate": 0.9,
+        "premises": 1000,
+        "deviceCapacityLPerHour": 10,
+        "usageHoursPerDay": 5,
+        "devicesPerPremises": 1
+      },
+      "outputs": {
+        "qpwPerPremises": 20,
+        "Q_pop": 7300000,
+        "deviceMinApplied": 0,
+        "EF_b": 0.000108,
+        "Q_y": 7300000,
+        "Q_adj": 6570000,
+        "BE_unadj": 748.9799999999999,
+        "BE_u": 674.0819999999999,
+        "BE_downadj": 650.8261709999999,
+        "BE_BAU": 674.0819999999999,
+        "BE_CB": 650.8261709999999,
+        "MC": 23.25582899999995,
+        "PE": 0,
+        "leakageOption": 1,
+        "LE_market": 13.016523419999999,
+        "LE_embodied": 0,
+        "LE": 13.016523419999999,
+        "ER": 637.8096475799999
+      }
+    },
+    {
+      "id": "synthetic-daf-01",
+      "kind": "synthetic",
+      "calc": "paa",
+      "inputs": {
+        "method": 1,
+        "SE_o": 360,
+        "fNRB": 0.5,
+        "stoveStrata": [
+          {
+            "share": 1,
+            "eta": 0.2
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 1,
+            "ef_co2": 100,
+            "ef_nonco2": 10
+          }
+        ],
+        "Q_pop": 100000000,
+        "Q_m": null,
+        "C_b": 0.1,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "DAF": 0.1111,
+        "PE": 0,
+        "leakage": {
+          "option": 1
+        }
+      },
+      "outputs": {
+        "EF_b": 0.000108,
+        "Q_y": 100000000,
+        "Q_adj": 100000000,
+        "BE_unadj": 9720,
+        "BE_u": 9720,
+        "BE_downadj": 8640.108,
+        "BE_BAU": 9720,
+        "BE_CB": 8640.108,
+        "MC": 1079.8919999999998,
+        "PE": 0,
+        "leakageOption": 1,
+        "LE_market": 172.80216000000001,
+        "LE_embodied": 0,
+        "LE": 172.80216000000001,
+        "ER": 8467.30584
+      }
+    },
+    {
+      "id": "cws-ind-hi",
+      "kind": "synthetic",
+      "calc": "legacy",
+      "inputs": {
+        "method": 1,
+        "SE_o": 360.83,
+        "fNRB": 0.07,
+        "stoveStrata": [
+          {
+            "share": 0.8,
+            "eta": 0.1
+          },
+          {
+            "share": 0.2,
+            "eta": 0.1
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 0.8,
+            "ef_co2": 112,
+            "ef_nonco2": 9.46
+          },
+          {
+            "fuel": "charcoal",
+            "energyFraction": 0.2,
+            "ef_co2": 165.22,
+            "ef_nonco2": 44.83
+          }
+        ],
+        "Q_pop": 66000000,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "PE": 0,
+        "LE": 0
+      },
+      "outputs": {
+        "eta_weighted": 0.10000000000000002,
+        "SE": 3608.2999999999993,
+        "combinedEF": 25.119080000000004,
+        "EF_b": 0.000090637176364,
+        "Q_y": 66000000,
+        "BE": 5682.9509580228005,
+        "PE": 0,
+        "LE": 0,
+        "ER": 5682.9509580228005
+      }
+    },
+    {
+      "id": "cws-ind-lo",
+      "kind": "synthetic",
+      "calc": "legacy",
+      "inputs": {
+        "method": 1,
+        "SE_o": 360.83,
+        "fNRB": 0.07,
+        "stoveStrata": [
+          {
+            "share": 0.8,
+            "eta": 0.1
+          },
+          {
+            "share": 0.2,
+            "eta": 0.1
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 0.8,
+            "ef_co2": 112,
+            "ef_nonco2": 9.46
+          },
+          {
+            "fuel": "charcoal",
+            "energyFraction": 0.2,
+            "ef_co2": 165.22,
+            "ef_nonco2": 44.83
+          }
+        ],
+        "Q_pop": 13200000,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "PE": 0,
+        "LE": 0
+      },
+      "outputs": {
+        "eta_weighted": 0.10000000000000002,
+        "SE": 3608.2999999999993,
+        "combinedEF": 25.119080000000004,
+        "EF_b": 0.000090637176364,
+        "Q_y": 13200000,
+        "BE": 1136.59019160456,
+        "PE": 0,
+        "LE": 0,
+        "ER": 1136.59019160456
+      }
+    },
+    {
+      "id": "cws-ken-hi",
+      "kind": "synthetic",
+      "calc": "legacy",
+      "inputs": {
+        "method": 1,
+        "SE_o": 360.83,
+        "fNRB": 0.29,
+        "stoveStrata": [
+          {
+            "share": 0.8,
+            "eta": 0.1
+          },
+          {
+            "share": 0.2,
+            "eta": 0.1
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 0.8,
+            "ef_co2": 112,
+            "ef_nonco2": 9.46
+          },
+          {
+            "fuel": "charcoal",
+            "energyFraction": 0.2,
+            "ef_co2": 165.22,
+            "ef_nonco2": 44.83
+          }
+        ],
+        "Q_pop": 66000000,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "PE": 0,
+        "LE": 0
+      },
+      "outputs": {
+        "eta_weighted": 0.10000000000000002,
+        "SE": 3608.2999999999993,
+        "combinedEF": 52.100759999999994,
+        "EF_b": 0.00018799517230799995,
+        "Q_y": 66000000,
+        "BE": 11787.297303711595,
+        "PE": 0,
+        "LE": 0,
+        "ER": 11787.297303711595
+      }
+    },
+    {
+      "id": "cws-ken-lo",
+      "kind": "synthetic",
+      "calc": "legacy",
+      "inputs": {
+        "method": 1,
+        "SE_o": 360.83,
+        "fNRB": 0.29,
+        "stoveStrata": [
+          {
+            "share": 0.8,
+            "eta": 0.1
+          },
+          {
+            "share": 0.2,
+            "eta": 0.1
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 0.8,
+            "ef_co2": 112,
+            "ef_nonco2": 9.46
+          },
+          {
+            "fuel": "charcoal",
+            "energyFraction": 0.2,
+            "ef_co2": 165.22,
+            "ef_nonco2": 44.83
+          }
+        ],
+        "Q_pop": 13200000,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "PE": 0,
+        "LE": 0
+      },
+      "outputs": {
+        "eta_weighted": 0.10000000000000002,
+        "SE": 3608.2999999999993,
+        "combinedEF": 52.100759999999994,
+        "EF_b": 0.00018799517230799995,
+        "Q_y": 13200000,
+        "BE": 2357.459460742319,
+        "PE": 0,
+        "LE": 0,
+        "ER": 2357.459460742319
+      }
+    },
+    {
+      "id": "cws-uga-hi",
+      "kind": "synthetic",
+      "calc": "legacy",
+      "inputs": {
+        "method": 1,
+        "SE_o": 360.83,
+        "fNRB": 0.39,
+        "stoveStrata": [
+          {
+            "share": 0.8,
+            "eta": 0.1
+          },
+          {
+            "share": 0.2,
+            "eta": 0.1
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 0.8,
+            "ef_co2": 112,
+            "ef_nonco2": 9.46
+          },
+          {
+            "fuel": "charcoal",
+            "energyFraction": 0.2,
+            "ef_co2": 165.22,
+            "ef_nonco2": 44.83
+          }
+        ],
+        "Q_pop": 66000000,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "PE": 0,
+        "LE": 0
+      },
+      "outputs": {
+        "eta_weighted": 0.10000000000000002,
+        "SE": 3608.2999999999993,
+        "combinedEF": 64.36516,
+        "EF_b": 0.00023224880682799998,
+        "Q_y": 66000000,
+        "BE": 14562.000188115597,
+        "PE": 0,
+        "LE": 0,
+        "ER": 14562.000188115597
+      }
+    },
+    {
+      "id": "cws-uga-lo",
+      "kind": "synthetic",
+      "calc": "legacy",
+      "inputs": {
+        "method": 1,
+        "SE_o": 360.83,
+        "fNRB": 0.39,
+        "stoveStrata": [
+          {
+            "share": 0.8,
+            "eta": 0.1
+          },
+          {
+            "share": 0.2,
+            "eta": 0.1
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 0.8,
+            "ef_co2": 112,
+            "ef_nonco2": 9.46
+          },
+          {
+            "fuel": "charcoal",
+            "energyFraction": 0.2,
+            "ef_co2": 165.22,
+            "ef_nonco2": 44.83
+          }
+        ],
+        "Q_pop": 13200000,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "PE": 0,
+        "LE": 0
+      },
+      "outputs": {
+        "eta_weighted": 0.10000000000000002,
+        "SE": 3608.2999999999993,
+        "combinedEF": 64.36516,
+        "EF_b": 0.00023224880682799998,
+        "Q_y": 13200000,
+        "BE": 2912.4000376231193,
+        "PE": 0,
+        "LE": 0,
+        "ER": 2912.4000376231193
+      }
+    },
+    {
+      "id": "cws-mwi-hi",
+      "kind": "synthetic",
+      "calc": "legacy",
+      "inputs": {
+        "method": 1,
+        "SE_o": 360.83,
+        "fNRB": 0.48,
+        "stoveStrata": [
+          {
+            "share": 0.8,
+            "eta": 0.1
+          },
+          {
+            "share": 0.2,
+            "eta": 0.1
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 0.8,
+            "ef_co2": 112,
+            "ef_nonco2": 9.46
+          },
+          {
+            "fuel": "charcoal",
+            "energyFraction": 0.2,
+            "ef_co2": 165.22,
+            "ef_nonco2": 44.83
+          }
+        ],
+        "Q_pop": 66000000,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "PE": 0,
+        "LE": 0
+      },
+      "outputs": {
+        "eta_weighted": 0.10000000000000002,
+        "SE": 3608.2999999999993,
+        "combinedEF": 75.40312,
+        "EF_b": 0.00027207707789599994,
+        "Q_y": 66000000,
+        "BE": 17059.232784079195,
+        "PE": 0,
+        "LE": 0,
+        "ER": 17059.232784079195
+      }
+    },
+    {
+      "id": "cws-mwi-lo",
+      "kind": "synthetic",
+      "calc": "legacy",
+      "inputs": {
+        "method": 1,
+        "SE_o": 360.83,
+        "fNRB": 0.48,
+        "stoveStrata": [
+          {
+            "share": 0.8,
+            "eta": 0.1
+          },
+          {
+            "share": 0.2,
+            "eta": 0.1
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 0.8,
+            "ef_co2": 112,
+            "ef_nonco2": 9.46
+          },
+          {
+            "fuel": "charcoal",
+            "energyFraction": 0.2,
+            "ef_co2": 165.22,
+            "ef_nonco2": 44.83
+          }
+        ],
+        "Q_pop": 13200000,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "PE": 0,
+        "LE": 0
+      },
+      "outputs": {
+        "eta_weighted": 0.10000000000000002,
+        "SE": 3608.2999999999993,
+        "combinedEF": 75.40312,
+        "EF_b": 0.00027207707789599994,
+        "Q_y": 13200000,
+        "BE": 3411.846556815839,
+        "PE": 0,
+        "LE": 0,
+        "ER": 3411.846556815839
+      }
+    },
+    {
+      "id": "cws-tza-hi",
+      "kind": "synthetic",
+      "calc": "legacy",
+      "inputs": {
+        "method": 1,
+        "SE_o": 360.83,
+        "fNRB": 0.51,
+        "stoveStrata": [
+          {
+            "share": 0.8,
+            "eta": 0.1
+          },
+          {
+            "share": 0.2,
+            "eta": 0.1
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 0.8,
+            "ef_co2": 112,
+            "ef_nonco2": 9.46
+          },
+          {
+            "fuel": "charcoal",
+            "energyFraction": 0.2,
+            "ef_co2": 165.22,
+            "ef_nonco2": 44.83
+          }
+        ],
+        "Q_pop": 66000000,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "PE": 0,
+        "LE": 0
+      },
+      "outputs": {
+        "eta_weighted": 0.10000000000000002,
+        "SE": 3608.2999999999993,
+        "combinedEF": 79.08244,
+        "EF_b": 0.00028535316825199997,
+        "Q_y": 66000000,
+        "BE": 17891.643649400397,
+        "PE": 0,
+        "LE": 0,
+        "ER": 17891.643649400397
+      }
+    },
+    {
+      "id": "cws-tza-lo",
+      "kind": "synthetic",
+      "calc": "legacy",
+      "inputs": {
+        "method": 1,
+        "SE_o": 360.83,
+        "fNRB": 0.51,
+        "stoveStrata": [
+          {
+            "share": 0.8,
+            "eta": 0.1
+          },
+          {
+            "share": 0.2,
+            "eta": 0.1
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 0.8,
+            "ef_co2": 112,
+            "ef_nonco2": 9.46
+          },
+          {
+            "fuel": "charcoal",
+            "energyFraction": 0.2,
+            "ef_co2": 165.22,
+            "ef_nonco2": 44.83
+          }
+        ],
+        "Q_pop": 13200000,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "PE": 0,
+        "LE": 0
+      },
+      "outputs": {
+        "eta_weighted": 0.10000000000000002,
+        "SE": 3608.2999999999993,
+        "combinedEF": 79.08244,
+        "EF_b": 0.00028535316825199997,
+        "Q_y": 13200000,
+        "BE": 3578.3287298800797,
+        "PE": 0,
+        "LE": 0,
+        "ER": 3578.3287298800797
+      }
+    },
+    {
+      "id": "cws-ner-hi",
+      "kind": "synthetic",
+      "calc": "legacy",
+      "inputs": {
+        "method": 1,
+        "SE_o": 360.83,
+        "fNRB": 0.61,
+        "stoveStrata": [
+          {
+            "share": 0.8,
+            "eta": 0.1
+          },
+          {
+            "share": 0.2,
+            "eta": 0.1
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 0.8,
+            "ef_co2": 112,
+            "ef_nonco2": 9.46
+          },
+          {
+            "fuel": "charcoal",
+            "energyFraction": 0.2,
+            "ef_co2": 165.22,
+            "ef_nonco2": 44.83
+          }
+        ],
+        "Q_pop": 66000000,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "PE": 0,
+        "LE": 0
+      },
+      "outputs": {
+        "eta_weighted": 0.10000000000000002,
+        "SE": 3608.2999999999993,
+        "combinedEF": 91.34684,
+        "EF_b": 0.0003296068027719999,
+        "Q_y": 66000000,
+        "BE": 20666.346533804393,
+        "PE": 0,
+        "LE": 0,
+        "ER": 20666.346533804393
+      }
+    },
+    {
+      "id": "cws-ner-lo",
+      "kind": "synthetic",
+      "calc": "legacy",
+      "inputs": {
+        "method": 1,
+        "SE_o": 360.83,
+        "fNRB": 0.61,
+        "stoveStrata": [
+          {
+            "share": 0.8,
+            "eta": 0.1
+          },
+          {
+            "share": 0.2,
+            "eta": 0.1
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 0.8,
+            "ef_co2": 112,
+            "ef_nonco2": 9.46
+          },
+          {
+            "fuel": "charcoal",
+            "energyFraction": 0.2,
+            "ef_co2": 165.22,
+            "ef_nonco2": 44.83
+          }
+        ],
+        "Q_pop": 13200000,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "PE": 0,
+        "LE": 0
+      },
+      "outputs": {
+        "eta_weighted": 0.10000000000000002,
+        "SE": 3608.2999999999993,
+        "combinedEF": 91.34684,
+        "EF_b": 0.0003296068027719999,
+        "Q_y": 13200000,
+        "BE": 4133.269306760879,
+        "PE": 0,
+        "LE": 0,
+        "ER": 4133.269306760879
+      }
+    },
+    {
+      "id": "hwt-ind-hi",
+      "kind": "synthetic",
+      "calc": "legacy",
+      "inputs": {
+        "method": 2,
+        "SE_o": 360.83,
+        "fNRB": 0.07,
+        "stoveStrata": [
+          {
+            "share": 0.8,
+            "eta": 0.1
+          },
+          {
+            "share": 0.2,
+            "eta": 0.1
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 0.8,
+            "ef_co2": 112,
+            "ef_nonco2": 9.46
+          },
+          {
+            "fuel": "charcoal",
+            "energyFraction": 0.2,
+            "ef_co2": 165.22,
+            "ef_nonco2": 44.83
+          }
+        ],
+        "Q_pop": 59400000,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "PE": 0,
+        "LE": 0
+      },
+      "outputs": {
+        "eta_weighted": 0.10000000000000002,
+        "SE": 3608.2999999999993,
+        "combinedEF": 25.119080000000004,
+        "EF_b": 0.000090637176364,
+        "Q_y": 59400000,
+        "BE": 5114.65586222052,
+        "PE": 0,
+        "LE": 0,
+        "ER": 5114.65586222052
+      }
+    },
+    {
+      "id": "hwt-ind-lo",
+      "kind": "synthetic",
+      "calc": "legacy",
+      "inputs": {
+        "method": 2,
+        "SE_o": 360.83,
+        "fNRB": 0.07,
+        "stoveStrata": [
+          {
+            "share": 0.8,
+            "eta": 0.1
+          },
+          {
+            "share": 0.2,
+            "eta": 0.1
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 0.8,
+            "ef_co2": 112,
+            "ef_nonco2": 9.46
+          },
+          {
+            "fuel": "charcoal",
+            "energyFraction": 0.2,
+            "ef_co2": 165.22,
+            "ef_nonco2": 44.83
+          }
+        ],
+        "Q_pop": 6600000,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "PE": 0,
+        "LE": 0
+      },
+      "outputs": {
+        "eta_weighted": 0.10000000000000002,
+        "SE": 3608.2999999999993,
+        "combinedEF": 25.119080000000004,
+        "EF_b": 0.000090637176364,
+        "Q_y": 6600000,
+        "BE": 568.29509580228,
+        "PE": 0,
+        "LE": 0,
+        "ER": 568.29509580228
+      }
+    },
+    {
+      "id": "hwt-ken-hi",
+      "kind": "synthetic",
+      "calc": "legacy",
+      "inputs": {
+        "method": 2,
+        "SE_o": 360.83,
+        "fNRB": 0.29,
+        "stoveStrata": [
+          {
+            "share": 0.8,
+            "eta": 0.1
+          },
+          {
+            "share": 0.2,
+            "eta": 0.1
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 0.8,
+            "ef_co2": 112,
+            "ef_nonco2": 9.46
+          },
+          {
+            "fuel": "charcoal",
+            "energyFraction": 0.2,
+            "ef_co2": 165.22,
+            "ef_nonco2": 44.83
+          }
+        ],
+        "Q_pop": 59400000,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "PE": 0,
+        "LE": 0
+      },
+      "outputs": {
+        "eta_weighted": 0.10000000000000002,
+        "SE": 3608.2999999999993,
+        "combinedEF": 52.100759999999994,
+        "EF_b": 0.00018799517230799995,
+        "Q_y": 59400000,
+        "BE": 10608.567573340435,
+        "PE": 0,
+        "LE": 0,
+        "ER": 10608.567573340435
+      }
+    },
+    {
+      "id": "hwt-ken-lo",
+      "kind": "synthetic",
+      "calc": "legacy",
+      "inputs": {
+        "method": 2,
+        "SE_o": 360.83,
+        "fNRB": 0.29,
+        "stoveStrata": [
+          {
+            "share": 0.8,
+            "eta": 0.1
+          },
+          {
+            "share": 0.2,
+            "eta": 0.1
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 0.8,
+            "ef_co2": 112,
+            "ef_nonco2": 9.46
+          },
+          {
+            "fuel": "charcoal",
+            "energyFraction": 0.2,
+            "ef_co2": 165.22,
+            "ef_nonco2": 44.83
+          }
+        ],
+        "Q_pop": 6600000,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "PE": 0,
+        "LE": 0
+      },
+      "outputs": {
+        "eta_weighted": 0.10000000000000002,
+        "SE": 3608.2999999999993,
+        "combinedEF": 52.100759999999994,
+        "EF_b": 0.00018799517230799995,
+        "Q_y": 6600000,
+        "BE": 1178.7297303711596,
+        "PE": 0,
+        "LE": 0,
+        "ER": 1178.7297303711596
+      }
+    },
+    {
+      "id": "hwt-uga-hi",
+      "kind": "synthetic",
+      "calc": "legacy",
+      "inputs": {
+        "method": 2,
+        "SE_o": 360.83,
+        "fNRB": 0.39,
+        "stoveStrata": [
+          {
+            "share": 0.8,
+            "eta": 0.1
+          },
+          {
+            "share": 0.2,
+            "eta": 0.1
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 0.8,
+            "ef_co2": 112,
+            "ef_nonco2": 9.46
+          },
+          {
+            "fuel": "charcoal",
+            "energyFraction": 0.2,
+            "ef_co2": 165.22,
+            "ef_nonco2": 44.83
+          }
+        ],
+        "Q_pop": 59400000,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "PE": 0,
+        "LE": 0
+      },
+      "outputs": {
+        "eta_weighted": 0.10000000000000002,
+        "SE": 3608.2999999999993,
+        "combinedEF": 64.36516,
+        "EF_b": 0.00023224880682799998,
+        "Q_y": 59400000,
+        "BE": 13105.800169304037,
+        "PE": 0,
+        "LE": 0,
+        "ER": 13105.800169304037
+      }
+    },
+    {
+      "id": "hwt-uga-lo",
+      "kind": "synthetic",
+      "calc": "legacy",
+      "inputs": {
+        "method": 2,
+        "SE_o": 360.83,
+        "fNRB": 0.39,
+        "stoveStrata": [
+          {
+            "share": 0.8,
+            "eta": 0.1
+          },
+          {
+            "share": 0.2,
+            "eta": 0.1
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 0.8,
+            "ef_co2": 112,
+            "ef_nonco2": 9.46
+          },
+          {
+            "fuel": "charcoal",
+            "energyFraction": 0.2,
+            "ef_co2": 165.22,
+            "ef_nonco2": 44.83
+          }
+        ],
+        "Q_pop": 6600000,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "PE": 0,
+        "LE": 0
+      },
+      "outputs": {
+        "eta_weighted": 0.10000000000000002,
+        "SE": 3608.2999999999993,
+        "combinedEF": 64.36516,
+        "EF_b": 0.00023224880682799998,
+        "Q_y": 6600000,
+        "BE": 1456.2000188115596,
+        "PE": 0,
+        "LE": 0,
+        "ER": 1456.2000188115596
+      }
+    },
+    {
+      "id": "hwt-mwi-hi",
+      "kind": "synthetic",
+      "calc": "legacy",
+      "inputs": {
+        "method": 2,
+        "SE_o": 360.83,
+        "fNRB": 0.48,
+        "stoveStrata": [
+          {
+            "share": 0.8,
+            "eta": 0.1
+          },
+          {
+            "share": 0.2,
+            "eta": 0.1
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 0.8,
+            "ef_co2": 112,
+            "ef_nonco2": 9.46
+          },
+          {
+            "fuel": "charcoal",
+            "energyFraction": 0.2,
+            "ef_co2": 165.22,
+            "ef_nonco2": 44.83
+          }
+        ],
+        "Q_pop": 59400000,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "PE": 0,
+        "LE": 0
+      },
+      "outputs": {
+        "eta_weighted": 0.10000000000000002,
+        "SE": 3608.2999999999993,
+        "combinedEF": 75.40312,
+        "EF_b": 0.00027207707789599994,
+        "Q_y": 59400000,
+        "BE": 15353.309505671275,
+        "PE": 0,
+        "LE": 0,
+        "ER": 15353.309505671275
+      }
+    },
+    {
+      "id": "hwt-mwi-lo",
+      "kind": "synthetic",
+      "calc": "legacy",
+      "inputs": {
+        "method": 2,
+        "SE_o": 360.83,
+        "fNRB": 0.48,
+        "stoveStrata": [
+          {
+            "share": 0.8,
+            "eta": 0.1
+          },
+          {
+            "share": 0.2,
+            "eta": 0.1
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 0.8,
+            "ef_co2": 112,
+            "ef_nonco2": 9.46
+          },
+          {
+            "fuel": "charcoal",
+            "energyFraction": 0.2,
+            "ef_co2": 165.22,
+            "ef_nonco2": 44.83
+          }
+        ],
+        "Q_pop": 6600000,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "PE": 0,
+        "LE": 0
+      },
+      "outputs": {
+        "eta_weighted": 0.10000000000000002,
+        "SE": 3608.2999999999993,
+        "combinedEF": 75.40312,
+        "EF_b": 0.00027207707789599994,
+        "Q_y": 6600000,
+        "BE": 1705.9232784079195,
+        "PE": 0,
+        "LE": 0,
+        "ER": 1705.9232784079195
+      }
+    },
+    {
+      "id": "hwt-tza-hi",
+      "kind": "synthetic",
+      "calc": "legacy",
+      "inputs": {
+        "method": 2,
+        "SE_o": 360.83,
+        "fNRB": 0.51,
+        "stoveStrata": [
+          {
+            "share": 0.8,
+            "eta": 0.1
+          },
+          {
+            "share": 0.2,
+            "eta": 0.1
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 0.8,
+            "ef_co2": 112,
+            "ef_nonco2": 9.46
+          },
+          {
+            "fuel": "charcoal",
+            "energyFraction": 0.2,
+            "ef_co2": 165.22,
+            "ef_nonco2": 44.83
+          }
+        ],
+        "Q_pop": 59400000,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "PE": 0,
+        "LE": 0
+      },
+      "outputs": {
+        "eta_weighted": 0.10000000000000002,
+        "SE": 3608.2999999999993,
+        "combinedEF": 79.08244,
+        "EF_b": 0.00028535316825199997,
+        "Q_y": 59400000,
+        "BE": 16102.47928446036,
+        "PE": 0,
+        "LE": 0,
+        "ER": 16102.47928446036
+      }
+    },
+    {
+      "id": "hwt-tza-lo",
+      "kind": "synthetic",
+      "calc": "legacy",
+      "inputs": {
+        "method": 2,
+        "SE_o": 360.83,
+        "fNRB": 0.51,
+        "stoveStrata": [
+          {
+            "share": 0.8,
+            "eta": 0.1
+          },
+          {
+            "share": 0.2,
+            "eta": 0.1
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 0.8,
+            "ef_co2": 112,
+            "ef_nonco2": 9.46
+          },
+          {
+            "fuel": "charcoal",
+            "energyFraction": 0.2,
+            "ef_co2": 165.22,
+            "ef_nonco2": 44.83
+          }
+        ],
+        "Q_pop": 6600000,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "PE": 0,
+        "LE": 0
+      },
+      "outputs": {
+        "eta_weighted": 0.10000000000000002,
+        "SE": 3608.2999999999993,
+        "combinedEF": 79.08244,
+        "EF_b": 0.00028535316825199997,
+        "Q_y": 6600000,
+        "BE": 1789.1643649400398,
+        "PE": 0,
+        "LE": 0,
+        "ER": 1789.1643649400398
+      }
+    },
+    {
+      "id": "hwt-ner-hi",
+      "kind": "synthetic",
+      "calc": "legacy",
+      "inputs": {
+        "method": 2,
+        "SE_o": 360.83,
+        "fNRB": 0.61,
+        "stoveStrata": [
+          {
+            "share": 0.8,
+            "eta": 0.1
+          },
+          {
+            "share": 0.2,
+            "eta": 0.1
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 0.8,
+            "ef_co2": 112,
+            "ef_nonco2": 9.46
+          },
+          {
+            "fuel": "charcoal",
+            "energyFraction": 0.2,
+            "ef_co2": 165.22,
+            "ef_nonco2": 44.83
+          }
+        ],
+        "Q_pop": 59400000,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "PE": 0,
+        "LE": 0
+      },
+      "outputs": {
+        "eta_weighted": 0.10000000000000002,
+        "SE": 3608.2999999999993,
+        "combinedEF": 91.34684,
+        "EF_b": 0.0003296068027719999,
+        "Q_y": 59400000,
+        "BE": 18599.711880423954,
+        "PE": 0,
+        "LE": 0,
+        "ER": 18599.711880423954
+      }
+    },
+    {
+      "id": "hwt-ner-lo",
+      "kind": "synthetic",
+      "calc": "legacy",
+      "inputs": {
+        "method": 2,
+        "SE_o": 360.83,
+        "fNRB": 0.61,
+        "stoveStrata": [
+          {
+            "share": 0.8,
+            "eta": 0.1
+          },
+          {
+            "share": 0.2,
+            "eta": 0.1
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 0.8,
+            "ef_co2": 112,
+            "ef_nonco2": 9.46
+          },
+          {
+            "fuel": "charcoal",
+            "energyFraction": 0.2,
+            "ef_co2": 165.22,
+            "ef_nonco2": 44.83
+          }
+        ],
+        "Q_pop": 6600000,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "PE": 0,
+        "LE": 0
+      },
+      "outputs": {
+        "eta_weighted": 0.10000000000000002,
+        "SE": 3608.2999999999993,
+        "combinedEF": 91.34684,
+        "EF_b": 0.0003296068027719999,
+        "Q_y": 6600000,
+        "BE": 2066.6346533804394,
+        "PE": 0,
+        "LE": 0,
+        "ER": 2066.6346533804394
+      }
+    },
+    {
+      "id": "cws-uga-transition-legacy082",
+      "kind": "synthetic",
+      "calc": "legacy",
+      "inputs": {
+        "method": 1,
+        "SE_o": 360.83,
+        "fNRB": 0.82,
+        "stoveStrata": [
+          {
+            "share": 0.8,
+            "eta": 0.1
+          },
+          {
+            "share": 0.2,
+            "eta": 0.1
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 0.8,
+            "ef_co2": 112,
+            "ef_nonco2": 9.46
+          },
+          {
+            "fuel": "charcoal",
+            "energyFraction": 0.2,
+            "ef_co2": 165.22,
+            "ef_nonco2": 44.83
+          }
+        ],
+        "Q_pop": 66000000,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "PE": 0,
+        "LE": 0
+      },
+      "outputs": {
+        "eta_weighted": 0.10000000000000002,
+        "SE": 3608.2999999999993,
+        "combinedEF": 117.10208,
+        "EF_b": 0.0004225394352639999,
+        "Q_y": 66000000,
+        "BE": 26493.222591052792,
+        "PE": 0,
+        "LE": 0,
+        "ER": 26493.222591052792
+      }
+    },
+    {
+      "id": "cws-ken-generator",
+      "kind": "synthetic",
+      "calc": "legacy",
+      "inputs": {
+        "method": 1,
+        "SE_o": 360.83,
+        "fNRB": 0.29,
+        "stoveStrata": [
+          {
+            "share": 0.8,
+            "eta": 0.1
+          },
+          {
+            "share": 0.2,
+            "eta": 0.1
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 0.8,
+            "ef_co2": 112,
+            "ef_nonco2": 9.46
+          },
+          {
+            "fuel": "charcoal",
+            "energyFraction": 0.2,
+            "ef_co2": 165.22,
+            "ef_nonco2": 44.83
+          }
+        ],
+        "Q_pop": 66000000,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "PE": 40.56975,
+        "LE": 0
+      },
+      "outputs": {
+        "eta_weighted": 0.10000000000000002,
+        "SE": 3608.2999999999993,
+        "combinedEF": 52.100759999999994,
+        "EF_b": 0.00018799517230799995,
+        "Q_y": 66000000,
+        "BE": 11787.297303711595,
+        "PE": 40.56975,
+        "LE": 0,
+        "ER": 11746.727553711595
+      }
+    },
+    {
+      "id": "cws-tza-schoolmix",
+      "kind": "synthetic",
+      "calc": "legacy",
+      "inputs": {
+        "method": 1,
+        "SE_o": 360.83,
+        "fNRB": 0.51,
+        "stoveStrata": [
+          {
+            "share": 0.8,
+            "eta": 0.1
+          },
+          {
+            "share": 0.2,
+            "eta": 0.1
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 0.8,
+            "ef_co2": 112,
+            "ef_nonco2": 9.46
+          },
+          {
+            "fuel": "charcoal",
+            "energyFraction": 0.2,
+            "ef_co2": 165.22,
+            "ef_nonco2": 44.83
+          }
+        ],
+        "Q_pop": 1122000,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "PE": 0,
+        "LE": 0
+      },
+      "outputs": {
+        "eta_weighted": 0.10000000000000002,
+        "SE": 3608.2999999999993,
+        "combinedEF": 79.08244,
+        "EF_b": 0.00028535316825199997,
+        "Q_y": 1122000,
+        "BE": 304.15794203980676,
+        "PE": 0,
+        "LE": 0,
+        "ER": 304.15794203980676
+      }
+    },
+    {
+      "id": "cws-tza-hi-flat5",
+      "kind": "synthetic",
+      "calc": "legacy",
+      "inputs": {
+        "method": 1,
+        "SE_o": 360.83,
+        "fNRB": 0.51,
+        "stoveStrata": [
+          {
+            "share": 0.8,
+            "eta": 0.1
+          },
+          {
+            "share": 0.2,
+            "eta": 0.1
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 0.8,
+            "ef_co2": 112,
+            "ef_nonco2": 9.46
+          },
+          {
+            "fuel": "charcoal",
+            "energyFraction": 0.2,
+            "ef_co2": 165.22,
+            "ef_nonco2": 44.83
+          }
+        ],
+        "Q_pop": 66000000,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "PE": 0,
+        "LE": 0,
+        "leakageFivePercent": true
+      },
+      "outputs": {
+        "eta_weighted": 0.10000000000000002,
+        "SE": 3608.2999999999993,
+        "combinedEF": 79.08244,
+        "EF_b": 0.00028535316825199997,
+        "Q_y": 66000000,
+        "BE": 17891.643649400397,
+        "PE": 0,
+        "LE": 894.5821824700199,
+        "ER": 16997.061466930376
+      }
+    },
+    {
+      "id": "paa-cws-ind-hi",
+      "kind": "synthetic",
+      "calc": "paa",
+      "inputs": {
+        "method": 1,
+        "SE_o": 360.83,
+        "fNRB": 0.07,
+        "stoveStrata": [
+          {
+            "share": 0.8,
+            "eta": 0.1
+          },
+          {
+            "share": 0.2,
+            "eta": 0.1
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 0.8,
+            "ef_co2": 112,
+            "ef_nonco2": 9.46
+          },
+          {
+            "fuel": "charcoal",
+            "energyFraction": 0.2,
+            "ef_co2": 236.91,
+            "ef_nonco2": 61.74,
+            "v2Charcoal": "4:1"
+          }
+        ],
+        "Q_pop": 66000000,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "DAF": 0.0204,
+        "PE": 0,
+        "leakage": {
+          "option": 1
+        }
+      },
+      "outputs": {
+        "EF_b": 0.000106461953342,
+        "Q_y": 66000000,
+        "Q_adj": 66000000,
+        "BE_unadj": 6675.1644745434,
+        "BE_u": 6675.1644745434,
+        "BE_downadj": 6538.991119262714,
+        "BE_BAU": 6675.1644745434,
+        "BE_CB": 6538.991119262714,
+        "MC": 136.17335528068543,
+        "PE": 0,
+        "leakageOption": 1,
+        "LE_market": 130.77982238525428,
+        "LE_embodied": 0,
+        "LE": 130.77982238525428,
+        "ER": 6408.21129687746
+      }
+    },
+    {
+      "id": "paa-cws-ken-hi",
+      "kind": "synthetic",
+      "calc": "paa",
+      "inputs": {
+        "method": 1,
+        "SE_o": 360.83,
+        "fNRB": 0.29,
+        "stoveStrata": [
+          {
+            "share": 0.8,
+            "eta": 0.1
+          },
+          {
+            "share": 0.2,
+            "eta": 0.1
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 0.8,
+            "ef_co2": 112,
+            "ef_nonco2": 9.46
+          },
+          {
+            "fuel": "charcoal",
+            "energyFraction": 0.2,
+            "ef_co2": 355.36,
+            "ef_nonco2": 89.68,
+            "v2Charcoal": "6:1"
+          }
+        ],
+        "Q_pop": 66000000,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "DAF": 0.0345,
+        "PE": 0,
+        "leakage": {
+          "option": 1
+        }
+      },
+      "outputs": {
+        "EF_b": 0.000260154388704,
+        "Q_y": 66000000,
+        "Q_adj": 66000000,
+        "BE_unadj": 16311.6801717408,
+        "BE_u": 16311.6801717408,
+        "BE_downadj": 15748.927205815742,
+        "BE_BAU": 16311.6801717408,
+        "BE_CB": 15748.927205815742,
+        "MC": 562.7529659250577,
+        "PE": 0,
+        "leakageOption": 1,
+        "LE_market": 314.9785441163148,
+        "LE_embodied": 0,
+        "LE": 314.9785441163148,
+        "ER": 15433.948661699427
+      }
+    },
+    {
+      "id": "paa-cws-uga-hi",
+      "kind": "synthetic",
+      "calc": "paa",
+      "inputs": {
+        "method": 1,
+        "SE_o": 360.83,
+        "fNRB": 0.39,
+        "stoveStrata": [
+          {
+            "share": 0.8,
+            "eta": 0.1
+          },
+          {
+            "share": 0.2,
+            "eta": 0.1
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 0.8,
+            "ef_co2": 112,
+            "ef_nonco2": 9.46
+          },
+          {
+            "fuel": "charcoal",
+            "energyFraction": 0.2,
+            "ef_co2": 355.36,
+            "ef_nonco2": 89.68,
+            "v2Charcoal": "6:1"
+          }
+        ],
+        "Q_pop": 66000000,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "DAF": 0.0345,
+        "PE": 0,
+        "leakage": {
+          "option": 1
+        }
+      },
+      "outputs": {
+        "EF_b": 0.00031812966646399993,
+        "Q_y": 66000000,
+        "Q_adj": 66000000,
+        "BE_unadj": 19946.73008729279,
+        "BE_u": 19946.73008729279,
+        "BE_downadj": 19258.56789928119,
+        "BE_BAU": 19946.73008729279,
+        "BE_CB": 19258.56789928119,
+        "MC": 688.1621880115999,
+        "PE": 0,
+        "leakageOption": 1,
+        "LE_market": 385.17135798562384,
+        "LE_embodied": 0,
+        "LE": 385.17135798562384,
+        "ER": 18873.39654129557
+      }
+    },
+    {
+      "id": "paa-cws-mwi-hi",
+      "kind": "synthetic",
+      "calc": "paa",
+      "inputs": {
+        "method": 1,
+        "SE_o": 360.83,
+        "fNRB": 0.48,
+        "stoveStrata": [
+          {
+            "share": 0.8,
+            "eta": 0.1
+          },
+          {
+            "share": 0.2,
+            "eta": 0.1
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 0.8,
+            "ef_co2": 112,
+            "ef_nonco2": 9.46
+          },
+          {
+            "fuel": "charcoal",
+            "energyFraction": 0.2,
+            "ef_co2": 355.36,
+            "ef_nonco2": 89.68,
+            "v2Charcoal": "6:1"
+          }
+        ],
+        "Q_pop": 66000000,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "DAF": 0.0345,
+        "PE": 0,
+        "leakage": {
+          "option": 1
+        }
+      },
+      "outputs": {
+        "EF_b": 0.00037030741644799995,
+        "Q_y": 66000000,
+        "Q_adj": 66000000,
+        "BE_unadj": 23218.275011289596,
+        "BE_u": 23218.275011289596,
+        "BE_downadj": 22417.244523400106,
+        "BE_BAU": 23218.275011289596,
+        "BE_CB": 22417.244523400106,
+        "MC": 801.0304878894895,
+        "PE": 0,
+        "leakageOption": 1,
+        "LE_market": 448.3448904680021,
+        "LE_embodied": 0,
+        "LE": 448.3448904680021,
+        "ER": 21968.899632932105
+      }
+    },
+    {
+      "id": "paa-cws-tza-hi",
+      "kind": "synthetic",
+      "calc": "paa",
+      "inputs": {
+        "method": 1,
+        "SE_o": 360.83,
+        "fNRB": 0.51,
+        "stoveStrata": [
+          {
+            "share": 0.8,
+            "eta": 0.1
+          },
+          {
+            "share": 0.2,
+            "eta": 0.1
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 0.8,
+            "ef_co2": 112,
+            "ef_nonco2": 9.46
+          },
+          {
+            "fuel": "charcoal",
+            "energyFraction": 0.2,
+            "ef_co2": 355.36,
+            "ef_nonco2": 89.68,
+            "v2Charcoal": "6:1"
+          }
+        ],
+        "Q_pop": 66000000,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "DAF": 0.0345,
+        "PE": 0,
+        "leakage": {
+          "option": 1
+        }
+      },
+      "outputs": {
+        "EF_b": 0.00038769999977600003,
+        "Q_y": 66000000,
+        "Q_adj": 66000000,
+        "BE_unadj": 24308.7899859552,
+        "BE_u": 24308.7899859552,
+        "BE_downadj": 23470.136731439747,
+        "BE_BAU": 24308.7899859552,
+        "BE_CB": 23470.136731439747,
+        "MC": 838.653254515455,
+        "PE": 0,
+        "leakageOption": 1,
+        "LE_market": 469.4027346287949,
+        "LE_embodied": 0,
+        "LE": 469.4027346287949,
+        "ER": 23000.73399681095
+      }
+    },
+    {
+      "id": "paa-cws-ner-hi",
+      "kind": "synthetic",
+      "calc": "paa",
+      "inputs": {
+        "method": 1,
+        "SE_o": 360.83,
+        "fNRB": 0.61,
+        "stoveStrata": [
+          {
+            "share": 0.8,
+            "eta": 0.1
+          },
+          {
+            "share": 0.2,
+            "eta": 0.1
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 0.8,
+            "ef_co2": 112,
+            "ef_nonco2": 9.46
+          },
+          {
+            "fuel": "charcoal",
+            "energyFraction": 0.2,
+            "ef_co2": 355.36,
+            "ef_nonco2": 89.68,
+            "v2Charcoal": "6:1"
+          }
+        ],
+        "Q_pop": 66000000,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "DAF": 0.0345,
+        "PE": 0,
+        "leakage": {
+          "option": 1
+        }
+      },
+      "outputs": {
+        "EF_b": 0.00044567527753599996,
+        "Q_y": 66000000,
+        "Q_adj": 66000000,
+        "BE_unadj": 27943.839901507195,
+        "BE_u": 27943.839901507195,
+        "BE_downadj": 26979.777424905198,
+        "BE_BAU": 27943.839901507195,
+        "BE_CB": 26979.777424905198,
+        "MC": 964.0624766019973,
+        "PE": 0,
+        "leakageOption": 1,
+        "LE_market": 539.595548498104,
+        "LE_embodied": 0,
+        "LE": 539.595548498104,
+        "ER": 26440.181876407096
+      }
+    },
+    {
+      "id": "paa-agetier-ken-sdoff",
+      "kind": "synthetic",
+      "calc": "paa",
+      "inputs": {
+        "method": 1,
+        "SE_o": 360.83,
+        "fNRB": 0.29,
+        "stoveStrata": [
+          {
+            "share": 0.8,
+            "eta": 0.1
+          },
+          {
+            "share": 0.2,
+            "eta": 0.1
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 0.8,
+            "ef_co2": 112,
+            "ef_nonco2": 9.46
+          },
+          {
+            "fuel": "charcoal",
+            "energyFraction": 0.2,
+            "ef_co2": 355.36,
+            "ef_nonco2": 89.68,
+            "v2Charcoal": "6:1"
+          }
+        ],
+        "Q_pop": 108071700,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "DAF": 0.0345,
+        "PE": 0,
+        "leakage": {
+          "option": 1
+        }
+      },
+      "outputs": {
+        "EF_b": 0.000260154388704,
+        "Q_y": 108071700,
+        "Q_adj": 108071700,
+        "BE_unadj": 26709.560697216973,
+        "BE_u": 26709.560697216973,
+        "BE_downadj": 25788.08085316299,
+        "BE_BAU": 26709.560697216973,
+        "BE_CB": 25788.08085316299,
+        "MC": 921.4798440539853,
+        "PE": 0,
+        "leakageOption": 1,
+        "LE_market": 515.7616170632598,
+        "LE_embodied": 0,
+        "LE": 515.7616170632598,
+        "ER": 25272.319236099727
+      }
+    },
+    {
+      "id": "paa-agetier-ken-sdon",
+      "kind": "synthetic",
+      "calc": "paa",
+      "inputs": {
+        "method": 1,
+        "SE_o": 360.83,
+        "fNRB": 0.29,
+        "stoveStrata": [
+          {
+            "share": 0.8,
+            "eta": 0.1
+          },
+          {
+            "share": 0.2,
+            "eta": 0.1
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 0.8,
+            "ef_co2": 112,
+            "ef_nonco2": 9.46
+          },
+          {
+            "fuel": "charcoal",
+            "energyFraction": 0.2,
+            "ef_co2": 355.36,
+            "ef_nonco2": 89.68,
+            "v2Charcoal": "6:1"
+          }
+        ],
+        "Q_pop": 102668115,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "DAF": 0.0345,
+        "PE": 0,
+        "leakage": {
+          "option": 1
+        }
+      },
+      "outputs": {
+        "EF_b": 0.000260154388704,
+        "Q_y": 102668115,
+        "Q_adj": 102668115,
+        "BE_unadj": 25374.082662356126,
+        "BE_u": 25374.082662356126,
+        "BE_downadj": 24498.67681050484,
+        "BE_BAU": 25374.082662356126,
+        "BE_CB": 24498.67681050484,
+        "MC": 875.4058518512866,
+        "PE": 0,
+        "leakageOption": 1,
+        "LE_market": 489.9735362100968,
+        "LE_embodied": 0,
+        "LE": 489.9735362100968,
+        "ER": 24008.70327429474
+      }
+    },
+    {
+      "id": "paa-agetier-ner-sdoff",
+      "kind": "synthetic",
+      "calc": "paa",
+      "inputs": {
+        "method": 1,
+        "SE_o": 360.83,
+        "fNRB": 0.61,
+        "stoveStrata": [
+          {
+            "share": 0.8,
+            "eta": 0.1
+          },
+          {
+            "share": 0.2,
+            "eta": 0.1
+          }
+        ],
+        "fuelMix": [
+          {
+            "fuel": "wood",
+            "energyFraction": 0.8,
+            "ef_co2": 112,
+            "ef_nonco2": 9.46
+          },
+          {
+            "fuel": "charcoal",
+            "energyFraction": 0.2,
+            "ef_co2": 355.36,
+            "ef_nonco2": 89.68,
+            "v2Charcoal": "6:1"
+          }
+        ],
+        "Q_pop": 101356530,
+        "Q_m": null,
+        "C_b": 0.05,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "DAF": 0.0345,
+        "PE": 0,
+        "leakage": {
+          "option": 1
+        }
+      },
+      "outputs": {
+        "EF_b": 0.00044567527753599996,
+        "Q_y": 101356530,
+        "Q_adj": 101356530,
+        "BE_unadj": 42913.49465594411,
+        "BE_u": 42913.49465594411,
+        "BE_downadj": 41432.97909031404,
+        "BE_BAU": 42913.49465594411,
+        "BE_CB": 41432.97909031404,
+        "MC": 1480.5155656300703,
+        "PE": 0,
+        "leakageOption": 1,
+        "LE_market": 828.6595818062808,
+        "LE_embodied": 0,
+        "LE": 828.6595818062808,
+        "ER": 40604.31950850776
+      }
+    },
+    {
+      "id": "synthetic-entered-mix-paa",
+      "kind": "synthetic",
+      "calc": "paa",
+      "inputs": {
+        "method": 1,
+        "SE_o": 360.83,
+        "fNRB": 0.5,
+        "stoveStrata": [],
+        "fuelMix": [],
+        "Q_pop": 10000000,
+        "Q_m": null,
+        "C_b": 0.1,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "DAF": 0.02,
+        "PE": 0,
+        "leakage": {
+          "option": 1
+        }
+      },
+      "baselineEdit": {
+        "stoveShares": {
+          "threeStone": 0.6,
+          "otherConventional": 0,
+          "ics": 0.4,
+          "fossil": 0
+        },
+        "fuelShares": {
+          "wood": 0.7,
+          "charcoal": 0.3,
+          "lpg": 0
+        },
+        "charcoalConvention": "6:1"
+      },
+      "outputs": {
+        "EF_b": 0.00021654954714285713,
+        "Q_y": 10000000,
+        "Q_adj": 10000000,
+        "BE_unadj": 1948.9459242857142,
+        "BE_u": 1948.9459242857142,
+        "BE_downadj": 1909.9670058,
+        "BE_BAU": 1948.9459242857142,
+        "BE_CB": 1909.9670058,
+        "MC": 38.9789184857143,
+        "PE": 0,
+        "leakageOption": 1,
+        "LE_market": 38.199340116,
+        "LE_embodied": 0,
+        "LE": 38.199340116,
+        "ER": 1871.767665684
+      }
+    },
+    {
+      "id": "synthetic-entered-mix-legacy",
+      "kind": "synthetic",
+      "calc": "legacy",
+      "inputs": {
+        "method": 1,
+        "SE_o": 360.83,
+        "fNRB": 0.8,
+        "stoveStrata": [],
+        "fuelMix": [],
+        "Q_pop": 10000000,
+        "Q_m": null,
+        "C_b": 0.1,
+        "X_cleanboil": 0,
+        "M_qy": 1,
+        "PE": 0
+      },
+      "baselineEdit": {
+        "stoveShares": {
+          "threeStone": 0.5,
+          "otherConventional": 0.5,
+          "ics": 0,
+          "fossil": 0
+        },
+        "fuelShares": {
+          "wood": 0.9,
+          "charcoal": 0,
+          "lpg": 0.1
+        }
+      },
+      "outputs": {
+        "eta_weighted": 0.15000000000000002,
+        "SE": 2405.533333333333,
+        "combinedEF": 95.46400000000001,
+        "EF_b": 0.00022964183413333333,
+        "Q_y": 10000000,
+        "BE": 2066.7765071999997,
+        "PE": 0,
+        "LE": 0,
+        "ER": 2066.7765071999997
+      }
+    }
+  ],
+  "fnrbCases": [
+    {
+      "id": "fnrb-regional-lso-01",
+      "kind": "fnrb-resolution",
+      "scenarioInput": {
+        "version": "paa",
+        "preset": "traditional-wood-cws",
+        "populationMode": "people",
+        "populationCount": 1000,
+        "countryIso": "LSO",
+        "litresPerPersonPerDay": 5,
+        "operationalDays": 300
+      },
+      "outputs": {
+        "fNRB": 0.4,
+        "region": "Sub-Saharan Africa"
+      }
+    },
+    {
+      "id": "fnrb-refusal-mar-01",
+      "kind": "fnrb-resolution",
+      "scenarioInput": {
+        "version": "paa",
+        "preset": "traditional-wood-cws",
+        "populationMode": "people",
+        "populationCount": 1000,
+        "countryIso": "MAR",
+        "litresPerPersonPerDay": 5,
+        "operationalDays": 300
+      },
+      "outputs": {
+        "refused": true,
+        "message": "No official fNRB default covers Morocco. Enter your project's own value with its source; the tools publish national values for 90 countries and multi-national values for three regions only."
+      }
+    }
+  ]
+}

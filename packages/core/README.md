@@ -1,9 +1,16 @@
 # @waterbots/core
 
-The plug points every module shares: the project description, the list of standards, the save outcome, the agent contract, and the design tokens and base stylesheet. Those arrive in later steps (see `BUILD_PLAN.md`).
+What every module shares. It arrived with the Calvin seed, a one-time copy of the Calvin module carried over by Amy. `SEEDS.md` at the root of this repo records what arrived, when, and what was checked.
 
-**Empty for now — Calvin arrives by a one-time seed.**
+What is in `src/`:
+
+- `project.ts`: the shape of a project, as a module sees it.
+- `standards.ts`: the list of standards a project can follow.
+- `saveOutcome.ts` and `SaveNotice.tsx`: what a save can return, and the notice that shows it.
+- `readOnly.tsx`: the read-only seat, for screens that must show a result but not allow edits.
+- `agent.ts` and `calculatorTool.ts`: the agent contract, and the helper that turns a calculator into an agent tool.
+
+The files that arrived with the seed are kept as they came. Change them only in their own pull request.
 
 - Not published. Nothing in this repo goes to npm yet; the package is marked `private`.
-- It builds and has one trivial test, so the checks in CI run for real.
 - Apache License 2.0. See `LICENSE` and `NOTICE` in this folder.

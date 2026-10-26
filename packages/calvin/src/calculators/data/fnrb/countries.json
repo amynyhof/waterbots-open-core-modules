@@ -1,0 +1,488 @@
+{
+  "pathway": "gs4gg-carbon",
+  "dataset": "fnrb-by-country",
+  "version": "2.4.0",
+  "description": "Per-country fNRB for ex-ante calculations and the transition analysis, structured by VINTAGE. The OFFICIAL source for national defaults is A6.4-AMT-009 v01.0 Table 3 (Amy's ruling (2), 2026-09-21), whose values are the same as CDM TOOL33 v03.0 Table 3 (AMT-009 para.16) and originate in MoFuSS / Ghilardi & Bailis (2024); the default vintage carries exactly those values. Each value carries its vintage + citation; every calculator output MUST label which vintage was used. Missing country within a vintage -> the OFFICIAL multi-national value from A6.4-AMT-009 v01.0 Table 2, chosen by the country's UN M49 region (Amy's ruling (3), built 2026-09-22, calculator v0.10.0); a country outside the three regions gets no number and an honest refusal. STRUCK 2026-09-22: 'the labeled conservative global fallback' - the quartile dial is retired for fNRB. Transitioning projects supply their filing-era fNRB via per-project filed-override fields (entered + cited per project), NOT from these tables. See the vintage policy in notes.",
+  "defaultVintage": "mofuss-adm0-csv",
+  "ruleUpdate": {
+    "label": "fNRB rule update",
+    "effective": "2025-06-12",
+    "instrument": "A6.4-AMT-009 v01.0 (in force 21 May 2026, valid to 20 May 2029) Table 3 national and Table 2 multi-national fNRB defaults, pp.5-7; the same values as CDM TOOL33 v03.0, EB 125 Annex 2 (12 June 2025), Table 3 pp.5-7 (AMT-009 para.16); origin MoFuSS / Ghilardi & Bailis (2024), the national (adm0) dataset, DOI 10.5281/zenodo.18865904",
+    "registrySources": [
+      "cdm-tool33",
+      "a64-amt-009-fnrb",
+      "mofuss-fnrb-2024"
+    ],
+    "previousInstrument": "CDM TOOL33 v02.0, EB 115 Annex 5 (8 September 2022), which introduced the earlier national defaults. Not held in Methodology/. CLOSED 2026-09-21 by Amy's ruling (1): the old-file hunt is over - transitioning projects use their filed value only, and no earlier-default line is built or planned.",
+    "desc": "The report's separate 'fNRB rule update (<year>)' line reads its year from `effective` and its citation from `instrument`. The line is the legacy (V1.0) ER at the project's FILED fNRB minus the legacy ER at the current standardised-tool value; it is null, with a reason, when no filed value is on the record (Amy's amended R1, 2026-09-21). It sits OUTSIDE the methodology-transition table, which holds fNRB equal on both sides.",
+    "instrument_corrected_2026-09-22": "STRUCK (Amy's ruling (2), 2026-09-21; corrected 2026-09-22): the line used to end 'Both take the MoFuSS June 2024 values (Table 5 pp.32-33)'. False - the tools' values match the MoFuSS adm0 dataset, not the June 2024 report's Table 5 (India 7 vs 6, Kenya 29 vs 30, Uganda 39 vs 35, Malawi 48 vs 49, Niger 61 vs 60; Tanzania 51 both). Kept here as the record of what was believed from 2026-09-21."
+  },
+  "vintages": {
+    "mofuss-2024-06-report": {
+      "label": "MoFuSS - June 2024 report (Table 5) - HISTORICAL, not the default",
+      "registrySources": [
+        "mofuss-fnrb-2024",
+        "gs-429-v1-methodology"
+      ],
+      "cite": "MoFuSS, Updated fNRB Values for Woodfuel Interventions (20 Jun 2024), Table 5 national fNRB 2020-2030, pp.32-33",
+      "coverage": "6 anchor countries hand-keyed from the report's Table 5 (pp.32-33). HISTORICAL since 2026-09-22: the official tools took the adm0 dataset, not Table 5, so this vintage differs from A6.4-AMT-009 Table 3 on 5 of the 6 (IND 0.06 vs 0.07, KEN 0.30 vs 0.29, UGA 0.35 vs 0.39, MWI 0.49 vs 0.48, NER 0.60 vs 0.61; TZA 0.51 both). Kept as a cited record, read by no default path. STRUCK: 'The reference entries are anchored to THIS vintage' - they anchor to the official Table 3 values from calculator v0.9.0 (Amy's ruling (4)).",
+      "countries": {
+        "IND": {
+          "name": "India",
+          "fnrb": 0.06,
+          "note": "Genuinely-low case (fNRB 2020-2030 = 6%, report p.31). Large base of GS safe-water projects."
+        },
+        "KEN": {
+          "name": "Kenya",
+          "fnrb": 0.3,
+          "note": "Text-confirmed in the report: decreased from 46% to 30%."
+        },
+        "UGA": {
+          "name": "Uganda",
+          "fnrb": 0.35,
+          "note": "Flagship transition case: a documented pre-MoFuSS national default (2012-2017), higher than MoFuSS 0.35. That older value is filing-era; supply it per project via filed-override, not this table (vintage policy)."
+        },
+        "MWI": {
+          "name": "Malawi",
+          "fnrb": 0.49
+        },
+        "TZA": {
+          "name": "Tanzania",
+          "fnrb": 0.51
+        },
+        "NER": {
+          "name": "Niger",
+          "fnrb": 0.6,
+          "note": "High-fNRB case (Sahel); spans the high end."
+        }
+      },
+      "retired_2026-09-22_fallback": {
+        "struck": "STRUCK 2026-09-22 (Amy's ruling (3), 2026-09-21). The quartile dial is retired for fNRB on every vintage: a country with no national row takes A6.4-AMT-009 Table 2's official multi-national value for its UN M49 region, or gets an honest refusal outside the three regions. A quartile of the countries that happen to be in a table was never a published default - it was our own statistic, offered as if it were one. Kept here as the record of what was read until calculator v0.10.0; read by nothing.",
+        "conservativeDirection": "low",
+        "percentiles": {
+          "p25": 0.3125,
+          "p50": 0.42,
+          "p75": 0.505
+        },
+        "cite": "MoFuSS - June 2024 report (Table 5) — quartiles of the vintage's national fNRB. Lower fNRB = lower baseline = fewer credits = conservative; the 25th percentile is the default when a country is absent.",
+        "note": "Adjustable Low/Median/High stops exposed by the UI ONLY when this fallback fires."
+      }
+    },
+    "mofuss-adm0-csv": {
+      "label": "A6.4-AMT-009 Table 3 (national default)",
+      "registrySources": [
+        "a64-amt-009-fnrb",
+        "cdm-tool33",
+        "mofuss-adm0-zenodo-18865904"
+      ],
+      "cite": "A6.4-AMT-009 v01.0 Table 3, national default values for fNRB (pp.5-7) - the same values as CDM TOOL33 v03.0 (EB 125 Annex 2, 12 June 2025) Table 3 (AMT-009 para.16); origin MoFuSS / Ghilardi & Bailis (2024), summary_adm0.csv column fNRB_2020_2030_mean, DOI 10.5281/zenodo.18865904. Verified 2026-09-22: all 90 rows equal both tools' Table 3 exactly.",
+      "coverage": "All 90 countries of A6.4-AMT-009 Table 3 (= TOOL33 v03.0 Table 3 = the MoFuSS adm0 dataset). DEFAULT vintage for new ex-ante calculations and, since 2026-09-22 (Amy's ruling (4)), the vintage the reference dataset anchors to. Countries absent take the official Table 2 multi-national value for their UN M49 region, or - outside the three regions - no number and an honest refusal (Amy's ruling (3), BUILT 2026-09-22, calculator v0.10.0). STRUCK: 'Countries absent fall back to the labelled quartile dial today; ruling (3) replaces that ... next sitting.'",
+      "countries": {
+        "AFG": {
+          "name": "Afghanistan",
+          "fnrb": 0.1
+        },
+        "AGO": {
+          "name": "Angola",
+          "fnrb": 0.27
+        },
+        "ARM": {
+          "name": "Armenia",
+          "fnrb": 0.01
+        },
+        "AZE": {
+          "name": "Azerbaijan",
+          "fnrb": 0.01
+        },
+        "BDI": {
+          "name": "Burundi",
+          "fnrb": 0.35
+        },
+        "BEN": {
+          "name": "Benin",
+          "fnrb": 0.34
+        },
+        "BFA": {
+          "name": "Burkina Faso",
+          "fnrb": 0.36
+        },
+        "BGD": {
+          "name": "Bangladesh",
+          "fnrb": 0.39
+        },
+        "BOL": {
+          "name": "Bolivia",
+          "fnrb": 0.14
+        },
+        "BRA": {
+          "name": "Brazil",
+          "fnrb": 0.13
+        },
+        "BTN": {
+          "name": "Bhutan",
+          "fnrb": 0.3
+        },
+        "BWA": {
+          "name": "Botswana",
+          "fnrb": 0.35
+        },
+        "CAF": {
+          "name": "Central African Republic",
+          "fnrb": 0.42
+        },
+        "CHN": {
+          "name": "China",
+          "fnrb": 0.1
+        },
+        "CIV": {
+          "name": "Côte d'Ivoire",
+          "fnrb": 0.19
+        },
+        "CMR": {
+          "name": "Cameroon",
+          "fnrb": 0.38
+        },
+        "COD": {
+          "name": "Democratic Republic of the Congo",
+          "fnrb": 0.42
+        },
+        "COG": {
+          "name": "Republic of the Congo",
+          "fnrb": 0.16
+        },
+        "COL": {
+          "name": "Colombia",
+          "fnrb": 0.07
+        },
+        "CRI": {
+          "name": "Costa Rica",
+          "fnrb": 0.1
+        },
+        "DJI": {
+          "name": "Djibouti",
+          "fnrb": 0.01
+        },
+        "DOM": {
+          "name": "Dominican Republic",
+          "fnrb": 0.43
+        },
+        "ECU": {
+          "name": "Ecuador",
+          "fnrb": 0.28
+        },
+        "ERI": {
+          "name": "Eritrea",
+          "fnrb": 0.3
+        },
+        "ETH": {
+          "name": "Ethiopia",
+          "fnrb": 0.33
+        },
+        "GAB": {
+          "name": "Gabon",
+          "fnrb": 0.18
+        },
+        "GEO": {
+          "name": "Georgia",
+          "fnrb": 0.01
+        },
+        "GHA": {
+          "name": "Ghana",
+          "fnrb": 0.35
+        },
+        "GIN": {
+          "name": "Guinea",
+          "fnrb": 0.37
+        },
+        "GMB": {
+          "name": "Gambia",
+          "fnrb": 0.55
+        },
+        "GNB": {
+          "name": "Guinea-Bissau",
+          "fnrb": 0.34
+        },
+        "GNQ": {
+          "name": "Equatorial Guinea",
+          "fnrb": 0.31
+        },
+        "GTM": {
+          "name": "Guatemala",
+          "fnrb": 0.41
+        },
+        "GUY": {
+          "name": "Guyana",
+          "fnrb": 0.0
+        },
+        "HND": {
+          "name": "Honduras",
+          "fnrb": 0.33
+        },
+        "HTI": {
+          "name": "Haiti",
+          "fnrb": 0.59
+        },
+        "IDN": {
+          "name": "Indonesia",
+          "fnrb": 0.09
+        },
+        "IND": {
+          "name": "India",
+          "fnrb": 0.07
+        },
+        "IRN": {
+          "name": "Iran",
+          "fnrb": 0.05
+        },
+        "IRQ": {
+          "name": "Iraq",
+          "fnrb": 0.01
+        },
+        "JAM": {
+          "name": "Jamaica",
+          "fnrb": 0.38
+        },
+        "JOR": {
+          "name": "Jordan",
+          "fnrb": 0.01
+        },
+        "KAZ": {
+          "name": "Kazakhstan",
+          "fnrb": 0.07
+        },
+        "KEN": {
+          "name": "Kenya",
+          "fnrb": 0.29
+        },
+        "KGZ": {
+          "name": "Kyrgyzstan",
+          "fnrb": 0.25
+        },
+        "KHM": {
+          "name": "Cambodia",
+          "fnrb": 0.2
+        },
+        "LAO": {
+          "name": "Laos",
+          "fnrb": 0.47
+        },
+        "LBR": {
+          "name": "Liberia",
+          "fnrb": 0.4
+        },
+        "LKA": {
+          "name": "Sri Lanka",
+          "fnrb": 0.45
+        },
+        "MDG": {
+          "name": "Madagascar",
+          "fnrb": 0.36
+        },
+        "MEX": {
+          "name": "México",
+          "fnrb": 0.3
+        },
+        "MLI": {
+          "name": "Mali",
+          "fnrb": 0.45
+        },
+        "MMR": {
+          "name": "Myanmar",
+          "fnrb": 0.36
+        },
+        "MNG": {
+          "name": "Mongolia",
+          "fnrb": 0.12
+        },
+        "MOZ": {
+          "name": "Mozambique",
+          "fnrb": 0.38
+        },
+        "MRT": {
+          "name": "Mauritania",
+          "fnrb": 0.65
+        },
+        "MWI": {
+          "name": "Malawi",
+          "fnrb": 0.48
+        },
+        "MYS": {
+          "name": "Malaysia",
+          "fnrb": 0.39
+        },
+        "NAM": {
+          "name": "Namibia",
+          "fnrb": 0.28
+        },
+        "NER": {
+          "name": "Niger",
+          "fnrb": 0.61
+        },
+        "NGA": {
+          "name": "Nigeria",
+          "fnrb": 0.38
+        },
+        "NIC": {
+          "name": "Nicaragua",
+          "fnrb": 0.26
+        },
+        "NPL": {
+          "name": "Nepal",
+          "fnrb": 0.45
+        },
+        "PAK": {
+          "name": "Pakistan",
+          "fnrb": 0.08
+        },
+        "PAN": {
+          "name": "Panama",
+          "fnrb": 0.21
+        },
+        "PER": {
+          "name": "Peru",
+          "fnrb": 0.04
+        },
+        "PHL": {
+          "name": "Philippines",
+          "fnrb": 0.55
+        },
+        "PNG": {
+          "name": "Papua New Guinea",
+          "fnrb": 0.08
+        },
+        "RWA": {
+          "name": "Rwanda",
+          "fnrb": 0.33
+        },
+        "SDN": {
+          "name": "Sudan",
+          "fnrb": 0.5
+        },
+        "SEN": {
+          "name": "Senegal",
+          "fnrb": 0.61
+        },
+        "SLE": {
+          "name": "Sierra Leone",
+          "fnrb": 0.41
+        },
+        "SOM": {
+          "name": "Somalia",
+          "fnrb": 0.64
+        },
+        "SSD": {
+          "name": "South Sudan",
+          "fnrb": 0.35
+        },
+        "SWZ": {
+          "name": "Swaziland",
+          "fnrb": 0.16
+        },
+        "SYR": {
+          "name": "Syria",
+          "fnrb": 0.03
+        },
+        "TCD": {
+          "name": "Chad",
+          "fnrb": 0.37
+        },
+        "TGO": {
+          "name": "Togo",
+          "fnrb": 0.46
+        },
+        "THA": {
+          "name": "Thailand",
+          "fnrb": 0.2
+        },
+        "TJK": {
+          "name": "Tajikistan",
+          "fnrb": 0.19
+        },
+        "TKM": {
+          "name": "Turkmenistan",
+          "fnrb": 0.0
+        },
+        "TLS": {
+          "name": "Timor-Leste",
+          "fnrb": 0.39
+        },
+        "TUR": {
+          "name": "Turkey",
+          "fnrb": 0.13
+        },
+        "TZA": {
+          "name": "Tanzania",
+          "fnrb": 0.51
+        },
+        "UGA": {
+          "name": "Uganda",
+          "fnrb": 0.39
+        },
+        "UZB": {
+          "name": "Uzbekistan",
+          "fnrb": 0.15
+        },
+        "VNM": {
+          "name": "Vietnam",
+          "fnrb": 0.36
+        },
+        "ZAF": {
+          "name": "South Africa",
+          "fnrb": 0.18
+        },
+        "ZMB": {
+          "name": "Zambia",
+          "fnrb": 0.4
+        },
+        "ZWE": {
+          "name": "Zimbabwe",
+          "fnrb": 0.21
+        }
+      },
+      "multiNational": {
+        "desc": "THE OFFICIAL FALLBACK (Amy's ruling (3), 2026-09-21). A country with no Table 3 national row takes the multi-national value for its region. The region is decided by the cited UN M49 geoscheme in calculators/data/regions/un-m49.json, because AMT-009 names the three regions and publishes no country list for them. A country in none of the three takes NO VALUE - the calculator refuses and asks for a filed value.",
+        "cite": "A6.4-AMT-009 v01.0 Table 2, default values for fNRB at multi-national level (p.4) - the same values as CDM TOOL33 v03.0 Table 2 (AMT-009 para.16); origin MoFuSS / Ghilardi & Bailis (2024). Read from the PDF 2026-09-22.",
+        "registrySources": [
+          "a64-amt-009-fnrb",
+          "cdm-tool33"
+        ],
+        "regionMap": "calculators/data/regions/un-m49.json",
+        "footnote5": "A6.4-AMT-009 footnote 5: multi-national values are appropriate where no country-specific national value exists and the activity reduces charcoal use; they may also suit places where cross-border charcoal trade is pervasive and the multi-national value is conservative against the national one.",
+        "regions": {
+          "asia": {
+            "label": "Asia",
+            "fnrb": 0.18
+          },
+          "latin-america": {
+            "label": "Latin America",
+            "fnrb": 0.32
+          },
+          "sub-saharan-africa": {
+            "label": "Sub-Saharan Africa",
+            "fnrb": 0.4
+          }
+        },
+        "noGlobalValue": "CHECKED IN BOTH PRIMARY PDFs, 2026-09-22 (Amy asked, on her eyeball of ruling (3)): NEITHER TOOL PUBLISHES A GLOBAL OR WORLD fNRB ROW. A6.4-AMT-009 v01.0 Table 2 has exactly three rows (Asia, Latin America, Sub-Saharan Africa) and the word \"global\" does not appear anywhere in the document; CDM TOOL33 v03.0 Table 2 is titled \"Regional (Continental) fNRB values\" and carries the same three rows, with no global or world row either. Table 4 is SUB-national - narrower, not broader. So there is no wider official value being withheld from a project outside the three regions: the refusal is the whole of what the tools offer, not our choice among options.", "supportingRule": "CDM TOOL33 v03.0 para.16: national values are the general choice, and a regional value is allowed only when no national value exists. Read 2026-09-22 - it states the national-then-regional order this fallback implements. AMT-009 footnote 5 is the CONDITION on using a regional value and is the one printed to the user; this line is the order-of-preference, recorded so the check is not repeated.", "refusal": "No official fNRB default covers this country. AMT-009 publishes national values for 90 countries and multi-national values for three regions only; this country is in neither list, so the calculator has no number to offer and will not invent one."
+      },
+      "retired_2026-09-22_fallback": {
+        "struck": "STRUCK 2026-09-22 (Amy's ruling (3), 2026-09-21), replaced by multiNational above. A quartile of the countries that happen to be in Table 3 was never a published default - it was our own statistic, offered as if it were one, and the Low/Median/High dial invited a consultant to pick among three numbers no tool publishes. Kept here as the record of what was read until calculator v0.10.0; read by nothing.",
+        "conservativeDirection": "low",
+        "percentiles": {
+          "p25": 0.1325,
+          "p50": 0.32,
+          "p75": 0.39
+        },
+        "cite": "MoFuSS - global sim adm0 (Zenodo) — quartiles of the vintage's national fNRB. Lower fNRB = lower baseline = fewer credits = conservative; the 25th percentile is the default when a country is absent.",
+        "note": "Adjustable Low/Median/High stops exposed by the UI ONLY when this fallback fires."
+      }
+    }
+  },
+  "notes": [
+    "VINTAGE POLICY (standing; amended 2026-09-21 by Amy's amended R1; amended again 2026-09-21 by her ruling (1)): vintages are demand-driven, not exhaustive. Do NOT catalog historical fNRB sources as calculation vintages. Transitioning projects supply their filing-era fNRB from their own filed documents via per-project filed-override fields (entered + cited per project), not from lookup tables. Lookup tables serve ex-ante calculations on current vintages. STRUCK 2026-09-22 (ruling (1), the old-file hunt is closed): the 'ONE planned exception - an ILLUSTRATIVE earlier-default line read from TOOL33 v02.0' is withdrawn; transitioning projects use their filed value only.",
+    "Default vintage for new ex-ante = mofuss-adm0-csv (the A6.4-AMT-009 Table 3 values, full coverage). CORRECTED 2026-09-22: this line used to say 'The UI exposes a vintage picker (advanced area)' - no picker exists; the seat always uses defaultVintage, and a filed current value is the only override.",
+    "Reference entries anchor to the OFFICIAL Table 3 values (A6.4-AMT-009 = TOOL33 v03.0) from calculator v0.9.0, 2026-09-22 (Amy's ruling (4)): IND 0.07 / KEN 0.29 / UGA 0.39 / MWI 0.48 / TZA 0.51 / NER 0.61; 29 reference entries re-derived, table in the maintainers' reference derivation notes. STRUCK: 'Reference entries stay anchored to the report vintage; the exact-anchor gate passes within that vintage (IND 0.06 / KEN 0.30 / UGA 0.35 / MWI 0.49 / TZA 0.51 / NER 0.60). No reference re-derivation.'",
+    "B1 transition analysis computes under the filing-era values (via overrides) AND the latest vintage side by side. 'Which vintage validators accept for issuance' is on the reviewer's question list (Q1). Since 2026-09-21 the fNRB change is reported as its own 'fNRB rule update' line, apart from the methodology transition (see ruleUpdate).",
+    "Every calculator output MUST label the fNRB vintage used.",
+    "RULING (3), BUILT 2026-09-22 (calculator v0.10.0; was recorded here as NOT BUILT on 2026-09-22 and is struck to BUILT the same day): a country with no Table 3 row takes the official multi-national value from A6.4-AMT-009 Table 2 (Asia 18, Latin America 32, Sub-Saharan Africa 40) by the cited UN M49 geoscheme data file calculators/data/regions/un-m49.json; a country outside the three regions gets an honest 'no official default, enter a filed value' and no number; when a regional value is used the report prints AMT-009 footnote 5's condition (multi-national values are for activities reducing charcoal use where no national value exists). The quartile dial is retired for fNRB on every vintage - see each vintage's retired_2026-09-22_fallback. The dial itself stays for household size, which has no official regional table."
+  ]
+}

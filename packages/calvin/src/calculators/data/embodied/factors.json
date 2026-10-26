@@ -1,0 +1,18 @@
+{
+  "pathway": "gs4gg-carbon",
+  "dataset": "embodied-emission-factors",
+  "version": "1.0.0",
+  "description": "Default cradle-to-gate embodied-emission deductions per new activity-technology unit (HWT/IWT) or system (CWT/CWS), applied once per unit disseminated: upfront in the year of dissemination (Eq.18, technical lifetime < 5 y or by choice) or amortised evenly over the first crediting period (Eq.19, durable technologies). Transcribed 2026-09-21 from GS4GG PAA M400-12 V2.0 §9.2 Table 10 (p.36) and the embodied-factor parameter table (p.58, kg CO2e). The parameter table marks the values provisional pending the SI §3 LCA derivation and holds the 4,500 kg borehole figure for source verification. Answers the reviewer's comment 1.7 ([#208], [#209]).",
+  "registrySources": ["gs-429-v2-methodology", "gs-429-v2-si"],
+  "unit": "tCO2e per unit (HWT/IWT) or per system (CWT/CWS)",
+  "amortisationYears": { "value": 5, "cite": "V2 §9.2.2.1(b) p.37 — amortised over the first crediting period (5 years)", "registry": "gs-429-v2-methodology" },
+  "categories": {
+    "basic-filter": { "label": "Basic filters (ceramic, sand, dispensers)", "technology": "HWT/IWT", "factor": 0.008, "cite": "V2 §9.2 Table 10 p.36; parameter table p.58 (8.0 kg)", "registry": "gs-429-v2-methodology" },
+    "advanced-treatment": { "label": "Advanced treatment (membrane, UV)", "technology": "HWT/IWT", "factor": 0.012, "cite": "V2 §9.2 Table 10 p.36; p.58 (12.0 kg)", "registry": "gs-429-v2-methodology" },
+    "biosand-concrete": { "label": "Biosand filter — concrete", "technology": "HWT/IWT", "factor": 0.065, "cite": "V2 §9.2 Table 10 p.36; p.58 (65 kg)", "registry": "gs-429-v2-methodology" },
+    "biosand-plastic": { "label": "Biosand filter — plastic", "technology": "HWT/IWT", "factor": 0.025, "cite": "V2 §9.2 Table 10 p.36; p.58 (25 kg)", "registry": "gs-429-v2-methodology" },
+    "rehabilitation": { "label": "Rehabilitation (pump / hardware only)", "technology": "CWT/CWS", "factor": 1.0, "cite": "V2 §9.2 Table 10 p.36; p.58 (1,000 kg)", "registry": "gs-429-v2-methodology" },
+    "cwt-kiosk": { "label": "CWT kiosk (treatment infrastructure)", "technology": "CWT/CWS", "factor": 2.0, "cite": "V2 §9.2 Table 10 p.36; p.58 (2,000 kg)", "registry": "gs-429-v2-methodology" },
+    "new-borehole-mechanised": { "label": "New borehole / mechanised system", "technology": "CWT/CWS", "factor": 4.5, "cite": "V2 §9.2 Table 10 p.36; p.58 (4,500 kg — held for source verification)", "registry": "gs-429-v2-methodology" }
+  }
+}

@@ -1,0 +1,1135 @@
+{
+  "pathway": "cross-cutting",
+  "dataset": "household-size-default",
+  "version": "1.1.0",
+  "description": "National average household size (people per household) — the DEFAULT conversion for the households<->people population-input toggle on the Vector calculator (M8). FULL COVERAGE: every country the UN source provides. Labelled a default; replaceable by a project's own surveyed household size.",
+  "registrySources": [
+    "un-hh-size-2022"
+  ],
+  "source_year": 2022,
+  "coverage": "All 186 countries resolvable to ISO 3166-1 alpha-3 in the UN 2022 source. A country absent from the source has no household size here: the project's own figure is asked for (Amy, 2026-10-23). The quartile fallback this file used to hold is kept in the maintainers' archive.",
+  "method": "From UN DESA 'Household Size and Composition 2022', sheet 'HH size and composition 2022', column 'Average household size (number of members)'. For each country the most-recent reference date across all listed survey sources (DHS/MICS/census/DYB) is selected. UN M49 code mapped to ISO3 via pycountry.",
+  "countries": {
+    "ABW": {
+      "name": "Aruba",
+      "peoplePerHousehold": 2.89,
+      "source": "DYB",
+      "reference_year": 2010
+    },
+    "AFG": {
+      "name": "Afghanistan",
+      "peoplePerHousehold": 8.04,
+      "source": "DHS",
+      "reference_year": 2015
+    },
+    "AGO": {
+      "name": "Angola",
+      "peoplePerHousehold": 4.82,
+      "source": "DHS",
+      "reference_year": 2016
+    },
+    "ALB": {
+      "name": "Albania",
+      "peoplePerHousehold": 3.3,
+      "source": "DHS",
+      "reference_year": 2017
+    },
+    "ARG": {
+      "name": "Argentina",
+      "peoplePerHousehold": 2.95,
+      "source": "MICS",
+      "reference_year": 2019
+    },
+    "ARM": {
+      "name": "Armenia",
+      "peoplePerHousehold": 3.54,
+      "source": "DHS",
+      "reference_year": 2016
+    },
+    "AUS": {
+      "name": "Australia",
+      "peoplePerHousehold": 2.55,
+      "source": "DYB",
+      "reference_year": 2016
+    },
+    "AUT": {
+      "name": "Austria",
+      "peoplePerHousehold": 2.27,
+      "source": "DYB",
+      "reference_year": 2011
+    },
+    "AZE": {
+      "name": "Azerbaijan",
+      "peoplePerHousehold": 4.55,
+      "source": "DYB",
+      "reference_year": 2009
+    },
+    "BDI": {
+      "name": "Burundi",
+      "peoplePerHousehold": 4.83,
+      "source": "DHS",
+      "reference_year": 2016
+    },
+    "BEL": {
+      "name": "Belgium",
+      "peoplePerHousehold": 2.32,
+      "source": "DYB",
+      "reference_year": 2011
+    },
+    "BEN": {
+      "name": "Benin",
+      "peoplePerHousehold": 5.19,
+      "source": "DHS",
+      "reference_year": 2018
+    },
+    "BFA": {
+      "name": "Burkina Faso",
+      "peoplePerHousehold": 5.92,
+      "source": "DHS",
+      "reference_year": 2014
+    },
+    "BGD": {
+      "name": "Bangladesh",
+      "peoplePerHousehold": 4.26,
+      "source": "MICS",
+      "reference_year": 2019
+    },
+    "BGR": {
+      "name": "Bulgaria",
+      "peoplePerHousehold": 2.34,
+      "source": "LFS",
+      "reference_year": 2011
+    },
+    "BHS": {
+      "name": "Bahamas",
+      "peoplePerHousehold": 3.4,
+      "source": "DYB",
+      "reference_year": 2010
+    },
+    "BIH": {
+      "name": "Bosnia and Herzegovina",
+      "peoplePerHousehold": 3.5,
+      "source": "MICS",
+      "reference_year": 2011
+    },
+    "BLM": {
+      "name": "Saint Barthélémy",
+      "peoplePerHousehold": 2.42,
+      "source": "DYB",
+      "reference_year": 2015
+    },
+    "BLR": {
+      "name": "Belarus",
+      "peoplePerHousehold": 2.16,
+      "source": "DYB",
+      "reference_year": 2019
+    },
+    "BLZ": {
+      "name": "Belize",
+      "peoplePerHousehold": 3.75,
+      "source": "MICS",
+      "reference_year": 2015
+    },
+    "BMU": {
+      "name": "Bermuda",
+      "peoplePerHousehold": 2.26,
+      "source": "DYB",
+      "reference_year": 2016
+    },
+    "BOL": {
+      "name": "Bolivia (Plurinational State of)",
+      "peoplePerHousehold": 3.53,
+      "source": "DYB",
+      "reference_year": 2012
+    },
+    "BRA": {
+      "name": "Brazil",
+      "peoplePerHousehold": 3.31,
+      "source": "IPUMS",
+      "reference_year": 2010
+    },
+    "BRB": {
+      "name": "Barbados",
+      "peoplePerHousehold": 2.85,
+      "source": "MICS",
+      "reference_year": 2012
+    },
+    "BTN": {
+      "name": "Bhutan",
+      "peoplePerHousehold": 4.59,
+      "source": "MICS",
+      "reference_year": 2010
+    },
+    "BWA": {
+      "name": "Botswana",
+      "peoplePerHousehold": 3.52,
+      "source": "IPUMS",
+      "reference_year": 2011
+    },
+    "CAF": {
+      "name": "Central African Republic",
+      "peoplePerHousehold": 5.59,
+      "source": "MICS",
+      "reference_year": 2018
+    },
+    "CAN": {
+      "name": "Canada",
+      "peoplePerHousehold": 2.45,
+      "source": "DYB",
+      "reference_year": 2016
+    },
+    "CHE": {
+      "name": "Switzerland",
+      "peoplePerHousehold": 2.24,
+      "source": "DYB",
+      "reference_year": 2000
+    },
+    "CHL": {
+      "name": "Chile",
+      "peoplePerHousehold": 3.04,
+      "source": "IPUMS",
+      "reference_year": 2017
+    },
+    "CHN": {
+      "name": "China",
+      "peoplePerHousehold": 3.38,
+      "source": "IPUMS",
+      "reference_year": 2000
+    },
+    "CIV": {
+      "name": "Côte d’Ivoire",
+      "peoplePerHousehold": 4.58,
+      "source": "MICS",
+      "reference_year": 2016
+    },
+    "CMR": {
+      "name": "Cameroon",
+      "peoplePerHousehold": 4.99,
+      "source": "DHS",
+      "reference_year": 2018
+    },
+    "COD": {
+      "name": "Dem. Republic of the Congo",
+      "peoplePerHousehold": 5.17,
+      "source": "MICS",
+      "reference_year": 2017
+    },
+    "COG": {
+      "name": "Congo",
+      "peoplePerHousehold": 4.22,
+      "source": "MICS",
+      "reference_year": 2014
+    },
+    "COL": {
+      "name": "Colombia",
+      "peoplePerHousehold": 3.53,
+      "source": "DHS",
+      "reference_year": 2015
+    },
+    "COM": {
+      "name": "Comoros",
+      "peoplePerHousehold": 5.37,
+      "source": "DHS",
+      "reference_year": 2012
+    },
+    "CRI": {
+      "name": "Costa Rica",
+      "peoplePerHousehold": 3.21,
+      "source": "MICS",
+      "reference_year": 2018
+    },
+    "CUB": {
+      "name": "Cuba",
+      "peoplePerHousehold": 2.71,
+      "source": "MICS",
+      "reference_year": 2019
+    },
+    "CYP": {
+      "name": "Cyprus",
+      "peoplePerHousehold": 2.76,
+      "source": "DYB",
+      "reference_year": 2011
+    },
+    "CZE": {
+      "name": "Czechia",
+      "peoplePerHousehold": 2.34,
+      "source": "DYB",
+      "reference_year": 2011
+    },
+    "DEU": {
+      "name": "Germany",
+      "peoplePerHousehold": 2.14,
+      "source": "DYB",
+      "reference_year": 2011
+    },
+    "DJI": {
+      "name": "Djibouti",
+      "peoplePerHousehold": 5.89,
+      "source": "MICS",
+      "reference_year": 2006
+    },
+    "DOM": {
+      "name": "Dominican Republic",
+      "peoplePerHousehold": 3.09,
+      "source": "MICS",
+      "reference_year": 2019
+    },
+    "DZA": {
+      "name": "Algeria",
+      "peoplePerHousehold": 4.94,
+      "source": "MICS",
+      "reference_year": 2018
+    },
+    "ECU": {
+      "name": "Ecuador",
+      "peoplePerHousehold": 3.78,
+      "source": "DYB",
+      "reference_year": 2010
+    },
+    "EGY": {
+      "name": "Egypt",
+      "peoplePerHousehold": 4.13,
+      "source": "DHS",
+      "reference_year": 2014
+    },
+    "ESP": {
+      "name": "Spain",
+      "peoplePerHousehold": 2.58,
+      "source": "DYB",
+      "reference_year": 2011
+    },
+    "EST": {
+      "name": "Estonia",
+      "peoplePerHousehold": 2.3,
+      "source": "LFS",
+      "reference_year": 2011
+    },
+    "ETH": {
+      "name": "Ethiopia",
+      "peoplePerHousehold": 4.73,
+      "source": "DHS",
+      "reference_year": 2019
+    },
+    "FIN": {
+      "name": "Finland",
+      "peoplePerHousehold": 2.07,
+      "source": "DYB",
+      "reference_year": 2010
+    },
+    "FJI": {
+      "name": "Fiji",
+      "peoplePerHousehold": 4.57,
+      "source": "IPUMS",
+      "reference_year": 2014
+    },
+    "FRA": {
+      "name": "France",
+      "peoplePerHousehold": 2.22,
+      "source": "DYB",
+      "reference_year": 2015
+    },
+    "GAB": {
+      "name": "Gabon",
+      "peoplePerHousehold": 4.1,
+      "source": "DHS",
+      "reference_year": 2012
+    },
+    "GBR": {
+      "name": "United Kingdom",
+      "peoplePerHousehold": 2.35,
+      "source": "DYB",
+      "reference_year": 2011
+    },
+    "GEO": {
+      "name": "Georgia",
+      "peoplePerHousehold": 3.42,
+      "source": "MICS",
+      "reference_year": 2018
+    },
+    "GHA": {
+      "name": "Ghana",
+      "peoplePerHousehold": 3.83,
+      "source": "DHS",
+      "reference_year": 2019
+    },
+    "GIN": {
+      "name": "Guinea",
+      "peoplePerHousehold": 6.39,
+      "source": "DHS",
+      "reference_year": 2021
+    },
+    "GLP": {
+      "name": "Guadeloupe",
+      "peoplePerHousehold": 2.3,
+      "source": "DYB",
+      "reference_year": 2015
+    },
+    "GMB": {
+      "name": "Gambia",
+      "peoplePerHousehold": 8.07,
+      "source": "DHS",
+      "reference_year": 2020
+    },
+    "GNB": {
+      "name": "Guinea-Bissau",
+      "peoplePerHousehold": 6.81,
+      "source": "MICS",
+      "reference_year": 2018
+    },
+    "GNQ": {
+      "name": "Equatorial Guinea",
+      "peoplePerHousehold": 5.3,
+      "source": "MICS",
+      "reference_year": 2000
+    },
+    "GRC": {
+      "name": "Greece",
+      "peoplePerHousehold": 2.56,
+      "source": "IPUMS",
+      "reference_year": 2011
+    },
+    "GTM": {
+      "name": "Guatemala",
+      "peoplePerHousehold": 4.81,
+      "source": "DHS",
+      "reference_year": 2015
+    },
+    "GUF": {
+      "name": "French Guiana",
+      "peoplePerHousehold": 3.45,
+      "source": "DYB",
+      "reference_year": 2015
+    },
+    "GUY": {
+      "name": "Guyana",
+      "peoplePerHousehold": 3.5,
+      "source": "MICS",
+      "reference_year": 2019
+    },
+    "HKG": {
+      "name": "China, Hong Kong SAR",
+      "peoplePerHousehold": 2.83,
+      "source": "DYB",
+      "reference_year": 2016
+    },
+    "HND": {
+      "name": "Honduras",
+      "peoplePerHousehold": 3.87,
+      "source": "MICS",
+      "reference_year": 2019
+    },
+    "HRV": {
+      "name": "Croatia",
+      "peoplePerHousehold": 2.8,
+      "source": "DYB",
+      "reference_year": 2011
+    },
+    "HTI": {
+      "name": "Haiti",
+      "peoplePerHousehold": 4.29,
+      "source": "DHS",
+      "reference_year": 2017
+    },
+    "HUN": {
+      "name": "Hungary",
+      "peoplePerHousehold": 2.36,
+      "source": "DYB",
+      "reference_year": 2011
+    },
+    "IDN": {
+      "name": "Indonesia",
+      "peoplePerHousehold": 3.86,
+      "source": "DHS",
+      "reference_year": 2017
+    },
+    "IMN": {
+      "name": "Isle of Man",
+      "peoplePerHousehold": 2.28,
+      "source": "DYB",
+      "reference_year": 2016
+    },
+    "IND": {
+      "name": "India",
+      "peoplePerHousehold": 4.38,
+      "source": "DHS",
+      "reference_year": 2020
+    },
+    "IRL": {
+      "name": "Ireland",
+      "peoplePerHousehold": 2.83,
+      "source": "IPUMS",
+      "reference_year": 2016
+    },
+    "IRN": {
+      "name": "Iran (Islamic Republic of)",
+      "peoplePerHousehold": 3.51,
+      "source": "DYB",
+      "reference_year": 2011
+    },
+    "IRQ": {
+      "name": "Iraq",
+      "peoplePerHousehold": 6.35,
+      "source": "MICS",
+      "reference_year": 2018
+    },
+    "ISR": {
+      "name": "Israel",
+      "peoplePerHousehold": 3.14,
+      "source": "DYB",
+      "reference_year": 2008
+    },
+    "ITA": {
+      "name": "Italy",
+      "peoplePerHousehold": 2.4,
+      "source": "DYB",
+      "reference_year": 2011
+    },
+    "JAM": {
+      "name": "Jamaica",
+      "peoplePerHousehold": 3.06,
+      "source": "DYB",
+      "reference_year": 2011
+    },
+    "JOR": {
+      "name": "Jordan",
+      "peoplePerHousehold": 4.72,
+      "source": "DHS",
+      "reference_year": 2017
+    },
+    "JPN": {
+      "name": "Japan",
+      "peoplePerHousehold": 2.33,
+      "source": "DYB",
+      "reference_year": 2015
+    },
+    "KAZ": {
+      "name": "Kazakhstan",
+      "peoplePerHousehold": 3.44,
+      "source": "MICS",
+      "reference_year": 2015
+    },
+    "KEN": {
+      "name": "Kenya",
+      "peoplePerHousehold": 3.75,
+      "source": "DHS",
+      "reference_year": 2020
+    },
+    "KGZ": {
+      "name": "Kyrgyzstan",
+      "peoplePerHousehold": 4.05,
+      "source": "MICS",
+      "reference_year": 2018
+    },
+    "KHM": {
+      "name": "Cambodia",
+      "peoplePerHousehold": 4.61,
+      "source": "DHS",
+      "reference_year": 2014
+    },
+    "KIR": {
+      "name": "Kiribati",
+      "peoplePerHousehold": 5.9,
+      "source": "MICS",
+      "reference_year": 2018
+    },
+    "KOR": {
+      "name": "Republic of Korea",
+      "peoplePerHousehold": 2.34,
+      "source": "DYB",
+      "reference_year": 2020
+    },
+    "LAO": {
+      "name": "Lao People's Dem. Republic",
+      "peoplePerHousehold": 4.7,
+      "source": "MICS",
+      "reference_year": 2017
+    },
+    "LBR": {
+      "name": "Liberia",
+      "peoplePerHousehold": 4.58,
+      "source": "DHS",
+      "reference_year": 2019
+    },
+    "LCA": {
+      "name": "Saint Lucia",
+      "peoplePerHousehold": 2.89,
+      "source": "MICS",
+      "reference_year": 2012
+    },
+    "LIE": {
+      "name": "Liechtenstein",
+      "peoplePerHousehold": 2.26,
+      "source": "DYB",
+      "reference_year": 2015
+    },
+    "LSO": {
+      "name": "Lesotho",
+      "peoplePerHousehold": 3.73,
+      "source": "MICS",
+      "reference_year": 2018
+    },
+    "LTU": {
+      "name": "Lithuania",
+      "peoplePerHousehold": 2.38,
+      "source": "DYB",
+      "reference_year": 2011
+    },
+    "LUX": {
+      "name": "Luxembourg",
+      "peoplePerHousehold": 2.41,
+      "source": "DYB",
+      "reference_year": 2011
+    },
+    "LVA": {
+      "name": "Latvia",
+      "peoplePerHousehold": 2.26,
+      "source": "DYB",
+      "reference_year": 2021
+    },
+    "MAC": {
+      "name": "China, Macao SAR",
+      "peoplePerHousehold": 3.07,
+      "source": "DYB",
+      "reference_year": 2016
+    },
+    "MAF": {
+      "name": "Saint-Martin (French part)",
+      "peoplePerHousehold": 2.56,
+      "source": "DYB",
+      "reference_year": 2015
+    },
+    "MAR": {
+      "name": "Morocco",
+      "peoplePerHousehold": 4.58,
+      "source": "IPUMS",
+      "reference_year": 2014
+    },
+    "MCO": {
+      "name": "Monaco",
+      "peoplePerHousehold": 2.13,
+      "source": "DYB",
+      "reference_year": 2016
+    },
+    "MDA": {
+      "name": "Republic of Moldova",
+      "peoplePerHousehold": 2.89,
+      "source": "DYB",
+      "reference_year": 2014
+    },
+    "MDG": {
+      "name": "Madagascar",
+      "peoplePerHousehold": 4.5,
+      "source": "MICS",
+      "reference_year": 2018
+    },
+    "MDV": {
+      "name": "Maldives",
+      "peoplePerHousehold": 5.4,
+      "source": "DHS",
+      "reference_year": 2017
+    },
+    "MEX": {
+      "name": "Mexico",
+      "peoplePerHousehold": 3.74,
+      "source": "IPUMS",
+      "reference_year": 2015
+    },
+    "MKD": {
+      "name": "TFYR Macedonia",
+      "peoplePerHousehold": 3.45,
+      "source": "MICS",
+      "reference_year": 2018
+    },
+    "MLI": {
+      "name": "Mali",
+      "peoplePerHousehold": 5.81,
+      "source": "DHS",
+      "reference_year": 2018
+    },
+    "MLT": {
+      "name": "Malta",
+      "peoplePerHousehold": 2.67,
+      "source": "DYB",
+      "reference_year": 2011
+    },
+    "MMR": {
+      "name": "Myanmar",
+      "peoplePerHousehold": 4.22,
+      "source": "DHS",
+      "reference_year": 2016
+    },
+    "MNE": {
+      "name": "Montenegro",
+      "peoplePerHousehold": 3.29,
+      "source": "MICS",
+      "reference_year": 2018
+    },
+    "MNG": {
+      "name": "Mongolia",
+      "peoplePerHousehold": 3.63,
+      "source": "MICS",
+      "reference_year": 2018
+    },
+    "MOZ": {
+      "name": "Mozambique",
+      "peoplePerHousehold": 4.52,
+      "source": "DHS",
+      "reference_year": 2018
+    },
+    "MRT": {
+      "name": "Mauritania",
+      "peoplePerHousehold": 5.77,
+      "source": "MICS",
+      "reference_year": 2015
+    },
+    "MTQ": {
+      "name": "Martinique",
+      "peoplePerHousehold": 2.25,
+      "source": "DYB",
+      "reference_year": 2015
+    },
+    "MUS": {
+      "name": "Mauritius",
+      "peoplePerHousehold": 3.48,
+      "source": "DYB",
+      "reference_year": 2011
+    },
+    "MWI": {
+      "name": "Malawi",
+      "peoplePerHousehold": 4.28,
+      "source": "MICS",
+      "reference_year": 2019
+    },
+    "MYS": {
+      "name": "Malaysia",
+      "peoplePerHousehold": 4.57,
+      "source": "DYB",
+      "reference_year": 2000
+    },
+    "MYT": {
+      "name": "Mayotte",
+      "peoplePerHousehold": 4.05,
+      "source": "DYB",
+      "reference_year": 2017
+    },
+    "NAM": {
+      "name": "Namibia",
+      "peoplePerHousehold": 4.24,
+      "source": "DHS",
+      "reference_year": 2013
+    },
+    "NER": {
+      "name": "Niger",
+      "peoplePerHousehold": 5.92,
+      "source": "DHS",
+      "reference_year": 2012
+    },
+    "NGA": {
+      "name": "Nigeria",
+      "peoplePerHousehold": 4.66,
+      "source": "DHS",
+      "reference_year": 2018
+    },
+    "NIC": {
+      "name": "Nicaragua",
+      "peoplePerHousehold": 4.92,
+      "source": "IPUMS",
+      "reference_year": 2005
+    },
+    "NLD": {
+      "name": "Netherlands",
+      "peoplePerHousehold": 2.23,
+      "source": "LFS",
+      "reference_year": 2011
+    },
+    "NOR": {
+      "name": "Norway",
+      "peoplePerHousehold": 2.22,
+      "source": "DYB",
+      "reference_year": 2011
+    },
+    "NPL": {
+      "name": "Nepal",
+      "peoplePerHousehold": 4.25,
+      "source": "MICS",
+      "reference_year": 2019
+    },
+    "NZL": {
+      "name": "New Zealand",
+      "peoplePerHousehold": 2.6,
+      "source": "DYB",
+      "reference_year": 2018
+    },
+    "OMN": {
+      "name": "Oman",
+      "peoplePerHousehold": 8.02,
+      "source": "DYB",
+      "reference_year": 2003
+    },
+    "PAK": {
+      "name": "Pakistan",
+      "peoplePerHousehold": 6.8,
+      "source": "DHS",
+      "reference_year": 2013
+    },
+    "PAN": {
+      "name": "Panama",
+      "peoplePerHousehold": 3.64,
+      "source": "MICS",
+      "reference_year": 2013
+    },
+    "PER": {
+      "name": "Peru",
+      "peoplePerHousehold": 3.46,
+      "source": "DYB",
+      "reference_year": 2017
+    },
+    "PHL": {
+      "name": "Philippines",
+      "peoplePerHousehold": 4.23,
+      "source": "DHS",
+      "reference_year": 2017
+    },
+    "PNG": {
+      "name": "Papua New Guinea",
+      "peoplePerHousehold": 5.43,
+      "source": "IPUMS",
+      "reference_year": 2000
+    },
+    "POL": {
+      "name": "Poland",
+      "peoplePerHousehold": 2.82,
+      "source": "DYB",
+      "reference_year": 2011
+    },
+    "PRI": {
+      "name": "Puerto Rico",
+      "peoplePerHousehold": 2.67,
+      "source": "IPUMS",
+      "reference_year": 2010
+    },
+    "PRK": {
+      "name": "Dem. People's Rep. of Korea",
+      "peoplePerHousehold": 3.93,
+      "source": "DYB",
+      "reference_year": 2008
+    },
+    "PRT": {
+      "name": "Portugal",
+      "peoplePerHousehold": 2.58,
+      "source": "DYB",
+      "reference_year": 2011
+    },
+    "PRY": {
+      "name": "Paraguay",
+      "peoplePerHousehold": 3.87,
+      "source": "MICS",
+      "reference_year": 2016
+    },
+    "PSE": {
+      "name": "State of Palestine",
+      "peoplePerHousehold": 5.06,
+      "source": "MICS",
+      "reference_year": 2019
+    },
+    "QAT": {
+      "name": "Qatar",
+      "peoplePerHousehold": 4.67,
+      "source": "MICS",
+      "reference_year": 2012
+    },
+    "REU": {
+      "name": "Réunion",
+      "peoplePerHousehold": 2.64,
+      "source": "DYB",
+      "reference_year": 2015
+    },
+    "ROU": {
+      "name": "Romania",
+      "peoplePerHousehold": 2.67,
+      "source": "DYB",
+      "reference_year": 2011
+    },
+    "RUS": {
+      "name": "Russian Federation",
+      "peoplePerHousehold": 2.58,
+      "source": "DYB",
+      "reference_year": 2010
+    },
+    "RWA": {
+      "name": "Rwanda",
+      "peoplePerHousehold": 4.28,
+      "source": "DHS",
+      "reference_year": 2020
+    },
+    "SDN": {
+      "name": "Sudan",
+      "peoplePerHousehold": 5.89,
+      "source": "MICS",
+      "reference_year": 2014
+    },
+    "SEN": {
+      "name": "Senegal",
+      "peoplePerHousehold": 8.66,
+      "source": "DHS",
+      "reference_year": 2017
+    },
+    "SGP": {
+      "name": "Singapore",
+      "peoplePerHousehold": 2.95,
+      "source": "DYB",
+      "reference_year": 2020
+    },
+    "SLE": {
+      "name": "Sierra Leone",
+      "peoplePerHousehold": 5.29,
+      "source": "DHS",
+      "reference_year": 2019
+    },
+    "SLV": {
+      "name": "El Salvador",
+      "peoplePerHousehold": 3.92,
+      "source": "MICS",
+      "reference_year": 2014
+    },
+    "SOM": {
+      "name": "Somalia",
+      "peoplePerHousehold": 6.16,
+      "source": "MICS",
+      "reference_year": 2011
+    },
+    "SPM": {
+      "name": "Saint Pierre and Miquelon",
+      "peoplePerHousehold": 2.26,
+      "source": "DYB",
+      "reference_year": 2015
+    },
+    "SRB": {
+      "name": "Serbia",
+      "peoplePerHousehold": 2.85,
+      "source": "MICS",
+      "reference_year": 2019
+    },
+    "SSD": {
+      "name": "South Sudan",
+      "peoplePerHousehold": 5.98,
+      "source": "MICS",
+      "reference_year": 2010
+    },
+    "STP": {
+      "name": "Sao Tome and Principe",
+      "peoplePerHousehold": 4.06,
+      "source": "MICS",
+      "reference_year": 2019
+    },
+    "SUR": {
+      "name": "Suriname",
+      "peoplePerHousehold": 3.86,
+      "source": "MICS",
+      "reference_year": 2018
+    },
+    "SVK": {
+      "name": "Slovakia",
+      "peoplePerHousehold": 2.9,
+      "source": "DYB",
+      "reference_year": 2011
+    },
+    "SVN": {
+      "name": "Slovenia",
+      "peoplePerHousehold": 2.47,
+      "source": "DYB",
+      "reference_year": 2015
+    },
+    "SWZ": {
+      "name": "Eswatini",
+      "peoplePerHousehold": 4.04,
+      "source": "MICS",
+      "reference_year": 2014
+    },
+    "SXM": {
+      "name": "Sint Maarten (Dutch part)",
+      "peoplePerHousehold": 2.58,
+      "source": "DYB",
+      "reference_year": 2011
+    },
+    "SYC": {
+      "name": "Seychelles",
+      "peoplePerHousehold": 3.78,
+      "source": "DYB",
+      "reference_year": 2002
+    },
+    "SYR": {
+      "name": "Syrian Arab Republic",
+      "peoplePerHousehold": 5.65,
+      "source": "MICS",
+      "reference_year": 2006
+    },
+    "TCA": {
+      "name": "Turks and Caicos Islands",
+      "peoplePerHousehold": 2.37,
+      "source": "MICS",
+      "reference_year": 2019
+    },
+    "TCD": {
+      "name": "Chad",
+      "peoplePerHousehold": 5.97,
+      "source": "MICS",
+      "reference_year": 2019
+    },
+    "TGO": {
+      "name": "Togo",
+      "peoplePerHousehold": 4.35,
+      "source": "MICS",
+      "reference_year": 2017
+    },
+    "THA": {
+      "name": "Thailand",
+      "peoplePerHousehold": 2.84,
+      "source": "MICS",
+      "reference_year": 2019
+    },
+    "TJK": {
+      "name": "Tajikistan",
+      "peoplePerHousehold": 5.99,
+      "source": "DHS",
+      "reference_year": 2017
+    },
+    "TKL": {
+      "name": "Tokelau",
+      "peoplePerHousehold": 5.24,
+      "source": "DYB",
+      "reference_year": 2011
+    },
+    "TKM": {
+      "name": "Turkmenistan",
+      "peoplePerHousehold": 5.22,
+      "source": "MICS",
+      "reference_year": 2019
+    },
+    "TLS": {
+      "name": "Timor-Leste",
+      "peoplePerHousehold": 5.27,
+      "source": "DHS",
+      "reference_year": 2016
+    },
+    "TON": {
+      "name": "Tonga",
+      "peoplePerHousehold": 5.3,
+      "source": "MICS",
+      "reference_year": 2019
+    },
+    "TTO": {
+      "name": "Trinidad and Tobago",
+      "peoplePerHousehold": 3.29,
+      "source": "IPUMS",
+      "reference_year": 2011
+    },
+    "TUN": {
+      "name": "Tunisia",
+      "peoplePerHousehold": 3.89,
+      "source": "MICS",
+      "reference_year": 2018
+    },
+    "TUR": {
+      "name": "Türkiye",
+      "peoplePerHousehold": 4.07,
+      "source": "DHS",
+      "reference_year": 2004
+    },
+    "TUV": {
+      "name": "Tuvalu",
+      "peoplePerHousehold": 6.05,
+      "source": "MICS",
+      "reference_year": 2019
+    },
+    "TZA": {
+      "name": "United Republic of Tanzania",
+      "peoplePerHousehold": 4.85,
+      "source": "DHS",
+      "reference_year": 2015
+    },
+    "UGA": {
+      "name": "Uganda",
+      "peoplePerHousehold": 4.87,
+      "source": "DHS",
+      "reference_year": 2019
+    },
+    "UKR": {
+      "name": "Ukraine",
+      "peoplePerHousehold": 2.53,
+      "source": "MICS",
+      "reference_year": 2012
+    },
+    "URY": {
+      "name": "Uruguay",
+      "peoplePerHousehold": 3.02,
+      "source": "MICS",
+      "reference_year": 2012
+    },
+    "USA": {
+      "name": "United States of America",
+      "peoplePerHousehold": 2.49,
+      "source": "IPUMS",
+      "reference_year": 2015
+    },
+    "UZB": {
+      "name": "Uzbekistan",
+      "peoplePerHousehold": 5.22,
+      "source": "MICS",
+      "reference_year": 2006
+    },
+    "VEN": {
+      "name": "Venezuela (Bolivarian Republic of)",
+      "peoplePerHousehold": 4.33,
+      "source": "IPUMS",
+      "reference_year": 2001
+    },
+    "VNM": {
+      "name": "Viet Nam",
+      "peoplePerHousehold": 3.44,
+      "source": "MICS",
+      "reference_year": 2020
+    },
+    "VUT": {
+      "name": "Vanuatu",
+      "peoplePerHousehold": 5.08,
+      "source": "MICS",
+      "reference_year": 2007
+    },
+    "WSM": {
+      "name": "Samoa",
+      "peoplePerHousehold": 6.6,
+      "source": "MICS",
+      "reference_year": 2019
+    },
+    "YEM": {
+      "name": "Yemen",
+      "peoplePerHousehold": 6.67,
+      "source": "DHS",
+      "reference_year": 2013
+    },
+    "ZAF": {
+      "name": "South Africa",
+      "peoplePerHousehold": 3.36,
+      "source": "DHS",
+      "reference_year": 2016
+    },
+    "ZMB": {
+      "name": "Zambia",
+      "peoplePerHousehold": 5.0,
+      "source": "DHS",
+      "reference_year": 2018
+    },
+    "ZWE": {
+      "name": "Zimbabwe",
+      "peoplePerHousehold": 4.02,
+      "source": "MICS",
+      "reference_year": 2019
+    }
+  },
+  "notes": [
+    "DEFAULT only — a project with its own surveyed household size overrides these.",
+    "Most-recent reference date per country selected from the UN 2022 time series; some countries reflect older survey rounds (see reference_year) — flag for refresh if newer UN data lands.",
+    "1 non-ISO3 UN areas skipped (no alpha-3): Kosovo (under UNSC res. 1244)."
+  ]
+}

@@ -34,8 +34,9 @@ gate's design before the real gate is built.
   - [~] Four stubs: `@waterbots/core`, `calvin`, `phoebe`, `bridget`. Each builds, has one trivial test, an Apache 2.0
         `LICENSE` and `NOTICE` (copyright line: WaterBots AI, LLC), and a README that says it is empty for now. All marked `private`: nothing goes to npm.
   - [~] `scripts/check-packages.mjs`, run by the test job: keeps every package private, licensed and empty-for-now
-  - [ ] Later, own pull requests: the real plug points in `core` (`ModuleProject`, `StandardId`, `SaveOutcome`, the
-        agent contract, design tokens and base stylesheet); Calvin's folders arrive with the seed (M2).
+  - [~] The real plug points in `core` (`ModuleProject`, `StandardId`, `SaveOutcome`, the agent contract) and Calvin's
+        folders arrive with the seed (M2.1). Design tokens and the base stylesheet are still to do, in their own pull
+        request.
 - **M1.4 Amy's hand-steps** — blocked until Amy; Session C cannot do these. **Due before the first release (M2.2).**
   - [!] Branch protection on `main`: a pull request before merging, every check required, no force pushes or
         deletions, applied to admins too. Can be done now; steps are in pull request #1.
@@ -52,10 +53,14 @@ gate's design before the real gate is built.
 
 *Stop for Amy:* the private side confirms the package matches the seed. *Waits on:* the seed (Amy's one-time carry).
 
-- [ ] **M2.1** Seed arrives unchanged, with its reviewed-version ledger kept exactly as it arrives. Show that the
+- [~] **M2.1** Seed arrives unchanged, with its reviewed-version ledger kept exactly as it arrives. Show that the
       carried calculator builds and tests the same under this repo's tool versions (TypeScript 7.0.2, vitest 5.0.5,
-      Node 24.20.0), and say so in the pull request.
+      Node 24.20.0), and say so in the pull request. (Open pull request. `SEEDS.md` records it. No ledger file came
+      with the seed; see its known gaps.)
 - [ ] **M2.2** Publish `0.1.0` with no changes to what arrived. *Blocked until* Amy's hand-steps in M1.4 are done.
+- [ ] **M2.3 Linting** (was M1.6): add a linter that runs as part of CI, with the strictest settings that fit. Amy
+      ruled on 2026-10-23 that it comes right after the seed lands (after M2.2), not before it. The seed is carried
+      as it is first.
 
 ## M3 — The method registry (no look change)
 
@@ -124,9 +129,12 @@ Amy's safety passes cover all three repos. This repo's own parts are listed here
 - **Strict typing is on from day one.** `tsconfig.base.json` sets `strict` plus extra checks (unchecked indexed
   access, exact optional properties, no implicit override, verbatim module syntax). Every package extends it, and the
   `typecheck` check must pass on every pull request.
-- **Linting is not set up yet.** Only strict typing is on today. Adding a linter is its own pull request (lane 3).
-- [ ] **M1.6 Linting:** add a linter that runs as part of CI, with the strictest settings that fit. Ahead of the seed
-      (M2) so the carried calculator is held to it from the start.
+- **Two of the extra checks are off for `calvin`.** The seed was typechecked with `strict` only. Unchecked indexed
+  access and exact optional properties flag its code in 95 places, so `packages/calvin/tsconfig.json` leaves them
+  off. `core` keeps them. A known gap (see `SEEDS.md`): the code is fixed at the source, in the private repo, before a
+  later seal, and carried as a new seed. Then the two checks go back on for `calvin`.
+- **Linting is not set up yet.** Only strict typing is on today. Adding a linter is its own pull request (lane 3):
+  plan item M2.3, right after the seed lands.
 
 ---
 

@@ -1,0 +1,93 @@
+{
+  "pathway": "gs4gg-carbon",
+  "method": "legacy-v1.0",
+  "version": "1.0.0",
+  "description": "Legacy (SDWS V1.0) default parameters, confirmed against the official ER Excel tool. See CALCULATOR_SPEC.md §2.6. Version-pinned, source-cited; no magic numbers in calculator code.",
+  "registrySources": [
+    "gs-429-v1-methodology",
+    "gs-429-1-ertool-cws"
+  ],
+  "parameters": {
+    "SE_o": {
+      "value": 360.83,
+      "unit": "kJ/L",
+      "cite": "V1 §3.6.2; ERtool Parameters!E53",
+      "registry": "gs-429-v1-methodology",
+      "desc": "Energy to boil 1 L of water (5-minute rolling boil)"
+    },
+    "EF_CO2": {
+      "wood": 112,
+      "charcoal": 165.22,
+      "unit": "tCO2/TJ",
+      "cite": "SDWS 9.1/9.2",
+      "registry": "gs-429-v1-methodology",
+      "desc": "Fuel CO2 emission factor by fuel type"
+    },
+    "EF_nonCO2": {
+      "wood": 9.46,
+      "charcoal": 44.83,
+      "unit": "tCO2e/TJ",
+      "cite": "SDWS 10.1/10.2",
+      "registry": "gs-429-v1-methodology",
+      "desc": "Fuel non-CO2 emission factor by fuel type (omitted for fossil fuels per V1 §3.6.1)"
+    },
+    "eta": {
+      "TSF": 0.1,
+      "conventional": 0.2,
+      "ICS": 0.3,
+      "other": 1,
+      "unit": "fraction",
+      "cite": "V1 SDWS 11 (p.24): three-stone/TSF 10%, other conventional 20%, ICS 30% (or mfr spec)",
+      "registry": "gs-429-v1-methodology",
+      "desc": "Stove thermal efficiency by class — LEGACY V1 defaults. VERSION-AWARE: V2 (PAA) SDWS 11 (p.52) differs — three-stone/conventional 15%, other conventional 25%, ICS 30%. Do NOT apply these V1 values to a PAA computation; lower eta inflates the baseline (more credits), so the V2 defaults are the more conservative direction. Byte-verified against both PDFs 2026-07-22."
+    },
+    "Xcleanboil_default": {
+      "value": 0,
+      "unit": "fraction",
+      "cite": "SDWS 22",
+      "registry": "gs-429-v1-methodology",
+      "desc": "Proportion of end-users boiling already-clean water (ex-ante default 0; see §5.1)"
+    },
+    "Mq_default": {
+      "value": 1,
+      "unit": "fraction",
+      "cite": "SDWS 18",
+      "registry": "gs-429-v1-methodology",
+      "desc": "Water-quality modifier default (fraction of samples passing)"
+    },
+    "EF_ec": {
+      "above_250_kWh_yr": 0.001,
+      "below_250_kWh_yr": 0.0008,
+      "unit": "tCO2/kWh",
+      "cite": "SDWS 16.1/16.2",
+      "registry": "gs-429-v1-methodology",
+      "desc": "Electricity emission factor by annual consumption band"
+    },
+    "TDL_ec": {
+      "value": 0.2,
+      "unit": "fraction",
+      "cite": "SDWS 17",
+      "registry": "gs-429-v1-methodology",
+      "desc": "Technical distribution loss factor for electricity"
+    },
+    "QPW_institutional": {
+      "full_day": 4,
+      "half_day": 3,
+      "unit": "L/person/day",
+      "cite": "SDWS 24.1/24.2",
+      "registry": "gs-429-v1-methodology",
+      "desc": "Institutional per-person daily water quantity default (full-day / half-day)"
+    },
+    "QPW_cap": {
+      "value": 5.5,
+      "unit": "L/person/day",
+      "cite": "V1 §3.6.6",
+      "registry": "gs-429-v1-methodology",
+      "desc": "Per-person daily safe-water volume cap"
+    }
+  },
+  "notes": [
+    "NCV_f and EF_f (fuel net calorific value / fuel emission factors) use IPCC or national values [SDWS 14/15]; supplied per-project, not defaulted here.",
+    "fNRB_default was the legacy flat value; it is retired, and its record is kept in the maintainers' archive rather than in this file. The old-TOOL30-vs-updated-MoFuSS fNRB shift (materially moves credits) is exercised in the reference dataset via the per-country fNRB table, a separate data file."
+  ]
+}
