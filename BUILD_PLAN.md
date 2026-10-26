@@ -131,7 +131,8 @@ Amy's safety passes cover all three repos. This repo's own parts are listed here
   `typecheck` check must pass on every pull request.
 - **Two of the extra checks are off for `calvin`.** The seed was typechecked with `strict` only. Unchecked indexed
   access and exact optional properties flag its code in 95 places, so `packages/calvin/tsconfig.json` leaves them
-  off. `core` keeps them. Bringing the seed's code up to them is its own pull request (lane 3).
+  off. `core` keeps them. A known gap (see `SEEDS.md`): the code is fixed at the source, in the private repo, before a
+  later seal, and carried as a new seed. Then the two checks go back on for `calvin`.
 - **Linting is not set up yet.** Only strict typing is on today. Adding a linter is its own pull request (lane 3):
   plan item M2.3, right after the seed lands.
 
