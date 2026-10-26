@@ -2,7 +2,7 @@
   "name": "@waterbots/core",
   "version": "0.0.0",
   "private": true,
-  "description": "WaterBots open core module: core (the plug points every module shares). Empty for now. Not published.",
+  "description": "WaterBots open core module: core (what every module shares: the project shape, standards list, save outcome, agent contract). Arrived with the Calvin seed. Not published.",
   "license": "Apache-2.0",
   "type": "module",
   "repository": {
@@ -16,6 +16,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "default": "./dist/*.js"
     }
   },
   "files": [
@@ -27,5 +31,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "build": "tsc -p tsconfig.build.json"
+  },
+  "peerDependencies": {
+    "react": "19.3.1"
   }
 }

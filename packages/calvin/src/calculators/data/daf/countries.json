@@ -1,0 +1,75 @@
+{
+  "pathway": "gs4gg-carbon",
+  "dataset": "daf-by-country-vintage",
+  "version": "2.0.0-six-rows",
+  "description": "Downward Adjustment Factor (DAF) lookup, keyed by (host country, vintage year -> 5-year application window). A fixed coefficient within a window. Values from the 457 DAF tool (GS4GG PAA MT400-05 v1.0, 22/12/2025), Table 03 'Default Downward Adjustment Factor Value (2026-2030)', PDF pp.15-31 (printed folios 14-30). See CALCULATOR_SPEC §3.4.",
+  "registrySources": [
+    "gs-457-daf"
+  ],
+  "coverage": "Six rows only: India, Kenya, Uganda, Malawi, Tanzania and Niger, the rows already public. Redistribution of the full table is not confirmed, so the other rows are left out until Gold Standard grants permission. Every other country takes the absolute floor below, labelled as such by the engine (scenario.ts resolveDaf).",
+  "method": "Read from Table 03 of the 457 DAF tool (PDF pages 15-31) with pdftotext. Each row keeps the 'Default DAF' column (daf_2026_2030, the value the engine applies) and the 'Peer Group' column as basis.",
+  "absolute_floor": {
+    "value": 0.0125,
+    "cite": "457 §5.7.1(b), PDF p.8; Definitions 'Absolute DAF Floor'",
+    "desc": "1.25% global fallback, which the tool applies when no comparison group can be established. The engine also uses it for a country Table 03 does not list, under the same fallback rule (Amy's ruling, 19 Oct), and the screens say so beside the value."
+  },
+  "sector_carveout_floor": {
+    "value": 0.0125,
+    "sectors": [
+      "Land Use & Forestry (removals)",
+      "engineered removals",
+      "agriculture",
+      "blue carbon"
+    ],
+    "cite": "457 §5.7.1(c) / §6.1.4",
+    "desc": "These sectors take the 1.25% absolute floor by default. (SDWS is none of these — informational.)"
+  },
+  "windows": {
+    "2026-2030": {
+      "start": "2026-01-01",
+      "end": "2030-12-31",
+      "cite": "457 §6.2.1(a)-(b); values in Table 03, PDF pp.15-31"
+    },
+    "2031-2035": {
+      "value": null,
+      "note": "Next NDC-cycle update, not yet published (457 §6.3.1(a)). Version 1.0 of the tool publishes the 2026-2030 window only."
+    }
+  },
+  "transitional_rule": "Projects registered before 2026 apply the 2026-2030 DAF from the 2026 vintage (457 §6.2.2).",
+  "countries": {
+    "IND": {
+      "name": "India",
+      "daf_2026_2030": 0.0204,
+      "basis": "Country DAF"
+    },
+    "KEN": {
+      "name": "Kenya",
+      "daf_2026_2030": 0.0345,
+      "basis": "Country DAF"
+    },
+    "UGA": {
+      "name": "Uganda",
+      "daf_2026_2030": 0.0345,
+      "basis": "Ambition Floor (Peer Group)"
+    },
+    "MWI": {
+      "name": "Malawi",
+      "daf_2026_2030": 0.0345,
+      "basis": "Ambition Floor (Peer Group)"
+    },
+    "TZA": {
+      "name": "Tanzania",
+      "daf_2026_2030": 0.0345,
+      "basis": "Ambition Floor (Peer Group)"
+    },
+    "NER": {
+      "name": "Niger",
+      "daf_2026_2030": 0.0345,
+      "basis": "Ambition Floor (Peer Group)"
+    }
+  },
+  "notes": [
+    "daf_2026_2030 is Table 03's 'Default DAF' column, read as published. 457 §6.2.1(b) says methodology developers shall refer to these default values.",
+    "DAF is a fixed coefficient applied to every vintage year within the window (457 §6.1.1, §6.3.1(a)); select the row by host country and the window containing the crediting vintage."
+  ]
+}

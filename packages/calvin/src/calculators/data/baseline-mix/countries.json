@@ -1,0 +1,18 @@
+{
+  "pathway": "gs4gg-carbon",
+  "dataset": "baseline-mix",
+  "version": "stub",
+  "description": "STUB, NO COUNTRY DATA. The published WHO household energy series is not carried in this bundle because its redistribution is unconfirmed, so no country has a default mix here and every project falls back to the labelled screening preset. Replace this file with the full one once the licence is confirmed.",
+  "registrySources": [],
+  "retrieval_date": "2026-09-26",
+  "fuelSource": {
+    "cite": "withheld from this bundle - see description",
+    "url": ""
+  },
+  "stoveSource": {
+    "cite": "withheld from this bundle - see description",
+    "url": ""
+  },
+  "coverage": "none (stub)",
+  "countries": {}
+}

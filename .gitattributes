@@ -1,0 +1,15 @@
+# Seeded files are kept byte for byte: no line-ending changes on any machine, so their fingerprints always match.
+# See SEEDS.md and scripts/check-seed.mjs.
+seeds/** -text
+packages/core/src/agent.ts -text
+packages/core/src/calculatorTool.ts -text
+packages/core/src/project.ts -text
+packages/core/src/readOnly.tsx -text
+packages/core/src/SaveNotice.tsx -text
+packages/core/src/saveOutcome.ts -text
+packages/core/src/standards.ts -text
+packages/calvin/src/modules/calvin/** -text
+packages/calvin/src/calculators/** -text
+packages/calvin/src/agents/** -text
+packages/calvin/src/sources/** -text
+packages/calvin/src/expected-outputs.json -text

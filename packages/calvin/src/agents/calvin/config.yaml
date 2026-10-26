@@ -1,0 +1,23 @@
+# Calvin — GS Safe Water quantification specialist (Tier 1). Paid Quantify seat
+# (Amy brand yes 2026-09-17). Vector is not a second chatbot face.
+# ~~Same exam as the Vector-named run (accredited 2026-08-03): status passing; `validator`
+# STAYS NULL — expert sign-off belongs to consultant reviewers.~~
+# BETA (Amy, 2026-09-18, [#197]): grades and credentials come only from the grading partner's rig, on questions
+# Amy has signed. The 2026-08-03 run was an engineer-written exam, never signed, never rig-graded —
+# a RECORD, not a credential (kept in the pack's evals/ folder). Status is draft so the repo claims
+# nothing Amy has not signed. Calvin stays live on the paid site; status has no runtime effect.
+agent: calvin
+version: 0.6.0 # 2026-10-23 ([#257]): his tool takes a device flow rate and devices per household, asked for only with a flow rate; 0.5.0 required the project facts (CALCULATOR_SPEC §0.2); 0.4.0 was the shared/paid split
+persona: calvin
+model: claude-sonnet-5
+role_prompt: prompt.md
+base_rules: ../_base-rules.md
+knowledge: knowledge.md
+context_packs: [] # none in the shared Calvin; a host that adds a search tool adds the packs it searches
+tools: # the shared Calvin's tools; a host may add its own (this site's are in a paid add-on, never seeded)
+  - calc/gs4gg-carbon.computeScenario
+  - calc/gs4gg-carbon.transitionWaterfall
+output_templates: []
+eval_suite: "knowledge-packs/calvin-quantify/evals/" # draft questions + the last run as a RECORD ([#197], 2026-09-18); the runner stays in evals/calvin/
+# ~~status: passing~~ (struck 2026-09-18, see the header)
+status: draft

@@ -1,0 +1,33 @@
+/* Calvin's stylesheet — the rules the calculator needs that are not utility classes.
+   Moved here from app/globals.css with the cut (PR C, seam S8): the report's print rules belong
+   to the module, so every host that mounts the calculator gets the same export. The paid site
+   imports this file in app/layout.tsx. */
+
+/* Report export — hidden on screen; the browser's Print / Save-as-PDF reveals only the
+   report (Slice 6 export; Anne's deliverable with the full Sources & Assumptions trail). */
+.print-report { display: none; }
+/* Report tab preview (M9.4): reveal the normally print-only report on-screen inside the tab.
+   Higher specificity than `.print-report{display:none}`, so the single ReportView instance
+   serves both the on-screen preview and the print target without duplicating. */
+.report-preview .print-report { display: block; }
+@media print {
+  html, body { height: auto; background: white; }
+  body * { visibility: hidden !important; }
+  .print-report { display: block !important; position: absolute; left: 0; top: 0; width: 100%; }
+  .print-report, .print-report * { visibility: visible !important; }
+  /* Pagination hygiene — keep table rows and headings intact across page breaks so nothing
+     overlaps (fixes the appendix "baseline profile" row bleeding into the closing text). */
+  .print-report table { break-inside: auto; }
+  .print-report tr, .print-report th, .print-report td { break-inside: avoid; }
+  .print-report h2 { break-after: avoid; break-inside: avoid; }
+  .print-report p { orphans: 2; widows: 2; }
+  /* Default export target: US Letter, portrait, 1" margins. Page numbers via CSS paged media —
+     honoured by standards-compliant PDF engines and Firefox. NOTE: Chrome/Safari print-to-PDF
+     ignore @page margin-boxes, so enable the print dialog's "Headers and footers" there (or wire
+     a paged-media / server PDF renderer for guaranteed CSS-controlled numbering). */
+  @page {
+    size: letter portrait;
+    margin: 1in;
+    @bottom-center { content: "Page " counter(page) " of " counter(pages); font-size: 9px; }
+  }
+}
