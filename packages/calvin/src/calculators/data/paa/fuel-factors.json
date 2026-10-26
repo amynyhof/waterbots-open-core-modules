@@ -1,0 +1,26 @@
+{
+  "pathway": "gs4gg-carbon",
+  "method": "paa-v2.0",
+  "version": "1.0.0",
+  "description": "PAA v2.0 (GS4GG PAA M400-12 V2.0) default fuel emission factors for the baseline emission factor (Eq.1). V2 changed the CHARCOAL factors from V1: combustion-only defaults, or the higher figures that include charcoal production at a mandatory wood-to-charcoal conversion factor (WCCF) — 6:1 for Sub-Saharan Africa and LDCs, 4:1 for other regions. A v2.0 run with charcoal must name which; the engine refuses a charcoal entry on the V1 factors (since 2026-09-21). Wood is unchanged from V1.",
+  "registrySources": ["gs-429-v2-methodology"],
+  "wccf": {
+    "6:1": { "label": "WCCF 6:1 — mandatory for Sub-Saharan Africa and LDCs", "cite": "V2 SDWS 9 p.51: 'the mandatory WCCF ratios (6:1 for SSA/LDCs; 4:1 for other regions)'" },
+    "4:1": { "label": "WCCF 4:1 — other regions", "cite": "V2 SDWS 9 p.51" },
+    "combustion-only": { "label": "Combustion only (no charcoal-production emissions)", "cite": "V2 SDWS 9 p.51 'Default: 112 tCO2/TJ (combustion only)'; SDWS 10 p.52 'Default: 5.87'" }
+  },
+  "fuels": {
+    "wood": {
+      "ef_co2": 112, "ef_nonco2": 9.46, "unit": "tCO2/TJ · tCO2e/TJ",
+      "cite": "V2 SDWS 9 p.51 (wood 112); SDWS 10 p.52 (wood 9.46, AR5 GWP)", "registry": "gs-429-v2-methodology"
+    },
+    "charcoal": {
+      "combustion-only": { "ef_co2": 112, "ef_nonco2": 5.87 },
+      "6:1": { "ef_co2": 355.36, "ef_nonco2": 89.68 },
+      "4:1": { "ef_co2": 236.91, "ef_nonco2": 61.74 },
+      "unit": "tCO2/TJ · tCO2e/TJ",
+      "cite": "V2 SDWS 9 p.51 (charcoal: 112 combustion only; 355.36 WCCF 6:1; 236.91 WCCF 4:1); SDWS 10 p.52 (5.87; 89.68; 61.74)", "registry": "gs-429-v2-methodology"
+    }
+  },
+  "v1_for_comparison": { "charcoal": { "ef_co2": 165.22, "ef_nonco2": 44.83, "cite": "V1 SDWS 9.2 / 10.2 p.24 — includes production emissions at V1's own ratio; NOT a V2 value" } }
+}

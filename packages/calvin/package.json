@@ -2,7 +2,7 @@
   "name": "@waterbots/calvin",
   "version": "0.0.0",
   "private": true,
-  "description": "WaterBots open core module: calvin (quantify: the carbon calculator). Empty for now. Not published.",
+  "description": "WaterBots open core module: calvin (quantify: the carbon calculator). Arrived with the Calvin seed. Not published.",
   "license": "Apache-2.0",
   "type": "module",
   "repository": {
@@ -27,5 +27,11 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "build": "tsc -p tsconfig.build.json"
+  },
+  "dependencies": {
+    "@waterbots/core": "0.0.0"
+  },
+  "peerDependencies": {
+    "react": "19.3.1"
   }
 }

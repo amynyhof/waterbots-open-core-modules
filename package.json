@@ -12,12 +12,16 @@
     "node": "24.20.0"
   },
   "scripts": {
-    "typecheck": "npm run typecheck --workspaces",
-    "test": "node scripts/check-packages.mjs && node --test .github/lanes/lane-rule.test.mjs && npm run test --workspaces",
-    "build": "npm run build --workspaces"
+    "typecheck": "npm run build -w @waterbots/core && npm run typecheck --workspaces",
+    "test": "node scripts/check-packages.mjs && node --test .github/lanes/lane-rule.test.mjs scripts/check-names.test.mjs scripts/check-paid-code.test.mjs scripts/check-seed.test.mjs && node scripts/check-seed.mjs && node scripts/check-paid-code.mjs packages && npm run test --workspaces",
+    "build": "npm run build -w @waterbots/core && npm run build -w @waterbots/calvin -w @waterbots/phoebe -w @waterbots/bridget"
   },
   "devDependencies": {
     "@types/node": "26.6.5",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
     "typescript": "7.0.2",
     "vitest": "5.0.5"
   }

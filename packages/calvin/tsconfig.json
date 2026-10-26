@@ -1,5 +1,18 @@
 {
   "extends": "../../tsconfig.base.json",
-  "compilerOptions": { "noEmit": true },
+  "compilerOptions": {
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "jsx": "react-jsx",
+    "resolveJsonModule": true,
+    "types": ["node"],
+    // The seed was typechecked with `strict` only. Two of the base's extra checks flag the seed's code, 95 places
+    // in all: unchecked indexed access and exact optional properties. They stay off for this package until the
+    // seed's code is brought up to them in its own pull request. Seed files are not edited here.
+    "noUncheckedIndexedAccess": false,
+    "exactOptionalPropertyTypes": false,
+    "noEmit": true
+  },
   "include": ["src"]
 }

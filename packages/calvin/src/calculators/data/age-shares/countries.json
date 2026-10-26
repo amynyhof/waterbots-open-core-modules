@@ -1,0 +1,1450 @@
+{
+  "pathway": "cross-cutting",
+  "dataset": "age-shares-default",
+  "version": "2.0.0",
+  "description": "National age-distribution shares (under-5 / 5-18 / 19+) — the DEFAULT split for the Table 9 age-split helper (CALCULATOR_SPEC §3.1.1) when a project lacks age-disaggregated data. FULL COVERAGE: every country the UN WPP source provides. Labelled a default; replaceable by real survey data. Table 9 age tiers applied on household runs under v2.0 from calculator v0.5.0 (Amy's ruling R4, 2026-09-21; [#24]).",
+  "registrySources": [
+    "un-wpp-2024-pop-age1"
+  ],
+  "source_year": 2024,
+  "variant": "medium",
+  "coverage": "All 237 UN WPP 2024 'Country/Area' rows (medium variant, year 2024). Countries absent fall back to globalDefault (output labeled 'global default').",
+  "method": "From UN WPP 2024 single-age file (POP/01-1), medium variant, year 2024: under5 = ages 0-4; age5_18 = ages 5-18; adult19plus = ages 19-100+. Exact 18/19 boundary (2026-09-21, replacing the 4:1 split of the 15-19 five-year band used in v1.x).",
+  "globalDefault": {
+    "under5": 0.0793,
+    "age5_18": 0.232,
+    "adult19plus": 0.6887,
+    "basis": "UN WPP 2024 World aggregate (medium variant, 2024), single-age file, exact 18/19 boundary. Fallback for countries absent from the source; outputs using it are labeled a global default.",
+    "cite": "UN WPP 2024 POP/01-1, World row, 2024"
+  },
+  "countries": {
+    "ABW": {
+      "name": "Aruba",
+      "under5": 0.0481,
+      "age5_18": 0.172,
+      "adult19plus": 0.78
+    },
+    "AFG": {
+      "name": "Afghanistan",
+      "under5": 0.1589,
+      "age5_18": 0.3604,
+      "adult19plus": 0.4807
+    },
+    "AGO": {
+      "name": "Angola",
+      "under5": 0.1676,
+      "age5_18": 0.3625,
+      "adult19plus": 0.4699
+    },
+    "AIA": {
+      "name": "Anguilla",
+      "under5": 0.0468,
+      "age5_18": 0.1815,
+      "adult19plus": 0.7717
+    },
+    "ALB": {
+      "name": "Albania",
+      "under5": 0.0508,
+      "age5_18": 0.1647,
+      "adult19plus": 0.7845
+    },
+    "AND": {
+      "name": "Andorra",
+      "under5": 0.0307,
+      "age5_18": 0.1306,
+      "adult19plus": 0.8387
+    },
+    "ARE": {
+      "name": "United Arab Emirates",
+      "under5": 0.0527,
+      "age5_18": 0.1434,
+      "adult19plus": 0.8039
+    },
+    "ARG": {
+      "name": "Argentina",
+      "under5": 0.057,
+      "age5_18": 0.2216,
+      "adult19plus": 0.7214
+    },
+    "ARM": {
+      "name": "Armenia",
+      "under5": 0.0593,
+      "age5_18": 0.1845,
+      "adult19plus": 0.7562
+    },
+    "ASM": {
+      "name": "American Samoa",
+      "under5": 0.0771,
+      "age5_18": 0.2738,
+      "adult19plus": 0.6491
+    },
+    "ATG": {
+      "name": "Antigua and Barbuda",
+      "under5": 0.0585,
+      "age5_18": 0.1755,
+      "adult19plus": 0.766
+    },
+    "AUS": {
+      "name": "Australia",
+      "under5": 0.0575,
+      "age5_18": 0.17,
+      "adult19plus": 0.7725
+    },
+    "AUT": {
+      "name": "Austria",
+      "under5": 0.0455,
+      "age5_18": 0.1349,
+      "adult19plus": 0.8196
+    },
+    "AZE": {
+      "name": "Azerbaijan",
+      "under5": 0.0634,
+      "age5_18": 0.2145,
+      "adult19plus": 0.7221
+    },
+    "BDI": {
+      "name": "Burundi",
+      "under5": 0.1557,
+      "age5_18": 0.3859,
+      "adult19plus": 0.4585
+    },
+    "BEL": {
+      "name": "Belgium",
+      "under5": 0.0482,
+      "age5_18": 0.1585,
+      "adult19plus": 0.7933
+    },
+    "BEN": {
+      "name": "Benin",
+      "under5": 0.1522,
+      "age5_18": 0.3498,
+      "adult19plus": 0.4981
+    },
+    "BES": {
+      "name": "Bonaire, Sint Eustatius and Saba",
+      "under5": 0.0508,
+      "age5_18": 0.1511,
+      "adult19plus": 0.7982
+    },
+    "BFA": {
+      "name": "Burkina Faso",
+      "under5": 0.1427,
+      "age5_18": 0.3685,
+      "adult19plus": 0.4888
+    },
+    "BGD": {
+      "name": "Bangladesh",
+      "under5": 0.0962,
+      "age5_18": 0.2624,
+      "adult19plus": 0.6414
+    },
+    "BGR": {
+      "name": "Bulgaria",
+      "under5": 0.0455,
+      "age5_18": 0.14,
+      "adult19plus": 0.8146
+    },
+    "BHR": {
+      "name": "Bahrain",
+      "under5": 0.0594,
+      "age5_18": 0.1715,
+      "adult19plus": 0.7692
+    },
+    "BHS": {
+      "name": "Bahamas",
+      "under5": 0.0543,
+      "age5_18": 0.1822,
+      "adult19plus": 0.7635
+    },
+    "BIH": {
+      "name": "Bosnia and Herzegovina",
+      "under5": 0.0401,
+      "age5_18": 0.1313,
+      "adult19plus": 0.8286
+    },
+    "BLM": {
+      "name": "Saint Barthélemy",
+      "under5": 0.0533,
+      "age5_18": 0.1976,
+      "adult19plus": 0.749
+    },
+    "BLR": {
+      "name": "Belarus",
+      "under5": 0.0413,
+      "age5_18": 0.1658,
+      "adult19plus": 0.7929
+    },
+    "BLZ": {
+      "name": "Belize",
+      "under5": 0.0851,
+      "age5_18": 0.2544,
+      "adult19plus": 0.6605
+    },
+    "BMU": {
+      "name": "Bermuda",
+      "under5": 0.0415,
+      "age5_18": 0.1365,
+      "adult19plus": 0.822
+    },
+    "BOL": {
+      "name": "Bolivia (Plurinational State of)",
+      "under5": 0.101,
+      "age5_18": 0.2734,
+      "adult19plus": 0.6257
+    },
+    "BRA": {
+      "name": "Brazil",
+      "under5": 0.0618,
+      "age5_18": 0.1907,
+      "adult19plus": 0.7475
+    },
+    "BRB": {
+      "name": "Barbados",
+      "under5": 0.0556,
+      "age5_18": 0.1686,
+      "adult19plus": 0.7757
+    },
+    "BRN": {
+      "name": "Brunei Darussalam",
+      "under5": 0.0675,
+      "age5_18": 0.195,
+      "adult19plus": 0.7375
+    },
+    "BTN": {
+      "name": "Bhutan",
+      "under5": 0.0614,
+      "age5_18": 0.2152,
+      "adult19plus": 0.7234
+    },
+    "BWA": {
+      "name": "Botswana",
+      "under5": 0.1179,
+      "age5_18": 0.2809,
+      "adult19plus": 0.6012
+    },
+    "CAF": {
+      "name": "Central African Republic",
+      "under5": 0.1856,
+      "age5_18": 0.4037,
+      "adult19plus": 0.4107
+    },
+    "CAN": {
+      "name": "Canada",
+      "under5": 0.0473,
+      "age5_18": 0.1475,
+      "adult19plus": 0.8052
+    },
+    "CHE": {
+      "name": "Switzerland",
+      "under5": 0.0483,
+      "age5_18": 0.1404,
+      "adult19plus": 0.8113
+    },
+    "CHL": {
+      "name": "Chile",
+      "under5": 0.0474,
+      "age5_18": 0.1714,
+      "adult19plus": 0.7812
+    },
+    "CHN": {
+      "name": "China",
+      "under5": 0.0366,
+      "age5_18": 0.1708,
+      "adult19plus": 0.7926
+    },
+    "CIV": {
+      "name": "Côte d'Ivoire",
+      "under5": 0.1452,
+      "age5_18": 0.3508,
+      "adult19plus": 0.504
+    },
+    "CMR": {
+      "name": "Cameroon",
+      "under5": 0.1526,
+      "age5_18": 0.3496,
+      "adult19plus": 0.4979
+    },
+    "COD": {
+      "name": "Democratic Republic of the Congo",
+      "under5": 0.1811,
+      "age5_18": 0.3643,
+      "adult19plus": 0.4546
+    },
+    "COG": {
+      "name": "Congo",
+      "under5": 0.1417,
+      "age5_18": 0.3498,
+      "adult19plus": 0.5085
+    },
+    "COK": {
+      "name": "Cook Islands",
+      "under5": 0.065,
+      "age5_18": 0.2504,
+      "adult19plus": 0.6845
+    },
+    "COL": {
+      "name": "Colombia",
+      "under5": 0.0671,
+      "age5_18": 0.1952,
+      "adult19plus": 0.7377
+    },
+    "COM": {
+      "name": "Comoros",
+      "under5": 0.1326,
+      "age5_18": 0.3203,
+      "adult19plus": 0.5471
+    },
+    "CPV": {
+      "name": "Cabo Verde",
+      "under5": 0.0683,
+      "age5_18": 0.2608,
+      "adult19plus": 0.6709
+    },
+    "CRI": {
+      "name": "Costa Rica",
+      "under5": 0.0527,
+      "age5_18": 0.1917,
+      "adult19plus": 0.7555
+    },
+    "CUB": {
+      "name": "Cuba",
+      "under5": 0.0444,
+      "age5_18": 0.1507,
+      "adult19plus": 0.8049
+    },
+    "CUW": {
+      "name": "Curaçao",
+      "under5": 0.0378,
+      "age5_18": 0.1562,
+      "adult19plus": 0.806
+    },
+    "CYM": {
+      "name": "Cayman Islands",
+      "under5": 0.0582,
+      "age5_18": 0.1459,
+      "adult19plus": 0.7959
+    },
+    "CYP": {
+      "name": "Cyprus",
+      "under5": 0.0548,
+      "age5_18": 0.1453,
+      "adult19plus": 0.7999
+    },
+    "CZE": {
+      "name": "Czechia",
+      "under5": 0.0483,
+      "age5_18": 0.1494,
+      "adult19plus": 0.8023
+    },
+    "DEU": {
+      "name": "Germany",
+      "under5": 0.0453,
+      "age5_18": 0.1302,
+      "adult19plus": 0.8245
+    },
+    "DJI": {
+      "name": "Djibouti",
+      "under5": 0.0983,
+      "age5_18": 0.2719,
+      "adult19plus": 0.6298
+    },
+    "DMA": {
+      "name": "Dominica",
+      "under5": 0.0544,
+      "age5_18": 0.1768,
+      "adult19plus": 0.7688
+    },
+    "DNK": {
+      "name": "Denmark",
+      "under5": 0.0512,
+      "age5_18": 0.1526,
+      "adult19plus": 0.7962
+    },
+    "DOM": {
+      "name": "Dominican Republic",
+      "under5": 0.0869,
+      "age5_18": 0.2472,
+      "adult19plus": 0.6659
+    },
+    "DZA": {
+      "name": "Algeria",
+      "under5": 0.099,
+      "age5_18": 0.2686,
+      "adult19plus": 0.6324
+    },
+    "ECU": {
+      "name": "Ecuador",
+      "under5": 0.0758,
+      "age5_18": 0.2385,
+      "adult19plus": 0.6856
+    },
+    "EGY": {
+      "name": "Egypt",
+      "under5": 0.1011,
+      "age5_18": 0.2936,
+      "adult19plus": 0.6053
+    },
+    "ERI": {
+      "name": "Eritrea",
+      "under5": 0.1324,
+      "age5_18": 0.346,
+      "adult19plus": 0.5217
+    },
+    "ESH": {
+      "name": "Western Sahara",
+      "under5": 0.0767,
+      "age5_18": 0.211,
+      "adult19plus": 0.7123
+    },
+    "ESP": {
+      "name": "Spain",
+      "under5": 0.0361,
+      "age5_18": 0.136,
+      "adult19plus": 0.8279
+    },
+    "EST": {
+      "name": "Estonia",
+      "under5": 0.0462,
+      "age5_18": 0.1558,
+      "adult19plus": 0.7979
+    },
+    "ETH": {
+      "name": "Ethiopia",
+      "under5": 0.1468,
+      "age5_18": 0.333,
+      "adult19plus": 0.5201
+    },
+    "FIN": {
+      "name": "Finland",
+      "under5": 0.0417,
+      "age5_18": 0.1499,
+      "adult19plus": 0.8084
+    },
+    "FJI": {
+      "name": "Fiji",
+      "under5": 0.088,
+      "age5_18": 0.2541,
+      "adult19plus": 0.6579
+    },
+    "FLK": {
+      "name": "Falkland Islands (Malvinas)",
+      "under5": 0.054,
+      "age5_18": 0.1504,
+      "adult19plus": 0.7956
+    },
+    "FRA": {
+      "name": "France",
+      "under5": 0.0504,
+      "age5_18": 0.1643,
+      "adult19plus": 0.7853
+    },
+    "FRO": {
+      "name": "Faroe Islands",
+      "under5": 0.0645,
+      "age5_18": 0.1905,
+      "adult19plus": 0.7451
+    },
+    "FSM": {
+      "name": "Micronesia (Fed. States of)",
+      "under5": 0.107,
+      "age5_18": 0.2941,
+      "adult19plus": 0.5989
+    },
+    "GAB": {
+      "name": "Gabon",
+      "under5": 0.1309,
+      "age5_18": 0.3096,
+      "adult19plus": 0.5595
+    },
+    "GBR": {
+      "name": "United Kingdom",
+      "under5": 0.0513,
+      "age5_18": 0.1685,
+      "adult19plus": 0.7802
+    },
+    "GEO": {
+      "name": "Georgia",
+      "under5": 0.0611,
+      "age5_18": 0.1967,
+      "adult19plus": 0.7421
+    },
+    "GGY": {
+      "name": "Guernsey",
+      "under5": 0.0404,
+      "age5_18": 0.1408,
+      "adult19plus": 0.8188
+    },
+    "GHA": {
+      "name": "Ghana",
+      "under5": 0.1234,
+      "age5_18": 0.317,
+      "adult19plus": 0.5596
+    },
+    "GIB": {
+      "name": "Gibraltar",
+      "under5": 0.0592,
+      "age5_18": 0.1657,
+      "adult19plus": 0.7751
+    },
+    "GIN": {
+      "name": "Guinea",
+      "under5": 0.1505,
+      "age5_18": 0.3466,
+      "adult19plus": 0.5029
+    },
+    "GLP": {
+      "name": "Guadeloupe",
+      "under5": 0.0513,
+      "age5_18": 0.1638,
+      "adult19plus": 0.7849
+    },
+    "GMB": {
+      "name": "Gambia",
+      "under5": 0.1406,
+      "age5_18": 0.3516,
+      "adult19plus": 0.5078
+    },
+    "GNB": {
+      "name": "Guinea-Bissau",
+      "under5": 0.1364,
+      "age5_18": 0.3399,
+      "adult19plus": 0.5237
+    },
+    "GNQ": {
+      "name": "Equatorial Guinea",
+      "under5": 0.1351,
+      "age5_18": 0.3154,
+      "adult19plus": 0.5494
+    },
+    "GRC": {
+      "name": "Greece",
+      "under5": 0.0375,
+      "age5_18": 0.1371,
+      "adult19plus": 0.8254
+    },
+    "GRD": {
+      "name": "Grenada",
+      "under5": 0.0587,
+      "age5_18": 0.1946,
+      "adult19plus": 0.7466
+    },
+    "GRL": {
+      "name": "Greenland",
+      "under5": 0.0708,
+      "age5_18": 0.1873,
+      "adult19plus": 0.7419
+    },
+    "GTM": {
+      "name": "Guatemala",
+      "under5": 0.1009,
+      "age5_18": 0.2971,
+      "adult19plus": 0.6019
+    },
+    "GUF": {
+      "name": "French Guiana",
+      "under5": 0.1096,
+      "age5_18": 0.2802,
+      "adult19plus": 0.6102
+    },
+    "GUM": {
+      "name": "Guam",
+      "under5": 0.0872,
+      "age5_18": 0.2304,
+      "adult19plus": 0.6824
+    },
+    "GUY": {
+      "name": "Guyana",
+      "under5": 0.0988,
+      "age5_18": 0.2631,
+      "adult19plus": 0.6381
+    },
+    "HKG": {
+      "name": "China, Hong Kong SAR",
+      "under5": 0.0291,
+      "age5_18": 0.1068,
+      "adult19plus": 0.8641
+    },
+    "HND": {
+      "name": "Honduras",
+      "under5": 0.1056,
+      "age5_18": 0.2791,
+      "adult19plus": 0.6153
+    },
+    "HRV": {
+      "name": "Croatia",
+      "under5": 0.0429,
+      "age5_18": 0.1391,
+      "adult19plus": 0.8181
+    },
+    "HTI": {
+      "name": "Haiti",
+      "under5": 0.1045,
+      "age5_18": 0.2869,
+      "adult19plus": 0.6086
+    },
+    "HUN": {
+      "name": "Hungary",
+      "under5": 0.047,
+      "age5_18": 0.1388,
+      "adult19plus": 0.8141
+    },
+    "IDN": {
+      "name": "Indonesia",
+      "under5": 0.0784,
+      "age5_18": 0.2339,
+      "adult19plus": 0.6877
+    },
+    "IMN": {
+      "name": "Isle of Man",
+      "under5": 0.0412,
+      "age5_18": 0.1452,
+      "adult19plus": 0.8135
+    },
+    "IND": {
+      "name": "India",
+      "under5": 0.0783,
+      "age5_18": 0.2379,
+      "adult19plus": 0.6838
+    },
+    "IRL": {
+      "name": "Ireland",
+      "under5": 0.0547,
+      "age5_18": 0.1858,
+      "adult19plus": 0.7595
+    },
+    "IRN": {
+      "name": "Iran (Islamic Republic of)",
+      "under5": 0.0657,
+      "age5_18": 0.2149,
+      "adult19plus": 0.7194
+    },
+    "IRQ": {
+      "name": "Iraq",
+      "under5": 0.1219,
+      "age5_18": 0.3282,
+      "adult19plus": 0.55
+    },
+    "ISL": {
+      "name": "Iceland",
+      "under5": 0.0594,
+      "age5_18": 0.1691,
+      "adult19plus": 0.7715
+    },
+    "ISR": {
+      "name": "Israel",
+      "under5": 0.0928,
+      "age5_18": 0.2455,
+      "adult19plus": 0.6618
+    },
+    "ITA": {
+      "name": "Italy",
+      "under5": 0.0342,
+      "age5_18": 0.1238,
+      "adult19plus": 0.8421
+    },
+    "JAM": {
+      "name": "Jamaica",
+      "under5": 0.0575,
+      "age5_18": 0.1916,
+      "adult19plus": 0.7508
+    },
+    "JEY": {
+      "name": "Jersey",
+      "under5": 0.0422,
+      "age5_18": 0.1431,
+      "adult19plus": 0.8147
+    },
+    "JOR": {
+      "name": "Jordan",
+      "under5": 0.0999,
+      "age5_18": 0.2868,
+      "adult19plus": 0.6133
+    },
+    "JPN": {
+      "name": "Japan",
+      "under5": 0.0324,
+      "age5_18": 0.1183,
+      "adult19plus": 0.8493
+    },
+    "KAZ": {
+      "name": "Kazakhstan",
+      "under5": 0.1026,
+      "age5_18": 0.2551,
+      "adult19plus": 0.6423
+    },
+    "KEN": {
+      "name": "Kenya",
+      "under5": 0.126,
+      "age5_18": 0.3358,
+      "adult19plus": 0.5382
+    },
+    "KGZ": {
+      "name": "Kyrgyzstan",
+      "under5": 0.1069,
+      "age5_18": 0.2858,
+      "adult19plus": 0.6073
+    },
+    "KHM": {
+      "name": "Cambodia",
+      "under5": 0.1021,
+      "age5_18": 0.2707,
+      "adult19plus": 0.6272
+    },
+    "KIR": {
+      "name": "Kiribati",
+      "under5": 0.1209,
+      "age5_18": 0.3016,
+      "adult19plus": 0.5774
+    },
+    "KNA": {
+      "name": "Saint Kitts and Nevis",
+      "under5": 0.0597,
+      "age5_18": 0.1758,
+      "adult19plus": 0.7646
+    },
+    "KOR": {
+      "name": "Republic of Korea",
+      "under5": 0.0248,
+      "age5_18": 0.1163,
+      "adult19plus": 0.8589
+    },
+    "KWT": {
+      "name": "Kuwait",
+      "under5": 0.0537,
+      "age5_18": 0.1757,
+      "adult19plus": 0.7707
+    },
+    "LAO": {
+      "name": "Lao People's Democratic Republic",
+      "under5": 0.1019,
+      "age5_18": 0.2765,
+      "adult19plus": 0.6216
+    },
+    "LBN": {
+      "name": "Lebanon",
+      "under5": 0.0782,
+      "age5_18": 0.2565,
+      "adult19plus": 0.6653
+    },
+    "LBR": {
+      "name": "Liberia",
+      "under5": 0.1392,
+      "age5_18": 0.3489,
+      "adult19plus": 0.5118
+    },
+    "LBY": {
+      "name": "Libya",
+      "under5": 0.0856,
+      "age5_18": 0.2625,
+      "adult19plus": 0.652
+    },
+    "LCA": {
+      "name": "Saint Lucia",
+      "under5": 0.0563,
+      "age5_18": 0.174,
+      "adult19plus": 0.7697
+    },
+    "LIE": {
+      "name": "Liechtenstein",
+      "under5": 0.0467,
+      "age5_18": 0.1355,
+      "adult19plus": 0.8178
+    },
+    "LKA": {
+      "name": "Sri Lanka",
+      "under5": 0.0702,
+      "age5_18": 0.2129,
+      "adult19plus": 0.7169
+    },
+    "LSO": {
+      "name": "Lesotho",
+      "under5": 0.1127,
+      "age5_18": 0.3159,
+      "adult19plus": 0.5714
+    },
+    "LTU": {
+      "name": "Lithuania",
+      "under5": 0.0427,
+      "age5_18": 0.1438,
+      "adult19plus": 0.8135
+    },
+    "LUX": {
+      "name": "Luxembourg",
+      "under5": 0.0514,
+      "age5_18": 0.1481,
+      "adult19plus": 0.8005
+    },
+    "LVA": {
+      "name": "Latvia",
+      "under5": 0.0439,
+      "age5_18": 0.155,
+      "adult19plus": 0.8011
+    },
+    "MAC": {
+      "name": "China, Macao SAR",
+      "under5": 0.038,
+      "age5_18": 0.1338,
+      "adult19plus": 0.8281
+    },
+    "MAF": {
+      "name": "Saint Martin (French part)",
+      "under5": 0.0684,
+      "age5_18": 0.2045,
+      "adult19plus": 0.7271
+    },
+    "MAR": {
+      "name": "Morocco",
+      "under5": 0.0826,
+      "age5_18": 0.2415,
+      "adult19plus": 0.6759
+    },
+    "MCO": {
+      "name": "Monaco",
+      "under5": 0.047,
+      "age5_18": 0.12,
+      "adult19plus": 0.8331
+    },
+    "MDA": {
+      "name": "Republic of Moldova",
+      "under5": 0.0559,
+      "age5_18": 0.1918,
+      "adult19plus": 0.7523
+    },
+    "MDG": {
+      "name": "Madagascar",
+      "under5": 0.1457,
+      "age5_18": 0.3333,
+      "adult19plus": 0.521
+    },
+    "MDV": {
+      "name": "Maldives",
+      "under5": 0.0562,
+      "age5_18": 0.1902,
+      "adult19plus": 0.7535
+    },
+    "MEX": {
+      "name": "Mexico",
+      "under5": 0.0781,
+      "age5_18": 0.2351,
+      "adult19plus": 0.6868
+    },
+    "MHL": {
+      "name": "Marshall Islands",
+      "under5": 0.1074,
+      "age5_18": 0.339,
+      "adult19plus": 0.5536
+    },
+    "MKD": {
+      "name": "North Macedonia",
+      "under5": 0.0501,
+      "age5_18": 0.1636,
+      "adult19plus": 0.7864
+    },
+    "MLI": {
+      "name": "Mali",
+      "under5": 0.1736,
+      "age5_18": 0.3804,
+      "adult19plus": 0.446
+    },
+    "MLT": {
+      "name": "Malta",
+      "under5": 0.0409,
+      "age5_18": 0.1233,
+      "adult19plus": 0.8358
+    },
+    "MMR": {
+      "name": "Myanmar",
+      "under5": 0.0807,
+      "age5_18": 0.2267,
+      "adult19plus": 0.6926
+    },
+    "MNE": {
+      "name": "Montenegro",
+      "under5": 0.0574,
+      "age5_18": 0.1739,
+      "adult19plus": 0.7688
+    },
+    "MNG": {
+      "name": "Mongolia",
+      "under5": 0.0982,
+      "age5_18": 0.2886,
+      "adult19plus": 0.6132
+    },
+    "MNP": {
+      "name": "Northern Mariana Islands",
+      "under5": 0.0667,
+      "age5_18": 0.2243,
+      "adult19plus": 0.709
+    },
+    "MOZ": {
+      "name": "Mozambique",
+      "under5": 0.167,
+      "age5_18": 0.3664,
+      "adult19plus": 0.4666
+    },
+    "MRT": {
+      "name": "Mauritania",
+      "under5": 0.1576,
+      "age5_18": 0.358,
+      "adult19plus": 0.4844
+    },
+    "MSR": {
+      "name": "Montserrat",
+      "under5": 0.0532,
+      "age5_18": 0.1604,
+      "adult19plus": 0.7864
+    },
+    "MTQ": {
+      "name": "Martinique",
+      "under5": 0.0465,
+      "age5_18": 0.1501,
+      "adult19plus": 0.8034
+    },
+    "MUS": {
+      "name": "Mauritius",
+      "under5": 0.0471,
+      "age5_18": 0.1537,
+      "adult19plus": 0.7992
+    },
+    "MWI": {
+      "name": "Malawi",
+      "under5": 0.1445,
+      "age5_18": 0.3591,
+      "adult19plus": 0.4964
+    },
+    "MYS": {
+      "name": "Malaysia",
+      "under5": 0.0625,
+      "age5_18": 0.2175,
+      "adult19plus": 0.72
+    },
+    "MYT": {
+      "name": "Mayotte",
+      "under5": 0.1587,
+      "age5_18": 0.3636,
+      "adult19plus": 0.4777
+    },
+    "NAM": {
+      "name": "Namibia",
+      "under5": 0.1339,
+      "age5_18": 0.3117,
+      "adult19plus": 0.5544
+    },
+    "NCL": {
+      "name": "New Caledonia",
+      "under5": 0.0708,
+      "age5_18": 0.2005,
+      "adult19plus": 0.7287
+    },
+    "NER": {
+      "name": "Niger",
+      "under5": 0.1769,
+      "age5_18": 0.3816,
+      "adult19plus": 0.4415
+    },
+    "NGA": {
+      "name": "Nigeria",
+      "under5": 0.1454,
+      "age5_18": 0.3558,
+      "adult19plus": 0.4988
+    },
+    "NIC": {
+      "name": "Nicaragua",
+      "under5": 0.0947,
+      "age5_18": 0.2687,
+      "adult19plus": 0.6367
+    },
+    "NIU": {
+      "name": "Niue",
+      "under5": 0.0676,
+      "age5_18": 0.2323,
+      "adult19plus": 0.7
+    },
+    "NLD": {
+      "name": "Netherlands",
+      "under5": 0.049,
+      "age5_18": 0.1453,
+      "adult19plus": 0.8058
+    },
+    "NOR": {
+      "name": "Norway",
+      "under5": 0.0494,
+      "age5_18": 0.161,
+      "adult19plus": 0.7896
+    },
+    "NPL": {
+      "name": "Nepal",
+      "under5": 0.0932,
+      "age5_18": 0.2703,
+      "adult19plus": 0.6365
+    },
+    "NRU": {
+      "name": "Nauru",
+      "under5": 0.1238,
+      "age5_18": 0.339,
+      "adult19plus": 0.5371
+    },
+    "NZL": {
+      "name": "New Zealand",
+      "under5": 0.0572,
+      "age5_18": 0.1752,
+      "adult19plus": 0.7676
+    },
+    "OMN": {
+      "name": "Oman",
+      "under5": 0.0808,
+      "age5_18": 0.2125,
+      "adult19plus": 0.7067
+    },
+    "PAK": {
+      "name": "Pakistan",
+      "under5": 0.1273,
+      "age5_18": 0.3255,
+      "adult19plus": 0.5472
+    },
+    "PAN": {
+      "name": "Panama",
+      "under5": 0.0788,
+      "age5_18": 0.2352,
+      "adult19plus": 0.686
+    },
+    "PER": {
+      "name": "Peru",
+      "under5": 0.0785,
+      "age5_18": 0.229,
+      "adult19plus": 0.6925
+    },
+    "PHL": {
+      "name": "Philippines",
+      "under5": 0.0792,
+      "age5_18": 0.2781,
+      "adult19plus": 0.6427
+    },
+    "PLW": {
+      "name": "Palau",
+      "under5": 0.0549,
+      "age5_18": 0.1817,
+      "adult19plus": 0.7634
+    },
+    "PNG": {
+      "name": "Papua New Guinea",
+      "under5": 0.1166,
+      "age5_18": 0.2978,
+      "adult19plus": 0.5856
+    },
+    "POL": {
+      "name": "Poland",
+      "under5": 0.0436,
+      "age5_18": 0.1469,
+      "adult19plus": 0.8095
+    },
+    "PRI": {
+      "name": "Puerto Rico",
+      "under5": 0.0298,
+      "age5_18": 0.1319,
+      "adult19plus": 0.8383
+    },
+    "PRK": {
+      "name": "Dem. People's Republic of Korea",
+      "under5": 0.0643,
+      "age5_18": 0.1746,
+      "adult19plus": 0.7611
+    },
+    "PRT": {
+      "name": "Portugal",
+      "under5": 0.0408,
+      "age5_18": 0.1266,
+      "adult19plus": 0.8326
+    },
+    "PRY": {
+      "name": "Paraguay",
+      "under5": 0.0976,
+      "age5_18": 0.2564,
+      "adult19plus": 0.6461
+    },
+    "PSE": {
+      "name": "State of Palestine",
+      "under5": 0.1303,
+      "age5_18": 0.3336,
+      "adult19plus": 0.5361
+    },
+    "PYF": {
+      "name": "French Polynesia",
+      "under5": 0.0521,
+      "age5_18": 0.2008,
+      "adult19plus": 0.747
+    },
+    "QAT": {
+      "name": "Qatar",
+      "under5": 0.051,
+      "age5_18": 0.1315,
+      "adult19plus": 0.8176
+    },
+    "REU": {
+      "name": "Réunion",
+      "under5": 0.0659,
+      "age5_18": 0.204,
+      "adult19plus": 0.7301
+    },
+    "ROU": {
+      "name": "Romania",
+      "under5": 0.0489,
+      "age5_18": 0.1544,
+      "adult19plus": 0.7967
+    },
+    "RUS": {
+      "name": "Russian Federation",
+      "under5": 0.0477,
+      "age5_18": 0.1695,
+      "adult19plus": 0.7828
+    },
+    "RWA": {
+      "name": "Rwanda",
+      "under5": 0.1329,
+      "age5_18": 0.3304,
+      "adult19plus": 0.5367
+    },
+    "SAU": {
+      "name": "Saudi Arabia",
+      "under5": 0.078,
+      "age5_18": 0.2179,
+      "adult19plus": 0.7042
+    },
+    "SDN": {
+      "name": "Sudan",
+      "under5": 0.1514,
+      "age5_18": 0.3405,
+      "adult19plus": 0.508
+    },
+    "SEN": {
+      "name": "Senegal",
+      "under5": 0.1348,
+      "age5_18": 0.3368,
+      "adult19plus": 0.5284
+    },
+    "SGP": {
+      "name": "Singapore",
+      "under5": 0.0399,
+      "age5_18": 0.1206,
+      "adult19plus": 0.8396
+    },
+    "SHN": {
+      "name": "Saint Helena",
+      "under5": 0.0388,
+      "age5_18": 0.1361,
+      "adult19plus": 0.8251
+    },
+    "SLB": {
+      "name": "Solomon Islands",
+      "under5": 0.1278,
+      "age5_18": 0.3242,
+      "adult19plus": 0.548
+    },
+    "SLE": {
+      "name": "Sierra Leone",
+      "under5": 0.1357,
+      "age5_18": 0.3335,
+      "adult19plus": 0.5308
+    },
+    "SLV": {
+      "name": "El Salvador",
+      "under5": 0.0777,
+      "age5_18": 0.241,
+      "adult19plus": 0.6814
+    },
+    "SMR": {
+      "name": "San Marino",
+      "under5": 0.0327,
+      "age5_18": 0.131,
+      "adult19plus": 0.8363
+    },
+    "SOM": {
+      "name": "Somalia",
+      "under5": 0.1841,
+      "age5_18": 0.3692,
+      "adult19plus": 0.4466
+    },
+    "SPM": {
+      "name": "Saint Pierre and Miquelon",
+      "under5": 0.0297,
+      "age5_18": 0.163,
+      "adult19plus": 0.8073
+    },
+    "SRB": {
+      "name": "Serbia",
+      "under5": 0.0458,
+      "age5_18": 0.1371,
+      "adult19plus": 0.8171
+    },
+    "SSD": {
+      "name": "South Sudan",
+      "under5": 0.1292,
+      "age5_18": 0.363,
+      "adult19plus": 0.5078
+    },
+    "STP": {
+      "name": "Sao Tome and Principe",
+      "under5": 0.1324,
+      "age5_18": 0.3403,
+      "adult19plus": 0.5273
+    },
+    "SUR": {
+      "name": "Suriname",
+      "under5": 0.0841,
+      "age5_18": 0.2412,
+      "adult19plus": 0.6747
+    },
+    "SVK": {
+      "name": "Slovakia",
+      "under5": 0.0498,
+      "age5_18": 0.1488,
+      "adult19plus": 0.8015
+    },
+    "SVN": {
+      "name": "Slovenia",
+      "under5": 0.0443,
+      "age5_18": 0.1436,
+      "adult19plus": 0.8122
+    },
+    "SWE": {
+      "name": "Sweden",
+      "under5": 0.0517,
+      "age5_18": 0.1652,
+      "adult19plus": 0.7831
+    },
+    "SWZ": {
+      "name": "Eswatini",
+      "under5": 0.1138,
+      "age5_18": 0.3037,
+      "adult19plus": 0.5825
+    },
+    "SXM": {
+      "name": "Sint Maarten (Dutch part)",
+      "under5": 0.0423,
+      "age5_18": 0.1606,
+      "adult19plus": 0.7971
+    },
+    "SYC": {
+      "name": "Seychelles",
+      "under5": 0.0682,
+      "age5_18": 0.181,
+      "adult19plus": 0.7508
+    },
+    "SYR": {
+      "name": "Syrian Arab Republic",
+      "under5": 0.0995,
+      "age5_18": 0.2875,
+      "adult19plus": 0.613
+    },
+    "TCA": {
+      "name": "Turks and Caicos Islands",
+      "under5": 0.055,
+      "age5_18": 0.1506,
+      "adult19plus": 0.7945
+    },
+    "TCD": {
+      "name": "Chad",
+      "under5": 0.1817,
+      "age5_18": 0.3675,
+      "adult19plus": 0.4508
+    },
+    "TGO": {
+      "name": "Togo",
+      "under5": 0.1426,
+      "age5_18": 0.3391,
+      "adult19plus": 0.5183
+    },
+    "THA": {
+      "name": "Thailand",
+      "under5": 0.0423,
+      "age5_18": 0.1526,
+      "adult19plus": 0.8051
+    },
+    "TJK": {
+      "name": "Tajikistan",
+      "under5": 0.1256,
+      "age5_18": 0.3089,
+      "adult19plus": 0.5654
+    },
+    "TKL": {
+      "name": "Tokelau",
+      "under5": 0.0926,
+      "age5_18": 0.2488,
+      "adult19plus": 0.6587
+    },
+    "TKM": {
+      "name": "Turkmenistan",
+      "under5": 0.1058,
+      "age5_18": 0.269,
+      "adult19plus": 0.6252
+    },
+    "TLS": {
+      "name": "Timor-Leste",
+      "under5": 0.1086,
+      "age5_18": 0.3175,
+      "adult19plus": 0.5738
+    },
+    "TON": {
+      "name": "Tonga",
+      "under5": 0.1124,
+      "age5_18": 0.3313,
+      "adult19plus": 0.5562
+    },
+    "TTO": {
+      "name": "Trinidad and Tobago",
+      "under5": 0.0548,
+      "age5_18": 0.1732,
+      "adult19plus": 0.772
+    },
+    "TUN": {
+      "name": "Tunisia",
+      "under5": 0.0706,
+      "age5_18": 0.2282,
+      "adult19plus": 0.7012
+    },
+    "TUR": {
+      "name": "Türkiye",
+      "under5": 0.0632,
+      "age5_18": 0.209,
+      "adult19plus": 0.7277
+    },
+    "TUV": {
+      "name": "Tuvalu",
+      "under5": 0.1101,
+      "age5_18": 0.2914,
+      "adult19plus": 0.5986
+    },
+    "TWN": {
+      "name": "China, Taiwan Province of China",
+      "under5": 0.0312,
+      "age5_18": 0.1203,
+      "adult19plus": 0.8485
+    },
+    "TZA": {
+      "name": "United Republic of Tanzania",
+      "under5": 0.1607,
+      "age5_18": 0.3528,
+      "adult19plus": 0.4864
+    },
+    "UGA": {
+      "name": "Uganda",
+      "under5": 0.1613,
+      "age5_18": 0.3682,
+      "adult19plus": 0.4705
+    },
+    "UKR": {
+      "name": "Ukraine",
+      "under5": 0.0333,
+      "age5_18": 0.1499,
+      "adult19plus": 0.8168
+    },
+    "URY": {
+      "name": "Uruguay",
+      "under5": 0.0503,
+      "age5_18": 0.1878,
+      "adult19plus": 0.7618
+    },
+    "USA": {
+      "name": "United States of America",
+      "under5": 0.0537,
+      "age5_18": 0.1724,
+      "adult19plus": 0.7739
+    },
+    "UZB": {
+      "name": "Uzbekistan",
+      "under5": 0.1224,
+      "age5_18": 0.2513,
+      "adult19plus": 0.6263
+    },
+    "VAT": {
+      "name": "Holy See",
+      "under5": 0.0202,
+      "age5_18": 0.0646,
+      "adult19plus": 0.9152
+    },
+    "VCT": {
+      "name": "Saint Vincent and the Grenadines",
+      "under5": 0.0612,
+      "age5_18": 0.2112,
+      "adult19plus": 0.7276
+    },
+    "VEN": {
+      "name": "Venezuela (Bolivarian Republic of)",
+      "under5": 0.0735,
+      "age5_18": 0.2594,
+      "adult19plus": 0.6671
+    },
+    "VGB": {
+      "name": "British Virgin Islands",
+      "under5": 0.0417,
+      "age5_18": 0.1583,
+      "adult19plus": 0.8
+    },
+    "VIR": {
+      "name": "United States Virgin Islands",
+      "under5": 0.0562,
+      "age5_18": 0.1567,
+      "adult19plus": 0.7871
+    },
+    "VNM": {
+      "name": "Viet Nam",
+      "under5": 0.0699,
+      "age5_18": 0.2212,
+      "adult19plus": 0.7089
+    },
+    "VUT": {
+      "name": "Vanuatu",
+      "under5": 0.1346,
+      "age5_18": 0.3276,
+      "adult19plus": 0.5378
+    },
+    "WLF": {
+      "name": "Wallis and Futuna Islands",
+      "under5": 0.0456,
+      "age5_18": 0.2303,
+      "adult19plus": 0.7241
+    },
+    "WSM": {
+      "name": "Samoa",
+      "under5": 0.1264,
+      "age5_18": 0.3416,
+      "adult19plus": 0.532
+    },
+    "XKX": {
+      "name": "Kosovo (under UNSC res. 1244)",
+      "under5": 0.0591,
+      "age5_18": 0.2151,
+      "adult19plus": 0.7259
+    },
+    "YEM": {
+      "name": "Yemen",
+      "under5": 0.1588,
+      "age5_18": 0.3361,
+      "adult19plus": 0.5052
+    },
+    "ZAF": {
+      "name": "South Africa",
+      "under5": 0.0923,
+      "age5_18": 0.2341,
+      "adult19plus": 0.6736
+    },
+    "ZMB": {
+      "name": "Zambia",
+      "under5": 0.1503,
+      "age5_18": 0.356,
+      "adult19plus": 0.4937
+    },
+    "ZWE": {
+      "name": "Zimbabwe",
+      "under5": 0.1403,
+      "age5_18": 0.3606,
+      "adult19plus": 0.4992
+    }
+  },
+  "notes": [
+    "Shares sum to 1 per country (4-dp rounding may leave a ~1e-4 residual).",
+    "DEFAULT only — a project with surveyed age bands overrides these.",
+    "GS survey templates collect >15/<15, not Table 9's <5/5-18/19+ (see §3.1.1), so this default is the norm rather than the exception.",
+    "Data file widened to full coverage in M8; the Table 9 age-tiering math remains deferred (OPEN #24)."
+  ]
+}
