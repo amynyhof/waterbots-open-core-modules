@@ -14,6 +14,17 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 **Checked:** counts only, no names. Whole-word matches found nothing in files, file names, history or pull requests.
 
+## 2026-10-23 — Safety pass SP6 and the close-out rule
+
+**Done (open pull request, branch `sp6-review-and-closeout`):**
+- `BUILD_PLAN.md`: safety pass SP6 added — a human engineer reviews the structure of all three repos, now, not
+  blocking. A "Code standards" note: strict typing is on from day one.
+- `CLAUDE.md`: close-out rule — at each family close, tidy what you touched (dead code, stale notes, duplicate logic).
+
+**Found:** linting is **not** set up. Only strict typing is on. Added plan item M1.6 for a linter; not built here.
+
+---
+
 ## 2026-10-20 — M1.3 Amy's answers on the pull request
 
 **Done (same branch, `m1-3-package-skeleton`):**

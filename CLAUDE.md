@@ -70,6 +70,10 @@ A commit that mixes kinds of work is split into two commits. Every pull request'
 - A pull request title, commit message or description never names what is being removed. Say what the change does in
   plain words ("Tidy paths and comments"), not what it takes out.
 
+## Close-out
+
+At each family close, tidy what you touched (dead code, stale notes, duplicate logic) as part of close-out.
+
 ## Plain-English public copy
 
 Everything here is public: README, docs, cards, screen text, commit messages, PR descriptions.
