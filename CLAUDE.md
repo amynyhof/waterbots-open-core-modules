@@ -67,6 +67,8 @@ A commit that mixes kinds of work is split into two commits. Every pull request'
 - Start the description with a **For Amy** block in plain words: what changed, what to check, the lane, the grant
   bucket, and anything that needs her decision.
 - Update `BUILD_LOG.md` with what was done; tick items in `BUILD_PLAN.md`.
+- A pull request title, commit message or description never names what is being removed. Say what the change does in
+  plain words ("Tidy paths and comments"), not what it takes out.
 
 ## Close-out
 
@@ -90,6 +92,7 @@ Everything here is public: README, docs, cards, screen text, commit messages, PR
 - Standards text, quoted or paraphrased closely. Cite it instead.
 - A credit price. It was removed from the module and appears nowhere.
 - Any key, token or password.
+- A person's folder path or Windows username. Use a path that names no user, such as `%USERPROFILE%\GitHub\...`.
 
 ### Words (Amy, 19 Oct 2026)
 
