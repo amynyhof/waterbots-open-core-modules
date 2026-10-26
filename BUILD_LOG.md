@@ -28,6 +28,16 @@ seed (no finding); typecheck passes; the seed's own tests pass (13 files, 84 tes
 Two extra typing checks are off for `calvin`. No reviewed-version ledger file came with the seed. Some comments in the
 seed use words the word rules restrict. All four are in `SEEDS.md`.
 
+## 2026-10-25 — Tidy paths and comments
+
+**Done (open pull request, branch `tidy-paths-and-comments`):**
+- Checked every tracked file, every file name, the git history and the pull request text against Amy's private list.
+  The list stayed where it is and was not copied. Nothing needed changing.
+- `CLAUDE.md`: two rules. Never write a person's folder path or Windows username into the repo. Pull request titles,
+  commit messages and descriptions never name what is being removed.
+
+**Checked:** counts only, no names. Whole-word matches found nothing in files, file names, history or pull requests.
+
 ## 2026-10-23 — Safety pass SP6 and the close-out rule
 
 **Done (open pull request, branch `sp6-review-and-closeout`):**
