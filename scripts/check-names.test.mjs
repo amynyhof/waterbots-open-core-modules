@@ -6,7 +6,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { parseNames, loadNames, scanText, pathHasName, scanFiles, ListError } from "./check-names.mjs";
+import { parseNames, loadNames, listPathFromEnv, scanText, pathHasName, scanFiles, ListError } from "./check-names.mjs";
 
 const script = fileURLToPath(new URL("./check-names.mjs", import.meta.url));
 const tmp = () => mkdtempSync(join(tmpdir(), "name-scan-"));
@@ -90,11 +90,21 @@ test("loadNames fails closed when the list is missing or empty", () => {
   assert.throws(() => loadNames(dir), ListError, "a folder is not a list");
 });
 
-function run(args, listPath) {
-  return spawnSync(process.execPath, [script, ...args], {
-    encoding: "utf8",
-    env: { ...process.env, CARRY_NAMES_FILE: listPath },
-  });
+test("the list's path comes from WB_NAMES_LIST only; unset or empty is a ListError", () => {
+  assert.equal(listPathFromEnv({ WB_NAMES_LIST: "/some/where/list.txt" }), "/some/where/list.txt");
+  assert.throws(() => listPathFromEnv({}), ListError);
+  assert.throws(() => listPathFromEnv({ WB_NAMES_LIST: "" }), ListError);
+  assert.throws(() => listPathFromEnv({ WB_NAMES_LIST: "   " }), ListError);
+  assert.throws(() => listPathFromEnv({ CARRY_NAMES_FILE: "/some/where/list.txt" }), ListError, "no other variable counts");
+});
+
+// `listPath` null leaves WB_NAMES_LIST unset. The caller's own value is always removed first, so a real list
+// on the machine running the tests can never leak into them.
+function run(args, listPath, extraEnv = {}) {
+  const env = { ...process.env, ...extraEnv };
+  delete env.WB_NAMES_LIST;
+  if (listPath !== null) env.WB_NAMES_LIST = listPath;
+  return spawnSync(process.execPath, [script, ...args], { encoding: "utf8", env, cwd: tmp() });
 }
 
 test("command line: exit 0 when clean, 1 when found, 2 when the list is missing; no name is ever printed", () => {
@@ -120,12 +130,32 @@ test("command line: exit 0 when clean, 1 when found, 2 when the list is missing;
   const missing = run([clean], join(dir, "gone.txt"));
   assert.equal(missing.status, 2);
 
-  for (const r of [ok, bad, missing]) {
+  const unset = run([clean], null);
+  assert.equal(unset.status, 2);
+  assert.match(unset.stderr, /WB_NAMES_LIST is not set/);
+
+  // The old variable name is ignored: with only it set, the scan still fails closed.
+  const oldName = run([clean], null, { CARRY_NAMES_FILE: list });
+  assert.equal(oldName.status, 2);
+
+  for (const r of [ok, bad, missing, unset, oldName]) {
     const all = (r.stdout + r.stderr).toLowerCase();
     for (const secret of ["zelda", "quimby", "plinth", "orrery", "40417", "harbour", "voss"]) {
       assert.equal(all.includes(secret), false, `output must not contain "${secret}"`);
     }
   }
+});
+
+test("command line: the list is never looked for in the home folder", () => {
+  const dir = tmp();
+  const clean = join(dir, "clean");
+  mkdirSync(clean);
+  writeFileSync(join(clean, "a.txt"), "hello\n");
+  const home = join(dir, "home");
+  mkdirSync(home);
+  writeFileSync(join(home, "list.txt"), LIST);
+  const r = run([clean], null, { HOME: home, USERPROFILE: home });
+  assert.equal(r.status, 2, "a list sitting in the home folder is not found");
 });
 
 test("command line: a missing folder to scan is a failed run, not a pass", () => {

@@ -19,6 +19,8 @@ pass-or-fail results with a reference line — **never a figure.**
 
 1. **Rule Zero — stay in this repo.** Never open, read or search the private WaterBots repos, the harness repo or the
    carry folder on this machine. The only outside file Session C may read is the brief Amy hands over, read-only.
+   The one other exception: the name scan may read the private name list in place, through the `WB_NAMES_LIST`
+   variable, and nothing else in that place.
 2. **Nothing private goes in.** No real project figures, no real project names, no reviewer or partner names or
    organisations, no secrets or keys. Not in code, tests, fixtures, comments, presets, commit messages or PR text.
    Fixtures are **invented** projects only.

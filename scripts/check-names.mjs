@@ -3,7 +3,8 @@
 //   node scripts/check-names.mjs [file-or-folder ...]
 //
 // The list lives outside this repo and is read in place. It is never copied, never printed and never logged.
-// Where the list is: the CARRY_NAMES_FILE variable, or GitHub/private/names-to-block.txt in the home folder.
+// Where the list is: the WB_NAMES_LIST variable holds its full path. There is no default path in the code.
+// If the variable is unset or empty, or the path points at nothing readable, the scan stops (see below).
 //
 // One entry per line. `#` starts a comment. Blank lines are skipped. An entry may end in
 // `| allowed on copyright and licence lines only`: it is then let through on lines that say
@@ -12,12 +13,11 @@
 // Matching is by whole word, upper or lower case. A space, dot, dash or underscore inside an entry matches any
 // of those, or nothing. So `Ada Lovelace` also finds `ada_lovelace` and `AdaLovelace`.
 //
-// Fails closed: a missing, unreadable or empty list stops the run with exit code 2 and no result.
+// Fails closed: an unset variable, or a missing, unreadable or empty list, stops the run with exit code 2 and no result.
 // Output is file, line and kind only. A file whose own name is a hit is shown as "(path hidden)".
 //
 // Exit codes: 0 nothing found, 1 something found, 2 the scan could not run.
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
-import { homedir } from "node:os";
 import { join, relative, sep, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -57,8 +57,11 @@ export function loadNames(path) {
   return parseNames(text);
 }
 
-export function defaultListPath(env = process.env) {
-  return env.CARRY_NAMES_FILE || join(homedir(), "GitHub", "private", "names-to-block.txt");
+/** The list's path, from the WB_NAMES_LIST variable only. Unset or empty is a ListError: there is no default. */
+export function listPathFromEnv(env = process.env) {
+  const path = (env.WB_NAMES_LIST ?? "").trim();
+  if (path === "") throw new ListError("WB_NAMES_LIST is not set");
+  return path;
 }
 
 /** Lines of `text` that hold a listed name. Returns line numbers only. */
@@ -124,7 +127,7 @@ export function main(argv, env = process.env, cwd = process.cwd(), out = console
   let entries;
   let sets;
   try {
-    entries = loadNames(defaultListPath(env));
+    entries = loadNames(listPathFromEnv(env));
     sets = listFiles(argv, cwd);
   } catch (e) {
     if (!(e instanceof ListError)) throw e;

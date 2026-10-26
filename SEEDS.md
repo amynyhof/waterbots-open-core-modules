@@ -16,14 +16,14 @@ A fingerprint is a scrambled code that changes if even one byte of the file chan
 
 ## Calvin: what was checked
 
-Seed built by Session A on 2026-10-25. It was read from Amy's handoff folder and nothing was written there.
+Seed built by Session A on 2026-10-25. It was read from the handoff folder and nothing was written there.
 
 | # | Check | Result | Where |
 |---|---|---|---|
 | 1 | Seal check: the tag exists and holds the engine and the module | Cited, not rerun. The tag is on the private side. Session A: pass. | Session A's `checks/1-seal-check-and-match.log` |
 | 2 | Ledger check: calvin was not already listed in this file | Pass. There was no `SEEDS.md` before this one. | This pull request |
 | 3 | Number gate | **Not run here. Known gap.** Session A: pass. | `checks/3-number-gate.log` |
-| 4 | Name scan | Pass. 75 files, 38 entries, no finding. Session A: pass. | `scripts/check-names.mjs`; `checks/4-name-scan.log` |
+| 4 | Name scan | Pass. 75 files, 38 entries, no finding. Session A: pass. The script finds the private list through the `WB_NAMES_LIST` variable and stops if it is unset. | `scripts/check-names.mjs`; `checks/4-name-scan.log` |
 | 5 | Copied-text check | **Not run here. Known gap.** Session A: pass. | `checks/5-copied-text.log` |
 | 6 | Paid-code scan | Pass. 68 files, no finding. Session A: pass. | `scripts/check-paid-code.mjs`; `checks/6-paid-code.log` |
 | 7 | File fingerprints | Pass. 67 of 67 files match the list. The folder holds exactly the 68 files `MANIFEST.md` lists, no more and no fewer. | `checks/7-hashes.log` |
@@ -41,13 +41,13 @@ Proving the numbers, under TypeScript 7.0.2, vitest 5.0.5 and Node 24.20.0:
 
 This shows nothing broke. It does **not** show the numbers match real filings. That check runs privately, outside this repo.
 
-Session A's output for checks 1 and 3 to 8 sits in the `checks/` folder of the seed, in Amy's handoff folder. It is cited here, not copied.
+Session A's output for checks 1 and 3 to 8 sits in the `checks/` folder of the seed, in the handoff folder. It is cited here, not copied.
 
 ## Known gaps
 
 1. **Number gate and copied-text check were not run here.** Both need inputs that never leave the private side (the private reference cases, and the standards PDFs). Until the private number list exists and the real gate is built (M1.2), these two rest on Session A's results. Lane 3 review is the cover meanwhile.
 2. **Session A's logs hold counts, not fingerprints.** They say "67 files" and "all 67 hashes OK". They name no digest. That the same bytes were checked is shown by the matching counts and by the one fingerprint of the list, not by a digest in the log.
-3. **Typecheck settings are looser for `calvin`.** The seed was typechecked with `strict` only. Two of this repo's extra checks (unchecked indexed access, exact optional properties) flag 95 places in the seed's code, so they are off in `packages/calvin/tsconfig.json`. `core` keeps all of them. Seed files were not edited to fit. Bringing the code up to them is its own pull request.
+3. **Typecheck settings are looser for `calvin`.** The seed was typechecked with `strict` only. Two of this repo's extra checks (unchecked indexed access, exact optional properties) flag 95 places in the seed's code, so they are off in `packages/calvin/tsconfig.json`. `core` keeps all of them. Seed files were not edited to fit. **To be fixed at the source, before a later seal:** the code is brought up to both checks in the private repo, sealed again and carried as a new seed. Then the two checks go back on for `calvin`.
 4. **No reviewed-version ledger came with the seed.** The folder held no such file. The seal tag above is the only version record. If one exists on the private side, Amy hands it over and it is added as it arrives.
 5. **Some comments in the seed use words the repo's word rules restrict** (see `CLAUDE.md`, "Words"). They are in comments, not in names. They were left as they came, because changing them would change the fingerprints. Amy decides whether they are fixed in a later pull request.
 
