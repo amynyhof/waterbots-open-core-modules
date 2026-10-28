@@ -1,6 +1,6 @@
 {
   "name": "@waterbots/core",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "description": "WaterBots open core module: core (what every module shares: the project shape, standards list, save outcome, agent contract). Arrived with the Calvin seed. Not published.",
   "license": "Apache-2.0",
@@ -34,5 +34,10 @@
   },
   "peerDependencies": {
     "react": "19.3.1"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
   }
 }

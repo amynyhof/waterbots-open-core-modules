@@ -12,5 +12,6 @@ What is in `src/`:
 
 The files that arrived with the seed are kept as they came. Change them only in their own pull request.
 
-- Not published. Nothing in this repo goes to npm yet; the package is marked `private`.
+- React is an optional peer. Only `SaveNotice.tsx` and `readOnly.tsx` use it.
+- Version 0.1.0. Not published. Nothing in this repo goes to npm yet; the package is marked `private`.
 - Apache License 2.0. See `LICENSE` and `NOTICE` in this folder.
