@@ -53,11 +53,14 @@ gate's design before the real gate is built.
 
 *Stop for Amy:* the private side confirms the package matches the seed. *Waits on:* the seed (Amy's one-time carry).
 
-- [~] **M2.1** Seed arrives unchanged, with its reviewed-version ledger kept exactly as it arrives. Show that the
+- [x] **M2.1** Seed arrives unchanged, with its reviewed-version ledger kept exactly as it arrives. Show that the
       carried calculator builds and tests the same under this repo's tool versions (TypeScript 7.0.2, vitest 5.0.5,
-      Node 24.20.0), and say so in the pull request. (Open pull request. `SEEDS.md` records it. No ledger file came
-      with the seed; see its known gaps.)
+      Node 24.20.0), and say so in the pull request. (Merged. `SEEDS.md` records it. No ledger file came with the
+      seed; see its known gaps.)
 - [ ] **M2.2** Publish `0.1.0` with no changes to what arrived. *Blocked until* Amy's hand-steps in M1.4 are done.
+  - [~] Get it ready (open pull request): an engine-only entry, `@waterbots/calvin/engine`, added in new files only;
+        React made an optional peer of `calvin` and `core`; both set to version 0.1.0. Still `private`.
+  - [!] Publish. Amy's call, after M1.4.
 - [ ] **M2.3 Linting** (was M1.6): add a linter that runs as part of CI, with the strictest settings that fit. Amy
       ruled on 2026-10-23 that it comes right after the seed lands (after M2.2), not before it. The seed is carried
       as it is first.

@@ -4,6 +4,30 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-10-27 — M2.2 Engine-only entry, React optional, version 0.1.0
+
+**Done (open pull request, branch `add-engine-entry`):**
+- `packages/calvin/src/engine.ts`: a new entry, `@waterbots/calvin/engine`. It passes on the calculator's math and
+  data only: no React, no screens, no agent code, no `@waterbots/core`. Re-exports only; it computes nothing.
+- The calvin build now also bundles that entry into one plain file, `dist/engine.js`, with the `rolldown` command
+  (a bundler: it joins many files into one). `rolldown` 1.2.14 is now a pinned dev tool. It was already installed, as
+  part of vitest.
+- React is an optional peer of `calvin` and `core`. Anyone using only the engine need not install it.
+- `calvin` and `core` are version 0.1.0. `phoebe` and `bridget` stay at 0.0.0: they are still empty. All four stay
+  `private`. Nothing was published.
+- Two checks, both run by `npm test`: `packages/calvin/test/engine-entry.test.mjs` (the entry imports only engine
+  files, and gives the same 48 answers in place), and `scripts/check-engine-entry.mjs` with its own tests (builds the
+  entry, installs it alone in a fresh folder with no React, and gets the same 48 answers there in plain Node).
+- No seed file was edited. Everything is in new files, package manifests, READMEs and the lockfile.
+
+**Checked:** clean install, typecheck, test and build all pass. Seed check 65 of 65. Paid-code scan: no finding.
+The engine entry: 48 of 48 in place, and 48 of 48 installed with no React.
+
+**Open:** the entry's types work fully for projects that use a bundler's module rules. For projects that use Node's
+own module rules, the entry's names are typed, but some deeper types fall back to "any". The cause is the seed's
+import paths, which have no file endings. It is fixed at the source, like the typing gap in `SEEDS.md`. The name scan
+was not run: `WB_NAMES_LIST` is not set in this session.
+
 ## 2026-10-25 — M2.1 Add calculator module (the Calvin seed)
 
 **Done (open pull request, branch `add-calculator-module`):**
