@@ -19,14 +19,20 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
   files, and gives the same 48 answers in place), and `scripts/check-engine-entry.mjs` with its own tests (builds the
   entry, installs it alone in a fresh folder with no React, and gets the same 48 answers there in plain Node).
 - No seed file was edited. Everything is in new files, package manifests, READMEs and the lockfile.
+- Amy's ruling: since the seed, Calvin's home is this repo. Later changes are made here by Session C, with no new seal
+  or seed. `SEEDS.md`, `BUILD_PLAN.md`, the 2026-10-25 entry below and a comment in `packages/calvin/tsconfig.json` now
+  say so.
+- `scripts/check-seed.mjs` now reads the seed's files from the commit where the seed landed (`50fe2f6`, pull request
+  #5), not from today's files. It checks that commit is in history, that its files match the list, and that the list
+  is unchanged. Normal changes to seeded files are allowed, and counted. Its tests now use a throwaway git repo. The CI
+  check job fetches full history so the commit can be read.
 
-**Checked:** clean install, typecheck, test and build all pass. Seed check 65 of 65. Paid-code scan: no finding.
-The engine entry: 48 of 48 in place, and 48 of 48 installed with no React.
+**Checked:** clean install, typecheck, test and build all pass. Seed check 65 of 65 at the seed commit. Paid-code scan:
+no finding. Name scan: no finding. The engine entry: 48 of 48 in place, and 48 of 48 installed with no React.
 
 **Open:** the entry's types work fully for projects that use a bundler's module rules. For projects that use Node's
 own module rules, the entry's names are typed, but some deeper types fall back to "any". The cause is the seed's
-import paths, which have no file endings. It is fixed at the source, like the typing gap in `SEEDS.md`. The name scan
-was not run: `WB_NAMES_LIST` is not set in this session.
+import paths, which have no file endings. Session C fixes this here, in its own pull request.
 
 ## 2026-10-25 — M2.1 Add calculator module (the Calvin seed)
 
@@ -51,7 +57,8 @@ seed (no finding); typecheck passes; the seed's own tests pass (13 files, 84 tes
 (48 of 48).
 
 **Open:** the number gate and the copied-text check could not run here and rest on Session A's results (known gap).
-Two extra typing checks are off for `calvin`: a known gap, to be fixed at the source before a later seal. No
+Two extra typing checks are off for `calvin`: a known gap, to be fixed here by a normal pull request (corrected
+2026-10-27 at Amy's direction: Calvin's home is this repo, with no new seal or seed). No
 reviewed-version ledger file came with the seed. Some comments in the seed use words the word rules restrict. All four
 are in `SEEDS.md`.
 
