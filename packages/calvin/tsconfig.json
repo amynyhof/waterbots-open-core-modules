@@ -9,7 +9,7 @@
     "types": ["node"],
     // The seed was typechecked with `strict` only. Two of the base's extra checks flag the seed's code, 95 places
     // in all: unchecked indexed access and exact optional properties. They stay off for this package until the
-    // seed's code is brought up to them in its own pull request. Seed files are not edited here.
+    // code is brought up to them here, in its own pull request.
     "noUncheckedIndexedAccess": false,
     "exactOptionalPropertyTypes": false,
     "noEmit": true

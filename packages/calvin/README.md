@@ -29,7 +29,7 @@ Two checks run on every `npm test`. `test/engine-entry.test.mjs` checks that the
 
 ## Notes
 
-The files that arrived with the seed are kept as they came. Change them only in their own pull request.
+Since the seed landed, this repo is Calvin's home. Changes are made here, by pull request. `scripts/check-seed.mjs` proves what arrived against the commit where the seed landed, so later changes are allowed.
 
 - Version 0.1.0. Not published. Nothing in this repo goes to npm yet; the package is marked `private`.
 - The build writes plain files for a bundler to pick up. Apart from `dist/engine.js`, they do not run on their own in Node.

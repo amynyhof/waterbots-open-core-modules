@@ -10,7 +10,7 @@ What is in `src/`:
 - `readOnly.tsx`: the read-only seat, for screens that must show a result but not allow edits.
 - `agent.ts` and `calculatorTool.ts`: the agent contract, and the helper that turns a calculator into an agent tool.
 
-The files that arrived with the seed are kept as they came. Change them only in their own pull request.
+Since the seed landed, this repo is its home. Changes are made here, by pull request. `scripts/check-seed.mjs` proves what arrived against the commit where the seed landed, so later changes are allowed.
 
 - React is an optional peer. Only `SaveNotice.tsx` and `readOnly.tsx` use it.
 - Version 0.1.0. Not published. Nothing in this repo goes to npm yet; the package is marked `private`.
