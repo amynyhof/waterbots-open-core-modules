@@ -40,8 +40,8 @@ smaller tables, such as the six-row table of fallback factors, are fine as they 
 
 | # | Step | Waits on | Done when |
 |---|---|---|---|
-| V1 | Amy reviews and merges the engine-only entry (pull request #6). | Amy. | It is on `main`. |
-| V2 | Make the engine's types complete for projects that use Node's own module rules. | V1. | A fresh project using Node's module rules typechecks against the built package, with no type falling back to "any". |
+| V1 | [x] Amy reviews and merges the engine-only entry (pull request #6). Merged. | Amy. | It is on `main`. |
+| V2 | [~] Make the engine's types complete for projects that use Node's own module rules. (Open pull request.) | V1. | A fresh project using Node's module rules typechecks against the built package, with no type falling back to "any". |
 | V3 | Sliders for anticipated performance (ex-ante: before the project runs). Each slider is held between a cited floor and a cited ceiling. Each has a pencil to type an exact value, and shows the credited number. The engine works out that number; the screen computes nothing. The default and the cap stay two separate things. | V1; Amy's description of the sliders (from site pull request #156); a cited source for every floor and ceiling. | Tests show each slider stays inside its cited bounds, the pencil value is held to the same bounds, and the number shown is the engine's. Amy checks the screen. |
 | V4 | The simple view: it hides the advanced material until asked. | V3. | A test shows advanced parts are hidden at first and one control shows them. Amy checks the screen. |
 | V5 | The first GitHub release: the packed package and its fingerprint, with the sliders. Replaces the npm publish in M2.2. | V2, V3, V4; Amy's approval; branch protection and the tag rule (M1.4). | The release holds the file and its fingerprint. Both sites pin it. The private side reports pass or fail on both carbon filings. |
@@ -119,7 +119,7 @@ gate's design before the real gate is built.
       Node 24.20.0), and say so in the pull request. (Merged. `SEEDS.md` records it. No ledger file came with the
       seed; see its known gaps.)
 - [ ] **M2.2** Publish `0.1.0` with no changes to what arrived. *Blocked until* Amy's hand-steps in M1.4 are done.
-  - [~] Get it ready (open pull request): an engine-only entry, `@waterbots/calvin/engine`, added in new files only;
+  - [x] Get it ready (merged, pull request #6): an engine-only entry, `@waterbots/calvin/engine`, added in new files only;
         React made an optional peer of `calvin` and `core`; both set to version 0.1.0. Still `private`.
   - [!] Publish. Amy's call, after M1.4.
 - [ ] **M2.3 Linting** (was M1.6): add a linter that runs as part of CI, with the strictest settings that fit. Amy
