@@ -2,7 +2,8 @@
 
 Each step is one coherent, testable thing Amy can check in one sitting and undo in one motion. Each step is a family;
 its items are the pull requests or checks inside it. `[x]` done (merged), `[~]` open pull request, `[ ]` not started,
-`[!]` blocked until Amy acts.
+`[!]` blocked until Amy acts. **(V1)** marks an item inside a family that v1 needs, even where the rest of its family
+comes after v1.
 
 **Every engine change is published first as a release candidate** (a trial version). The private side installs it,
 runs its real-filing tests, and reports back through Amy: pass or fail and the reference line, never a figure. Only
@@ -69,7 +70,8 @@ smaller tables, such as the six-row table of fallback factors, are fine as they 
   pull the number gate forward.
 - M2.3 linting.
 - M4 openings and labels.
-- M5 the friendly view, beyond the sliders and simple view in V3 and V4.
+- M5 the friendly view, beyond the sliders and simple view in V3 and V4 and its items marked **(V1)**.
+- M9.2 Bridget's map, beyond its item marked **(V1)**.
 - M6 the fuel-mix floor.
 - M7 diesel and grid factors.
 - M8.2 the free site's water file.
@@ -130,6 +132,13 @@ gate's design before the real gate is built.
 - [ ] **M2.3 Linting** (was M1.6): add a linter that runs as part of CI, with the strictest settings that fit. Amy
       ruled on 2026-10-23 that it comes right after the seed lands (after M2.2), not before it. The seed is carried
       as it is first.
+- [ ] **M2.4 (V1)** Tag which of the 47 made-up test cases in `expected-outputs.json` are outputs of Gold Standard's
+      official V1.0 calculator on made-up inputs. Amy reports 26, from an audit on the private side (2026-10-25). The
+      file marks every case "synthetic" today, so the report's sentence about the official tools cannot be checked
+      here. Done when each case carries its source and a test checks the report's claim against the tags.
+- [ ] **M2.5 (V1)** Record how each of the other 21 made-up test cases was worked out, including every V2.0 case. The
+      file records only what the engine returned, not how each expected value was found. Done when each of the 21
+      says how it was worked out, or says plainly that its only source is the engine itself.
 
 ## M3 — The method registry (no look change)
 
@@ -155,6 +164,10 @@ the litres check on the cap (N5). A step with no image yet has not started.
 
 - [ ] **M5.1** Mockup from the captured image
 - [ ] **M5.2** Built page; the litres slider's **default** and **cap** kept as two separate things
+- [ ] **M5.3 (V1)** Calvin's question rows are big enough to tap on a phone. Done when a test checks their tap size
+      and Amy checks them on a phone.
+- [ ] **M5.4 (V1)** Calvin's color is Plum on his screens. Done when his screens use one Plum color token and Amy
+      checks the screen.
 
 ## M6 — The fuel-mix floor
 
@@ -183,6 +196,8 @@ The first release does not wait for this.
 
 - [ ] **M9.1** Phoebe (eligibility) to its first release
 - [ ] **M9.2** Bridget (the map) to its first release
+  - [ ] **(V1)** The map's + and - buttons are big enough to tap on a phone. Done when a test checks their tap size
+        and Amy checks them on a phone.
 
 ---
 

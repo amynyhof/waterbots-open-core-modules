@@ -4,6 +4,22 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-10-31 — V3 Sliders: brought up to date, and four v1 items planned
+
+**Done (same branch, `sliders`):**
+- Merged `main` into the branch. Both sets of log entries are kept, newest first.
+- `.claude/settings.local.json` is already in `.gitignore`, and git confirms it ignores the file. No change needed.
+- Added four items to the plan, each marked **(V1)**:
+  - M2.4: tag which made-up test cases are outputs of Gold Standard's official V1.0 calculator.
+  - M2.5: record how each of the other test cases was worked out, including every V2.0 case.
+  - M5.3 and M9.2: Calvin's question rows and the map's + and - buttons are big enough to tap on a phone.
+  - M5.4: Calvin's color is Plum on his screens.
+
+**Checked:** typecheck, test and build pass. The same 48 of 48 checks. Name scan on committed files: no finding.
+
+**Open:** the test-case file records only what the engine returned for each case. Nothing in this repo says which
+cases came from the official V1.0 calculator, or how any case was worked out. M2.4 and M2.5 need that from Amy.
+
 ## 2026-10-31 — The report's sentence on how the calculator is checked
 
 **Done (open pull request, branch `report-test-case-count`):**
