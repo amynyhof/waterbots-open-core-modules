@@ -4,6 +4,15 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-10-31 — V3 Sliders: community days start at 347
+
+**Done (same branch, `sliders`):**
+- Community systems' days-of-operation slider starts at 347, labelled with its source (V2.0 SDWS 32; V1.0 SDWS 27).
+  With sliders on, an unsaved days value starts there too, so the slider, its label and the engine begin at the same
+  number. A saved value always wins. Household treatment keeps 365. The typed boxes keep 365 for both.
+
+**Checked:** typecheck, test and build pass. The same 48 of 48 test cases. Name scan: no finding.
+
 ## 2026-10-30 — V3 Sliders: answers on the pull request
 
 **Done (same branch, `sliders`):**
