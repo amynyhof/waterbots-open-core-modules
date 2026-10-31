@@ -12,6 +12,7 @@ import { peopleServed, projectFacts, type CalcState } from "./state";
 import { fmt, fmtExp, parseNumericInput } from "./format";
 import HelpTip from "./HelpTip";
 import { sdwsRef, citeShort, type Basis } from "./citations";
+import { creditedValue, shownValue, sliderLabel, sliderSpecs, type SliderKey } from "./exAnte";
 
 /*
  * Derivation view — structured by the GS methodology's NATIVE sections (Baseline emissions →
@@ -123,7 +124,7 @@ export function TagLegend() {
  * the [#114] defect: a marker advertising a capability the reader does not have. Guarding the
  * component means a seventh call site added tomorrow cannot reintroduce it.
  */
-function EditGlyph({ title }: { title?: string }) {
+export function EditGlyph({ title }: { title?: string }) {
   const readOnly = useReadOnlySeat();
   if (readOnly) return null;
   const text = title ?? "Adjustable in this row";
@@ -144,7 +145,7 @@ function EditGlyph({ title }: { title?: string }) {
  * nothing, and on a touch screen it never appeared at all. The note is the one that already
  * existed (`tip`, or the state's own line); nothing new is written here.
  */
-function StateBadge({ state, tip }: { state: EditState; tip?: string }) {
+export function StateBadge({ state, tip }: { state: EditState; tip?: string }) {
   const b = STATE_META[state];
   return (
     <HelpTip text={tip ?? b.tip} label={`What does "${b.text}" mean here?`}>
@@ -255,6 +256,10 @@ function VarRow({ label, value, unit, state, tip, baselineSdws }: { label: strin
 }
 
 /**
+ * (The ex-ante sliders, Road to v1 step V3, ruling 2026-10-30, are a separate row, `SliderRow`, that a
+ * site turns on for four anticipated values. Each carries a pencil for an exact value. This row stays a
+ * typed box everywhere else.)
+ *
  * AN ADJUSTABLE PARAMETER — A TYPED BOX, NOT A SLIDER (Amy's walk-through, 25 Sep 2026:
  * *"every field is a typed box with its tag and a pencil, no sliders on this site"*).
  *
@@ -419,7 +424,9 @@ function EqRow({ eqNum, symbol, title, formula, value, oneLiner, binding, open, 
 
 // ── the stack ────────────────────────────────────────────────────────────────
 
-export default function EquationStack({ result, state, patch, canonPopulation, seed }: { result: ScenarioResult; state: CalcState; patch: (p: Partial<CalcState>) => void; canonPopulation?: number; seed?: CalcState }) {
+export default function EquationStack({ result, state, patch, canonPopulation, seed, sliders = false }: { result: ScenarioResult; state: CalcState; patch: (p: Partial<CalcState>) => void; canonPopulation?: number; seed?: CalcState;
+  /** Show the ex-ante sliders in place of the typed boxes for the four anticipated values (`exAnte.ts`). */
+  sliders?: boolean }) {
   // Read once here for the legend below; the input primitives read it for themselves ([#97]).
   const readOnlySeat = useReadOnlySeat();
   // Method 2 (HWT/IWT) opens the Eq.6/7 quantity rows by default so its per-premises derivation
@@ -507,7 +514,17 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
   // t_p SDWS 35), sales records (N_p SDWS 33, DN_p SDWS 37). QPW_p (the WCFT) and Q_m (a meter) are
   // also monitored under §14.3.1 but by other instruments, so they are left unmarked pending her word.
   const mon = (key: string, instrument: string) => ({ sdws: sdwsRef(basis, key), instrument });
-  const mqParam = <Param monitor={mon("Mq", "water-quality tests")} label="M_q,y — water-quality modifier" sdwsRef={sdwsRef(basis, "Mq")} value={state.waterQualityFactor} changed={changed.mq} onChange={(v) => patch({ waterQualityFactor: v })} min={0} max={1} step={0.01} unit="" baseline="1.0 (all samples pass at point of use)" tip="Fraction of water-quality samples that pass at the point of use. 0 = all failing → no credits." />;
+  // EX-ANTE SLIDERS (V3): when on, these four values are set on the sliders above the stack
+  // (`ExAntePanel`). Their rows here show the credited value and point up; no second box.
+  const slider = (key: SliderKey) => {
+    const spec = sliderSpecs(state).find((x) => x.key === key);
+    if (!sliders || !spec) return null;
+    return (
+      <VarRow label={`${spec.label}, set on the sliders above`} value={shownValue(spec, creditedValue(state, result, key))}
+        state={sliderLabel(state, key)} tip="Set on the anticipated-performance sliders above the equations. This is the value the engine credits." />
+    );
+  };
+  const mqParam = slider("testsPass") ?? <Param monitor={mon("Mq", "water-quality tests")} label="M_q,y — water-quality modifier" sdwsRef={sdwsRef(basis, "Mq")} value={state.waterQualityFactor} changed={changed.mq} onChange={(v) => patch({ waterQualityFactor: v })} min={0} max={1} step={0.01} unit="" baseline="1.0 (all samples pass at point of use)" tip="Fraction of water-quality samples that pass at the point of use. 0 = all failing → no credits." />;
   const cbParam = <Param resting="assumed" label="C_b — already-safe share" sdwsRef={sdwsRef(basis, "Cb")} baselineSdws="V2.0 SDWS 12" value={state.cBaseline} changed={changed.cb} onChange={(v) => patch({ cBaseline: v })} min={0} max={1} step={0.01} unit="" baseline="0% — your baseline survey replaces this" tip="Share of end-users already using a safe supply that didn't require boiling. 1 = everyone → no credits. Assumed 0% until your baseline survey (V2.0 SDWS 12) replaces it." />;
   const xcbParam = <Param monitor={mon("X", "usage survey")} label="X_cleanboil,y — still boiling the safe water" sdwsRef={sdwsRef(basis, "X")} value={state.xCleanboil} changed={changed.xcb} onChange={(v) => patch({ xCleanboil: v })} min={0} max={1} step={0.01} unit="" baseline="0 (not yet surveyed)" tip="Share of end-users who still boil the project's safe water after it arrives — that boiling still burns fuel. 1 = everyone → no credits." />;
 
@@ -807,9 +824,10 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
     );
   })();
 
+  const qpwSlider = slider("litres");
   const qpwParam = (
     <>
-      <Param label="QPW_p — litres / person / day" sdwsRef={sdwsRef(basis, "QPW")} value={state.litresPerPersonPerDay} changed={changed.qpw || state.qpwEntered}
+      {qpwSlider ?? <Param label="QPW_p — litres / person / day" sdwsRef={sdwsRef(basis, "QPW")} value={state.litresPerPersonPerDay} changed={changed.qpw || state.qpwEntered}
         onChange={(v) => patch({ litresPerPersonPerDay: v, qpwEntered: true })} min={0} max={20} step={0.1} unit="L"
         // ⚠ ON A TABLE 9 RUN THE SLIDER IS NOT THE CREDITED NUMBER, AND THE CAPTION NOW SAYS SO.
         // The slider sits at the ADULT tier default (4.0) while the engine credits the age-weighted
@@ -823,8 +841,8 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
           : "rulebook default 4 L/p/d (V1.0 SDWS 24); cap 5.5"}
         tip={v2
           ? "Daily drinking water per person. Default 4.0 L/p/d for adults (V2.0 Table 9, V2.0 SDWS 29 Option 1) unless a design value or a Water Consumption Field Test is entered; capped at 5.5."
-          : "Daily drinking water per person. Default 4 L/p/d (V1.0 SDWS 24) unless a design value or a Water Consumption Field Test is entered; capped at 5.5."} />
-      {state.litresPerPersonPerDay > 5.5 ? (
+          : "Daily drinking water per person. Default 4 L/p/d (V1.0 SDWS 24) unless a design value or a Water Consumption Field Test is entered; capped at 5.5."} />}
+      {!qpwSlider && state.litresPerPersonPerDay > 5.5 ? (
         <p className="t-caption" style={{ fontSize: 10, color: "var(--amber)" }}>
           Capped to 5.5 L/p/d ({v2 ? "V2.0 Table 9" : "V1.0 SDWS 24"}) in the credited volume — entered {fmt(state.litresPerPersonPerDay, 1)}.
         </p>
@@ -832,7 +850,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
       {ageSplitRow}
     </>
   );
-  const doParam = (
+  const doParam = slider("days") ?? (
     <Param label={`${m2 ? "DP" : "DO"} — operational days / yr`} sdwsRef={sdwsRef(basis, m2 ? "DP" : "DO")} value={state.operationalDays} changed={changed.do}
       onChange={(v) => patch({ operationalDays: v })} min={0} max={365} step={1} unit="d"
       baseline="365 (full year)" tip="Days per year the system serves water." />
@@ -967,7 +985,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
           <p className="t-caption py-1 text-fg-4" style={{ fontSize: 10 }}>
             U_p (usage rate) is not in Eq.6 under V2.0 — it is applied in Eq.8 (Q_adj), where it is entered.
           </p>
-        ) : (
+        ) : slider("usage") ?? (
           <Param monitor={mon("Up", "usage survey")} label="U_p,y — usage rate" sdwsRef={sdwsRef(basis, "Up")} value={state.usageRate} changed={state.usageRate !== 1} onChange={(v) => patch({ usageRate: v })} min={0} max={1} step={0.01} unit="" baseline="1.0 (full use)" tip="Under V1.0, U_p is folded into Eq.6 (Q_pop). Fraction of the time the device is actually used." />
         )}
         {doParam}
@@ -1136,7 +1154,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
         </div>
       </EqRow>
 
-      {v2 ? paaTail(result, open, toggle, xcbParam, mqParam, cbParam, state, patch) : legacyTail(result, open, toggle, cbParam, xcbParam, mqParam)}
+      {v2 ? paaTail(result, open, toggle, xcbParam, mqParam, cbParam, state, patch, slider("usage")) : legacyTail(result, open, toggle, cbParam, xcbParam, mqParam)}
       {/* version-scoped citations flow through citeShort(basis, key); see ./citations */}
 
       {/* ══ Emission reductions (credits) ══ */}
@@ -1188,7 +1206,7 @@ function peLeRows(result: ScenarioResult, open: Set<string>, toggle: Toggle, bas
   );
 }
 
-function paaTail(result: ScenarioResult, open: Set<string>, toggle: Toggle, xcbParam: React.ReactNode, mqParam: React.ReactNode, cbParam: React.ReactNode, state: CalcState, patch: (p: Partial<CalcState>) => void) {
+function paaTail(result: ScenarioResult, open: Set<string>, toggle: Toggle, xcbParam: React.ReactNode, mqParam: React.ReactNode, cbParam: React.ReactNode, state: CalcState, patch: (p: Partial<CalcState>) => void, usageSlider: React.ReactNode) {
   const p = result.result as PaaErOutput;
   // A host country with no row in the engine's DAF data takes the default; the engine's provenance
   // label carries the note, and this row only prints it (Amy's rulings, 19 and 23 Oct).
@@ -1206,7 +1224,7 @@ function paaTail(result: ScenarioResult, open: Set<string>, toggle: Toggle, xcbP
         open={open.has("q_adj")} onToggle={() => toggle("q_adj")} editable cite={citeShort("paa", "qadj")}>
         {xcbParam}
         {mqParam}
-        {state.method === 2 ? (
+        {state.method === 2 ? usageSlider ?? (
           <Param monitor={{ sdws: sdwsRef("paa", "Up"), instrument: "usage survey" }} label="U_p,y — usage rate" sdwsRef={sdwsRef("paa", "Up")} value={state.usageRate} changed={state.usageRate !== 1} onChange={(v) => patch({ usageRate: v })} min={0} max={1} step={0.01} unit="" baseline="1.0 (full use)" tip="Fraction of the time the technology is actually used (Method 2). 0 = never → no credits." />
         ) : (
           <VarRow label="U_p — usage rate (Method 1)" value="1.0" state="default" tip="Usage rate is fixed at 1.0 for Method 1 (CWS/CWT)." />

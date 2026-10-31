@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 
 import { ReadOnlySeat } from "../../core/readOnly";
 import EquationStack from "./EquationStack";
+import ExAntePanel from "./ExAntePanel";
 import { DerivedTag, InRowNum, TagLegend } from "./EquationStack";
 import ReportView, { type ReportSlots } from "./ReportView";
 import VersionTabs from "./VersionTabs";
@@ -265,9 +266,11 @@ export default function CalculatorWork({
 
           {/* THE KEY, WHERE THE TAGS ARE READ (Amy's ruling (2), 2026-09-24). One line above the
               derivation, so a reader never has to remember what four small words mean. */}
+          {calc.sliders ? <ExAntePanel state={state} result={result} patch={patch} /> : null}
+
           <TagLegend />
 
-          <EquationStack result={result} state={state} patch={patch} canonPopulation={project.population?.served} seed={seed} />
+          <EquationStack result={result} state={state} patch={patch} canonPopulation={project.population?.served} seed={seed} sliders={calc.sliders} />
 
           {/* ── Beta footer — one line, honest state, shown to visitors (Amy, 2026-09-07) ── */}
           <div className="border-t border-line pt-2">

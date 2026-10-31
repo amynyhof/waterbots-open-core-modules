@@ -24,6 +24,7 @@ import {
   type ProjectFact,
 } from "./state";
 import { zeroCreditWarning } from "./warnings";
+import { showSliders, withSliderStarts } from "./exAnte";
 
 /**
  * The GS4GG carbon calculator's state, lifted out of the standalone calculator page
@@ -74,12 +75,20 @@ export interface CalculatorOptions {
    * does not hold (the paid site's crediting rules stay paid; plan §1.3).
    */
   creditingPeriodYears?: number;
+  /**
+   * EX-ANTE SLIDERS (ruling 2026-10-30). A site turns this on to show sliders, on an ex-ante run, for
+   * the four values a project can only anticipate (`exAnte.ts`). Off, or on an ex-post run, the seat
+   * keeps its typed boxes. The paid site leaves it off.
+   */
+  exAnteSliders?: boolean;
 }
 
 export interface CalculatorState {
   /* ── Permission ─────────────────────────────────────────────────────────── */
   /** See `CalculatorOptions.readOnly`. */
   readOnly: boolean;
+  /** True when this seat shows the ex-ante sliders: the site turned them on and the run is ex-ante. */
+  sliders: boolean;
 
   /* ── Working inputs ─────────────────────────────────────────────────────── */
   /** The live input state. */
@@ -148,8 +157,8 @@ export interface CalculatorState {
 }
 
 export function useCalculatorState(project: CalvinProject, options: CalculatorOptions = {}): CalculatorState {
-  const { readOnly = false, onSave, onDirtyChange, onExport, creditingPeriodYears } = options;
-  const seed = useMemo(() => seedCalcState(project), [project]);
+  const { readOnly = false, onSave, onDirtyChange, onExport, creditingPeriodYears, exAnteSliders } = options;
+  const seed = useMemo(() => withSliderStarts(seedCalcState(project), project.analysis, exAnteSliders), [project, exAnteSliders]);
   const [state, setState] = useState<CalcState>(seed);
   // INERT WHEN READ-ONLY, and this is the layer that actually guarantees it. The surface
   // disables its controls too, but a disabled control is a courtesy — this is the lock.
@@ -314,6 +323,7 @@ export function useCalculatorState(project: CalvinProject, options: CalculatorOp
 
   return {
     readOnly,
+    sliders: showSliders(exAnteSliders, state),
     state,
     patch,
     seed,
