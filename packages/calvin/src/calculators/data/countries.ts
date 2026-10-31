@@ -1,4 +1,4 @@
-import household from "./household-size/countries.json";
+import household from "./household-size/countries.json" with { type: "json" };
 
 /** A selectable country (ISO 3166-1 alpha-3 + display name). */
 export interface CountryOption {

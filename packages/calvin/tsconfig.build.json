@@ -2,5 +2,5 @@
   "extends": "./tsconfig.json",
   "compilerOptions": { "noEmit": false, "rootDir": "src", "outDir": "dist" },
   "include": ["src"],
-  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/prove-expected-outputs.test.ts", "src/reference-cases.ts"]
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/prove-expected-outputs.test.ts", "src/test-cases.ts"]
 }
