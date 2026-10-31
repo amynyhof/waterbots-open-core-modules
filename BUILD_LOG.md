@@ -4,6 +4,55 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-10-30 — M2.2 Engine entry: answers on the pull request
+
+**Done (same branch, `add-engine-entry`):**
+- Brought `main` in. Both sets of log entries are kept, newest first.
+- Rulings are credited by date ("ruling 2026-10-27") in the lines this pull request adds to `BUILD_LOG.md`,
+  `SEEDS.md` and `BUILD_PLAN.md`. `CLAUDE.md` now has this as a rule.
+- One copy of the case-running steps: `packages/calvin/src/reference-cases.ts`, moved out of
+  `prove-expected-outputs.test.ts`. That test, `test/engine-entry.test.mjs` and `scripts/check-engine-entry.mjs` all use
+  it. The file is left out of the build.
+- Gold Standard file and constant names stay as they are. They name the standard, not a partner.
+
+**Checked:** clean typecheck, test and build pass. The same 48 of 48 in place, and 48 of 48 installed with no React.
+Seed check 65 of 65 at the seed commit. Paid-code scan: no finding.
+
+## 2026-10-30 — Road to v1: how D-3 is checked (plan only)
+
+**Done (same branch, `road-to-v1`):**
+- `BUILD_PLAN.md`: the VWBA 2.0 guidebook has no worked example for D-3. So V8, the finish line and the M8 stop now
+  say: D-3 is tested on hand-worked cases, with every step cited to the guidebook (cited, not copied). An outside
+  expert checks it once the prototype is up. The plan does not name the expert.
+- V8 now also says: the VWBA spec is written alongside the build, in `docs/`, for Amy to review then.
+
+**Open:** nothing for Amy in the plan itself. Nothing was built.
+
+## 2026-10-30 — Road to v1, revised after Amy's answers (plan only)
+
+**Done (same branch, `road-to-v1`):**
+- `BUILD_PLAN.md`: the Road to v1 section now follows Amy's new finish line. It has 15 steps (V1 to V15).
+- Sliders (V3) and the simple view (V4) are in v1, right after pull request #6. They follow Amy's description of
+  them. Site pull request #156 lives in another repo and was not read here.
+- No npm in v1. Each release is a GitHub release with the packed package and its fingerprint, which both sites pin
+  (V5, V15). The first pinned version has the sliders. npm is v2.
+- Violet, the water-benefit agent, is her own module (V7). She hosts D-3 first (V8).
+- The paid site keeps its own data on top of the package. The engine lists what came from a site's tables (V13).
+- No question cap. Each module counts its questions on each walk (V9 to V12); the average is reported.
+- The two open questions are dropped, as Amy said.
+
+**Open:** nothing for Amy in the plan itself. Nothing was built.
+
+## 2026-10-30 — Road to v1 (plan only)
+
+**Done (open pull request, branch `road-to-v1`):**
+- `BUILD_PLAN.md`: a "Road to v1" section. It lists, in order, only the work in this repo that Amy's v1 finish line
+  needs (V1 to V11). Each step says what it waits on, in this repo and in others, and how we know it is done.
+  Everything else is marked "after v1".
+- The reference filings are named by kind only (household, community). No project names or places.
+
+**Open:** two questions for Amy, listed at the end of the section. Nothing was built.
+
 ## 2026-10-27 — M2.2 Engine-only entry, React optional, version 0.1.0
 
 **Done (open pull request, branch `add-engine-entry`):**
@@ -19,7 +68,7 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
   files, and gives the same 48 answers in place), and `scripts/check-engine-entry.mjs` with its own tests (builds the
   entry, installs it alone in a fresh folder with no React, and gets the same 48 answers there in plain Node).
 - No seed file was edited. Everything is in new files, package manifests, READMEs and the lockfile.
-- Amy's ruling: since the seed, Calvin's home is this repo. Later changes are made here by Session C, with no new seal
+- Ruling 2026-10-27: since the seed, Calvin's home is this repo. Later changes are made here by Session C, with no new seal
   or seed. `SEEDS.md`, `BUILD_PLAN.md`, the 2026-10-25 entry below and a comment in `packages/calvin/tsconfig.json` now
   say so.
 - `scripts/check-seed.mjs` now reads the seed's files from the commit where the seed landed (`50fe2f6`, pull request
@@ -57,8 +106,8 @@ seed (no finding); typecheck passes; the seed's own tests pass (13 files, 84 tes
 (48 of 48).
 
 **Open:** the number gate and the copied-text check could not run here and rest on Session A's results (known gap).
-Two extra typing checks are off for `calvin`: a known gap, to be fixed here by a normal pull request (corrected
-2026-10-27 at Amy's direction: Calvin's home is this repo, with no new seal or seed). No
+Two extra typing checks are off for `calvin`: a known gap, to be fixed here by a normal pull request (corrected by
+ruling 2026-10-27: Calvin's home is this repo, with no new seal or seed). No
 reviewed-version ledger file came with the seed. Some comments in the seed use words the word rules restrict. All four
 are in `SEEDS.md`.
 
