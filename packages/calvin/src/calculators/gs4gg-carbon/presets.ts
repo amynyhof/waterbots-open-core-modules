@@ -1,7 +1,7 @@
-import type { MethodologyVersion, QuantityMethod } from "./quantity";
-import paaFuel from "../data/paa/fuel-factors.json";
-import m49Json from "../data/regions/un-m49.json";
-import baselineMixJson from "../data/baseline-mix/countries.json";
+import type { MethodologyVersion, QuantityMethod } from "./quantity.js";
+import paaFuel from "../data/paa/fuel-factors.json" with { type: "json" };
+import m49Json from "../data/regions/un-m49.json" with { type: "json" };
+import baselineMixJson from "../data/baseline-mix/countries.json" with { type: "json" };
 
 /**
  * presets.ts — conservative, cited, country-informed baseline profiles that pre-fill

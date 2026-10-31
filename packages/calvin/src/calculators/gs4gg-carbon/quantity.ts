@@ -42,7 +42,7 @@
  */
 
 /** V1 (legacy SDWS) vs V2 (PAA M400-12). */
-import { table9Volume } from "./table9";
+import { table9Volume } from "./table9.js";
 
 export type MethodologyVersion = "legacy" | "paa";
 

@@ -3,13 +3,14 @@
 // case-running steps, used by `prove-expected-outputs.test.ts`, `test/engine-entry.test.mjs` and
 // `scripts/check-engine-entry.mjs`. It has no runtime imports and only types Node can strip, so that check can run it
 // in plain Node, in a folder where only the built engine entry is installed. Not part of the build.
+// These are made-up test cases, not real filings.
 import type * as Engine from "./engine";
 
 type Outputs = Record<string, number>;
-type RefCase = { id: string; calc: string; inputs: any; baselineEdit?: any; quantityInputs?: any; outputs: Outputs };
+type TestCase = { id: string; calc: string; inputs: any; baselineEdit?: any; quantityInputs?: any; outputs: Outputs };
 type FnrbCase = { id: string; scenarioInput: any; outputs: Record<string, unknown> };
-export type ReferenceDoc = { engineVersion: string; cases: RefCase[]; fnrbCases: FnrbCase[] };
-export type ReferenceRun = {
+export type TestCaseDoc = { engineVersion: string; cases: TestCase[]; fnrbCases: FnrbCase[] };
+export type TestCaseRun = {
   engineVersion: string;
   cases: Record<string, { held: unknown[]; outputs: Outputs }>;
   fnrbCases: Record<string, Record<string, unknown>>;
@@ -18,8 +19,8 @@ export type ReferenceRun = {
 const numbersOnly = (o: Record<string, unknown>): Outputs =>
   Object.fromEntries(Object.entries(o).filter((e): e is [string, number] => typeof e[1] === "number" && Number.isFinite(e[1])));
 
-export function runReferenceCases(engine: typeof Engine, doc: ReferenceDoc): ReferenceRun {
-  const cases: ReferenceRun["cases"] = {};
+export function runTestCases(engine: typeof Engine, doc: TestCaseDoc): TestCaseRun {
+  const cases: TestCaseRun["cases"] = {};
   for (const c of doc.cases) {
     let inputs = c.inputs;
     let quantity: Outputs = {};
@@ -38,7 +39,7 @@ export function runReferenceCases(engine: typeof Engine, doc: ReferenceDoc): Ref
     cases[c.id] = { held, outputs: { ...quantity, ...numbersOnly(out as unknown as Record<string, unknown>) } };
   }
 
-  const fnrbCases: ReferenceRun["fnrbCases"] = {};
+  const fnrbCases: TestCaseRun["fnrbCases"] = {};
   for (const c of doc.fnrbCases) {
     try {
       const out = engine.computeScenario(c.scenarioInput);

@@ -1,5 +1,5 @@
-import type { LegacyErInput, LegacyErOutput } from "./types";
-import { computeEfb } from "./baseline-ef";
+import type { LegacyErInput, LegacyErOutput } from "./types.js";
+import { computeEfb } from "./baseline-ef.js";
 
 /**
  * Legacy (SDWS V1.0) emission-reduction calculation.
