@@ -3,7 +3,7 @@
 Each step is one coherent, testable thing Amy can check in one sitting and undo in one motion. Each step is a family;
 its items are the pull requests or checks inside it. `[x]` done (merged), `[~]` open pull request, `[ ]` not started,
 `[!]` blocked until Amy acts. **(V1)** marks an item inside a family that v1 needs, even where the rest of its family
-comes after v1.
+comes after v1. **(V2)** marks an item planned for v2.
 
 **Every engine change is published first as a release candidate** (a trial version). The private side installs it,
 runs its real-filing tests, and reports back through Amy: pass or fail and the reference line, never a figure. Only
@@ -44,10 +44,10 @@ smaller tables, such as the six-row table of fallback factors, are fine as they 
 | V1 | [x] Amy reviews and merges the engine-only entry (pull request #6). Merged. | Amy. | It is on `main`. |
 | V2 | [x] Make the engine's types complete for projects that use Node's own module rules. (Merged, pull request #8.) | V1. | A fresh project using Node's module rules typechecks against the built package, with no type falling back to "any". |
 | V3 | [x] (Merged, pull request #9.) Sliders for anticipated performance (ex-ante: before the project runs). Each slider is held between a cited floor and a cited ceiling. Each has a pencil to type an exact value, and shows the credited number. The engine works out that number; the screen computes nothing. The default and the cap stay two separate things. | V1; Amy's description of the sliders (from site pull request #156); a cited source for every floor and ceiling. | Tests show each slider stays inside its cited bounds, the pencil value is held to the same bounds, and the number shown is the engine's. Amy checks the screen. |
-| V4 | The simple view, shipped as the next release after V5 (ruling 2026-10-31): it hides the advanced material until asked, with bigger tap buttons (M5.3) and Plum (M5.4). See M5.5. | V5. | A test shows advanced parts are hidden at first and one control shows them. Amy checks the screen. |
+| V4 | The simple view, shipped as the next release after V5 (ruling 2026-10-31): it hides the advanced material until asked, with bigger tap buttons (M5.3) and Reef (M5.4). See M5.5. | V5. | A test shows advanced parts are hidden at first and one control shows them. Amy checks the screen. |
 | V5 | [~] (Prepared from `main`; waiting on Amy's go.) The first GitHub release: the packed packages (`calvin` and the `core` it needs) and their fingerprints, with the sliders. Replaces the npm publish in M2.2. It does not wait for the simple view (ruling 2026-10-31). | V2, V3; Amy's approval; branch protection and the tag rule (M1.4). | The release holds the files and their fingerprints. Both sites pin it. The private side reports pass or fail on both carbon filings. |
 | V6 | The method registry (M3): one entry per carbon method, so both sites pick a method the same way. | V5. | A trial release is out; the private side reports pass on both carbon filings. |
-| V7 | Violet, the water-benefit agent, as her own module: `@waterbots/violet`. She hosts the D-n modules, starting with D-3. | V1; Amy's rulings on Violet. | The package builds, passes the package checks, and has a place for each D-n module. |
+| V7 | Violet, the water-benefit agent, as her own module: `@waterbots/violet`. She hosts the D-n modules, starting with D-3. Her color is Orchid (`#A457D4`) (ruling 2026-10-31). | V1; Amy's rulings on Violet. | The package builds, passes the package checks, and has a place for each D-n module. |
 | V8 | D-3, the water-supply module, inside Violet (M8.1). | V7; the activity-type signature; Amy's ruling on further gates (N6). | Violet's D-3 tests are hand-worked cases, with every step cited to the guidebook (cited, not copied). The VWBA spec is written alongside the build, in `docs/`, and Amy reviews it then. An outside expert checks the module once the prototype is up. |
 | V9 | The screening hand-off: one project record in `core` that every module fills in and the paid site reads. Each module writes how many questions it asked on that walk. | V5; the paid site's save format (paid repo); Wellington's fields (free-site repo). | A test takes an invented project through all four modules' parts, saves it, reads it back unchanged, and gives each module's question count. |
 | V10 | Phoebe (eligibility) to its first release (M9.1). | V9; Phoebe's rulings. | Released; Phoebe fills its part of the record and counts its questions. |
@@ -111,7 +111,8 @@ gate's design before the real gate is built.
   - [!] The npm scope: create the npm organisation or confirm Amy owns it (N13)
   - [!] The `NPM_TOKEN` Actions secret
   - [!] Amy as required reviewer on the `npm-publish` environment, so every release needs her approval
-  - [!] A tag rule so only Amy can create `v*` tags
+  - [!] **(V1)** The release tag rule: only Amy and Harrison may create release tags (`v*`, and each module's own,
+        such as `calvin-v*`). Set it once the GitHub organisation exists.
 - [ ] **M1.5 Lane 1 auto-merge** — not built; the earlier dormant job was removed. Rebuild only when the real
       number gate (M1.2) exists and Amy says to switch it on. Design: lane 1 and not a draft → arm GitHub's
       auto-merge; any other lane → disarm it. Needs the branch protection above, or it would merge at once.
@@ -129,16 +130,23 @@ gate's design before the real gate is built.
   - [x] Get it ready (merged, pull request #6): an engine-only entry, `@waterbots/calvin/engine`, added in new files only;
         React made an optional peer of `calvin` and `core`; both set to version 0.1.0. Still `private`.
   - [!] Publish. Amy's call, after M1.4.
+  - [ ] **(V2)** Rebuild the release on a second machine and show it gives the same bytes: the same fingerprints.
 - [ ] **M2.3 Linting** (was M1.6): add a linter that runs as part of CI, with the strictest settings that fit. Amy
       ruled on 2026-10-23 that it comes right after the seed lands (after M2.2), not before it. The seed is carried
       as it is first.
-- [ ] **M2.4 (V1)** Tag which of the 47 made-up test cases in `expected-outputs.json` are outputs of Gold Standard's
+- [~] **M2.4 (V1)** Tag which of the 47 made-up test cases in `expected-outputs.json` are outputs of Gold Standard's
       official V1.0 calculator on made-up inputs. Amy reports 26, from an audit on the private side (2026-10-25). The
       file marks every case "synthetic" today, so the report's sentence about the official tools cannot be checked
       here. Done when each case carries its source and a test checks the report's claim against the tags.
-- [ ] **M2.5 (V1)** Record how each of the other 21 made-up test cases was worked out, including every V2.0 case. The
+      (Open pull request. From the note of 2026-10-31: 26 began as the calculator's output, and 5 of them are still
+      its output unchanged. The other 21 were recalculated by our engine. The report counts only the 5.)
+- [~] **M2.5 (V1)** Record how each of the other 21 made-up test cases was worked out, including every V2.0 case. The
       file records only what the engine returned, not how each expected value was found. Done when each of the 21
-      says how it was worked out, or says plainly that its only source is the engine itself.
+      says how it was worked out, or says plainly that its only source is the engine itself. (Open pull request.
+      Every case now carries a `workedOut` tag, explained in the file's `workedOutTags`.)
+- [ ] **M2.6 (V2)** Put the 21 recalculated test cases back through Gold Standard's official V1.0 calculator, so their
+      expected results are the calculator's own again. Done when each one's tag says so and the report's count rises
+      with it.
 
 ## M3 — The method registry (no look change)
 
@@ -166,10 +174,10 @@ the litres check on the cap (N5). A step with no image yet has not started.
 - [ ] **M5.2** Built page; the litres slider's **default** and **cap** kept as two separate things
 - [ ] **M5.3 (V1)** Calvin's question rows are big enough to tap on a phone. Done when a test checks their tap size
       and Amy checks them on a phone.
-- [ ] **M5.4 (V1)** Calvin's color is Plum on his screens. Done when his screens use one Plum color token and Amy
-      checks the screen.
+- [ ] **M5.4 (V1)** Calvin's color is Reef (`#0E8A94`) on his screens (ruling 2026-10-31). Done when his screens use
+      one Reef color token and Amy checks the screen.
 - [ ] **M5.5 (V1)** The simple view ships as Calvin's next release, after the first (ruling 2026-10-31). It is one
-      release: the simple view (V4), the bigger tap buttons (M5.3) and Plum (M5.4). Done when that release holds the
+      release: the simple view (V4), the bigger tap buttons (M5.3) and Reef (M5.4). Done when that release holds the
       packed files and their fingerprints, and Amy checks the screens on a phone.
 
 ## M6 — The fuel-mix floor
