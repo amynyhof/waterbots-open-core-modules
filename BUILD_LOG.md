@@ -4,6 +4,32 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-10-30 — V3 Sliders for anticipated performance
+
+**Done (open pull request, branch `sliders`):**
+- A setting a site turns on, `exAnteSliders`. On an ex-ante run it shows an "Anticipated performance" panel above the
+  equations, with four sliders. Ex-post runs, and any site that leaves it off (the paid site), keep the typed boxes.
+- The four: drinking water per person per day; days a year the water is available (household treatment: days the
+  device is in the home, starting at 365 and moving down only); share of water tests that pass; share of homes that
+  really use the device (household treatment only, never 0).
+- Each starts at its value, labelled "assumed", and becomes "entered" once moved or typed. Each end shows its value and
+  its source. An end with no citation is not made up: the row says "No cited floor".
+- Each has a pencil to type an exact value. A value typed past a cited end is held at that end, and the row says the
+  credit is capped.
+- Each shows the number the engine credits, and one plain line on which way the credits move. Litres shows the
+  engine's own volume. On a V2.0 household run with no volume entered, that is the age-weighted volume, not the
+  starting 4.00 L.
+- The equation rows for these four values show the credited value and point to the panel. There is one control per
+  value.
+- The logic is in `screen/exAnte.ts`; the row is `SliderRow.tsx`; the panel is `ExAntePanel.tsx`. The engine is
+  unchanged.
+
+**Checked:** typecheck, test and build pass. The same 48 of 48 test cases. New tests cover the ends, the labels, the
+cap note and the credited number.
+
+**Open, for a ruling:** no floor is cited for litres, for days, or for the share of homes using the device. The
+starting value for that share (100%) has no rulebook citation either. The tests list these four, so a change shows.
+
 ## 2026-10-30 — V2 The engine's types under Node's own module rules
 
 **Done (open pull request, branch `engine-types-node`):**
