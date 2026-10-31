@@ -4,6 +4,16 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-10-30 — Road to v1: how D-3 is checked (plan only)
+
+**Done (same branch, `road-to-v1`):**
+- `BUILD_PLAN.md`: the VWBA 2.0 guidebook has no worked example for D-3. So V8, the finish line and the M8 stop now
+  say: D-3 is tested on hand-worked cases, with every step cited to the guidebook (cited, not copied). An outside
+  expert checks it once the prototype is up. The plan does not name the expert.
+- V8 now also says: the VWBA spec is written alongside the build, in `docs/`, for Amy to review then.
+
+**Open:** nothing for Amy in the plan itself. Nothing was built.
+
 ## 2026-10-30 — Road to v1, revised after Amy's answers (plan only)
 
 **Done (same branch, `road-to-v1`):**

@@ -18,8 +18,9 @@ Amy set the v1 finish line on 2026-10-30 and revised it the same day. v1 is done
 
 1. **Reliable.** The carbon calculators reproduce two real filings: one household water treatment filing and one
    community water supply filing. The private side checks this; we only hear pass or fail. The water-supply module
-   (VWBA D-3) reproduces the worked example in the VWBA 2.0 guidebook. VWBA is Volumetric Water Benefit Accounting, a
-   way to count the water a project gives back.
+   (VWBA D-3) is tested on hand-worked cases, with every step cited to the VWBA 2.0 guidebook. The guidebook has no
+   worked example for D-3. An outside expert checks the module once the prototype is up. VWBA is Volumetric Water
+   Benefit Accounting, a way to count the water a project gives back.
 2. **Whole journey.** A visitor runs a screening: Wellington, then Phoebe, then Bridget, then Calvin, then a report or
    sign-up. We count the questions on each walk and report the average. There is no cap. The project saves to the paid
    site. The same inputs give the same numbers on both sites. Where the paid site uses more precise data, the
@@ -46,7 +47,7 @@ smaller tables, such as the six-row table of fallback factors, are fine as they 
 | V5 | The first GitHub release: the packed package and its fingerprint, with the sliders. Replaces the npm publish in M2.2. | V2, V3, V4; Amy's approval; branch protection and the tag rule (M1.4). | The release holds the file and its fingerprint. Both sites pin it. The private side reports pass or fail on both carbon filings. |
 | V6 | The method registry (M3): one entry per carbon method, so both sites pick a method the same way. | V5. | A trial release is out; the private side reports pass on both carbon filings. |
 | V7 | Violet, the water-benefit agent, as her own module: `@waterbots/violet`. She hosts the D-n modules, starting with D-3. | V1; Amy's rulings on Violet. | The package builds, passes the package checks, and has a place for each D-n module. |
-| V8 | D-3, the water-supply module, inside Violet (M8.1). | V7; the activity-type signature; Amy's ruling on further gates (N6). | A test reproduces the guidebook's worked example, cited by page, not copied. Amy sees it. |
+| V8 | D-3, the water-supply module, inside Violet (M8.1). | V7; the activity-type signature; Amy's ruling on further gates (N6). | Violet's D-3 tests are hand-worked cases, with every step cited to the guidebook (cited, not copied). The VWBA spec is written alongside the build, in `docs/`, and Amy reviews it then. An outside expert checks the module once the prototype is up. |
 | V9 | The screening hand-off: one project record in `core` that every module fills in and the paid site reads. Each module writes how many questions it asked on that walk. | V5; the paid site's save format (paid repo); Wellington's fields (free-site repo). | A test takes an invented project through all four modules' parts, saves it, reads it back unchanged, and gives each module's question count. |
 | V10 | Phoebe (eligibility) to its first release (M9.1). | V9; Phoebe's rulings. | Released; Phoebe fills its part of the record and counts its questions. |
 | V11 | Bridget (the map) to its first release (M9.2). | V9; Bridget's rulings; a rights read on every data file; a ruling on the shared map key. | Released; Bridget fills its part of the record and counts its questions. |
@@ -162,7 +163,7 @@ indicator.
 
 ## M8 — The water-supply method (VWBA D-3)
 
-*Stop for Amy:* the worked example reproduced. *Waits on:* the activity-type signature; any further gates (N6).
+*Stop for Amy:* the hand-worked cases and the VWBA spec; then an outside expert's check (see V8). *Waits on:* the activity-type signature; any further gates (N6).
 The first release does not wait for this.
 
 - [ ] **M8.1** Water-supply method entry and engine
