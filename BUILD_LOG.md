@@ -4,6 +4,22 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-10-31 — V3 Sliders: brought up to date, and four v1 items planned
+
+**Done (same branch, `sliders`):**
+- Merged `main` into the branch. Both sets of log entries are kept, newest first.
+- `.claude/settings.local.json` is already in `.gitignore`, and git confirms it ignores the file. No change needed.
+- Added four items to the plan, each marked **(V1)**:
+  - M2.4: tag which made-up test cases are outputs of Gold Standard's official V1.0 calculator.
+  - M2.5: record how each of the other test cases was worked out, including every V2.0 case.
+  - M5.3 and M9.2: Calvin's question rows and the map's + and - buttons are big enough to tap on a phone.
+  - M5.4: Calvin's color is Plum on his screens.
+
+**Checked:** typecheck, test and build pass. The same 48 of 48 checks. Name scan on committed files: no finding.
+
+**Open:** the test-case file records only what the engine returned for each case. Nothing in this repo says which
+cases came from the official V1.0 calculator, or how any case was worked out. M2.4 and M2.5 need that from Amy.
+
 ## 2026-10-31 — The report's sentence on how the calculator is checked
 
 **Done (open pull request, branch `report-test-case-count`):**
@@ -20,6 +36,62 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 **Open:** the committed test-case file marks every case "synthetic". It does not say which cases came from Gold
 Standard's official V1.0 tools, so this repo cannot check that part of the sentence on its own.
+
+## 2026-10-31 — V3 Sliders: community days start at 347
+
+**Done (same branch, `sliders`):**
+- Community systems' days-of-operation slider starts at 347, labelled with its source (V2.0 SDWS 32; V1.0 SDWS 27).
+  With sliders on, an unsaved days value starts there too, so the slider, its label and the engine begin at the same
+  number. A saved value always wins. Household treatment keeps 365. The typed boxes keep 365 for both.
+
+**Checked:** typecheck, test and build pass. The same 48 of 48 test cases. Name scan: no finding.
+
+## 2026-10-30 — V3 Sliders: answers on the pull request
+
+**Done (same branch, `sliders`):**
+- The panel's headline is the engine's yearly credit for the values set. It moves as any slider moves.
+- Each slider shows the credited value only when it differs from the value set (for example, age-weighted litres).
+- Community systems: water, days of operation and tests passing. Above 347 days, the row says an operation sensor is
+  required (V2.0 SDWS 32; V1.0 SDWS 27). There is no usage slider, since V2.0 fixes usage at 100% for them.
+- Household treatment: the same, with days the device is in the home (starting at 365, moving down only) and the
+  share of homes that really use the device.
+- The share of users who still boil the safe water stays a typed value. A project does not control it.
+- Tests passing: below the V2.0 §7.4.3 corrective-action line (80% in year 1, 85% in year 2, 90% from year 3), the row
+  says a corrective action plan is required and that crediting is suspended if the next tests don't improve. It says
+  which years the share falls short in, since the run does not know the project's year. V2.0 runs only.
+- Ends from a share (0% to 100%) or the year (365 days) are labelled "natural limit". Where no floor is cited, the
+  slider just allows 0, with no note.
+- A starting value with no source says "assumed: no source yet". The plan has an item to find one: the share of homes
+  using the device (100%).
+
+**Checked:** typecheck, test and build pass. The same 48 of 48 test cases. Tests cover the ends, the starts, the three
+notes, the headline and the credited value.
+
+## 2026-10-30 — V3 Sliders for anticipated performance
+
+**Done (open pull request, branch `sliders`):**
+- A setting a site turns on, `exAnteSliders`. On an ex-ante run it shows an "Anticipated performance" panel above the
+  equations, with four sliders. Ex-post runs, and any site that leaves it off (the paid site), keep the typed boxes.
+- The four: drinking water per person per day; days a year the water is available (household treatment: days the
+  device is in the home, starting at 365 and moving down only); share of water tests that pass; share of homes that
+  really use the device (household treatment only, never 0).
+- Each starts at its value, labelled "assumed", and becomes "entered" once moved or typed. Each end shows its value and
+  its source. An end with no citation is not made up: the row says "No cited floor".
+- Each has a pencil to type an exact value. A value typed past a cited end is held at that end, and the row says the
+  credit is capped.
+- Each shows the number the engine credits, and one plain line on which way the credits move. Litres shows the
+  engine's own volume. On a V2.0 household run with no volume entered, that is the age-weighted volume, not the
+  starting 4.00 L.
+- The equation rows for these four values show the credited value and point to the panel. There is one control per
+  value.
+- The logic is in `screen/exAnte.ts`; the row is `SliderRow.tsx`; the panel is `ExAntePanel.tsx`. The engine is
+  unchanged.
+
+**Checked:** typecheck, test and build pass. The same 48 of 48 test cases. New tests cover the ends, the labels, the
+cap note and the credited number.
+
+**Open, for a ruling:** no floor is cited for litres, for days, or for the share of homes using the device. The
+starting value for that share (100%) has no rulebook citation either. The tests list these four, so a change shows.
 
 ## 2026-10-30 — V2 The engine's types under Node's own module rules
 

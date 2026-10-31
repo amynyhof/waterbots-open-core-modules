@@ -64,4 +64,7 @@ export interface SavedAnalysis {
   cBaseline?: number; // C_b
   xCleanboil?: number; // X_cleanboil
   mQuality?: number; // M_qy
+  /** Ex-ante sliders: which were moved, and any value typed past a cited end (see `exAnte.ts`). */
+  slidersEntered?: Partial<Record<"days" | "testsPass" | "usage", true>>;
+  slidersTyped?: Partial<Record<"litres" | "days" | "testsPass" | "usage", number>>;
 }

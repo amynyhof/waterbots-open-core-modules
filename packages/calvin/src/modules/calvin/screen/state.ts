@@ -93,6 +93,13 @@ export interface CalcState {
   fnrbFiledV1?: number | null;
   /** A project's own surveyed household size (people/household), overriding the UN 2022 country average — [#225](b). */
   householdSizeOverride?: number | null;
+  /**
+   * EX-ANTE SLIDERS (`exAnte.ts`). Which of days, tests passing and usage somebody has moved, so the
+   * row says "entered" rather than "assumed" (litres uses `qpwEntered`). And a value typed past a
+   * cited end, kept beside the held value so the row can say the credit is capped.
+   */
+  slidersEntered?: Partial<Record<"days" | "testsPass" | "usage", true>>;
+  slidersTyped?: Partial<Record<"litres" | "days" | "testsPass" | "usage", number>>;
 }
 
 /**
@@ -243,6 +250,8 @@ export function seedCalcState(project: CalvinProject): CalcState {
     // Household size: a saved analysis figure wins, else the RECORD's own (Amy's glossary,
     // 2026-09-24 — it is a project fact), else undefined and the cited UN average is used.
     householdSizeOverride: g.householdSizeOverride ?? project.population?.householdSize,
+    slidersEntered: g.slidersEntered,
+    slidersTyped: g.slidersTyped,
   };
 }
 
@@ -275,6 +284,8 @@ export function toSavedAnalysis(s: CalcState): SavedAnalysis {
     fnrbOverride: s.fnrbOverride,
     fnrbFiledV1: s.fnrbFiledV1,
     householdSizeOverride: s.householdSizeOverride,
+    slidersEntered: s.slidersEntered,
+    slidersTyped: s.slidersTyped,
   };
 }
 
