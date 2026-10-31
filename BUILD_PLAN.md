@@ -12,6 +12,67 @@ All of M1 to M9 is `Grant: open`. Edits to this plan and the build log are `Gran
 
 ---
 
+## Road to v1
+
+Amy set the v1 finish line on 2026-10-30 and revised it the same day. v1 is done when both are true:
+
+1. **Reliable.** The carbon calculators reproduce two real filings: one household water treatment filing and one
+   community water supply filing. The private side checks this; we only hear pass or fail. The water-supply module
+   (VWBA D-3) is tested on hand-worked cases, with every step cited to the VWBA 2.0 guidebook. The guidebook has no
+   worked example for D-3. An outside expert checks the module once the prototype is up. VWBA is Volumetric Water
+   Benefit Accounting, a way to count the water a project gives back.
+2. **Whole journey.** A visitor runs a screening: Wellington, then Phoebe, then Bridget, then Calvin, then a report or
+   sign-up. We count the questions on each walk and report the average. There is no cap. The project saves to the paid
+   site. The same inputs give the same numbers on both sites. Where the paid site uses more precise data, the
+   difference can be explained, or the report shows what changed.
+
+Benchmarks and pass rates are v2. No water-benefit filing match is needed for v1.
+
+This list holds only the work **in this repo** that v1 needs, in order. Wellington, the report and sign-up pages and
+both sites live in other repos. They appear here only as things a step waits on.
+
+**How the sites get the package in v1.** Not npm. Each release is a GitHub release that holds the packed package (one
+file, made by `npm pack`) and its fingerprint (a scrambled code that changes if one byte of the file changes). Both
+sites pin that file by its fingerprint. The first pinned version includes the sliders. npm is v2.
+
+**The paid site's own data.** The paid site keeps its own, more precise data on top of the package. The package's
+smaller tables, such as the six-row table of fallback factors, are fine as they are.
+
+| # | Step | Waits on | Done when |
+|---|---|---|---|
+| V1 | Amy reviews and merges the engine-only entry (pull request #6). | Amy. | It is on `main`. |
+| V2 | Make the engine's types complete for projects that use Node's own module rules. | V1. | A fresh project using Node's module rules typechecks against the built package, with no type falling back to "any". |
+| V3 | Sliders for anticipated performance (ex-ante: before the project runs). Each slider is held between a cited floor and a cited ceiling. Each has a pencil to type an exact value, and shows the credited number. The engine works out that number; the screen computes nothing. The default and the cap stay two separate things. | V1; Amy's description of the sliders (from site pull request #156); a cited source for every floor and ceiling. | Tests show each slider stays inside its cited bounds, the pencil value is held to the same bounds, and the number shown is the engine's. Amy checks the screen. |
+| V4 | The simple view: it hides the advanced material until asked. | V3. | A test shows advanced parts are hidden at first and one control shows them. Amy checks the screen. |
+| V5 | The first GitHub release: the packed package and its fingerprint, with the sliders. Replaces the npm publish in M2.2. | V2, V3, V4; Amy's approval; branch protection and the tag rule (M1.4). | The release holds the file and its fingerprint. Both sites pin it. The private side reports pass or fail on both carbon filings. |
+| V6 | The method registry (M3): one entry per carbon method, so both sites pick a method the same way. | V5. | A trial release is out; the private side reports pass on both carbon filings. |
+| V7 | Violet, the water-benefit agent, as her own module: `@waterbots/violet`. She hosts the D-n modules, starting with D-3. | V1; Amy's rulings on Violet. | The package builds, passes the package checks, and has a place for each D-n module. |
+| V8 | D-3, the water-supply module, inside Violet (M8.1). | V7; the activity-type signature; Amy's ruling on further gates (N6). | Violet's D-3 tests are hand-worked cases, with every step cited to the guidebook (cited, not copied). The VWBA spec is written alongside the build, in `docs/`, and Amy reviews it then. An outside expert checks the module once the prototype is up. |
+| V9 | The screening hand-off: one project record in `core` that every module fills in and the paid site reads. Each module writes how many questions it asked on that walk. | V5; the paid site's save format (paid repo); Wellington's fields (free-site repo). | A test takes an invented project through all four modules' parts, saves it, reads it back unchanged, and gives each module's question count. |
+| V10 | Phoebe (eligibility) to its first release (M9.1). | V9; Phoebe's rulings. | Released; Phoebe fills its part of the record and counts its questions. |
+| V11 | Bridget (the map) to its first release (M9.2). | V9; Bridget's rulings; a rights read on every data file; a ruling on the shared map key. | Released; Bridget fills its part of the record and counts its questions. |
+| V12 | Calvin's screening part: Calvin fills its part of the record and counts its questions. | V9. | A test shows Calvin's part saved and its count written. |
+| V13 | Data on top: the engine takes a site's own tables over the package's, and lists every value that came from the site's tables. | V5. | A test with an invented table shows the answer and the list of changed values. |
+| V14 | The same-numbers check: a project saved by the screening, read back the way the paid site reads it, gives the same numbers, or a list of what changed and why. | V6, V10, V11, V12, V13. | A test passes here on invented projects. The private side runs it on both real filings with the pinned release and reports pass. |
+| V15 | The v1 release: a GitHub release that both sites pin. | V8, V14; Amy's approval. | Both sites run the same pinned file. Amy confirms the whole journey on the live sites, and the average question count is reported. |
+
+**After v1** (not needed for the finish line):
+
+- npm publishing (M2.2's publish, and the npm scope and token in M1.4). This is v2.
+- Benchmarks and pass rates. This is v2.
+- M1.2 the real number gate, and M1.5 lane 1 auto-merge. Lane 3 review covers figures and names meanwhile. Amy may
+  pull the number gate forward.
+- M2.3 linting.
+- M4 openings and labels.
+- M5 the friendly view, beyond the sliders and simple view in V3 and V4.
+- M6 the fuel-mix floor.
+- M7 diesel and grid factors.
+- M8.2 the free site's water file.
+- The two extra typing checks back on for `calvin`, and the restricted words in the seed's comments.
+- SP6, the human engineer review. It runs alongside and blocks nothing.
+
+---
+
 ## M1 — Skeleton and guards, before any code
 
 *Stop for Amy:* read the CI run. *Waits on:* the npm scope (N13) — for publishing only. Amy may revisit the number
@@ -102,7 +163,7 @@ indicator.
 
 ## M8 — The water-supply method (VWBA D-3)
 
-*Stop for Amy:* the worked example reproduced. *Waits on:* the activity-type signature; any further gates (N6).
+*Stop for Amy:* the hand-worked cases and the VWBA spec; then an outside expert's check (see V8). *Waits on:* the activity-type signature; any further gates (N6).
 The first release does not wait for this.
 
 - [ ] **M8.1** Water-supply method entry and engine
