@@ -4,6 +4,25 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-10-31 — V5 The first release prepared; the simple view planned as the next one
+
+**Done (branch `plan-simple-view-release`):**
+- Prepared Calvin's first GitHub release from `main` at `dba49a8`, version 0.1.0. Packed two files with `npm pack`:
+  `calvin`, and `core`, which Calvin's package lists and npm fetches on install. Worked out each file's SHA-256
+  fingerprint and wrote the release notes. Nothing is published and no tag is pushed: that waits on Amy's go.
+- `BUILD_PLAN.md`: V3 marked merged. V5 no longer waits on the simple view (ruling 2026-10-31). New item M5.5: the
+  simple view, the bigger tap buttons and Plum ship together as the next release.
+
+**Checked:** CI, both secrets scanners and the number gate placeholder are green on `dba49a8`. On a clean checkout of
+that commit: typecheck, test and build pass; the engine gives 48 of 48 (47 made-up test cases plus the version check),
+in the package and with the engine entry installed alone; the seed check, the package check and the paid-code scan
+pass. The name scan finds nothing in the committed files or in the two packed files. The packed files hold no
+person's folder path or username, and their source maps use relative paths. A fresh folder installs both files with
+no network and loads both entries.
+
+**Open:** there is no tag rule yet (M1.4), so nothing yet limits who can make a release tag. A rebuild on another
+machine has not yet been shown to give the same bytes.
+
 ## 2026-10-31 — V3 Sliders: brought up to date, and four v1 items planned
 
 **Done (same branch, `sliders`):**

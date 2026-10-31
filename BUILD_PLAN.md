@@ -43,9 +43,9 @@ smaller tables, such as the six-row table of fallback factors, are fine as they 
 |---|---|---|---|
 | V1 | [x] Amy reviews and merges the engine-only entry (pull request #6). Merged. | Amy. | It is on `main`. |
 | V2 | [x] Make the engine's types complete for projects that use Node's own module rules. (Merged, pull request #8.) | V1. | A fresh project using Node's module rules typechecks against the built package, with no type falling back to "any". |
-| V3 | [~] (Open pull request.) Sliders for anticipated performance (ex-ante: before the project runs). Each slider is held between a cited floor and a cited ceiling. Each has a pencil to type an exact value, and shows the credited number. The engine works out that number; the screen computes nothing. The default and the cap stay two separate things. | V1; Amy's description of the sliders (from site pull request #156); a cited source for every floor and ceiling. | Tests show each slider stays inside its cited bounds, the pencil value is held to the same bounds, and the number shown is the engine's. Amy checks the screen. |
-| V4 | The simple view: it hides the advanced material until asked. | V3. | A test shows advanced parts are hidden at first and one control shows them. Amy checks the screen. |
-| V5 | The first GitHub release: the packed package and its fingerprint, with the sliders. Replaces the npm publish in M2.2. | V2, V3, V4; Amy's approval; branch protection and the tag rule (M1.4). | The release holds the file and its fingerprint. Both sites pin it. The private side reports pass or fail on both carbon filings. |
+| V3 | [x] (Merged, pull request #9.) Sliders for anticipated performance (ex-ante: before the project runs). Each slider is held between a cited floor and a cited ceiling. Each has a pencil to type an exact value, and shows the credited number. The engine works out that number; the screen computes nothing. The default and the cap stay two separate things. | V1; Amy's description of the sliders (from site pull request #156); a cited source for every floor and ceiling. | Tests show each slider stays inside its cited bounds, the pencil value is held to the same bounds, and the number shown is the engine's. Amy checks the screen. |
+| V4 | The simple view, shipped as the next release after V5 (ruling 2026-10-31): it hides the advanced material until asked, with bigger tap buttons (M5.3) and Plum (M5.4). See M5.5. | V5. | A test shows advanced parts are hidden at first and one control shows them. Amy checks the screen. |
+| V5 | [~] (Prepared from `main`; waiting on Amy's go.) The first GitHub release: the packed packages (`calvin` and the `core` it needs) and their fingerprints, with the sliders. Replaces the npm publish in M2.2. It does not wait for the simple view (ruling 2026-10-31). | V2, V3; Amy's approval; branch protection and the tag rule (M1.4). | The release holds the files and their fingerprints. Both sites pin it. The private side reports pass or fail on both carbon filings. |
 | V6 | The method registry (M3): one entry per carbon method, so both sites pick a method the same way. | V5. | A trial release is out; the private side reports pass on both carbon filings. |
 | V7 | Violet, the water-benefit agent, as her own module: `@waterbots/violet`. She hosts the D-n modules, starting with D-3. | V1; Amy's rulings on Violet. | The package builds, passes the package checks, and has a place for each D-n module. |
 | V8 | D-3, the water-supply module, inside Violet (M8.1). | V7; the activity-type signature; Amy's ruling on further gates (N6). | Violet's D-3 tests are hand-worked cases, with every step cited to the guidebook (cited, not copied). The VWBA spec is written alongside the build, in `docs/`, and Amy reviews it then. An outside expert checks the module once the prototype is up. |
@@ -168,6 +168,9 @@ the litres check on the cap (N5). A step with no image yet has not started.
       and Amy checks them on a phone.
 - [ ] **M5.4 (V1)** Calvin's color is Plum on his screens. Done when his screens use one Plum color token and Amy
       checks the screen.
+- [ ] **M5.5 (V1)** The simple view ships as Calvin's next release, after the first (ruling 2026-10-31). It is one
+      release: the simple view (V4), the bigger tap buttons (M5.3) and Plum (M5.4). Done when that release holds the
+      packed files and their fingerprints, and Amy checks the screens on a phone.
 
 ## M6 — The fuel-mix floor
 
