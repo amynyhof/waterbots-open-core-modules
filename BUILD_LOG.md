@@ -4,6 +4,23 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-10-31 — The report's sentence on how the calculator is checked
+
+**Done (open pull request, branch `report-test-case-count`):**
+- Calvin's report now says: "Every build checks it against N made-up test cases, including results from Gold
+  Standard's official V1.0 tools on made-up inputs." N is read from the committed test-case file
+  (`expected-outputs.json`), not typed. It is 47 today.
+- The sentence lives in `screen/buildCheck.ts`. The typed count, the accuracy figure and the claim about filings are
+  gone from the report.
+- The closing note's "tested against the reference cases described above" now says "test cases", to match.
+- Tests pin the wording, check N against the file, and check the report carries no typed count, accuracy figure or
+  claim about filings.
+
+**Checked:** typecheck, test and build pass. The same 48 of 48 checks. Name scan on committed files: no finding.
+
+**Open:** the committed test-case file marks every case "synthetic". It does not say which cases came from Gold
+Standard's official V1.0 tools, so this repo cannot check that part of the sentence on its own.
+
 ## 2026-10-30 — V2 The engine's types under Node's own module rules
 
 **Done (open pull request, branch `engine-types-node`):**
