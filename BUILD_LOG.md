@@ -4,6 +4,16 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-10-30 — Road to v1 (plan only)
+
+**Done (open pull request, branch `road-to-v1`):**
+- `BUILD_PLAN.md`: a "Road to v1" section. It lists, in order, only the work in this repo that Amy's v1 finish line
+  needs (V1 to V11). Each step says what it waits on, in this repo and in others, and how we know it is done.
+  Everything else is marked "after v1".
+- The reference filings are named by kind only (household, community). No project names or places.
+
+**Open:** two questions for Amy, listed at the end of the section. Nothing was built.
+
 ## 2026-10-25 — M2.1 Add calculator module (the Calvin seed)
 
 **Done (open pull request, branch `add-calculator-module`):**

@@ -12,6 +12,56 @@ All of M1 to M9 is `Grant: open`. Edits to this plan and the build log are `Gran
 
 ---
 
+## Road to v1
+
+Amy set the v1 finish line on 2026-10-30. v1 is done when both are true:
+
+1. **Reliable.** The paid site's carbon and water-benefit calculators reproduce two real filings: one household water
+   treatment filing and one community water supply filing. The private side checks this. We only hear pass or fail.
+2. **Whole journey.** A visitor screens in 30 questions or fewer (Wellington, then Phoebe, then Bridget, then Calvin,
+   then a report or sign-up). The project saves to the paid site. The paid calculators give the same numbers as the
+   screening did.
+
+This list holds only the work **in this repo** that v1 needs, in order. Wellington, the report and sign-up pages and
+the paid site live in other repos. They appear here only as things a step waits on.
+
+"Water-benefit" means VWBA (Volumetric Water Benefit Accounting, a way to count the water a project gives back).
+
+| # | Step | Waits on | Done when |
+|---|---|---|---|
+| V1 | Amy reviews and merges the engine-only entry (open pull request #6). | Amy. | It is on `main`. |
+| V2 | Make the engine's types complete for projects that use Node's own module rules. | V1. | A fresh project using Node's module rules typechecks against the built package, with no type falling back to "any". |
+| V3 | Publish `0.1.0` (M2.2). | V1, V2; Amy's hand-steps in M1.4 (npm scope, token, branch protection, release approval, tag rule). | The package is on npm with provenance. The private side installs it and reports pass or fail on both reference filings' carbon numbers. |
+| V4 | The method registry (M3): one entry per carbon method, so the screening and the paid site pick a method the same way. | V3. | Release candidate out; the private side reports pass on both carbon filings. |
+| V5 | The water-supply method, VWBA D-3 (M8). | V4; the activity-type signature; Amy's ruling on further gates (N6); the free site's water file (free-site repo). | Amy sees the worked example reproduced. The private side reports pass on the community filing's water-benefit number. |
+| V6 | The screening hand-off: one project record in `core` that every module fills in, that the paid site reads, and that counts each module's questions. | V4; the paid site's save format (paid repo); Wellington's fields (free-site repo). | A test takes an invented project through all four modules' parts, saves it, reads it back unchanged, and adds up the questions. |
+| V7 | Phoebe (eligibility) to its first release (M9.1). | V6; Phoebe's rulings. | Released; Phoebe fills its part of the record; its question count is fixed by a test. |
+| V8 | Bridget (the map) to its first release (M9.2). | V6; Bridget's rulings; a rights read on every data file; a ruling on the shared map key. | Released; Bridget fills its part of the record; its question count is fixed by a test. |
+| V9 | Calvin's screening questions: the short set Calvin asks, which fills its part of the record. | V6. | A test fixes Calvin's count. Wellington's count plus the three here is 30 or fewer. |
+| V10 | The same-numbers check: a project saved by the screening, read back the way the paid site reads it, gives the same engine answers. | V5, V7, V8, V9. | A test here passes on invented projects. The private side runs it on both reference filings with the published versions and reports pass. |
+| V11 | The v1 release: publish the versions the free site and the paid site both pin. | V10; Amy's approval. | Published. Both sites run the same versions. Amy confirms the whole journey on the live sites. |
+
+**After v1** (not needed for the finish line):
+
+- M1.2 the real number gate, and M1.5 lane 1 auto-merge. Lane 3 review covers figures and names meanwhile. Amy may
+  pull the number gate forward.
+- M2.3 linting.
+- M4 openings and labels. *Unless* a private-side run fails because of an opening or the operating-days cap; then
+  that item moves into v1.
+- M5 the friendly view. The seed's screen serves v1.
+- M6 the fuel-mix floor.
+- M7 diesel and grid factors. *Unless* the community filing has a pumped system; then it moves into v1, before V4.
+- The two extra typing checks back on for `calvin`, and the restricted words in the seed's comments.
+- SP6, the human engineer review, runs alongside and blocks nothing.
+
+**Open for v1:**
+
+- Does the household filing need a water-benefit method too? Only D-3 (water supply) is planned. If the household
+  filing needs one, it is a new step after V5.
+- Does the community filing use a pumped system? This decides whether M7 joins v1.
+
+---
+
 ## M1 — Skeleton and guards, before any code
 
 *Stop for Amy:* read the CI run. *Waits on:* the npm scope (N13) — for publishing only. Amy may revisit the number
