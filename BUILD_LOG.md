@@ -4,6 +4,41 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-10-30 — Road to v1: how D-3 is checked (plan only)
+
+**Done (same branch, `road-to-v1`):**
+- `BUILD_PLAN.md`: the VWBA 2.0 guidebook has no worked example for D-3. So V8, the finish line and the M8 stop now
+  say: D-3 is tested on hand-worked cases, with every step cited to the guidebook (cited, not copied). An outside
+  expert checks it once the prototype is up. The plan does not name the expert.
+- V8 now also says: the VWBA spec is written alongside the build, in `docs/`, for Amy to review then.
+
+**Open:** nothing for Amy in the plan itself. Nothing was built.
+
+## 2026-10-30 — Road to v1, revised after Amy's answers (plan only)
+
+**Done (same branch, `road-to-v1`):**
+- `BUILD_PLAN.md`: the Road to v1 section now follows Amy's new finish line. It has 15 steps (V1 to V15).
+- Sliders (V3) and the simple view (V4) are in v1, right after pull request #6. They follow Amy's description of
+  them. Site pull request #156 lives in another repo and was not read here.
+- No npm in v1. Each release is a GitHub release with the packed package and its fingerprint, which both sites pin
+  (V5, V15). The first pinned version has the sliders. npm is v2.
+- Violet, the water-benefit agent, is her own module (V7). She hosts D-3 first (V8).
+- The paid site keeps its own data on top of the package. The engine lists what came from a site's tables (V13).
+- No question cap. Each module counts its questions on each walk (V9 to V12); the average is reported.
+- The two open questions are dropped, as Amy said.
+
+**Open:** nothing for Amy in the plan itself. Nothing was built.
+
+## 2026-10-30 — Road to v1 (plan only)
+
+**Done (open pull request, branch `road-to-v1`):**
+- `BUILD_PLAN.md`: a "Road to v1" section. It lists, in order, only the work in this repo that Amy's v1 finish line
+  needs (V1 to V11). Each step says what it waits on, in this repo and in others, and how we know it is done.
+  Everything else is marked "after v1".
+- The reference filings are named by kind only (household, community). No project names or places.
+
+**Open:** two questions for Amy, listed at the end of the section. Nothing was built.
+
 ## 2026-10-25 — M2.1 Add calculator module (the Calvin seed)
 
 **Done (open pull request, branch `add-calculator-module`):**
