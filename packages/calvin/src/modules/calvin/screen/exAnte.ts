@@ -49,6 +49,9 @@ export interface SliderSpec {
 }
 
 const YEAR = "natural limit: the days in a year";
+/** Days of operation above which a community system needs an operation sensor, and where that is stated. */
+export const SENSOR_DAYS = 347;
+const SENSOR_SOURCE = "V2.0 SDWS 32; V1.0 SDWS 27";
 const SHARE = "natural limit: a share";
 
 /** The sliders for this run, in screen order. Usage is household treatment only. */
@@ -82,9 +85,9 @@ export function sliderSpecs(state: Pick<CalcState, "version" | "method">): Slide
       scale: 1,
       step: 1,
       dp: 0,
-      // Household treatment starts at 365 and only moves down (ruling 2026-10-30). The full year is
-      // the natural limit, so that is the start's source for both kinds of project.
-      start: { value: 365, source: YEAR },
+      // Household treatment starts at 365 and only moves down (ruling 2026-10-30), the year's natural
+      // limit. Community systems start at 347, the most days without an operation sensor (ruling 2026-10-31).
+      start: hwt ? { value: 365, source: YEAR } : { value: SENSOR_DAYS, source: SENSOR_SOURCE },
       floor: { value: 0, kind: "open" },
       ceiling: { value: 365, kind: "natural", source: YEAR },
       direction: hwt
@@ -224,9 +227,6 @@ export function capNote(state: CalcState, spec: SliderSpec): string | null {
   return `You typed ${shownValue(spec, typed)}. The credit is capped at ${shownValue(spec, spec.ceiling.value)} (${spec.ceiling.source}).`;
 }
 
-/** Days of operation above which a community system needs an operation sensor. */
-export const SENSOR_DAYS = 347;
-
 /**
  * THE NOTES A VALUE CAN TRIGGER (rulings 2026-10-30). Each one names its source. They say what the
  * rules require; they never change the number credited.
@@ -235,7 +235,7 @@ export function sliderNotes(state: CalcState, spec: SliderSpec): string[] {
   const notes: string[] = [];
   const v = storedValue(state, spec.key);
   if (spec.key === "days" && state.method === 1 && v > SENSOR_DAYS) {
-    notes.push("Over 347 days requires an operation sensor (V2.0 SDWS 32; V1.0 SDWS 27).");
+    notes.push(`Over ${SENSOR_DAYS} days requires an operation sensor (${SENSOR_SOURCE}).`);
   }
   // V2.0 §7.4.3: the corrective-action line is 80% in year 1, 85% in year 2, 90% from year 3. The run
   // does not know the project's year, so the note says which years this share falls short in.
@@ -247,6 +247,18 @@ export function sliderNotes(state: CalcState, spec: SliderSpec): string[] {
     );
   }
   return notes;
+}
+
+/**
+ * THE SEAT'S STARTING STATE WHEN SLIDERS ARE ON. The seed starts days at 365 for every project, and the
+ * typed boxes keep that. With sliders on, an unsaved days value starts at its slider's starting value
+ * instead (347 for a community system), so the slider, its label and the engine all begin at the same
+ * number. A saved value always wins.
+ */
+export function withSliderStarts(seed: CalcState, saved: { operationalDays?: number } | undefined, setting: boolean | undefined): CalcState {
+  if (!showSliders(setting, seed) || seed.method == null || saved?.operationalDays !== undefined) return seed;
+  const days = sliderSpecs(seed).find((s) => s.key === "days")!;
+  return { ...seed, operationalDays: days.start.value };
 }
 
 /** Whether this seat shows sliders: the site turned them on, and the run is ex-ante. */

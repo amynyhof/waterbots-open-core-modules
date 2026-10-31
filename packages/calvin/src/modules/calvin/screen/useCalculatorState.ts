@@ -24,7 +24,7 @@ import {
   type ProjectFact,
 } from "./state";
 import { zeroCreditWarning } from "./warnings";
-import { showSliders } from "./exAnte";
+import { showSliders, withSliderStarts } from "./exAnte";
 
 /**
  * The GS4GG carbon calculator's state, lifted out of the standalone calculator page
@@ -158,7 +158,7 @@ export interface CalculatorState {
 
 export function useCalculatorState(project: CalvinProject, options: CalculatorOptions = {}): CalculatorState {
   const { readOnly = false, onSave, onDirtyChange, onExport, creditingPeriodYears, exAnteSliders } = options;
-  const seed = useMemo(() => seedCalcState(project), [project]);
+  const seed = useMemo(() => withSliderStarts(seedCalcState(project), project.analysis, exAnteSliders), [project, exAnteSliders]);
   const [state, setState] = useState<CalcState>(seed);
   // INERT WHEN READ-ONLY, and this is the layer that actually guarantees it. The surface
   // disables its controls too, but a disabled control is a courtesy — this is the lock.

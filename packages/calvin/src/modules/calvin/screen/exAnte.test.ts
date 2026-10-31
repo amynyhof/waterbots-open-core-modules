@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { computeScenario, fnrbAvailability } from "../engine";
 import {
   applySlider, capNote, creditedIfDifferent, creditedValue, endLabel, showSliders, sliderLabel, sliderNotes,
-  sliderSpecs, startsWithoutSource, type SliderKey, type SliderSpec,
+  sliderSpecs, startsWithoutSource, withSliderStarts, type SliderKey, type SliderSpec,
 } from "./exAnte";
 import { seedCalcState, toScenarioInput, type CalcState, type CalvinProject } from "./state";
 
@@ -67,7 +67,22 @@ describe("the ends", () => {
     const u = spec(hwt(), "usage");
     expect(endLabel(u, u.floor)).toBe("1% · natural limit: a share, never 0");
   });
+  it("community days start at 347, with its source; with sliders on, the seat starts there too", () => {
+    expect(spec(cws(), "days").start).toEqual({ value: 347, source: "V2.0 SDWS 32; V1.0 SDWS 27" });
+    const s = withSliderStarts(cws(), {}, true);
+    expect(s.operationalDays).toBe(347);
+    expect(sliderNotes(s, spec(s, "days"))).toEqual([]);
+    expect(creditedValue(s, run(s), "days")).toBe(347);
+  });
+  it("the 347 start applies only with sliders on, and never over a saved value", () => {
+    expect(withSliderStarts(cws(), {}, false).operationalDays).toBe(365);
+    expect(withSliderStarts({ ...cws(), mode: "ex-post" }, {}, true).operationalDays).toBe(365);
+    const saved = seedCalcState(invented("CWS", { operationalDays: 300 }));
+    expect(withSliderStarts(saved, { operationalDays: 300 }, true).operationalDays).toBe(300);
+  });
   it("household days start at 365 and can only move down", () => {
+    expect(withSliderStarts(hwt(), {}, true).operationalDays).toBe(365);
+    expect(spec(hwt(), "days").start).toEqual({ value: 365, source: "natural limit: the days in a year" });
     const s = hwt();
     expect(spec(s, "days").start.value).toBe(365);
     expect(spec(s, "days").ceiling.value).toBe(365);
