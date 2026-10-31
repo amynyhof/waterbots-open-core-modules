@@ -4,6 +4,21 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-10-30 — Road to v1, revised after Amy's answers (plan only)
+
+**Done (same branch, `road-to-v1`):**
+- `BUILD_PLAN.md`: the Road to v1 section now follows Amy's new finish line. It has 15 steps (V1 to V15).
+- Sliders (V3) and the simple view (V4) are in v1, right after pull request #6. They follow Amy's description of
+  them. Site pull request #156 lives in another repo and was not read here.
+- No npm in v1. Each release is a GitHub release with the packed package and its fingerprint, which both sites pin
+  (V5, V15). The first pinned version has the sliders. npm is v2.
+- Violet, the water-benefit agent, is her own module (V7). She hosts D-3 first (V8).
+- The paid site keeps its own data on top of the package. The engine lists what came from a site's tables (V13).
+- No question cap. Each module counts its questions on each walk (V9 to V12); the average is reported.
+- The two open questions are dropped, as Amy said.
+
+**Open:** nothing for Amy in the plan itself. Nothing was built.
+
 ## 2026-10-30 — Road to v1 (plan only)
 
 **Done (open pull request, branch `road-to-v1`):**
