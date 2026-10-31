@@ -5,7 +5,7 @@
 // It builds the entry with the package's own `build:engine` script, then makes a fresh folder outside the repo and
 // installs only calvin's package.json and the built file there. No React, no `@waterbots/core`. A plain Node process
 // in that folder loads the entry through the package's exports, checks that React cannot be found, and re-runs every
-// case in `expected-outputs.json`. All 48 checks (the engine version and every case) must give the same answers.
+// case in `expected-outputs.json`, with the same steps as the package tests (`src/reference-cases.ts`). All 48 checks (the engine version and every case) must give the same answers.
 // This shows nothing broke. It does not show a match to real filings.
 // Exit codes: 0 all match, 1 something differs, 2 the check could not run.
 import { execFileSync, execSync } from "node:child_process";
@@ -19,7 +19,7 @@ const root = fileURLToPath(new URL("..", import.meta.url));
 const pkgDir = join(root, "packages", "calvin");
 
 const RUN = `import { readFileSync } from "node:fs";
-import { runReferenceCases } from "./run-reference-cases.mjs";
+import { runReferenceCases } from "./reference-cases.ts";
 const engine = await import("@waterbots/calvin/engine");
 const react = await import("react").then(() => "found", (e) => e.code);
 const doc = JSON.parse(readFileSync(new URL("./expected-outputs.json", import.meta.url), "utf8"));
@@ -35,7 +35,7 @@ function runInstalled() {
     mkdirSync(join(installed, "dist"), { recursive: true });
     copyFileSync(join(pkgDir, "package.json"), join(installed, "package.json"));
     copyFileSync(join(pkgDir, "dist", "engine.js"), join(installed, "dist", "engine.js"));
-    copyFileSync(join(pkgDir, "test", "run-reference-cases.mjs"), join(work, "run-reference-cases.mjs"));
+    copyFileSync(join(pkgDir, "src", "reference-cases.ts"), join(work, "reference-cases.ts"));
     copyFileSync(join(pkgDir, "src", "expected-outputs.json"), join(work, "expected-outputs.json"));
     writeFileSync(join(work, "package.json"), JSON.stringify({ name: "engine-only", private: true, type: "module" }));
     writeFileSync(join(work, "run.mjs"), RUN);

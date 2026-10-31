@@ -8,7 +8,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import * as engine from "../src/engine";
-import { runReferenceCases } from "./run-reference-cases.mjs";
+import { runReferenceCases } from "../src/reference-cases";
 
 const pkgDir = fileURLToPath(new URL("..", import.meta.url));
 const srcDir = join(pkgDir, "src");

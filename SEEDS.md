@@ -59,7 +59,7 @@ Added by this repo, not part of the seed: six small files in `packages/calvin/sr
 
 ## After the seed: Calvin's home is this repo
 
-Amy ruled on 2026-10-27: since the seed landed, Calvin's home is this repo. Every later change to Calvin (fixes, new features, the screens) is made here, by Session C, through a normal pull request. Nothing is changed in the private repo and carried over. There is no new seal and no new seed for Calvin.
+Ruling 2026-10-27: since the seed landed, Calvin's home is this repo. Every later change to Calvin (fixes, new features, the screens) is made here, by Session C, through a normal pull request. Nothing is changed in the private repo and carried over. There is no new seal and no new seed for Calvin.
 
 The seed landed on `main` in commit `50fe2f6e4ca6c718757a230c037fb30a7c56c95d` (pull request #5). That commit is the lasting record of what arrived.
 
