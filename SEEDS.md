@@ -47,9 +47,9 @@ Session A's output for checks 1 and 3 to 8 sits in the `checks/` folder of the s
 
 1. **Number gate and copied-text check were not run here.** Both need inputs that never leave the private side (the private reference cases, and the standards PDFs). Until the private number list exists and the real gate is built (M1.2), these two rest on Session A's results. Lane 3 review is the cover meanwhile.
 2. **Session A's logs hold counts, not fingerprints.** They say "67 files" and "all 67 hashes OK". They name no digest. That the same bytes were checked is shown by the matching counts and by the one fingerprint of the list, not by a digest in the log.
-3. **Typecheck settings are looser for `calvin`.** The seed was typechecked with `strict` only. Two of this repo's extra checks (unchecked indexed access, exact optional properties) flag 95 places in the seed's code, so they are off in `packages/calvin/tsconfig.json`. `core` keeps all of them. Seed files were not edited to fit. **To be fixed at the source, before a later seal:** the code is brought up to both checks in the private repo, sealed again and carried as a new seed. Then the two checks go back on for `calvin`.
+3. **Typecheck settings are looser for `calvin`.** The seed was typechecked with `strict` only. Two of this repo's extra checks (unchecked indexed access, exact optional properties) flag 95 places in the seed's code, so they are off in `packages/calvin/tsconfig.json`. `core` keeps all of them. Seed files were not edited to fit when the seed landed. **To be fixed here,** in this repo, by a normal pull request: Session C brings the code up to both checks, then turns them back on for `calvin`. There is no new seal and no new seed.
 4. **No reviewed-version ledger came with the seed.** The folder held no such file. The seal tag above is the only version record. If one exists on the private side, Amy hands it over and it is added as it arrives.
-5. **Some comments in the seed use words the repo's word rules restrict** (see `CLAUDE.md`, "Words"). They are in comments, not in names. They were left as they came, because changing them would change the fingerprints. Amy decides whether they are fixed in a later pull request.
+5. **Some comments in the seed use words the repo's word rules restrict** (see `CLAUDE.md`, "Words"). They are in comments, not in names. They were left as they came when the seed landed. They can be changed here by a normal pull request: the seed check reads the seed commit, not today's files. Amy decides whether they are fixed.
 
 ## What is not byte for byte
 
@@ -57,4 +57,16 @@ Of the 67 files on the seed's list, 65 are installed, and all 65 match the list.
 
 Added by this repo, not part of the seed: six small files in `packages/calvin/src/modules/core/` that pass the seed's shared imports on to `@waterbots/core`; `prove-expected-outputs.test.ts` (the test printed in the seed's README); the package entries and manifests; and the `.gitattributes` that keeps line endings as they are.
 
-`scripts/check-seed.mjs` checks all of this again on every `npm test`.
+## After the seed: Calvin's home is this repo
+
+Ruling 2026-10-27: since the seed landed, Calvin's home is this repo. Every later change to Calvin (fixes, new features, the screens) is made here, by Session C, through a normal pull request. Nothing is changed in the private repo and carried over. There is no new seal and no new seed for Calvin.
+
+The seed landed on `main` in commit `50fe2f6e4ca6c718757a230c037fb30a7c56c95d` (pull request #5). That commit is the lasting record of what arrived.
+
+`scripts/check-seed.mjs` runs on every `npm test`. It proves the record, and leaves later changes free:
+
+- The seed commit must be in the branch's history.
+- Every installed file, as it stood in that commit, must match its fingerprint on the list.
+- The list must be unchanged, and its fingerprint must be the one in the ledger above.
+
+It also counts how many seeded files later pull requests have changed. That count is information, not a failure.

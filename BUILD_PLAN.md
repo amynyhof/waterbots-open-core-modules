@@ -114,11 +114,14 @@ gate's design before the real gate is built.
 
 *Stop for Amy:* the private side confirms the package matches the seed. *Waits on:* the seed (Amy's one-time carry).
 
-- [~] **M2.1** Seed arrives unchanged, with its reviewed-version ledger kept exactly as it arrives. Show that the
+- [x] **M2.1** Seed arrives unchanged, with its reviewed-version ledger kept exactly as it arrives. Show that the
       carried calculator builds and tests the same under this repo's tool versions (TypeScript 7.0.2, vitest 5.0.5,
-      Node 24.20.0), and say so in the pull request. (Open pull request. `SEEDS.md` records it. No ledger file came
-      with the seed; see its known gaps.)
+      Node 24.20.0), and say so in the pull request. (Merged. `SEEDS.md` records it. No ledger file came with the
+      seed; see its known gaps.)
 - [ ] **M2.2** Publish `0.1.0` with no changes to what arrived. *Blocked until* Amy's hand-steps in M1.4 are done.
+  - [~] Get it ready (open pull request): an engine-only entry, `@waterbots/calvin/engine`, added in new files only;
+        React made an optional peer of `calvin` and `core`; both set to version 0.1.0. Still `private`.
+  - [!] Publish. Amy's call, after M1.4.
 - [ ] **M2.3 Linting** (was M1.6): add a linter that runs as part of CI, with the strictest settings that fit. Amy
       ruled on 2026-10-23 that it comes right after the seed lands (after M2.2), not before it. The seed is carried
       as it is first.
@@ -192,8 +195,11 @@ Amy's safety passes cover all three repos. This repo's own parts are listed here
   `typecheck` check must pass on every pull request.
 - **Two of the extra checks are off for `calvin`.** The seed was typechecked with `strict` only. Unchecked indexed
   access and exact optional properties flag its code in 95 places, so `packages/calvin/tsconfig.json` leaves them
-  off. `core` keeps them. A known gap (see `SEEDS.md`): the code is fixed at the source, in the private repo, before a
-  later seal, and carried as a new seed. Then the two checks go back on for `calvin`.
+  off. `core` keeps them. A known gap (see `SEEDS.md`): Session C fixes the code here, in this repo, by a normal pull
+  request, with no new seal or seed. Then the two checks go back on for `calvin`.
+- **Calvin's home is this repo** (ruling 2026-10-27). Since the seed landed, every change to Calvin is made here by
+  Session C, never in the private repo. The seed check proves the seed against the commit it landed in, so normal
+  changes to seeded files are allowed.
 - **Linting is not set up yet.** Only strict typing is on today. Adding a linter is its own pull request (lane 3):
   plan item M2.3, right after the seed lands.
 
