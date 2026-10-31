@@ -84,6 +84,7 @@ Everything here is public: README, docs, cards, screen text, commit messages, PR
 - Explain a technical word the first time it appears ("a keyed fingerprint — a scrambled code that can only be made or
   checked with a secret key").
 - Say who does what: "Amy merges", not "it is merged".
+- Credit a ruling by its date, not by a person: "ruling 2026-10-27", not "Amy ruled on 2026-10-27".
 - Opening values are either cited or labelled "starting point". Notes say which way credits move; they hold no
   computed number.
 - Keep the **default** and the **cap** of the litres slider as two separate things, in code and on screen.
