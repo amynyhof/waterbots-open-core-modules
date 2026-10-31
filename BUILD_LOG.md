@@ -4,6 +4,27 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-10-30 — V3 Sliders: answers on the pull request
+
+**Done (same branch, `sliders`):**
+- The panel's headline is the engine's yearly credit for the values set. It moves as any slider moves.
+- Each slider shows the credited value only when it differs from the value set (for example, age-weighted litres).
+- Community systems: water, days of operation and tests passing. Above 347 days, the row says an operation sensor is
+  required (V2.0 SDWS 32; V1.0 SDWS 27). There is no usage slider, since V2.0 fixes usage at 100% for them.
+- Household treatment: the same, with days the device is in the home (starting at 365, moving down only) and the
+  share of homes that really use the device.
+- The share of users who still boil the safe water stays a typed value. A project does not control it.
+- Tests passing: below the V2.0 §7.4.3 corrective-action line (80% in year 1, 85% in year 2, 90% from year 3), the row
+  says a corrective action plan is required and that crediting is suspended if the next tests don't improve. It says
+  which years the share falls short in, since the run does not know the project's year. V2.0 runs only.
+- Ends from a share (0% to 100%) or the year (365 days) are labelled "natural limit". Where no floor is cited, the
+  slider just allows 0, with no note.
+- A starting value with no source says "assumed: no source yet". The plan has an item to find one: the share of homes
+  using the device (100%).
+
+**Checked:** typecheck, test and build pass. The same 48 of 48 test cases. Tests cover the ends, the starts, the three
+notes, the headline and the credited value.
+
 ## 2026-10-30 — V3 Sliders for anticipated performance
 
 **Done (open pull request, branch `sliders`):**

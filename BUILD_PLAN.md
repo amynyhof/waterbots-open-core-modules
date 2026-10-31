@@ -56,6 +56,11 @@ smaller tables, such as the six-row table of fallback factors, are fine as they 
 | V14 | The same-numbers check: a project saved by the screening, read back the way the paid site reads it, gives the same numbers, or a list of what changed and why. | V6, V10, V11, V12, V13. | A test passes here on invented projects. The private side runs it on both real filings with the pinned release and reports pass. |
 | V15 | The v1 release: a GitHub release that both sites pin. | V8, V14; Amy's approval. | Both sites run the same pinned file. Amy confirms the whole journey on the live sites, and the average question count is reported. |
 
+**Sources still to find** (from V3):
+
+- [ ] A cited source for the starting value of the share of homes that really use the device (100%). Until then
+      its slider says "assumed: no source yet". `startsWithoutSource` in `screen/exAnte.ts` lists every such start.
+
 **After v1** (not needed for the finish line):
 
 - npm publishing (M2.2's publish, and the npm scope and token in M1.4). This is v2.
