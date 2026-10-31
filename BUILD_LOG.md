@@ -4,6 +4,23 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-10-30 — V2 The engine's types under Node's own module rules
+
+**Done (open pull request, branch `engine-types-node`):**
+- The engine's own files now import each other with file endings (`./quantity.js`), and import data files with the
+  JSON marker (`with { type: "json" }`). Eight files under `packages/calvin/src/calculators/`, import lines only.
+- `scenario.ts`: the type for device classes is now named from the constant, not from the data file. Same type. This
+  keeps the data file out of the built type files.
+- `scripts/check-engine-entry.mjs` now also installs the built type files and typechecks a fresh project that uses
+  Node's own module rules (`nodenext`), with the package's type files checked too. A small file there fails if any of
+  the entry's 48 exports, or any function's inputs or result, falls back to "any". New tests cover this.
+- `packages/calvin/src/reference-cases.ts` is now `test-cases.ts`, with its function and types renamed to match. It
+  runs made-up test cases. "Reference cases" means real filings only.
+
+**Checked:** clean typecheck, test and build pass. The same 48 of 48 in place, and 48 of 48 installed with no React.
+Types of all 48 exports pass under Node's module rules. Before the change, the same fresh project failed with 10
+errors (missing file endings, and a data file without the JSON marker).
+
 ## 2026-10-30 — M2.2 Engine entry: answers on the pull request
 
 **Done (same branch, `add-engine-entry`):**

@@ -8,7 +8,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import * as engine from "../src/engine";
-import { runReferenceCases } from "../src/reference-cases";
+import { runTestCases } from "../src/test-cases";
 
 const pkgDir = fileURLToPath(new URL("..", import.meta.url));
 const srcDir = join(pkgDir, "src");
@@ -52,7 +52,7 @@ describe("the engine-only entry", () => {
 });
 
 describe("the engine-only entry gives the same answers as expected-outputs.json", () => {
-  const got = runReferenceCases(engine, doc);
+  const got = runTestCases(engine, doc);
 
   it("was made by this engine version", () => {
     expect(got.engineVersion).toBe(doc.engineVersion);

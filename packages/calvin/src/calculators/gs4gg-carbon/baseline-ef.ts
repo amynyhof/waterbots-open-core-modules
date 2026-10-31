@@ -1,5 +1,5 @@
-import type { StoveStratum, FuelEntry } from "./types";
-import paaFuel from "../data/paa/fuel-factors.json";
+import type { StoveStratum, FuelEntry } from "./types.js";
+import paaFuel from "../data/paa/fuel-factors.json" with { type: "json" };
 
 type Convention = "combustion-only" | "6:1" | "4:1";
 const V2_CHARCOAL = paaFuel.fuels.charcoal as unknown as Record<Convention, { ef_co2: number; ef_nonco2: number }>;

@@ -1,22 +1,22 @@
-import type { MethodologyVersion, QuantityMethod } from "./quantity";
-import { computeQuantity } from "./quantity";
+import type { MethodologyVersion, QuantityMethod } from "./quantity.js";
+import { computeQuantity } from "./quantity.js";
 import {
   buildPreset, resolveBaselineEdit, countryBaselineDefault, defaultCharcoalConvention,
   type PresetId, type ResolvedStratum, type FuelSpec, type BaselineEdit,
   type CharcoalConvention, type FuelShares, type StoveShares,
-} from "./presets";
-import { computeLegacyEr } from "./emissions-legacy";
-import { computePaaEr } from "./emissions-paa-v2";
-import { computeEfb } from "./baseline-ef";
-import { resolveAgeShares, type ResolvedAgeShares } from "./table9";
-import type { LegacyErOutput, PaaErOutput, PaaLeakage } from "./types";
-import type { FallbackStop, FallbackStopKey } from "./fallback";
+} from "./presets.js";
+import { computeLegacyEr } from "./emissions-legacy.js";
+import { computePaaEr } from "./emissions-paa-v2.js";
+import { computeEfb } from "./baseline-ef.js";
+import { resolveAgeShares, type ResolvedAgeShares } from "./table9.js";
+import type { LegacyErOutput, PaaErOutput, PaaLeakage } from "./types.js";
+import type { FallbackStop, FallbackStopKey } from "./fallback.js";
 
-import embodiedJson from "../data/embodied/factors.json";
-import householdJson from "../data/household-size/countries.json";
-import fnrbJson from "../data/fnrb/countries.json";
-import dafJson from "../data/daf/countries.json";
-import m49Json from "../data/regions/un-m49.json";
+import embodiedJson from "../data/embodied/factors.json" with { type: "json" };
+import householdJson from "../data/household-size/countries.json" with { type: "json" };
+import fnrbJson from "../data/fnrb/countries.json" with { type: "json" };
+import dafJson from "../data/daf/countries.json" with { type: "json" };
+import m49Json from "../data/regions/un-m49.json" with { type: "json" };
 
 /**
  * scenario.ts — the Vector calculator orchestrator. Wires the deterministic engine into
@@ -67,8 +67,8 @@ type DafData = {
 };
 const household = householdJson as unknown as HouseholdData;
 /** Table 10 device classes (`calculators/data/embodied/factors.json`). */
-export type EmbodiedCategory = keyof typeof embodiedJson.categories;
 export const EMBODIED_CATEGORIES = embodiedJson.categories;
+export type EmbodiedCategory = keyof typeof EMBODIED_CATEGORIES;
 const fnrb = fnrbJson as unknown as FnrbData;
 const daf = dafJson as unknown as DafData;
 

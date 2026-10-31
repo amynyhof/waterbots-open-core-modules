@@ -18,7 +18,7 @@
  *
  * Pure. Amy's ruling R4 (2026-09-21, [#24]); calculator v0.5.0.
  */
-import ageSharesJson from "../data/age-shares/countries.json";
+import ageSharesJson from "../data/age-shares/countries.json" with { type: "json" };
 
 export interface AgeShares {
   under5: number;

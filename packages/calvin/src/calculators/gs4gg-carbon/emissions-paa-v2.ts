@@ -1,6 +1,6 @@
-import type { PaaErInput, PaaErOutput } from "./types";
-import { computeEfb } from "./baseline-ef";
-import embodiedFactors from "../data/embodied/factors.json";
+import type { PaaErInput, PaaErOutput } from "./types.js";
+import { computeEfb } from "./baseline-ef.js";
+import embodiedFactors from "../data/embodied/factors.json" with { type: "json" };
 
 /** Eq.19 amortisation: the first crediting period, 5 years (V2 §9.2.2.1(b), p.37) — from the data file. */
 const EMBODIED_AMORTISATION_YEARS: number = embodiedFactors.amortisationYears.value;
