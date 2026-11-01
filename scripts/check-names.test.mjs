@@ -58,6 +58,60 @@ test("an entry with the allowance is let through on copyright and licence lines 
   assert.deepEqual(scanText("Copyright 2026 Zelda Quimby", entries), [1], "the allowance is for its own entry only");
 });
 
+test("the allowance note works with or without its closing 'only'", () => {
+  const entries = parseNames("Merrin Ashgrove | allowed on copyright and licence lines\nTobin Fallowmere | Allowed on copyright and license lines only\n");
+  assert.deepEqual(entries.map((e) => e.copyrightOnly), [true, true]);
+  assert.deepEqual(scanText("written by Merrin Ashgrove", entries), [1], "the note is not read as part of the name");
+  assert.deepEqual(scanText("Copyright 2026 Merrin Ashgrove", entries), []);
+  assert.deepEqual(scanText("thanks to Tobin Fallowmere", entries), [1]);
+});
+
+test("a note the scan does not know stops it, instead of switching the entry off", () => {
+  assert.throws(() => parseNames("Merrin Ashgrove | allowed in footers\n"), ListError);
+  assert.throws(() => parseNames("Zelda Quimby\nMerrin Ashgrove |\n"), ListError, "an empty note is not known either");
+  const dir = tmp();
+  const list = join(dir, "list.txt");
+  writeFileSync(list, "Merrin Ashgrove | allowed in footers\n");
+  const clean = join(dir, "clean");
+  mkdirSync(clean);
+  writeFileSync(join(clean, "a.txt"), "hello\n");
+  const r = run([clean], list);
+  assert.equal(r.status, 2);
+  assert.equal((r.stdout + r.stderr).toLowerCase().includes("merrin"), false, "the entry is never printed");
+});
+
+test("a person with the allowance is also found by first name alone and by surname alone", () => {
+  const entries = parseNames(LIST);
+  assert.deepEqual(scanText("ask Harbour about it\nsent to Voss\nharbour_voss", entries), [1, 2, 3]);
+  assert.deepEqual(scanText("Copyright 2026 Voss", entries), [], "the allowance covers each part too");
+  assert.deepEqual(scanText("Harbourside\nVossberg", entries), [], "still whole words only");
+  assert.deepEqual(scanText("Zelda alone\nQuimby alone", entries), [], "entries without the allowance are not split");
+});
+
+test("a copyright or licence line must start with one of the set words, after any comment marks", () => {
+  const entries = parseNames(LIST);
+  for (const s of [
+    "Copyright 2026 Harbour Voss",
+    "© 2026 Harbour Voss",
+    "(c) 2026 Harbour Voss",
+    "  // Copyright 2026 Harbour Voss",
+    " * Copyright 2026 Harbour Voss",
+    "# SPDX-FileCopyrightText: Harbour Voss",
+    "<!-- Licence: Harbour Voss -->",
+  ]) {
+    assert.deepEqual(scanText(s, entries), [], s);
+  }
+  for (const s of [
+    "Harbour Voss holds the copyright",
+    "see the licence, Harbour Voss",
+    "notes (c) Harbour Voss",
+    "Copyrighted by Harbour Voss",
+    "SPDX Harbour Voss",
+  ]) {
+    assert.deepEqual(scanText(s, entries), [1], s);
+  }
+});
+
 test("a file name that holds a name is a hit", () => {
   const entries = parseNames(LIST);
   assert.equal(pathHasName("docs/zelda-quimby/notes.md", entries), true);
