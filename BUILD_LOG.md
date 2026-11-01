@@ -4,6 +4,27 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-11-01 — Name scan: three fixes
+
+**Done (branch `name-scan-fixes`):** the open site found three faults in the shared name scan. All three were in this
+repo's copy too. `scripts/check-names.mjs` now:
+- reads the copyright allowance note with or without its closing "only", and stops the scan on any note it does not
+  know. Before, a note without "only" was read as part of the name, so that entry never matched anything;
+- also finds a person with the allowance by first name alone and by surname alone;
+- treats a line as a copyright or licence line only when it starts, after any comment marks, with "Copyright", "©",
+  "(c)", "SPDX-" or "Licence". Before, the word anywhere in the line was enough.
+
+Each fix has a test with made-up names. Each new test fails on the old scan.
+
+**Checked:** the 17 name-scan tests pass. The fixed scan, run on the whole repo, now finds 249 hits in the committed
+files. Every one comes from a single list entry that the first fault had switched off: a first name used on
+purpose across the plan, `CLAUDE.md` and code comments, and the GitHub login in each package's repository link. The
+built files carry the same first name in their comments. A local, uncommitted settings file has 3 more hits from
+other entries.
+
+**Open:** how to treat those hits is Amy's decision. Until then the scan fails on this repo, and the first release
+cannot pass it.
+
 ## 2026-10-31 — V3 Sliders: brought up to date, and four v1 items planned
 
 **Done (same branch, `sliders`):**
