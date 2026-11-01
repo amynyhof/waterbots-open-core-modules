@@ -111,7 +111,7 @@ gate's design before the real gate is built.
   - [!] The npm scope: create the npm organisation or confirm Amy owns it (N13)
   - [!] The `NPM_TOKEN` Actions secret
   - [!] Amy as required reviewer on the `npm-publish` environment, so every release needs her approval
-  - [!] **(V1)** The release tag rule: only Amy and Harrison may create release tags (`v*`, and each module's own,
+  - [!] **(V1)** The release tag rule: only Amy and the engineer may create release tags (`v*`, and each module's own,
         such as `calvin-v*`). Set it once the GitHub organisation exists.
 - [ ] **M1.5 Lane 1 auto-merge** — not built; the earlier dormant job was removed. Rebuild only when the real
       number gate (M1.2) exists and Amy says to switch it on. Design: lane 1 and not a draft → arm GitHub's

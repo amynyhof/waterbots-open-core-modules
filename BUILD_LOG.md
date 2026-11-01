@@ -24,7 +24,7 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
   The entry below, from an earlier pull request, still says Plum; it is left as written.
 - `BUILD_PLAN.md`: V3 marked merged. V5 no longer waits on the simple view. New items: M5.5, the simple view, the
   bigger tap buttons and Reef ship together as the next release (V1); M2.6, put the 21 recalculated cases back
-  through the official V1.0 calculator (V2); the release tag rule in M1.4, with Harrison, once the GitHub organisation
+  through the official V1.0 calculator (V2); the release tag rule in M1.4, with the engineer, once the GitHub organisation
   exists (V1); a rebuild of the release on a second machine, under M2.2 (V2). M2.4 and M2.5 are closed by this pull
   request.
 
