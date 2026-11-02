@@ -4,6 +4,16 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-11-02 — Name scan: the repository link
+
+**Done (same branch, `name-scan-fixes`):** ruling 2026-11-02. The four `package.json` files keep the owner's GitHub
+login in their repository link until the repo moves to the WaterBots organisation. The scan now lets through the
+owner part of a GitHub link in a `package.json` "repository" field, and nowhere else. The rest of that line is still
+checked, and so is every other field, file and link. A test with made-up names pins this.
+
+**Checked:** the 18 name-scan tests pass. The fixed scan finds nothing in the four `package.json` files. The other
+hits are cleared in their own pull request.
+
 ## 2026-11-01 — Name scan: three fixes
 
 **Done (branch `name-scan-fixes`):** the open site found three faults in the shared name scan. All three were in this
