@@ -3,8 +3,8 @@
 #
 # It refuses to run unless: the tagged commit is on main; there are packages to publish; the npm
 # scope is real (not the "@<scope>" placeholder); and the NPM_TOKEN secret is set.
-# It runs in the "npm-publish" environment. Amy's approval is required for every release: she is the
-# environment's required reviewer, and only she may create v* tags.
+# It runs in the "npm-publish" environment. The maintainer's approval is required for every release: the
+# maintainer is the environment's required reviewer, and the only person who may create v* tags.
 
 name: publish
 
@@ -44,7 +44,7 @@ jobs:
             echo "::error::Nothing to publish yet: no root package.json."; exit 1
           fi
           if grep -rIl --include=package.json --exclude-dir=node_modules '@<scope>' .; then
-            echo "::error::The npm scope is still the '@<scope>' placeholder (waiting on Amy, N13)."; exit 1
+            echo "::error::The npm scope is still the '@<scope>' placeholder (waiting on the maintainer, N13)."; exit 1
           fi
           if [ -z "$NPM_TOKEN" ]; then
             echo "::error::The NPM_TOKEN secret is not set."; exit 1

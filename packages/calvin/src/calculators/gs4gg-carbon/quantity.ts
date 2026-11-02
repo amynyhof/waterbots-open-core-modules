@@ -24,7 +24,7 @@
  *       L/p/d (§3.6.6). V2 uses Table 9 age-tiered caps (§7.3.11: adults 4.0/5.5,
  *       5–18 3.0/4.5, <5 0.9/1.3) plus a suppressed-demand ×0.95 option. Table 9
  *       age-tiering, deferred at first, is APPLIED from calculator v0.5.0
- *       (Amy's ruling R4, 2026-09-21): when the caller passes `table9.ageShares`, the
+ *       (ruling R4, 2026-09-21): when the caller passes `table9.ageShares`, the
  *       V2 volume is the share-weighted tiered default (`table9.ts`), each tier capped;
  *       otherwise the flat per-person value, capped, with a note that says so.
  *
@@ -84,7 +84,7 @@ export interface QuantityInput {
   peakVolumeCapLPerPersonPerDay?: number;
 
   /**
-   * V2 household runs (Amy's ruling R4, 2026-09-21; [#24]): when set, the per-person volume is the
+   * V2 household runs (ruling R4, 2026-09-21; [#24]): when set, the per-person volume is the
    * Table 9 age-tiered default weighted by these age shares (`table9.ts`), and `litresPerPersonPerDay`
    * is ignored for the default. Absent → the flat per-person value (an entered design/WCFT value, or
    * the adult default). `suppressedDemand` applies the mandatory ×0.95 to the defaults, once.
@@ -101,7 +101,7 @@ export interface QuantityInput {
   /** Usage time t_p, hours/day. */
   usageHoursPerDay?: number;
   /**
-   * Devices per household DN_p — a project fact (Amy, 2026-10-23): a whole number, 1 or more, used
+   * Devices per household DN_p — a project fact (ruling 2026-10-23): a whole number, 1 or more, used
    * only in Eq.7's device cap. Not given means 1, the lowest and safest cap. Anything else is refused.
    */
   devicesPerPremises?: number;
@@ -163,7 +163,7 @@ export function peopleFromHouseholds(households: number, avgHouseholdSize: numbe
  */
 export function computeQuantity(input: QuantityInput): QuantityResult {
   // DN_p, when given, is a whole number, 1 or more — anything else is refused, never rounded
-  // (Amy, 2026-10-23). No upper limit: Eq.7's MIN against the people's water need already caps it.
+  // (ruling 2026-10-23). No upper limit: Eq.7's MIN against the people's water need already caps it.
   if (input.devicesPerPremises !== undefined && !validDevicesPerPremises(input.devicesPerPremises)) {
     throw new RangeError(DEVICES_PER_PREMISES_RULE);
   }
@@ -171,7 +171,7 @@ export function computeQuantity(input: QuantityInput): QuantityResult {
   const cap = input.peakVolumeCapLPerPersonPerDay ?? QPW_PERSON_CAP_DEFAULT;
 
   // Per-person daily volume. V1 §3.6.6 (p.12): a flat value, capped 5.5. V2 §7.3.11 Table 9 (p.31):
-  // age-tiered defaults and caps — applied when the caller supplies the age split (Amy's ruling R4,
+  // age-tiered defaults and caps — applied when the caller supplies the age split (ruling R4,
   // 2026-09-21, [#24]); each tier is capped inside table9Volume, so the flat cap is not re-applied.
   let qpwEffective: number;
   let qpwCapApplied = false;

@@ -99,7 +99,7 @@ function parseScenarioInput(raw: unknown): ScenarioInput {
   if (typeof o.meteredVolumeL === "number") input.meteredVolumeL = o.meteredVolumeL;
   if (typeof o.deviceCapacityLPerHour === "number" && o.deviceCapacityLPerHour > 0) input.deviceCapacityLPerHour = o.deviceCapacityLPerHour;
   if (o.devicesPerPremises !== undefined) {
-    // Same rule as the engine and the screen (Amy, 2026-10-23): a whole number, 1 or more.
+    // Same rule as the engine and the screen (ruling 2026-10-23): a whole number, 1 or more.
     if (!validDevicesPerPremises(o.devicesPerPremises)) throw new Error(DEVICES_PER_PREMISES_RULE);
     input.devicesPerPremises = o.devicesPerPremises;
   }

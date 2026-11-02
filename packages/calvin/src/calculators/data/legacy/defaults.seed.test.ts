@@ -1,4 +1,4 @@
-// THE SEED VERSION of ./defaults.test.ts (CARRY_RULES C7; Amy, 2026-10-23). The same checks, with
+// THE SEED VERSION of ./defaults.test.ts (CARRY_RULES C7; ruling 2026-10-23). The same checks, with
 // every registry id checked against the public source index rather than the source registry, which
 // never crosses. A seed carries the index filtered to the rows it names; this site carries all of it,
 // so the test runs, and passes, on both. The full test stays here.
@@ -27,7 +27,7 @@ describe("legacy default parameters (CALCULATOR_SPEC §2.6)", () => {
     expect(p.EF_nonCO2.charcoal).toBe(44.83);
     expect(p.eta).toMatchObject({ TSF: 0.1, conventional: 0.2, ICS: 0.3, other: 1 });
     // R1 (2026-09-21): the CWS workbook's applied value was never a methodology default — retired;
-    // its record left this file for the maintainers' archive on 2026-10-23 (Amy).
+    // its record left this file for the maintainers' archive on 2026-10-23.
     expect((p as Record<string, unknown>).fNRB_default).toBeUndefined();
     expect((p as Record<string, unknown>).fNRB_workbook_applied_value_RETIRED).toBeUndefined();
     expect(p.Xcleanboil_default.value).toBe(0);

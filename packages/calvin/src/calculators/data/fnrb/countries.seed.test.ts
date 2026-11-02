@@ -1,4 +1,4 @@
-// THE SEED VERSION of ./countries.test.ts (CARRY_RULES C7; Amy, 2026-10-23). The same checks, with
+// THE SEED VERSION of ./countries.test.ts (CARRY_RULES C7; ruling 2026-10-23). The same checks, with
 // every registry id checked against the public source index rather than the source registry, which
 // never crosses. A seed carries the index filtered to the rows it names; this site carries all of it,
 // so the test runs, and passes, on both. The full test stays here.
@@ -35,7 +35,7 @@ type Vintage = {
 const report = fnrb.vintages["mofuss-2024-06-report"] as Vintage;
 const official = fnrb.vintages["mofuss-adm0-csv"] as Vintage;
 
-describe("per-country fNRB — the official source (CALCULATOR_SPEC §2.8; Amy's rulings (2) and (4), 2026-09-21)", () => {
+describe("per-country fNRB — the official source (CALCULATOR_SPEC §2.8; rulings (2) and (4), 2026-09-21)", () => {
   // THE OFFICIAL-ANCHOR GATE. The default vintage carries A6.4-AMT-009 v01.0 Table 3 exactly — the same
   // values as CDM TOOL33 v03.0 Table 3 (AMT-009 ¶16), read from both PDFs on 2026-09-22. These six are
   // the countries the reference dataset is built on; a drift here is a drift in every reference entry.
@@ -114,7 +114,7 @@ describe("per-country fNRB — the official source (CALCULATOR_SPEC §2.8; Amy's
     }
   });
 
-  // AMY'S QUESTION, 2026-09-22, ANSWERED FROM BOTH PRIMARY PDFs: is there a GLOBAL row we are
+  // QUESTION, 2026-09-22, ANSWERED FROM BOTH PRIMARY PDFs: is there a GLOBAL row we are
   // refusing unnecessarily? No. AMT-009 Table 2 has exactly three rows and the word "global"
   // appears nowhere in the document; TOOL33 v03.0 Table 2 is "Regional (Continental)" with the
   // same three. Table 4 is SUB-national — narrower, not broader. The refusal is the whole of what
@@ -152,7 +152,7 @@ describe("per-country fNRB — the official source (CALCULATOR_SPEC §2.8; Amy's
   });
 
   it("the workbook comparator is retired (R1, 2026-09-21) and only real registry ids are referenced", () => {
-    // Retired on R1; its record left this file for the maintainers' archive on 2026-10-23 (Amy).
+    // Retired on R1; its record left this file for the maintainers' archive on 2026-10-23.
     expect((fnrb as Record<string, unknown>).legacy_flat_default).toBeUndefined();
     expect((fnrb as Record<string, unknown>)["retired_2026-09-21"]).toBeUndefined();
     const ids = new Set<string>([

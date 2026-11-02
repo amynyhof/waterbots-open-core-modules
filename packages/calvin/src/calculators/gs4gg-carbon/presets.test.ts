@@ -68,7 +68,7 @@ describe("presets — version-aware η, cited (A/C/D; no B)", () => {
   });
 });
 
-// Amy's ruling (1), 2026-09-26: the stove and fuel rows take typed SHARES; the engine resolves them.
+// ruling (1), 2026-09-26: the stove and fuel rows take typed SHARES; the engine resolves them.
 describe("resolveBaselineEdit — typed shares, the 100% guard, [#213] charcoal", () => {
   const stove = { threeStone: 0.6, otherConventional: 0, ics: 0.4, fossil: 0 };
   const fuel = { wood: 0.7, charcoal: 0.3, lpg: 0 };

@@ -23,7 +23,7 @@ export type CalvinProject = ModuleProject<SavedAnalysis>;
 export interface CalcState {
   version: "legacy" | "paa";
   /**
-   * PROJECT FACTS ARE NULL UNTIL PROVIDED (CALCULATOR_SPEC §0.2, Amy 2026-10-23): `method` (from the
+   * PROJECT FACTS ARE NULL UNTIL PROVIDED (CALCULATOR_SPEC §0.2, ruling 2026-10-23): `method` (from the
    * technology), `countryIso`, `populationMode` and `populationCount`. None is guessed or defaulted;
    * with any one missing the seat computes nothing and asks for it (`missingProjectFacts`).
    */
@@ -32,7 +32,7 @@ export interface CalcState {
   countryIso: string | null;
   populationMode: "people" | "households" | null;
   /**
-   * People (or households) served. NULL WHEN NOBODY HAS ENTERED IT (Amy, 2026-10-23): the seat then
+   * People (or households) served. NULL WHEN NOBODY HAS ENTERED IT (ruling 2026-10-23): the seat then
    * shows no figures and asks for the count. There is no stand-in number — a tonnage worked out
    * from a population nobody entered would be a figure about a project that is not this one.
    */
@@ -58,7 +58,7 @@ export interface CalcState {
   ageSharesEntered?: { under5: number; age5_18: number; adult19plus: number };
   /**
    * THE PROJECT'S OWN BASELINE MIX (V2.0 SDWS 6 stove shares, SDWS 8 fuel shares) — undefined until
-   * somebody types on the stove or fuel rows (Amy's ruling (1), 2026-09-26). Until then the labelled
+   * somebody types on the stove or fuel rows (ruling (1), 2026-09-26). Until then the labelled
    * screening preset stands. Each list must add up to 100% or the engine holds it back and the row
    * says why; the typed figures are kept either way, so nobody loses what they entered.
    */
@@ -104,7 +104,7 @@ export interface CalcState {
 
 /**
  * THE FIELDS THE PROJECT RECORD OWNS — and the ONLY ones a record save may overwrite in a seat
- * that is already open (Amy's eyeball of ruling (3), 2026-09-22).
+ * that is already open (eyeball of ruling (3), 2026-09-22).
  *
  * Canon: *"Project facts (country, technology, population…) live on the project record; working
  * surfaces READ them and are edited only at the project page."* These three are read straight from
@@ -152,7 +152,7 @@ export function missingProjectFacts(s: CalcState): ProjectFact[] {
   if (s.countryIso == null) out.push({ key: "country", label: "country" });
   if (s.populationCount == null) out.push({ key: "peopleServed", label: "people served" });
   else if (s.populationMode == null) out.push({ key: "countedAs", label: "whether people served were counted as people or households" });
-  // HOUSEHOLD SIZE, ONLY WHEN THE RUN NEEDS ONE AND NONE EXISTS (Amy, 2026-10-23): the project's own,
+  // HOUSEHOLD SIZE, ONLY WHEN THE RUN NEEDS ONE AND NONE EXISTS (ruling 2026-10-23): the project's own,
   // else the cited UN figure for the country — never a stand-in statistic of ours.
   else if (
     s.countryIso != null &&
@@ -236,18 +236,18 @@ export function seedCalcState(project: CalvinProject): CalcState {
     // N_p — households served (Method 2). A SAVED ANALYSIS FIGURE ONLY: the record's households
     // come from its ONE count, through `effectivePremises`, in whichever direction it was entered.
     //
-    // ⚠ IT NO LONGER READS `scale.units` (Amy's rule, 2026-09-24: *a real value lives in one
+    // ⚠ IT NO LONGER READS `scale.units` (rule, 2026-09-24: *a real value lives in one
     // place*). That field is the CWS water-point count now and has no box on a household project;
     // reading it here would let a second, stale figure quietly outrank the count on the record.
     premises: g.premises,
     deviceCapacityLPerHour: g.deviceCapacityLPerHour,
     usageHoursPerDay: g.usageHoursPerDay,
-    // DN_p: a saved value is used only if it is a whole number, 1 or more (Amy, 2026-10-23).
+    // DN_p: a saved value is used only if it is a whole number, 1 or more (ruling 2026-10-23).
     devicesPerPremises: validDevicesPerPremises(g.devicesPerPremises) ? g.devicesPerPremises : undefined,
     etaOverride: g.etaOverride,
     fnrbOverride: g.fnrbOverride,
     fnrbFiledV1: g.fnrbFiledV1,
-    // Household size: a saved analysis figure wins, else the RECORD's own (Amy's glossary,
+    // Household size: a saved analysis figure wins, else the RECORD's own (glossary,
     // 2026-09-24 — it is a project fact), else undefined and the cited UN average is used.
     householdSizeOverride: g.householdSizeOverride ?? project.population?.householdSize,
     slidersEntered: g.slidersEntered,
@@ -302,7 +302,7 @@ export function effectivePremises(s: CalcState): number | undefined {
   if (s.populationCount == null || s.countryIso == null || s.populationMode == null) return undefined;
   // BOTH DIRECTIONS, and the rule is the ENGINE's — called rather than copied, so the seat's N_p,
   // the record's box and the credited figure can never drift ([#225]). Entered as households, the
-  // households ARE N_p; entered as people, N_p is people ÷ the household size (Amy withdrew the
+  // households ARE N_p; entered as people, N_p is people ÷ the household size (the maintainer withdrew the
   // "nothing fires on People" instruction on 2026-09-24: for HWT/IWT the households are always
   // knowable, and without them Eq.6 cannot run at all).
   return derivePopulation({

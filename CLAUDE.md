@@ -7,18 +7,18 @@ Write as if a stranger is reading — because one will.
 
 | Who | Does | Never does |
 |---|---|---|
-| **Amy** | Decides. Merges every pull request (lane 1 may auto-merge only after Amy switches it on). Owns the repo settings, the GitHub secrets and the npm scope. | — |
+| **The maintainer** | Decides. Merges every pull request (lane 1 may auto-merge only after the maintainer switches it on). Owns the repo settings, the GitHub secrets and the npm scope. | — |
 | **Session C** (the Claude session that owns this repo) | Builds here: code, tests, CI, docs. Works on a branch and opens a pull request. | Merges. Pushes to `main`. Changes repo settings. Works in any other repo. |
 | **The private session** | Installs the **published** packages and runs its own real-filing tests against them. | Reads or works in this repo. |
 | **Outside AI review** | Reviews lane 3 pull requests (see below). | Merges. |
 
-Nothing crosses between this repo and the private side except by Amy's hand: the seed once, then version numbers and
+Nothing crosses between this repo and the private side except by the maintainer's hand: the seed once, then version numbers and
 pass-or-fail results with a reference line — **never a figure.**
 
 ## Hard rules
 
 1. **Rule Zero — stay in this repo.** Never open, read or search the private WaterBots repos, the harness repo or the
-   carry folder on this machine. The only outside file Session C may read is the brief Amy hands over, read-only.
+   carry folder on this machine. The only outside file Session C may read is the brief the maintainer hands over, read-only.
    The one other exception: the name scan may read the private name list in place, through the `WB_NAMES_LIST`
    variable, and nothing else in that place.
 2. **Nothing private goes in.** No real project figures, no real project names, no reviewer or partner names or
@@ -32,7 +32,7 @@ pass-or-fail results with a reference line — **never a figure.**
    ledger exactly as it arrives and only add rows. Never rewrite a row. The ledger, tag names and tag messages never
    name a reviewer or their organisation.
 6. **The engine does every sum; the screen computes nothing.**
-7. **Do not seed calculator code by hand.** It arrives once, by Amy's carry (step M2).
+7. **Do not seed calculator code by hand.** It arrives once, by the maintainer's carry (step M2).
 
 ## Merge lanes
 
@@ -41,16 +41,16 @@ in `.github/lanes/lane-rule.mjs`.
 
 | Lane | Files | How it merges |
 |---|---|---|
-| **1** | Only `BUILD_PLAN.md`, `BUILD_LOG.md`, `docs/**/*.md` | All checks green, then Amy merges with one click. There is no auto-merge. It may be built only after the keyed-fingerprint number gate exists, and runs only after Amy switches it on. |
-| **2** | What visitors see or read: `README.md` for now; screens and copy when they exist | Amy merges, then checks the live site. |
-| **3** | Everything else: calculator, engine, data, tests, packages, CI, rules files, the lane rule itself, and anything that could leak a real figure | Outside AI review, then Amy reviews and merges. |
+| **1** | Only `BUILD_PLAN.md`, `BUILD_LOG.md`, `docs/**/*.md` | All checks green, then the maintainer merges with one click. There is no auto-merge. It may be built only after the keyed-fingerprint number gate exists, and runs only after the maintainer switches it on. |
+| **2** | What visitors see or read: `README.md` for now; screens and copy when they exist | The maintainer merges, then checks the live site. |
+| **3** | Everything else: calculator, engine, data, tests, packages, CI, rules files, the lane rule itself, and anything that could leak a real figure | Outside AI review, then the maintainer reviews and merges. |
 
 - A file on no list → lane 3.
 - A pull request touching more than one lane takes the highest.
 - A pull request that changes the lane rule, CI or a rules file (`CLAUDE.md`, `.claude/**`) → lane 3.
 
 **The number gate is a placeholder for now.** It passes with a warning and checks nothing. Until the real
-keyed-fingerprint gate exists, lane 3 — Amy's review plus outside AI review — is what catches real figures and names.
+keyed-fingerprint gate exists, lane 3 — the maintainer's review plus outside AI review — is what catches real figures and names.
 
 ## The grant line
 
@@ -60,14 +60,14 @@ Every commit ends with a `Grant:` trailer on its own line, above any attribution
 - `Grant: neither` — planning only (for example, editing `BUILD_PLAN.md` or `BUILD_LOG.md`).
 - `Grant: paid` — paid-layer work. It should not appear in this repo.
 
-A commit that mixes kinds of work is split into two commits. Every pull request's **For Amy** block names its bucket.
+A commit that mixes kinds of work is split into two commits. Every pull request's **For the maintainer** block names its bucket.
 
 ## Pull requests
 
-- One step, or one coherent part of a step, per pull request: something Amy can check in one sitting and undo in one
+- One step, or one coherent part of a step, per pull request: something the maintainer can check in one sitting and undo in one
   motion.
-- Start the description with a **For Amy** block in plain words: what changed, what to check, the lane, the grant
-  bucket, and anything that needs her decision.
+- Start the description with a **For the maintainer** block in plain words: what changed, what to check, the lane, the grant
+  bucket, and anything that needs the maintainer's decision.
 - Update `BUILD_LOG.md` with what was done; tick items in `BUILD_PLAN.md`.
 - A pull request title, commit message or description never names what is being removed. Say what the change does in
   plain words ("Tidy paths and comments"), not what it takes out.
@@ -83,8 +83,8 @@ Everything here is public: README, docs, cards, screen text, commit messages, PR
 - Short sentences. One idea per sentence.
 - Explain a technical word the first time it appears ("a keyed fingerprint — a scrambled code that can only be made or
   checked with a secret key").
-- Say who does what: "Amy merges", not "it is merged".
-- Credit a ruling by its date, not by a person: "ruling 2026-10-27", not "Amy ruled on 2026-10-27".
+- Say who does what: "The maintainer merges", not "it is merged".
+- Credit a ruling by its date, not by a person: "ruling 2026-10-27", not "the maintainer ruled on 2026-10-27".
 - Opening values are either cited or labelled "starting point". Notes say which way credits move; they hold no
   computed number.
 - Keep the **default** and the **cap** of the litres slider as two separate things, in code and on screen.
@@ -97,7 +97,7 @@ Everything here is public: README, docs, cards, screen text, commit messages, PR
 - Any key, token or password.
 - A person's folder path or Windows username. Use a path that names no user, such as `%USERPROFILE%\GitHub\...`.
 
-### Words (Amy, 19 Oct 2026)
+### Words (ruling 19 Oct 2026)
 
 - **"golden" is banned.** Always say "reference" instead (a reference case, a reference value).
 - **WaterBots never says it validates.** "Validate" and "validation" may appear only when explaining what validation

@@ -2,7 +2,7 @@
  * What the project-record editor SAYS happened when you press Save.
  *
  * WHY THIS IS A MODULE AND NOT THREE TERNARIES IN THE COMPONENT (#88 part (6),
- * 2026-08-12). Amy: *"A form feeding the calculator cannot fail silently."* The defect
+ * 2026-08-12). The maintainer: *"A form feeding the calculator cannot fail silently."* The defect
  * this closes was not a broken write — it was a TRUE write and a FALSE screen: a save
  * threw, the error was swallowed, the button returned to its resting state, and the
  * field still showed the value the user typed while the database held the old one. It

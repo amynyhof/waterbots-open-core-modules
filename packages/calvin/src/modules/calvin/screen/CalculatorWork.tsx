@@ -41,7 +41,7 @@ import type { CalculatorState } from "./useCalculatorState";
  * periods with their vintages). The project arrives as a plain `ModuleProject` (seam S3).
  */
 /**
- * A summary figure. EVERY ONE IS TAGGED DERIVED (Amy's ruling (2), 2026-09-26): the four are
+ * A summary figure. EVERY ONE IS TAGGED DERIVED (ruling (2), 2026-09-26): the four are
  * outputs of the equations below, and the tag says so in the same four-word key as the stack.
  */
 function Metric({ label, value, sub, tip }: { label: string; value: string; sub?: string; tip: string }) {
@@ -98,7 +98,7 @@ export default function CalculatorWork({
   } = calc;
 
   /**
-   * A MISSING PROJECT FACT, NO FIGURES (CALCULATOR_SPEC §0.2, Amy 2026-10-23). The seat used to fill
+   * A MISSING PROJECT FACT, NO FIGURES (CALCULATOR_SPEC §0.2, ruling 2026-10-23). The seat used to fill
    * a missing fact itself — 10,000 people, Method 1 for no technology, an empty country code — and
    * every figure on the page was worked out from it. Now nothing is computed: the seat names what is
    * missing and where it is filled in, in the same words the paid site's record check uses. This
@@ -124,13 +124,13 @@ export default function CalculatorWork({
   }
 
   /**
-   * NO OFFICIAL fNRB COVERS THIS PROJECT'S COUNTRY (Amy's ruling (3)(b), 2026-09-21). The engine
+   * NO OFFICIAL fNRB COVERS THIS PROJECT'S COUNTRY (ruling (3)(b), 2026-09-21). The engine
    * has refused, so there is nothing to show on any tab: no totals, no equation stack, no report.
    * The honest empty state names what is missing and what unblocks it, and the fNRB pencil on the
    * project record is the way forward. A surface with nothing true to show says so.
    */
   /**
-   * NO FILED V1.0 fNRB ON THE RECORD, SO THERE IS NO TRANSITION RUN (Amy, R1 amended, 2026-09-24,
+   * NO FILED V1.0 fNRB ON THE RECORD, SO THERE IS NO TRANSITION RUN (R1 amended, 2026-09-24,
    * part 1). A transition compares this project's V1.0 credits with its V2.0 credits, and the V1.0
    * side is only true if it uses the fNRB the project was actually credited on. The old behaviour
    * borrowed the V2.0 value for the V1.0 side and said so in a footnote; that is retired, because a
@@ -264,7 +264,7 @@ export default function CalculatorWork({
             </div>
           </section>
 
-          {/* THE KEY, WHERE THE TAGS ARE READ (Amy's ruling (2), 2026-09-24). One line above the
+          {/* THE KEY, WHERE THE TAGS ARE READ (ruling (2), 2026-09-24). One line above the
               derivation, so a reader never has to remember what four small words mean. */}
           {calc.sliders ? <ExAntePanel state={state} result={result} patch={patch} /> : null}
 
@@ -272,7 +272,7 @@ export default function CalculatorWork({
 
           <EquationStack result={result} state={state} patch={patch} canonPopulation={project.population?.served} seed={seed} sliders={calc.sliders} />
 
-          {/* ── Beta footer — one line, honest state, shown to visitors (Amy, 2026-09-07) ── */}
+          {/* ── Beta footer — one line, honest state, shown to visitors (ruling 2026-09-07) ── */}
           <div className="border-t border-line pt-2">
             <BetaTag caseCount={referenceCaseCount} />
           </div>

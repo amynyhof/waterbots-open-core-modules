@@ -5,7 +5,7 @@
 # so a pull request cannot change the rule and relabel itself. It never checks out or runs the
 # pull request's code; it only asks GitHub for the list of changed file names.
 #
-# This workflow only labels. It never merges: Amy merges every pull request.
+# This workflow only labels. It never merges: the maintainer merges every pull request.
 
 name: lanes
 
@@ -60,9 +60,9 @@ jobs:
         run: |
           set -euo pipefail
           declare -A colour=([1]=0e8a16 [2]=fbca04 [3]=d93f0b)
-          declare -A about=([1]="Plain-writing files only. Amy merges with one click." \
-                            [2]="Visitors see it. Amy merges, then checks the live site." \
-                            [3]="Amy reviews, plus outside AI review.")
+          declare -A about=([1]="Plain-writing files only. The maintainer merges with one click." \
+                            [2]="Visitors see it. The maintainer merges, then checks the live site." \
+                            [3]="The maintainer reviews, plus outside AI review.")
           for n in 1 2 3; do
             if ! gh api "repos/$REPO/labels/lane%20$n" --silent 2>/dev/null; then
               gh api -X POST "repos/$REPO/labels" -f name="lane $n" -f color="${colour[$n]}" \

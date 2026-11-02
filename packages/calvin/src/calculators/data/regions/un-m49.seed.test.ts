@@ -1,4 +1,4 @@
-// THE SEED VERSION of ./un-m49.test.ts (CARRY_RULES C7; Amy, 2026-10-23). The same checks, with
+// THE SEED VERSION of ./un-m49.test.ts (CARRY_RULES C7; ruling 2026-10-23). The same checks, with
 // every registry id checked against the public source index rather than the source registry, which
 // never crosses. A seed carries the index filtered to the rows it names; this site carries all of it,
 // so the test runs, and passes, on both. The full test stays here.
@@ -27,11 +27,11 @@ const countries = m49.countries as unknown as Record<string, Row>;
  * The UN M49 geoscheme is GEOGRAPHY ONLY — it carries no fNRB number and no methodology
  * parameter. It exists because A6.4-AMT-009 v01.0 Table 2 publishes fNRB values for three
  * regions (Asia, Latin America, Sub-Saharan Africa) and names no country list for any of
- * them, so something cited has to decide which region a country sits in (Amy's ruling (3)(a),
+ * them, so something cited has to decide which region a country sits in (ruling (3)(a),
  * 2026-09-21). The fNRB values these regions carry are asserted next door, in
  * `calculators/data/fnrb/countries.test.ts`.
  */
-describe("UN M49 region map (Amy's ruling (3)(a), 2026-09-21)", () => {
+describe("UN M49 region map (ruling (3)(a), 2026-09-21)", () => {
   it("covers every country the calculator's selector offers (coverage rule)", () => {
     const missing = COUNTRIES.filter((c) => !countries[c.iso]).map((c) => `${c.iso} (${c.name})`);
     expect(missing, `selectable countries with no M49 row: ${missing.join(", ")}`).toEqual([]);

@@ -71,9 +71,9 @@ export default function CalculatorLens({
             modified · unsaved
           </span>
         ) : null}
-        {/* ── SAVE IS REPLACED BY THE REASON, NOT DISABLED ([#97], Amy 2026-08-12) ──
+        {/* ── SAVE IS REPLACED BY THE REASON, NOT DISABLED ([#97], ruling 2026-08-12) ──
             A disabled Save button is still an OFFER — it says "you could save, just not
-            right now", which is false: this caller can never save here. Amy's canon is
+            right now", which is false: this caller can never save here. canon is
             that the UI stops OFFERING what the database will refuse, so the affordance
             leaves and a plain sentence takes its place. The sentence names the way out
             rather than stopping at the refusal (governing statement 8). */}
@@ -101,7 +101,7 @@ export default function CalculatorLens({
             <SaveNoticeBox notice={saveNotice(saveState, dirty)} />
           </>
         )}
-        {/* EXPORT STAYS FOR EVERYONE, INCLUDING A CONTRIBUTOR. Amy's contributor canon names
+        {/* EXPORT STAYS FOR EVERYONE, INCLUDING A CONTRIBUTOR. contributor canon names
             exactly two allowances — "asking agents questions, and exporting reports" — so
             removing this alongside Save would take away half of what the role is FOR. */}
         <button

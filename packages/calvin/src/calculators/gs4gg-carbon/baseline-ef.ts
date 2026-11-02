@@ -5,7 +5,7 @@ type Convention = "combustion-only" | "6:1" | "4:1";
 const V2_CHARCOAL = paaFuel.fuels.charcoal as unknown as Record<Convention, { ef_co2: number; ef_nonco2: number }>;
 
 /**
- * THE CHARCOAL GUARD ([#213], Amy's go 2026-09-21). A v2.0 run may only carry a charcoal entry that
+ * THE CHARCOAL GUARD ([#213], go 2026-09-21). A v2.0 run may only carry a charcoal entry that
  * names its V2 convention and holds that convention's factors (V2 SDWS 9 p.51, SDWS 10 p.52). V1's
  * 165.22 / 44.83 (SDWS 9.2 / 10.2, p.24) is not a V2 value, so a v2.0 figure built on it is refused
  * rather than printed. Wood and fossil fuels are unaffected.
