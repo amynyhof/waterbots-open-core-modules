@@ -242,6 +242,22 @@ test("command line: the list is never looked for in the home folder", () => {
   assert.equal(r.status, 2, "a list sitting in the home folder is not found");
 });
 
+test("command line: a folder is scanned whole, built output included, as in an unpacked package", () => {
+  const dir = tmp();
+  const list = join(dir, "list.txt");
+  writeFileSync(list, LIST);
+  const pkg = join(dir, "package");
+  mkdirSync(join(pkg, "dist"), { recursive: true });
+  mkdirSync(join(pkg, "node_modules"));
+  writeFileSync(join(pkg, "README.md"), "hello\n");
+  writeFileSync(join(pkg, "dist", "engine.js"), "// by Zelda Quimby\n");
+  writeFileSync(join(pkg, "node_modules", "x.js"), "// by Zelda Quimby\n");
+  const r = run([pkg], list);
+  assert.equal(r.status, 1);
+  assert.match(r.stdout, /dist[\\/]engine\.js:1: name in text/);
+  assert.doesNotMatch(r.stdout, /node_modules/);
+});
+
 test("command line: a missing folder to scan is a failed run, not a pass", () => {
   const dir = tmp();
   const list = join(dir, "list.txt");
