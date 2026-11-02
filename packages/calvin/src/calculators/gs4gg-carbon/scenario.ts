@@ -62,7 +62,7 @@ type FnrbData = {
   vintages: Record<string, FnrbVintage>;
 };
 type DafData = {
-  absolute_floor: { value: number };
+  absolute_floor: { value: number; cite: string };
   countries: Record<string, { name: string; daf_2026_2030: number; basis: string }>;
 };
 const household = householdJson as unknown as HouseholdData;
@@ -564,8 +564,9 @@ function resolveDaf(iso: string, override?: number): { value: number; prov: Prov
   // A country with no row in the data file takes the floor, and the screens print this label beside the
   // value (ruling 19 Oct). The label states the value, that it is a default and whose fallback it is (ruling
   // 25 Oct), and nothing about which rows the table holds, because a copy of this engine may carry fewer rows
-  // than the tool publishes (ruling 23 Oct).
-  return { value: daf.absolute_floor.value, prov: { field: "DAF", label: `Default value: ${daf.absolute_floor.value} (Gold Standard DAF tool's fallback).`, source: "global-default" } };
+  // than the tool publishes (ruling 23 Oct). It ends with the section it rests on, read from the data file (ruling
+  // 2026-11-02).
+  return { value: daf.absolute_floor.value, prov: { field: "DAF", label: `Default value: ${daf.absolute_floor.value} (Gold Standard DAF tool's fallback; ${daf.absolute_floor.cite}).`, source: "global-default" } };
 }
 
 /** Run one scenario end-to-end, returning the calculator output + a labeled evidence trail. */
