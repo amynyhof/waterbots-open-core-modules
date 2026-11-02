@@ -113,6 +113,9 @@ gate's design before the real gate is built.
   - [!] The maintainer as required reviewer on the `npm-publish` environment, so every release needs their approval
   - [!] **(V1)** The release tag rule: only the maintainer and the engineer may create release tags (`v*`, and each module's own,
         such as `calvin-v*`). Set it once the GitHub organisation exists.
+  - [!] **(V1)** Move this repo to the WaterBots GitHub organisation (ruling 2026-11-02). Then Session C points the
+        repository link in each `package.json` at the new home, and the name scan's allowance for the owner's
+        account in that link can go.
 - [ ] **M1.5 Lane 1 auto-merge** — not built; the earlier dormant job was removed. Rebuild only when the real
       number gate (M1.2) exists and the maintainer says to switch it on. Design: lane 1 and not a draft → arm GitHub's
       auto-merge; any other lane → disarm it. Needs the branch protection above, or it would merge at once.
@@ -130,6 +133,8 @@ gate's design before the real gate is built.
   - [x] Get it ready (merged, pull request #6): an engine-only entry, `@waterbots/calvin/engine`, added in new files only;
         React made an optional peer of `calvin` and `core`; both set to version 0.1.0. Still `private`.
   - [!] Publish. The maintainer's call, after M1.4.
+  - [ ] **(V1)** Every release build runs the name scan on the packed files themselves, not only on the repo (ruling
+        2026-11-02). Each packed file is unpacked into an empty folder and scanned there. A finding stops the release.
   - [ ] **(V2)** Rebuild the release on a second machine and show it gives the same bytes: the same fingerprints.
 - [ ] **M2.3 Linting** (was M1.6): add a linter that runs as part of CI, with the strictest settings that fit. The maintainer
       ruled on 2026-10-23 that it comes right after the seed lands (after M2.2), not before it. The seed is carried
