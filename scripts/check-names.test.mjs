@@ -6,7 +6,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { parseNames, loadNames, listPathFromEnv, scanText, pathHasName, scanFiles, ListError } from "./check-names.mjs";
+import { parseNames, loadNames, listPathFromEnv, scanText, pathHasName, scanFiles, repositoryLines, ListError } from "./check-names.mjs";
 
 const script = fileURLToPath(new URL("./check-names.mjs", import.meta.url));
 const tmp = () => mkdtempSync(join(tmpdir(), "name-scan-"));
@@ -110,6 +110,36 @@ test("a copyright or licence line must start with one of the set words, after an
   ]) {
     assert.deepEqual(scanText(s, entries), [1], s);
   }
+});
+
+test("the owner in a package.json repository link is let through, and nowhere else", () => {
+  const entries = parseNames(LIST);
+  const pkg = [
+    "{",
+    '  "name": "@made-up/thing",',
+    '  "repository": {',
+    '    "type": "git",',
+    '    "url": "git+https://github.com/harbourvoss/made-up-repo.git"',
+    "  },",
+    '  "homepage": "https://github.com/harbourvoss/made-up-repo#readme",',
+    '  "author": "Harbour Voss"',
+    "}",
+  ].join("\n");
+  assert.deepEqual([...repositoryLines(pkg)], [3, 4, 5, 6]);
+  assert.deepEqual(scanText(pkg, entries, repositoryLines(pkg)), [7, 8], "the homepage and author fields still hit");
+  const dir = tmp();
+  writeFileSync(join(dir, "package.json"), pkg);
+  writeFileSync(join(dir, "README.md"), "git+https://github.com/harbourvoss/made-up-repo.git\n");
+  const r = scanFiles(dir, ["package.json", "README.md"], entries);
+  assert.deepEqual(r.findings.map((f) => `${f.file}:${f.line}`), ["package.json:7", "package.json:8", "README.md:1"]);
+  const same = (url) => scanText(`  "repository": "${url}",`, entries, new Set([1]));
+  assert.deepEqual(same("https://github.com/harbourvoss/made-up-repo"), [], "the short form of the field works too");
+  assert.deepEqual(same("https://github.com/someone/harbour-voss"), [1], "only the owner part is let through");
+  assert.deepEqual(same("https://github.com/plinth-orrery/made-up-repo"), [], "for an entry without the allowance too");
+  assert.deepEqual(same("https://github.com/harbourvoss/made-up-repo by Zelda Quimby"), [1], "the rest of the line is checked");
+  assert.deepEqual(same("https://example.org/harbourvoss/made-up-repo"), [1], "only in a GitHub link");
+  const other = '{\n  "notRepository": {\n    "url": "https://github.com/harbourvoss/x.git"\n  }\n}';
+  assert.deepEqual(scanText(other, entries, repositoryLines(other)), [3], "only in the repository field");
 });
 
 test("a file name that holds a name is a hit", () => {

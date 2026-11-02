@@ -11,6 +11,11 @@
 // entry is let through on copyright and licence lines, and nowhere else. A copyright or licence line is one that
 // starts, after any comment marks, with "Copyright", "©", "(c)", "SPDX-" or "Licence". Any other note stops the scan.
 //
+// One more place is let through, for every entry (ruling 2026-11-02): the owner part of a GitHub link in a
+// package.json "repository" field. That link names the owner's GitHub account until the repo moves to the WaterBots
+// organisation. Only the owner part is let through. The rest of the line is still checked, and so is every other
+// field, every other file and every other link.
+//
 // Matching is by whole word, upper or lower case. A space, dot, dash or underscore inside an entry matches any
 // of those, or nothing. So `Ada Lovelace` also finds `ada_lovelace` and `AdaLovelace`. An entry with the
 // copyright allowance is a person, so their first name alone and their surname alone are matched too.
@@ -21,7 +26,7 @@
 //
 // Exit codes: 0 nothing found, 1 something found, 2 the scan could not run.
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
-import { join, relative, sep, resolve } from "node:path";
+import { basename, join, relative, sep, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
@@ -29,6 +34,8 @@ const SKIP_DIRS = new Set([".git", "node_modules", "dist"]);
 // Comment marks a line may start with, then the words a copyright or licence line must start with.
 const COPYRIGHT_LINE = /^\s*(?:(?:\/\/+|\/\*+|\*+|#+|<!--|--|;+)\s*)*(?:copyright\b|©|\(c\)|spdx-|licen[cs]e\b)/i;
 const ALLOW_NOTE = /^allowed on copyright and licen[cs]e lines(?: only)?$/i;
+// The owner part of a GitHub link: the account name between "github.com/" (or "github.com:") and the next "/".
+const GITHUB_OWNER = /(github\.com[/:])[^/\s"']+(?=\/)/gi;
 
 export class ListError extends Error {}
 
@@ -76,12 +83,31 @@ export function listPathFromEnv(env = process.env) {
   return path;
 }
 
-/** Lines of `text` that hold a listed name. Returns line numbers only. */
-export function scanText(text, entries) {
+/** Line numbers of a package.json's top-level "repository" field: its own line, and the lines of its object. */
+export function repositoryLines(text) {
+  const lines = text.split(/\r?\n/);
+  const start = lines.findIndex((l) => /^(?: {2}|\t)"repository"\s*:/.test(l));
+  const found = new Set();
+  if (start === -1) return found;
+  found.add(start + 1);
+  if (!/\{\s*$/.test(lines[start])) return found;
+  for (let i = start + 1; i < lines.length; i++) {
+    found.add(i + 1);
+    if (/^\s*\}/.test(lines[i])) break;
+  }
+  return found;
+}
+
+/**
+ * Lines of `text` that hold a listed name. Returns line numbers only. `repoLines` holds the lines of a package.json
+ * "repository" field, where the owner part of a GitHub link is let through.
+ */
+export function scanText(text, entries, repoLines = new Set()) {
   const hits = [];
   text.split(/\r?\n/).forEach((line, i) => {
     const isCopyrightLine = COPYRIGHT_LINE.test(line);
-    if (entries.some((e) => matches(e, line) && !(e.copyrightOnly && isCopyrightLine))) hits.push(i + 1);
+    const checked = repoLines.has(i + 1) ? line.replace(GITHUB_OWNER, "$1") : line;
+    if (entries.some((e) => matches(e, checked) && !(e.copyrightOnly && isCopyrightLine))) hits.push(i + 1);
   });
   return hits;
 }
@@ -109,7 +135,9 @@ export function scanFiles(root, files, entries) {
       continue;
     }
     textFiles++;
-    for (const line of scanText(buf.toString("utf8"), entries)) findings.push({ file: shown, line, kind: "name in text" });
+    const text = buf.toString("utf8");
+    const repoLines = basename(f) === "package.json" ? repositoryLines(text) : new Set();
+    for (const line of scanText(text, entries, repoLines)) findings.push({ file: shown, line, kind: "name in text" });
   }
   return { findings, files: files.length, textFiles, skipped };
 }
