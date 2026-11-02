@@ -4,21 +4,43 @@ import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { computeScenario, computeTransitionWaterfall } from "../engine";
 import ReportView from "./ReportView";
-import { TEST_CASE_COUNT, buildCheckSentence } from "./buildCheck";
+import { OFFICIAL_CALCULATOR_COUNT, TEST_CASE_COUNT, buildCheckSentence } from "./buildCheck";
 import { seedCalcState, toScenarioInput, type CalvinProject } from "./state";
 
 const file = JSON.parse(readFileSync(new URL("../../../expected-outputs.json", import.meta.url), "utf8"));
+const allCases: { id: string; workedOut: string }[] = [...file.cases, ...file.fnrbCases];
+const tally = (tag: string) => allCases.filter((c) => c.workedOut === tag).length;
+
+describe("how each test case was worked out", () => {
+  it("tags every case with one of the explained tags", () => {
+    const tags = Object.keys(file.workedOutTags);
+    for (const c of allCases) expect(tags, c.id).toContain(c.workedOut);
+  });
+  it("holds these totals (note of 2026-10-31)", () => {
+    expect(allCases).toHaveLength(47);
+    expect(tally("v1-official-calculator")).toBe(5);
+    expect(tally("v1-official-calculator-recalculated")).toBe(21);
+    expect(tally("v1-by-hand")).toBe(3);
+    expect(tally("v2-by-hand")).toBe(16);
+    expect(tally("fnrb-lookup")).toBe(2);
+  });
+});
 
 describe("the build-check sentence", () => {
-  it("counts the cases in the committed test-case file", () => {
-    expect(TEST_CASE_COUNT).toBe(file.cases.length + file.fnrbCases.length);
+  it("reads both counts from the committed test-case file and its tags", () => {
+    expect(TEST_CASE_COUNT).toBe(allCases.length);
+    expect(OFFICIAL_CALCULATOR_COUNT).toBe(tally("v1-official-calculator"));
   });
-  it("has this wording, with the count read in", () => {
+  it("states 47 cases, 5 of them the official calculator's", () => {
+    expect(TEST_CASE_COUNT).toBe(47);
+    expect(OFFICIAL_CALCULATOR_COUNT).toBe(5);
+  });
+  it("has this wording, with both counts read in", () => {
     expect(buildCheckSentence()).toBe(
-      `Every build checks it against ${file.cases.length + file.fnrbCases.length} made-up test cases, including results from Gold Standard’s official V1.0 tools on made-up inputs.`,
+      "Every build checks it against 47 made-up test cases. 5 of them match Gold Standard’s official V1.0 calculator on made-up inputs.",
     );
-    expect(buildCheckSentence(7)).toBe(
-      "Every build checks it against 7 made-up test cases, including results from Gold Standard’s official V1.0 tools on made-up inputs.",
+    expect(buildCheckSentence(7, 2)).toBe(
+      "Every build checks it against 7 made-up test cases. 2 of them match Gold Standard’s official V1.0 calculator on made-up inputs.",
     );
   });
 });

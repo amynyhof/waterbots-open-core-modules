@@ -1,5 +1,5 @@
 {
-  "about": "The engine's results on made-up test cases only. No case here is a real filing, and no figure here comes from one. Each case gives the inputs and what the engine returned for them.",
+  "about": "The engine's results on made-up test cases only. No case here is a real filing, and no figure here comes from one. Each case gives the inputs and what the engine returned for them. Each case's workedOut says how its expected result was worked out; workedOutTags explains each tag.",
   "engine": "gs4gg-carbon",
   "engineVersion": "0.19.0",
   "sealTag": "calculator-seal-2026-10-25",
@@ -18,10 +18,18 @@
     "cases": 45,
     "fnrbCases": 2
   },
+  "workedOutTags": {
+    "v1-official-calculator": "Gold Standard's official V1.0 calculator's output on made-up inputs, unchanged.",
+    "v1-official-calculator-recalculated": "Began as the official V1.0 calculator's output on made-up inputs. The country's fNRB was then changed to the official UN value, and the expected result was recalculated by this engine, not by the official calculator.",
+    "v1-by-hand": "V1.0, worked from the methodology rather than the official calculator.",
+    "v2-by-hand": "V2.0, worked by hand from the methodology, each step citing its section or equation. No official V2.0 calculator exists.",
+    "fnrb-lookup": "A look-up of the official fNRB value a country gets, or a refusal where none exists. No emissions calculation."
+  },
   "cases": [
     {
       "id": "synthetic-inst-01",
       "kind": "synthetic",
+      "workedOut": "v2-by-hand",
       "calc": "paa",
       "inputs": {
         "method": 2,
@@ -74,6 +82,7 @@
     {
       "id": "synthetic-embodied-upfront-01",
       "kind": "synthetic",
+      "workedOut": "v2-by-hand",
       "calc": "paa",
       "inputs": {
         "method": 2,
@@ -131,6 +140,7 @@
     {
       "id": "synthetic-embodied-amortised-01",
       "kind": "synthetic",
+      "workedOut": "v2-by-hand",
       "calc": "paa",
       "inputs": {
         "method": 2,
@@ -188,6 +198,7 @@
     {
       "id": "synthetic-hwt-eq7-device-binds-01",
       "kind": "synthetic",
+      "workedOut": "v2-by-hand",
       "calc": "paa",
       "inputs": {
         "method": 2,
@@ -256,6 +267,7 @@
     {
       "id": "synthetic-hwt-eq7-people-binds-01",
       "kind": "synthetic",
+      "workedOut": "v2-by-hand",
       "calc": "paa",
       "inputs": {
         "method": 2,
@@ -324,6 +336,7 @@
     {
       "id": "synthetic-daf-01",
       "kind": "synthetic",
+      "workedOut": "v2-by-hand",
       "calc": "paa",
       "inputs": {
         "method": 1,
@@ -375,6 +388,7 @@
     {
       "id": "cws-ind-hi",
       "kind": "synthetic",
+      "workedOut": "v1-official-calculator-recalculated",
       "calc": "legacy",
       "inputs": {
         "method": 1,
@@ -427,6 +441,7 @@
     {
       "id": "cws-ind-lo",
       "kind": "synthetic",
+      "workedOut": "v1-official-calculator-recalculated",
       "calc": "legacy",
       "inputs": {
         "method": 1,
@@ -479,6 +494,7 @@
     {
       "id": "cws-ken-hi",
       "kind": "synthetic",
+      "workedOut": "v1-official-calculator-recalculated",
       "calc": "legacy",
       "inputs": {
         "method": 1,
@@ -531,6 +547,7 @@
     {
       "id": "cws-ken-lo",
       "kind": "synthetic",
+      "workedOut": "v1-official-calculator-recalculated",
       "calc": "legacy",
       "inputs": {
         "method": 1,
@@ -583,6 +600,7 @@
     {
       "id": "cws-uga-hi",
       "kind": "synthetic",
+      "workedOut": "v1-official-calculator-recalculated",
       "calc": "legacy",
       "inputs": {
         "method": 1,
@@ -635,6 +653,7 @@
     {
       "id": "cws-uga-lo",
       "kind": "synthetic",
+      "workedOut": "v1-official-calculator-recalculated",
       "calc": "legacy",
       "inputs": {
         "method": 1,
@@ -687,6 +706,7 @@
     {
       "id": "cws-mwi-hi",
       "kind": "synthetic",
+      "workedOut": "v1-official-calculator-recalculated",
       "calc": "legacy",
       "inputs": {
         "method": 1,
@@ -739,6 +759,7 @@
     {
       "id": "cws-mwi-lo",
       "kind": "synthetic",
+      "workedOut": "v1-official-calculator-recalculated",
       "calc": "legacy",
       "inputs": {
         "method": 1,
@@ -791,6 +812,7 @@
     {
       "id": "cws-tza-hi",
       "kind": "synthetic",
+      "workedOut": "v1-official-calculator",
       "calc": "legacy",
       "inputs": {
         "method": 1,
@@ -843,6 +865,7 @@
     {
       "id": "cws-tza-lo",
       "kind": "synthetic",
+      "workedOut": "v1-official-calculator",
       "calc": "legacy",
       "inputs": {
         "method": 1,
@@ -895,6 +918,7 @@
     {
       "id": "cws-ner-hi",
       "kind": "synthetic",
+      "workedOut": "v1-official-calculator-recalculated",
       "calc": "legacy",
       "inputs": {
         "method": 1,
@@ -947,6 +971,7 @@
     {
       "id": "cws-ner-lo",
       "kind": "synthetic",
+      "workedOut": "v1-official-calculator-recalculated",
       "calc": "legacy",
       "inputs": {
         "method": 1,
@@ -999,6 +1024,7 @@
     {
       "id": "hwt-ind-hi",
       "kind": "synthetic",
+      "workedOut": "v1-official-calculator-recalculated",
       "calc": "legacy",
       "inputs": {
         "method": 2,
@@ -1051,6 +1077,7 @@
     {
       "id": "hwt-ind-lo",
       "kind": "synthetic",
+      "workedOut": "v1-official-calculator-recalculated",
       "calc": "legacy",
       "inputs": {
         "method": 2,
@@ -1103,6 +1130,7 @@
     {
       "id": "hwt-ken-hi",
       "kind": "synthetic",
+      "workedOut": "v1-official-calculator-recalculated",
       "calc": "legacy",
       "inputs": {
         "method": 2,
@@ -1155,6 +1183,7 @@
     {
       "id": "hwt-ken-lo",
       "kind": "synthetic",
+      "workedOut": "v1-official-calculator-recalculated",
       "calc": "legacy",
       "inputs": {
         "method": 2,
@@ -1207,6 +1236,7 @@
     {
       "id": "hwt-uga-hi",
       "kind": "synthetic",
+      "workedOut": "v1-official-calculator-recalculated",
       "calc": "legacy",
       "inputs": {
         "method": 2,
@@ -1259,6 +1289,7 @@
     {
       "id": "hwt-uga-lo",
       "kind": "synthetic",
+      "workedOut": "v1-official-calculator-recalculated",
       "calc": "legacy",
       "inputs": {
         "method": 2,
@@ -1311,6 +1342,7 @@
     {
       "id": "hwt-mwi-hi",
       "kind": "synthetic",
+      "workedOut": "v1-official-calculator-recalculated",
       "calc": "legacy",
       "inputs": {
         "method": 2,
@@ -1363,6 +1395,7 @@
     {
       "id": "hwt-mwi-lo",
       "kind": "synthetic",
+      "workedOut": "v1-official-calculator-recalculated",
       "calc": "legacy",
       "inputs": {
         "method": 2,
@@ -1415,6 +1448,7 @@
     {
       "id": "hwt-tza-hi",
       "kind": "synthetic",
+      "workedOut": "v1-official-calculator",
       "calc": "legacy",
       "inputs": {
         "method": 2,
@@ -1467,6 +1501,7 @@
     {
       "id": "hwt-tza-lo",
       "kind": "synthetic",
+      "workedOut": "v1-official-calculator",
       "calc": "legacy",
       "inputs": {
         "method": 2,
@@ -1519,6 +1554,7 @@
     {
       "id": "hwt-ner-hi",
       "kind": "synthetic",
+      "workedOut": "v1-official-calculator-recalculated",
       "calc": "legacy",
       "inputs": {
         "method": 2,
@@ -1571,6 +1607,7 @@
     {
       "id": "hwt-ner-lo",
       "kind": "synthetic",
+      "workedOut": "v1-official-calculator-recalculated",
       "calc": "legacy",
       "inputs": {
         "method": 2,
@@ -1623,6 +1660,7 @@
     {
       "id": "cws-uga-transition-legacy082",
       "kind": "synthetic",
+      "workedOut": "v1-official-calculator",
       "calc": "legacy",
       "inputs": {
         "method": 1,
@@ -1675,6 +1713,7 @@
     {
       "id": "cws-ken-generator",
       "kind": "synthetic",
+      "workedOut": "v1-official-calculator-recalculated",
       "calc": "legacy",
       "inputs": {
         "method": 1,
@@ -1727,6 +1766,7 @@
     {
       "id": "cws-tza-schoolmix",
       "kind": "synthetic",
+      "workedOut": "v1-by-hand",
       "calc": "legacy",
       "inputs": {
         "method": 1,
@@ -1779,6 +1819,7 @@
     {
       "id": "cws-tza-hi-flat5",
       "kind": "synthetic",
+      "workedOut": "v1-by-hand",
       "calc": "legacy",
       "inputs": {
         "method": 1,
@@ -1832,6 +1873,7 @@
     {
       "id": "paa-cws-ind-hi",
       "kind": "synthetic",
+      "workedOut": "v2-by-hand",
       "calc": "paa",
       "inputs": {
         "method": 1,
@@ -1894,6 +1936,7 @@
     {
       "id": "paa-cws-ken-hi",
       "kind": "synthetic",
+      "workedOut": "v2-by-hand",
       "calc": "paa",
       "inputs": {
         "method": 1,
@@ -1956,6 +1999,7 @@
     {
       "id": "paa-cws-uga-hi",
       "kind": "synthetic",
+      "workedOut": "v2-by-hand",
       "calc": "paa",
       "inputs": {
         "method": 1,
@@ -2018,6 +2062,7 @@
     {
       "id": "paa-cws-mwi-hi",
       "kind": "synthetic",
+      "workedOut": "v2-by-hand",
       "calc": "paa",
       "inputs": {
         "method": 1,
@@ -2080,6 +2125,7 @@
     {
       "id": "paa-cws-tza-hi",
       "kind": "synthetic",
+      "workedOut": "v2-by-hand",
       "calc": "paa",
       "inputs": {
         "method": 1,
@@ -2142,6 +2188,7 @@
     {
       "id": "paa-cws-ner-hi",
       "kind": "synthetic",
+      "workedOut": "v2-by-hand",
       "calc": "paa",
       "inputs": {
         "method": 1,
@@ -2204,6 +2251,7 @@
     {
       "id": "paa-agetier-ken-sdoff",
       "kind": "synthetic",
+      "workedOut": "v2-by-hand",
       "calc": "paa",
       "inputs": {
         "method": 1,
@@ -2266,6 +2314,7 @@
     {
       "id": "paa-agetier-ken-sdon",
       "kind": "synthetic",
+      "workedOut": "v2-by-hand",
       "calc": "paa",
       "inputs": {
         "method": 1,
@@ -2328,6 +2377,7 @@
     {
       "id": "paa-agetier-ner-sdoff",
       "kind": "synthetic",
+      "workedOut": "v2-by-hand",
       "calc": "paa",
       "inputs": {
         "method": 1,
@@ -2390,6 +2440,7 @@
     {
       "id": "synthetic-entered-mix-paa",
       "kind": "synthetic",
+      "workedOut": "v2-by-hand",
       "calc": "paa",
       "inputs": {
         "method": 1,
@@ -2443,6 +2494,7 @@
     {
       "id": "synthetic-entered-mix-legacy",
       "kind": "synthetic",
+      "workedOut": "v1-by-hand",
       "calc": "legacy",
       "inputs": {
         "method": 1,
@@ -2487,6 +2539,7 @@
     {
       "id": "fnrb-regional-lso-01",
       "kind": "fnrb-resolution",
+      "workedOut": "fnrb-lookup",
       "scenarioInput": {
         "version": "paa",
         "preset": "traditional-wood-cws",
@@ -2504,6 +2557,7 @@
     {
       "id": "fnrb-refusal-mar-01",
       "kind": "fnrb-resolution",
+      "workedOut": "fnrb-lookup",
       "scenarioInput": {
         "version": "paa",
         "preset": "traditional-wood-cws",
