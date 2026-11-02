@@ -11,7 +11,10 @@ login in their repository link until the repo moves to the WaterBots organisatio
 owner part of a GitHub link in a `package.json` "repository" field, and nowhere else. The rest of that line is still
 checked, and so is every other field, file and link. A test with made-up names pins this.
 
-**Checked:** the 18 name-scan tests pass. The fixed scan finds nothing in the four `package.json` files. The other
+A folder named to the scan is now read whole, built output (`dist`) included, so an unpacked release package is
+scanned in full (ruling 2026-11-02: every release build scans the packed files). A test pins this too.
+
+**Checked:** the 19 name-scan tests pass. The fixed scan finds nothing in the four `package.json` files. The other
 hits are cleared in their own pull request.
 
 ## 2026-11-01 — Name scan: three fixes
