@@ -30,7 +30,8 @@ import { basename, join, relative, sep, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
-const SKIP_DIRS = new Set([".git", "node_modules", "dist"]);
+// Built output (`dist`) is scanned: it is what a packed package ships.
+const SKIP_DIRS = new Set([".git", "node_modules"]);
 // Comment marks a line may start with, then the words a copyright or licence line must start with.
 const COPYRIGHT_LINE = /^\s*(?:(?:\/\/+|\/\*+|\*+|#+|<!--|--|;+)\s*)*(?:copyright\b|©|\(c\)|spdx-|licen[cs]e\b)/i;
 const ALLOW_NOTE = /^allowed on copyright and licen[cs]e lines(?: only)?$/i;
