@@ -4,6 +4,21 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-11-02 — The maintainer, named by role
+
+**Done (branch `maintainer-wording`, built on the branches of #11 and #12):** ruling 2026-11-02. Every committed file
+now says "the maintainer" where it named a person, and credits a ruling by its date ("ruling 2026-09-21"). That covers
+`CLAUDE.md`, the plan, this log (older entries included, by that ruling), the workflows, `SEEDS.md`, the package
+READMEs and Calvin's code comments and data notes. The pull request block is now **For the maintainer**. Copyright and
+licence lines were left alone; none named a person. The module characters (Violet, Bridget) keep
+their pronouns. No number, calculation or test changed.
+
+**Checked:** typecheck, test and build pass. 48 of 48 in the engine-entry check. The seed check passes. The fixed name
+scan, run on the whole repo, finds nothing.
+
+**Open:** the data notes that reach a screen or report still credit rulings rather than sources. That is the next pull
+request.
+
 ## 2026-11-02 — Name scan: the repository link
 
 **Done (same branch, `name-scan-fixes`):** ruling 2026-11-02. The four `package.json` files keep the owner's GitHub
@@ -32,7 +47,7 @@ purpose across the plan, `CLAUDE.md` and code comments, and the GitHub login in 
 built files carry the same first name in their comments. A local, uncommitted settings file has 3 more hits from
 other entries.
 
-**Open:** how to treat those hits is Amy's decision. Until then the scan fails on this repo, and the first release
+**Open:** how to treat those hits is the maintainer's decision. Until then the scan fails on this repo, and the first release
 cannot pass it.
 
 ## 2026-10-31 — V5 The first release held; test cases tagged; Calvin's color is Reef
@@ -40,7 +55,7 @@ cannot pass it.
 **Done (branch `plan-simple-view-release`):**
 - Prepared Calvin's first GitHub release from `main` at `dba49a8`, version 0.1.0. Packed two files with `npm pack`:
   `calvin`, and `core`, which Calvin's package lists and npm fetches on install. Worked out each file's SHA-256
-  fingerprint and wrote the release notes. Amy then held the release (ruling 2026-10-31): nothing is published and no
+  fingerprint and wrote the release notes. The maintainer then held the release (ruling 2026-10-31): nothing is published and no
   tag is pushed. It is rebuilt from `main` after this pull request merges.
 - Took the note on how the test cases were worked out, `NOTE_test-case-methods_2026-10-31.md`, from the handoff
   folder (`%USERPROFILE%\GitHub\handoff\`), read-only. Used only its case IDs and methods. No figure came with it.
@@ -79,7 +94,7 @@ passed, in the repo and in the two packed files.
 **Checked:** typecheck, test and build pass. The same 48 of 48 checks. Name scan on committed files: no finding.
 
 **Open:** the test-case file records only what the engine returned for each case. Nothing in this repo says which
-cases came from the official V1.0 calculator, or how any case was worked out. M2.4 and M2.5 need that from Amy.
+cases came from the official V1.0 calculator, or how any case was worked out. M2.4 and M2.5 need that from the maintainer.
 
 ## 2026-10-31 — The report's sentence on how the calculator is checked
 
@@ -191,34 +206,34 @@ Seed check 65 of 65 at the seed commit. Paid-code scan: no finding.
 - `BUILD_PLAN.md`: the VWBA 2.0 guidebook has no worked example for D-3. So V8, the finish line and the M8 stop now
   say: D-3 is tested on hand-worked cases, with every step cited to the guidebook (cited, not copied). An outside
   expert checks it once the prototype is up. The plan does not name the expert.
-- V8 now also says: the VWBA spec is written alongside the build, in `docs/`, for Amy to review then.
+- V8 now also says: the VWBA spec is written alongside the build, in `docs/`, for the maintainer to review then.
 
-**Open:** nothing for Amy in the plan itself. Nothing was built.
+**Open:** nothing for the maintainer in the plan itself. Nothing was built.
 
-## 2026-10-30 — Road to v1, revised after Amy's answers (plan only)
+## 2026-10-30 — Road to v1, revised after the maintainer's answers (plan only)
 
 **Done (same branch, `road-to-v1`):**
-- `BUILD_PLAN.md`: the Road to v1 section now follows Amy's new finish line. It has 15 steps (V1 to V15).
-- Sliders (V3) and the simple view (V4) are in v1, right after pull request #6. They follow Amy's description of
+- `BUILD_PLAN.md`: the Road to v1 section now follows the maintainer's new finish line. It has 15 steps (V1 to V15).
+- Sliders (V3) and the simple view (V4) are in v1, right after pull request #6. They follow the maintainer's description of
   them. Site pull request #156 lives in another repo and was not read here.
 - No npm in v1. Each release is a GitHub release with the packed package and its fingerprint, which both sites pin
   (V5, V15). The first pinned version has the sliders. npm is v2.
 - Violet, the water-benefit agent, is her own module (V7). She hosts D-3 first (V8).
 - The paid site keeps its own data on top of the package. The engine lists what came from a site's tables (V13).
 - No question cap. Each module counts its questions on each walk (V9 to V12); the average is reported.
-- The two open questions are dropped, as Amy said.
+- The two open questions are dropped, as the maintainer said.
 
-**Open:** nothing for Amy in the plan itself. Nothing was built.
+**Open:** nothing for the maintainer in the plan itself. Nothing was built.
 
 ## 2026-10-30 — Road to v1 (plan only)
 
 **Done (open pull request, branch `road-to-v1`):**
-- `BUILD_PLAN.md`: a "Road to v1" section. It lists, in order, only the work in this repo that Amy's v1 finish line
+- `BUILD_PLAN.md`: a "Road to v1" section. It lists, in order, only the work in this repo that the maintainer's v1 finish line
   needs (V1 to V11). Each step says what it waits on, in this repo and in others, and how we know it is done.
   Everything else is marked "after v1".
 - The reference filings are named by kind only (household, community). No project names or places.
 
-**Open:** two questions for Amy, listed at the end of the section. Nothing was built.
+**Open:** two questions for the maintainer, listed at the end of the section. Nothing was built.
 
 ## 2026-10-27 — M2.2 Engine-only entry, React optional, version 0.1.0
 
@@ -281,7 +296,7 @@ are in `SEEDS.md`.
 ## 2026-10-25 — Tidy paths and comments
 
 **Done (open pull request, branch `tidy-paths-and-comments`):**
-- Checked every tracked file, every file name, the git history and the pull request text against Amy's private list.
+- Checked every tracked file, every file name, the git history and the pull request text against the maintainer's private list.
   The list stayed where it is and was not copied. Nothing needed changing.
 - `CLAUDE.md`: two rules. Never write a person's folder path or Windows username into the repo. Pull request titles,
   commit messages and descriptions never name what is being removed.
@@ -299,7 +314,7 @@ are in `SEEDS.md`.
 
 ---
 
-## 2026-10-20 — M1.3 Amy's answers on the pull request
+## 2026-10-20 — M1.3 the maintainer's answers on the pull request
 
 **Done (same branch, `m1-3-package-skeleton`):**
 - Copyright line "Copyright 2026 WaterBots AI, LLC" in the root `LICENSE` and in every package's `LICENSE` and `NOTICE`.
@@ -307,7 +322,7 @@ are in `SEEDS.md`.
 - `scripts/check-packages.mjs` now also checks the copyright line and the exact Node version.
 - `BUILD_PLAN.md`: at the seed (M2.1), show the carried calculator builds and tests the same under these versions.
 
-**Kept by Amy:** the `@waterbots` names (the scope is her open step N13); the tools; `publish.yml` left alone, since
+**Kept by the maintainer:** the `@waterbots` names (the scope is the maintainer's open step N13); the tools; `publish.yml` left alone, since
 the `private` flag and the check are the lock.
 
 ## 2026-10-20 — M1.3 Package skeleton
@@ -325,7 +340,7 @@ the `private` flag and the check are the lock.
 **Checked locally:** clean `npm ci --ignore-scripts`, typecheck, test and build all pass. `npm publish --dry-run` skips
 the packages as private. The guard fails when a package is made public.
 
-**Open:** the real plug points in `core` (later pull request). The `NOTICE` files name no copyright holder; Amy to say
+**Open:** the real plug points in `core` (later pull request). The `NOTICE` files name no copyright holder; the maintainer to say
 what they should carry.
 
 ---
@@ -334,25 +349,25 @@ what they should carry.
 
 **Done (same branch, `m1-ci-guards`):**
 - `lanes.yml`: the dormant lane 1 auto-merge job is removed. Labelling stays. The design is kept as plan item M1.5.
-- `CLAUDE.md`: every merge line now agrees — Amy merges every pull request; lane 1 may auto-merge only after Amy
+- `CLAUDE.md`: every merge line now agrees — the maintainer merges every pull request; lane 1 may auto-merge only after the maintainer
   switches it on. Added: until the real number gate exists, lane 3 covers figures and names. Added: no "validate"
   in code names either.
 - `publish.yml`, `number-gate.yml`: comments brought in line.
-- `BUILD_PLAN.md`: Amy's approval on every release (environment reviewer) and a `v*` tag rule are now
-  blocked-until-Amy items, due before the first release, with branch protection, the npm scope and `NPM_TOKEN`.
+- `BUILD_PLAN.md`: the maintainer's approval on every release (environment reviewer) and a `v*` tag rule are now
+  blocked-until-the-maintainer items, due before the first release, with branch protection, the npm scope and `NPM_TOKEN`.
 
-**Kept by Amy:** the broad local deny rule; quoting banned words inside the rules.
+**Kept by the maintainer:** the broad local deny rule; quoting banned words inside the rules.
 
-## 2026-10-19 — M1.1 Amy's answers on the pull request
+## 2026-10-19 — M1.1 the maintainer's answers on the pull request
 
 **Done (same branch, `m1-ci-guards`):**
 - `CLAUDE.md`: the word rules — "golden" banned (say "reference"); WaterBots never says it validates ("validate" and
   "validation" only when explaining what validation is and that external auditors do it); never call the site or a
   module a demo. No other words are banned.
-- `BUILD_PLAN.md`: Amy's hand-steps (branch protection, npm scope, `NPM_TOKEN`) marked blocked until Amy, due before
+- `BUILD_PLAN.md`: the maintainer's hand-steps (branch protection, npm scope, `NPM_TOKEN`) marked blocked until the maintainer, due before
   the first release (M2.2).
 
-**Accepted by Amy as built:** the number gate placeholder passes with a warning; the package skeleton is its own pull
+**Accepted by the maintainer as built:** the number gate placeholder passes with a warning; the package skeleton is its own pull
 request (M1.3); TruffleHog is the second scanner; the `CLAUDE.md` commit is `Grant: open`.
 
 ## 2026-10-19 — M1.1 Guards and rules
@@ -372,4 +387,4 @@ request (M1.3); TruffleHog is the second scanner; the `CLAUDE.md` commit is `Gra
 **Checked:** lane rule tests pass locally (Node 24). Secret scanning and push protection were already on.
 
 **Open:** this pull request labels itself only once the lane job is on `main` (by design, see the PR). The real
-number gate (M1.2). The package skeleton (M1.3). Amy's settings (M1.4). The banned-word list.
+number gate (M1.2). The package skeleton (M1.3). The maintainer's settings (M1.4). The banned-word list.
