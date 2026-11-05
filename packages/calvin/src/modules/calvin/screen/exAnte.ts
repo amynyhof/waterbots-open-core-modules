@@ -261,6 +261,21 @@ export function withSliderStarts(seed: CalcState, saved: { operationalDays?: num
   return { ...seed, operationalDays: days.start.value };
 }
 
+/**
+ * EX-ANTE ONLY (ruling 2026-11-05). A site that shows only the ex-ante view opens every seat as ex-ante,
+ * a saved ex-post analysis included, and drops any change to the mode.
+ */
+export function exAnteOnlySeed(seed: CalcState, exAnteOnly: boolean): CalcState {
+  return exAnteOnly ? { ...seed, mode: "ex-ante" } : seed;
+}
+
+/** The change a seat applies: on an ex-ante-only seat, everything but the mode. */
+export function exAnteOnlyPatch(p: Partial<CalcState>, exAnteOnly: boolean): Partial<CalcState> {
+  if (!exAnteOnly || !("mode" in p)) return p;
+  const { mode: _dropped, ...rest } = p;
+  return rest;
+}
+
 /** Whether this seat shows sliders: the site turned them on, and the run is ex-ante. */
 export function showSliders(setting: boolean | undefined, state: Pick<CalcState, "mode">): boolean {
   return Boolean(setting) && state.mode === "ex-ante";

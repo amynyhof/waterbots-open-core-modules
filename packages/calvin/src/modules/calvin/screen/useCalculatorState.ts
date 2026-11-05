@@ -24,7 +24,7 @@ import {
   type ProjectFact,
 } from "./state";
 import { zeroCreditWarning } from "./warnings";
-import { showSliders, withSliderStarts } from "./exAnte";
+import { exAnteOnlyPatch, exAnteOnlySeed, showSliders, withSliderStarts } from "./exAnte";
 
 /**
  * The GS4GG carbon calculator's state, lifted out of the standalone calculator page
@@ -81,6 +81,12 @@ export interface CalculatorOptions {
    * keeps its typed boxes. The paid site leaves it off.
    */
   exAnteSliders?: boolean;
+  /**
+   * EX-ANTE ONLY (ruling 2026-11-05). A site turns this on to show the ex-ante view and nothing else: the
+   * run is always ex-ante, a saved ex-post analysis opens as ex-ante, a change to ex-post is ignored,
+   * and the sliders are on. The open site's screening uses it. The paid site leaves it off and shows both.
+   */
+  exAnteOnly?: boolean;
 }
 
 export interface CalculatorState {
@@ -89,6 +95,8 @@ export interface CalculatorState {
   readOnly: boolean;
   /** True when this seat shows the ex-ante sliders: the site turned them on and the run is ex-ante. */
   sliders: boolean;
+  /** See `CalculatorOptions.exAnteOnly`. A site that offers an ex-ante / ex-post switch hides it when this is true. */
+  exAnteOnly: boolean;
 
   /* ── Working inputs ─────────────────────────────────────────────────────── */
   /** The live input state. */
@@ -157,14 +165,19 @@ export interface CalculatorState {
 }
 
 export function useCalculatorState(project: CalvinProject, options: CalculatorOptions = {}): CalculatorState {
-  const { readOnly = false, onSave, onDirtyChange, onExport, creditingPeriodYears, exAnteSliders } = options;
-  const seed = useMemo(() => withSliderStarts(seedCalcState(project), project.analysis, exAnteSliders), [project, exAnteSliders]);
+  const { readOnly = false, onSave, onDirtyChange, onExport, creditingPeriodYears, exAnteOnly = false } = options;
+  const exAnteSliders = options.exAnteSliders || exAnteOnly;
+  const seed = useMemo(
+    () => withSliderStarts(exAnteOnlySeed(seedCalcState(project), exAnteOnly), project.analysis, exAnteSliders),
+    [project, exAnteSliders, exAnteOnly],
+  );
   const [state, setState] = useState<CalcState>(seed);
   // INERT WHEN READ-ONLY, and this is the layer that actually guarantees it. The surface
   // disables its controls too, but a disabled control is a courtesy — this is the lock.
+  // An ex-ante-only seat keeps its mode the same way: a change to it is dropped here.
   const patch = (p: Partial<CalcState>) => {
     if (readOnly) return;
-    setState((s) => ({ ...s, ...p }));
+    setState((s) => ({ ...s, ...exAnteOnlyPatch(p, exAnteOnly) }));
   };
 
   // "modified · unsaved" landmark: working state differs from the last SAVED analysis.
@@ -324,6 +337,7 @@ export function useCalculatorState(project: CalvinProject, options: CalculatorOp
   return {
     readOnly,
     sliders: showSliders(exAnteSliders, state),
+    exAnteOnly,
     state,
     patch,
     seed,

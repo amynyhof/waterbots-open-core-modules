@@ -9,6 +9,7 @@ What is in `src/`:
 - `saveOutcome.ts` and `SaveNotice.tsx`: what a save can return, and the notice that shows it.
 - `readOnly.tsx`: the read-only seat, for screens that must show a result but not allow edits.
 - `agent.ts` and `calculatorTool.ts`: the agent contract, and the helper that turns a calculator into an agent tool.
+- `base.css`: the design tokens and the classes the module screens use. A site without a design system of its own imports it: `import "@waterbots/core/base.css"`. The paid site does not; its own design system styles the screens. Every colour is a starting point that a site can set for itself. Not part of the seed.
 
 Since the seed landed, this repo is its home. Changes are made here, by pull request. `scripts/check-seed.mjs` proves what arrived against the commit where the seed landed, so later changes are allowed.
 

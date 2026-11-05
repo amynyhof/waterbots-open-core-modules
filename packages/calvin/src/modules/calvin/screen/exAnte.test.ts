@@ -3,7 +3,7 @@
 import { describe, expect, it } from "vitest";
 import { computeScenario, fnrbAvailability } from "../engine";
 import {
-  applySlider, capNote, creditedIfDifferent, creditedValue, endLabel, showSliders, sliderLabel, sliderNotes,
+  applySlider, capNote, creditedIfDifferent, creditedValue, endLabel, exAnteOnlyPatch, exAnteOnlySeed, showSliders, sliderLabel, sliderNotes,
   sliderSpecs, startsWithoutSource, withSliderStarts, type SliderKey, type SliderSpec,
 } from "./exAnte";
 import { seedCalcState, toScenarioInput, type CalcState, type CalvinProject } from "./state";
@@ -193,5 +193,23 @@ describe("the number the engine credits", () => {
     expect([creditedValue(s, r, "litres"), creditedValue(s, r, "days"), creditedValue(s, r, "testsPass"), creditedValue(s, r, "usage")])
       .toEqual([r.qpwEffective, input.operationalDays, input.M_qy, input.usageRate]);
     expect([r.qpwEffective, input.operationalDays, input.M_qy, input.usageRate]).toEqual([3.2, 200, 0.85, 0.7]);
+  });
+});
+
+describe("a site locked to ex-ante (ruling 2026-11-05)", () => {
+  const savedExPost = () => seedCalcState(invented("CWS", { mode: "ex-post" }));
+  it("opens a saved ex-post analysis as ex-ante, and shows the sliders", () => {
+    expect(savedExPost().mode).toBe("ex-post");
+    const locked = exAnteOnlySeed(savedExPost(), true);
+    expect(locked.mode).toBe("ex-ante");
+    expect(showSliders(true, locked)).toBe(true);
+  });
+  it("drops a change to the mode, and keeps every other change", () => {
+    expect(exAnteOnlyPatch({ mode: "ex-post", operationalDays: 300 }, true)).toEqual({ operationalDays: 300 });
+    expect(exAnteOnlyPatch({ operationalDays: 300 }, true)).toEqual({ operationalDays: 300 });
+  });
+  it("leaves an unlocked site as it was: both views", () => {
+    expect(exAnteOnlySeed(savedExPost(), false).mode).toBe("ex-post");
+    expect(exAnteOnlyPatch({ mode: "ex-post" }, false)).toEqual({ mode: "ex-post" });
   });
 });

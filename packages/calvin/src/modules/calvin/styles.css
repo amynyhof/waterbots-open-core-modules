@@ -1,10 +1,11 @@
 /* Calvin's stylesheet — the rules the calculator needs that are not utility classes.
    Moved here from app/globals.css with the cut (PR C, seam S8): the report's print rules belong
-   to the module, so every host that mounts the calculator gets the same export. The paid site
-   imports this file in app/layout.tsx. */
+   to the module, so every host that mounts the calculator gets the same export. Every site
+   imports it: `import "@waterbots/calvin/styles.css"`. The design tokens and the classes the
+   screens use are in `@waterbots/core/base.css`, for a site without a design system of its own. */
 
 /* Report export — hidden on screen; the browser's Print / Save-as-PDF reveals only the
-   report (Slice 6 export; Anne's deliverable with the full Sources & Assumptions trail). */
+   report (Slice 6 export, with the full Sources & Assumptions trail). */
 .print-report { display: none; }
 /* Report tab preview (M9.4): reveal the normally print-only report on-screen inside the tab.
    Higher specificity than `.print-report{display:none}`, so the single ReportView instance
