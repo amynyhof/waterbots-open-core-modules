@@ -6,7 +6,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { parseNames, loadNames, listPathFromEnv, scanText, pathHasName, scanFiles, ListError } from "./check-names.mjs";
+import { parseNames, loadNames, listPathFromEnv, scanText, pathHasName, scanFiles, repositoryLines, ListError } from "./check-names.mjs";
 
 const script = fileURLToPath(new URL("./check-names.mjs", import.meta.url));
 const tmp = () => mkdtempSync(join(tmpdir(), "name-scan-"));
@@ -56,6 +56,90 @@ test("an entry with the allowance is let through on copyright and licence lines 
   assert.deepEqual(scanText("# Licence: Harbour Voss", entries), []);
   assert.deepEqual(scanText("written by Harbour Voss", entries), [1]);
   assert.deepEqual(scanText("Copyright 2026 Zelda Quimby", entries), [1], "the allowance is for its own entry only");
+});
+
+test("the allowance note works with or without its closing 'only'", () => {
+  const entries = parseNames("Merrin Ashgrove | allowed on copyright and licence lines\nTobin Fallowmere | Allowed on copyright and license lines only\n");
+  assert.deepEqual(entries.map((e) => e.copyrightOnly), [true, true]);
+  assert.deepEqual(scanText("written by Merrin Ashgrove", entries), [1], "the note is not read as part of the name");
+  assert.deepEqual(scanText("Copyright 2026 Merrin Ashgrove", entries), []);
+  assert.deepEqual(scanText("thanks to Tobin Fallowmere", entries), [1]);
+});
+
+test("a note the scan does not know stops it, instead of switching the entry off", () => {
+  assert.throws(() => parseNames("Merrin Ashgrove | allowed in footers\n"), ListError);
+  assert.throws(() => parseNames("Zelda Quimby\nMerrin Ashgrove |\n"), ListError, "an empty note is not known either");
+  const dir = tmp();
+  const list = join(dir, "list.txt");
+  writeFileSync(list, "Merrin Ashgrove | allowed in footers\n");
+  const clean = join(dir, "clean");
+  mkdirSync(clean);
+  writeFileSync(join(clean, "a.txt"), "hello\n");
+  const r = run([clean], list);
+  assert.equal(r.status, 2);
+  assert.equal((r.stdout + r.stderr).toLowerCase().includes("merrin"), false, "the entry is never printed");
+});
+
+test("a person with the allowance is also found by first name alone and by surname alone", () => {
+  const entries = parseNames(LIST);
+  assert.deepEqual(scanText("ask Harbour about it\nsent to Voss\nharbour_voss", entries), [1, 2, 3]);
+  assert.deepEqual(scanText("Copyright 2026 Voss", entries), [], "the allowance covers each part too");
+  assert.deepEqual(scanText("Harbourside\nVossberg", entries), [], "still whole words only");
+  assert.deepEqual(scanText("Zelda alone\nQuimby alone", entries), [], "entries without the allowance are not split");
+});
+
+test("a copyright or licence line must start with one of the set words, after any comment marks", () => {
+  const entries = parseNames(LIST);
+  for (const s of [
+    "Copyright 2026 Harbour Voss",
+    "© 2026 Harbour Voss",
+    "(c) 2026 Harbour Voss",
+    "  // Copyright 2026 Harbour Voss",
+    " * Copyright 2026 Harbour Voss",
+    "# SPDX-FileCopyrightText: Harbour Voss",
+    "<!-- Licence: Harbour Voss -->",
+  ]) {
+    assert.deepEqual(scanText(s, entries), [], s);
+  }
+  for (const s of [
+    "Harbour Voss holds the copyright",
+    "see the licence, Harbour Voss",
+    "notes (c) Harbour Voss",
+    "Copyrighted by Harbour Voss",
+    "SPDX Harbour Voss",
+  ]) {
+    assert.deepEqual(scanText(s, entries), [1], s);
+  }
+});
+
+test("the owner in a package.json repository link is let through, and nowhere else", () => {
+  const entries = parseNames(LIST);
+  const pkg = [
+    "{",
+    '  "name": "@made-up/thing",',
+    '  "repository": {',
+    '    "type": "git",',
+    '    "url": "git+https://github.com/harbourvoss/made-up-repo.git"',
+    "  },",
+    '  "homepage": "https://github.com/harbourvoss/made-up-repo#readme",',
+    '  "author": "Harbour Voss"',
+    "}",
+  ].join("\n");
+  assert.deepEqual([...repositoryLines(pkg)], [3, 4, 5, 6]);
+  assert.deepEqual(scanText(pkg, entries, repositoryLines(pkg)), [7, 8], "the homepage and author fields still hit");
+  const dir = tmp();
+  writeFileSync(join(dir, "package.json"), pkg);
+  writeFileSync(join(dir, "README.md"), "git+https://github.com/harbourvoss/made-up-repo.git\n");
+  const r = scanFiles(dir, ["package.json", "README.md"], entries);
+  assert.deepEqual(r.findings.map((f) => `${f.file}:${f.line}`), ["package.json:7", "package.json:8", "README.md:1"]);
+  const same = (url) => scanText(`  "repository": "${url}",`, entries, new Set([1]));
+  assert.deepEqual(same("https://github.com/harbourvoss/made-up-repo"), [], "the short form of the field works too");
+  assert.deepEqual(same("https://github.com/someone/harbour-voss"), [1], "only the owner part is let through");
+  assert.deepEqual(same("https://github.com/plinth-orrery/made-up-repo"), [], "for an entry without the allowance too");
+  assert.deepEqual(same("https://github.com/harbourvoss/made-up-repo by Zelda Quimby"), [1], "the rest of the line is checked");
+  assert.deepEqual(same("https://example.org/harbourvoss/made-up-repo"), [1], "only in a GitHub link");
+  const other = '{\n  "notRepository": {\n    "url": "https://github.com/harbourvoss/x.git"\n  }\n}';
+  assert.deepEqual(scanText(other, entries, repositoryLines(other)), [3], "only in the repository field");
 });
 
 test("a file name that holds a name is a hit", () => {
@@ -156,6 +240,22 @@ test("command line: the list is never looked for in the home folder", () => {
   writeFileSync(join(home, "list.txt"), LIST);
   const r = run([clean], null, { HOME: home, USERPROFILE: home });
   assert.equal(r.status, 2, "a list sitting in the home folder is not found");
+});
+
+test("command line: a folder is scanned whole, built output included, as in an unpacked package", () => {
+  const dir = tmp();
+  const list = join(dir, "list.txt");
+  writeFileSync(list, LIST);
+  const pkg = join(dir, "package");
+  mkdirSync(join(pkg, "dist"), { recursive: true });
+  mkdirSync(join(pkg, "node_modules"));
+  writeFileSync(join(pkg, "README.md"), "hello\n");
+  writeFileSync(join(pkg, "dist", "engine.js"), "// by Zelda Quimby\n");
+  writeFileSync(join(pkg, "node_modules", "x.js"), "// by Zelda Quimby\n");
+  const r = run([pkg], list);
+  assert.equal(r.status, 1);
+  assert.match(r.stdout, /dist[\\/]engine\.js:1: name in text/);
+  assert.doesNotMatch(r.stdout, /node_modules/);
 });
 
 test("command line: a missing folder to scan is a failed run, not a pass", () => {

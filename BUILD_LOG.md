@@ -4,6 +4,40 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-11-02 — Name scan: the repository link
+
+**Done (same branch, `name-scan-fixes`):** ruling 2026-11-02. The four `package.json` files keep the owner's GitHub
+login in their repository link until the repo moves to the WaterBots organisation. The scan now lets through the
+owner part of a GitHub link in a `package.json` "repository" field, and nowhere else. The rest of that line is still
+checked, and so is every other field, file and link. A test with made-up names pins this.
+
+A folder named to the scan is now read whole, built output (`dist`) included, so an unpacked release package is
+scanned in full (ruling 2026-11-02: every release build scans the packed files). A test pins this too.
+
+**Checked:** the 19 name-scan tests pass. The fixed scan finds nothing in the four `package.json` files. The other
+hits are cleared in their own pull request.
+
+## 2026-11-01 — Name scan: three fixes
+
+**Done (branch `name-scan-fixes`):** the open site found three faults in the shared name scan. All three were in this
+repo's copy too. `scripts/check-names.mjs` now:
+- reads the copyright allowance note with or without its closing "only", and stops the scan on any note it does not
+  know. Before, a note without "only" was read as part of the name, so that entry never matched anything;
+- also finds a person with the allowance by first name alone and by surname alone;
+- treats a line as a copyright or licence line only when it starts, after any comment marks, with "Copyright", "©",
+  "(c)", "SPDX-" or "Licence". Before, the word anywhere in the line was enough.
+
+Each fix has a test with made-up names. Each new test fails on the old scan.
+
+**Checked:** the 17 name-scan tests pass. The fixed scan, run on the whole repo, now finds 249 hits in the committed
+files. Every one comes from a single list entry that the first fault had switched off: a first name used on
+purpose across the plan, `CLAUDE.md` and code comments, and the GitHub login in each package's repository link. The
+built files carry the same first name in their comments. A local, uncommitted settings file has 3 more hits from
+other entries.
+
+**Open:** how to treat those hits is Amy's decision. Until then the scan fails on this repo, and the first release
+cannot pass it.
+
 ## 2026-10-31 — V5 The first release held; test cases tagged; Calvin's color is Reef
 
 **Done (branch `plan-simple-view-release`):**
