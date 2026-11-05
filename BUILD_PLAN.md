@@ -191,6 +191,18 @@ the litres check on the cap (N5). A step with no image yet has not started.
 indicator.
 
 - [ ] **M6.1** Fuel-mix floor, labelled
+- [ ] **M6.2 (V2) Stove and fuel preset sources.** The country-default notes in
+      `packages/calvin/src/calculators/gs4gg-carbon/presets.ts` keep their values unchanged until the pending permission
+      replies arrive: request #234 on the paid site. Today the baseline-mix data file holds no country rows, so none of
+      these notes reaches a screen. Open, all together:
+  - Fuel shares and their label: the WHO household energy series. Its licence for use here is unconfirmed.
+  - Stove shares and their label: The DHS Program's survey tables. Permission is pending.
+  - Our own mappings, with no published source: biomass counted as wood; gaseous fuels counted as LPG; electricity
+    at zero baseline emissions; the survey's stove types mapped to the rulebook's three classes; traditional stoves
+    not split by chimney counted as other conventional; gas, electric and liquid-fuel stoves moved off the stove row.
+  - Kerosene, coal and LPG factors: the source is named (IPCC 2006 Guidelines, Vol. 2, Ch. 2) but not yet held, so
+    the note says "source pending".
+  - Do not raise these sources with the maintainer until a reply arrives.
 
 ## M7 — Diesel and grid factors
 

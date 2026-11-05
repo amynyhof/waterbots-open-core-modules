@@ -4,6 +4,32 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-11-05 — Data notes on screen cite their source; preset sources logged; where a value comes from
+
+**Done (branch `data-notes-sources`, built on `maintainer-wording`):** ruling 2026-11-02.
+- Every note in Calvin's data files that reaches a screen, the report or Calvin's replies was read. None credits a
+  ruling or a person. Each names its source: the fNRB labels, multi-national citation, footnote and refusal
+  (A6.4-AMT-009 Tables 2 and 3), the rule-update line (its instrument), the DAF country rows (Tool 05 Table 03), the
+  age-share default (UN WPP 2024), the embodied-emission classes (V2 §9.2 Table 10) and the household sizes (UN 2022).
+- One note left out its section. The DAF fallback label said only "Gold Standard DAF tool's fallback". It now ends
+  with the data file's own citation (457 §5.7.1(b), PDF p.8). A test pins it. No number or calculation changed, so
+  the engine version stays 0.19.0.
+- The longer notes in the data files that credit a ruling (`desc`, `notes`, `coverage` and struck records) are read
+  by no screen or report. They are left as they are.
+- The plan now holds two **(V1)** items: move this repo to the WaterBots GitHub organisation (M1.4; it was not in
+  the plan before), and run the name scan on the packed files of every release (M2.2).
+- The country-default notes in `presets.ts` were read one by one (ruling 2026-11-05). None has a published source
+  this repo may use yet: the WHO and DHS figures wait on permission, and the mappings are our own. Every value is
+  left unchanged. They are logged together as one open item, M6.2 **(V2)**, naming the pending request (#234 on the
+  paid site). The baseline-mix data file holds no country rows, so none of these notes reaches a screen today.
+- `CLAUDE.md` now says where every value shown to a user comes from (entered, default, derived or assumed), and that
+  the preset sources are not raised again until the permission replies arrive (ruling 2026-11-05).
+- `.claude/settings.local.json` is already in `.gitignore`, and git confirms it ignores the file. No change needed.
+
+**Checked:** see the pull request.
+
+**Open:** M6.2, the stove and fuel preset sources, until the permission replies arrive.
+
 ## 2026-11-02 — The maintainer, named by role
 
 **Done (branch `maintainer-wording`, built on the branches of #11 and #12):** ruling 2026-11-02. Every committed file
