@@ -1,4 +1,4 @@
-// THE SEED VERSION of ./countries.test.ts (CARRY_RULES C7 and C31; Amy, 2026-10-23). A seed carries
+// THE SEED VERSION of ./countries.test.ts (CARRY_RULES C7 and C31; ruling 2026-10-23). A seed carries
 // only the six rows of this table that were already public, so this checks those six and nothing that
 // depends on the other rows: not the row count, not other countries' values, not which selectable
 // countries the full table lists. Registry ids are checked against the public source index. This site

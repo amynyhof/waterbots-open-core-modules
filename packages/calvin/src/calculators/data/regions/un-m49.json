@@ -2,7 +2,7 @@
   "pathway": "cross-cutting",
   "dataset": "un-m49-geoscheme",
   "version": "1.0.0",
-  "description": "UN M49 standard country or area codes for statistical use — the region map the fNRB multi-national fallback reads. A6.4-AMT-009 v01.0 Table 2 publishes fNRB values for three regions (Asia, Latin America, Sub-Saharan Africa) and names no country list for them; this file is the cited geoscheme that decides which region a country sits in. Geography only — the fNRB values themselves live in calculators/data/fnrb/countries.json (Amy's ruling (3)(a), 2026-09-21).",
+  "description": "UN M49 standard country or area codes for statistical use — the region map the fNRB multi-national fallback reads. A6.4-AMT-009 v01.0 Table 2 publishes fNRB values for three regions (Asia, Latin America, Sub-Saharan Africa) and names no country list for them; this file is the cited geoscheme that decides which region a country sits in. Geography only — the fNRB values themselves live in calculators/data/fnrb/countries.json (ruling (3)(a), 2026-09-21).",
   "registrySources": [
     "unsd-m49"
   ],

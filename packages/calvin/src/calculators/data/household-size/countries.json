@@ -7,7 +7,7 @@
     "un-hh-size-2022"
   ],
   "source_year": 2022,
-  "coverage": "All 186 countries resolvable to ISO 3166-1 alpha-3 in the UN 2022 source. A country absent from the source has no household size here: the project's own figure is asked for (Amy, 2026-10-23). The quartile fallback this file used to hold is kept in the maintainers' archive.",
+  "coverage": "All 186 countries resolvable to ISO 3166-1 alpha-3 in the UN 2022 source. A country absent from the source has no household size here: the project's own figure is asked for (ruling 2026-10-23). The quartile fallback this file used to hold is kept in the maintainers' archive.",
   "method": "From UN DESA 'Household Size and Composition 2022', sheet 'HH size and composition 2022', column 'Average household size (number of members)'. For each country the most-recent reference date across all listed survey sources (DHS/MICS/census/DYB) is selected. UN M49 code mapped to ISO3 via pycountry.",
   "countries": {
     "ABW": {

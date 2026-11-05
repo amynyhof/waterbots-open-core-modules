@@ -87,7 +87,7 @@ function S({ basis, k }: { basis: Basis; k: string }) {
 interface VRow { sym: React.ReactNode; value: string; source: string; desc: string; field?: string; tag?: ValueTag }
 
 /**
- * THE TAG KEY, ON THE REPORT TOO — the same four words the seat uses (Amy's ruling (2), 2026-09-24:
+ * THE TAG KEY, ON THE REPORT TOO — the same four words the seat uses (ruling (2), 2026-09-24:
  * *"A value carries its tag everywhere it appears."*).
  *
  * The tag is READ OFF THE SOURCE SENTENCE the row already carries, rather than typed a second time
@@ -248,13 +248,13 @@ export default function ReportView({
     ? "CWS — Method 1 (community water supply)"
     : "HWT — Method 2 (household water treatment)";
 
-  // The baseline mix, NAMED (Amy's ruling (4), 2026-09-24) — read from the values the engine used.
+  // The baseline mix, NAMED (ruling (4), 2026-09-24) — read from the values the engine used.
   const presetMixSummary = [
     result.stoveStrata.map((s) => `${s.label ?? "stove"} ${fmt(s.share * 100, 0)}%`).join(" + "),
     result.fuelMix.map((f) => `${f.fuel} ${fmt(f.energyFraction * 100, 0)}%`).join(" + "),
   ].filter(Boolean).join(" · ");
 
-  // THE BASELINE ROW'S SOURCE LINE (Amy's rulings (1) and (5), 2026-09-26) — each half named for
+  // THE BASELINE ROW'S SOURCE LINE (rulings (1) and (5), 2026-09-26) — each half named for
   // where it came from, the country default with its citation and every mapping note printed.
   const bm = result.baselineMix;
   const halfSource = (src: string, half: "stove" | "fuel") => {
@@ -280,7 +280,7 @@ export default function ReportView({
   // V1 value equal to the V2 one when nothing was filed, is RETIRED. A transition run now requires the
   // filing; without one the engine refuses and the seat asks for the value, naming the document and the
   // page. So a legacy column can only ever be reached with a filed value behind it.
-  // WHERE NO NATIONAL VALUE EXISTS, THE SOURCE LINE SAYS SO AND CARRIES FOOTNOTE 5 (Amy's ruling
+  // WHERE NO NATIONAL VALUE EXISTS, THE SOURCE LINE SAYS SO AND CARRIES FOOTNOTE 5 (ruling
   // (3)(c), 2026-09-21). A multi-national value is only appropriate under a stated condition, so
   // the condition travels with the number wherever the number goes. The sentence is built by the
   // engine (`result.fnrbMultiNational.condition`) and printed here, never assembled here.
@@ -307,12 +307,12 @@ export default function ReportView({
     : "Not applicable — Method 1 (CWT/CWS), U_p = 1 by Eq. 8";
   const srcPop = popOverridden ? "Baseline survey — surveyed count, entered for this analysis" : "Project record";
   // The household size ties the two counts together in whichever direction they were entered
-  // (Amy's glossary, 2026-09-24) — so the report prints it, with where it came from.
+  // (glossary, 2026-09-24) — so the report prints it, with where it came from.
   const srcHouseholdSize = state.householdSizeOverride != null
     ? "Entered — this project's own surveyed household size (V2.0 SDWS 30)"
     : (result.provenance.find((p) => p.field === "householdSize")?.label ?? "UN 2022 country average");
   // A host country with no row in the engine's DAF data takes the default; the engine's provenance
-  // label says so, and the report prints it beside the value (Amy's rulings, 19 and 23 Oct).
+  // label says so, and the report prints it beside the value (rulings, 19 and 23 Oct).
   const dafProv = result.provenance.find((p) => p.field === "DAF");
   const dafFallbackNote = dafProv?.source === "global-default" ? ` — ${dafProv.label}` : "";
   // N_p: the household count IS the premises count when population is entered as households
@@ -326,7 +326,7 @@ export default function ReportView({
   const srcQpw = state.qpwEntered
     ? (v2 ? "Entered — design value or WCFT (V2.0 SDWS 29, Option 2)" : "Entered — design value or WCFT (V1.0 SDWS 24, Option 2)")
     : (v2
-        // [#215] part C3, Amy's R4 wording: where the age split is NOT this project's survey, the
+        // [#215] part C3, R4 wording: where the age split is NOT this project's survey, the
         // report says the word "estimate". A national census share standing in for a project's own
         // people is an estimate, and a reader acting on the number is entitled to know which it is.
         ? (t9 ? `Methodology V2.0 default — Table 9 age tiers weighted by ${t9.ageShares.source === "country" ? "the national census age split (UN WPP 2024 — an estimate for the country, not this project's survey)" : t9.ageShares.source === "entered" ? "the project's surveyed age split" : "a global default age split (an estimate; no national row for this country)"} (V2.0 SDWS 29 Option 1; V2.0 SDWS 30)${t9.suppressedDemandApplied ? "; suppressed demand ×0.95" : ""}` : "Methodology V2.0 default — Table 9, adults 4.0 L/p/d (V2.0 SDWS 29, Option 1; cap 5.5)")
@@ -352,7 +352,7 @@ export default function ReportView({
         </div>
       ) : null}
 
-      {/* ── Masthead: the WaterBots mark, and NOTHING ELSE ([#171], Amy 2026-09-02) ──
+      {/* ── Masthead: the WaterBots mark, and NOTHING ELSE ([#171], ruling 2026-09-02) ──
           This corner used to print "Prepared with / Reviewed by —" and a partner organisation's name from a
           repo-wide constant, on every report of every project — including one created a minute
           earlier that no reviewer had ever seen. A partner's name is a claim that they reviewed
@@ -464,7 +464,7 @@ export default function ReportView({
       ) : (
         <Row k={`Effect of the ${ru.label}`} v="not shown" note={ru.driver} field="ruleImpact" />
       )}
-      {/* No illustrative earlier-default line: the old-file hunt is closed (Amy's ruling (1), 2026-09-21) — a
+      {/* No illustrative earlier-default line: the old-file hunt is closed (ruling (1), 2026-09-21) — a
           transitioning project's fNRB is its filed value only, entered on the record, never estimated here. */}
       <p className="t-caption text-fg-3" style={{ fontSize: 10, lineHeight: 1.5, marginTop: 4 }}>
         A transitioning project&rsquo;s earlier fNRB is the value on its own filing. This report never estimates it from
@@ -725,11 +725,11 @@ export default function ReportView({
             ? <AppxRow p={<S basis={basis} k="DP" />} d="Days the device was present in the household" u="d" v={fmt(state.operationalDays, 0)} s={`Project record — sales / distribution records (${sdwsRef(basis, "DP")})`} />
             : <AppxRow p={<S basis={basis} k="DO" />} d="Days the system was operational" u="d" v={fmt(state.operationalDays, 0)} s={`Project record — operation log or sensor (${sdwsRef(basis, "DO")})`} />}
           {m2 ? null : <AppxRow p={<S basis={basis} k="Qm" />} d="Metered / planned volume" u="L/yr" v={result.Q_m === null ? "none" : ML(result.Q_m)} s={`Flow meter or operation sensor (${sdwsRef(basis, "Qm")})`} />}
-          {/* THE ROW NAMES THE MIX IT ASSUMED, AND SAYS *"screening preset, no source"* (Amy's
-              ruling (4), 2026-09-24). "ASSUMED, not surveyed" reads as *not confirmed yet*, which is
+          {/* THE ROW NAMES THE MIX IT ASSUMED, AND SAYS *"screening preset, no source"*
+              (ruling (4), 2026-09-24). "ASSUMED, not surveyed" reads as *not confirmed yet*, which is
               softer than the truth: nothing at all stands behind these shares. The mix is printed
               from the values the engine actually used, never a second copy typed here. */}
-          {/* ENTERED SHARES ARE LABELLED ENTERED (Amy's ruling (1), 2026-09-26). The engine says
+          {/* ENTERED SHARES ARE LABELLED ENTERED (ruling (1), 2026-09-26). The engine says
               which half came from where (`result.baselineMix`); a half still on the preset keeps
               the preset's own admission. */}
           {result.baselineMix.stove === "preset" && result.baselineMix.fuel === "preset" ? (

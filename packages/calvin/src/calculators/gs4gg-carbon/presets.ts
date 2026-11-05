@@ -119,7 +119,7 @@ export function resolveFuelForVersion(f: FuelSpec, version: MethodologyVersion, 
   return { ...f, ef_co2: v2.ef_co2, ef_nonco2: v2.ef_nonco2 };
 }
 
-// ── THE ENTERED BASELINE MIX (Amy's ruling (1), 2026-09-26) ─────────────────────────────────────
+// ── THE ENTERED BASELINE MIX (ruling (1), 2026-09-26) ─────────────────────────────────────
 //
 // The stove and fuel rows became typed boxes. What a person types is the two numbers a baseline
 // survey reports — the share of each stove class (V2.0 SDWS 6, p.49) and the share of each fuel
@@ -127,7 +127,7 @@ export function resolveFuelForVersion(f: FuelSpec, version: MethodologyVersion, 
 // emission factors from SDWS 9/10. So the edit is SHARES ONLY, and the engine — not the screen —
 // turns shares into the strata and fuel list it computes on.
 //
-// ⚠ THE 100% GUARD STANDS (Amy, 2026-09-26). Each list must add up to 100% (within half a point,
+// ⚠ THE 100% GUARD STANDS (ruling 2026-09-26). Each list must add up to 100% (within half a point,
 // the age split's tolerance) or it is NOT passed: the run keeps the preset for that half and says
 // why. A half-typed list re-weighting itself silently would credit a mix nobody entered.
 
@@ -149,7 +149,7 @@ export const STOVE_CLASS_LABEL: Record<StoveShareKey, string> = {
 
 /**
  * The fuels a share may be given for. Wood and charcoal carry V2.0 SDWS 9/10's own factors.
- * LPG, kerosene, coal and electricity were added for the country default (Amy's six mapping rulings,
+ * LPG, kerosene, coal and electricity were added for the country default (six mapping rulings,
  * 2026-09-26), each LABELLED with what its factor is and is not:
  *   • electricity — ZERO baseline emissions (ruling 3): nothing is burned at the point of boiling.
  *   • LPG — the 63.1 tCO₂/TJ the presets have always carried; kerosene and coal — NO CODED VALUE
@@ -283,13 +283,13 @@ export function defaultCharcoalConvention(iso: string): CharcoalConvention | und
   return row?.toolRegion === "sub-saharan-africa" ? "6:1" : undefined;
 }
 
-// ── THE PER-COUNTRY DEFAULT MIX ([#227]; Amy's ruling (5) and six mapping rulings, 2026-09-26) ──────
+// ── THE PER-COUNTRY DEFAULT MIX ([#227]; ruling (5) and six mapping rulings, 2026-09-26) ──────
 //
 // V2.0 SDWS 6 and SDWS 8 (pp.49–50) accept "official statistics" and "credible published
 // literature" as sources, so a cited national figure is a DEFAULT, not a guess. Fuel shares come from
 // the WHO household energy series; stove shares from a DHS survey where one is recent enough.
 // Countries with no data keep the labelled screening preset. The published numbers sit untouched in
-// calculators/data/baseline-mix/countries.json; every mapping below is Amy's ruling, labelled on the
+// calculators/data/baseline-mix/countries.json; every mapping below is ruling, labelled on the
 // page and logged for the reviewer's next read ([#232]).
 
 type WhoFuel = "biomass" | "charcoal" | "gas" | "kerosene" | "coal" | "electricity";
@@ -304,7 +304,7 @@ const COUNTRY_MIX = baselineMixJson as unknown as {
   stoveSource: { cite: string; url: string };
   countries: Record<string, CountryMixRow>;
 };
-/** V2.0 SDWS 6 / SDWS 8: "Source applied shall not be more than 3 years old" — counted from the data year (Amy's ruling (3)). */
+/** V2.0 SDWS 6 / SDWS 8: "Source applied shall not be more than 3 years old" — counted from the data year (ruling (3)). */
 const FRESHNESS_YEARS = 3;
 /** The year a country default is judged against when the caller gives none: the retrieval year. */
 export const BASELINE_MIX_RETRIEVAL_YEAR = Number(COUNTRY_MIX.retrieval_date.slice(0, 4));
@@ -316,14 +316,14 @@ export interface CountryDefaultHalf<T> {
   /** Every mapping ruling that touched this country's figures, in plain words — printed, never hidden. */
   notes: string[];
   dataYear: number;
-  /** True when the data year is more than three years before `asOfYear` (Amy's ruling (3): shown anyway, with its year and a note). */
+  /** True when the data year is more than three years before `asOfYear` (ruling (3): shown anyway, with its year and a note). */
   stale: boolean;
 }
 
 const r1 = (x: number) => Math.round(x * 10) / 10;
 
 /**
- * The country's default fuel and stove shares, mapped and scaled by Amy's six rulings of 2026-09-26:
+ * The country's default fuel and stove shares, mapped and scaled by six rulings of 2026-09-26:
  *   (1) WHO biomass (wood, crop residues, dung) → wood's factor, "reads high where residues or dung are common"
  *   (2) WHO gaseous fuels (LPG, natural gas, biogas) → LPG
  *   (3) electricity → zero baseline emissions

@@ -1,6 +1,6 @@
 # Seeds
 
-A seed is a one-time copy of finished code, carried into this repo by Amy. Each seed gets one row here. Rows are only ever added. Never rewrite a row.
+A seed is a one-time copy of finished code, carried into this repo by the maintainer. Each seed gets one row here. Rows are only ever added. Never rewrite a row.
 
 Before a seed lands, Session C checks this file. If the module already has a row, the seed is refused.
 
@@ -48,8 +48,8 @@ Session A's output for checks 1 and 3 to 8 sits in the `checks/` folder of the s
 1. **Number gate and copied-text check were not run here.** Both need inputs that never leave the private side (the private reference cases, and the standards PDFs). Until the private number list exists and the real gate is built (M1.2), these two rest on Session A's results. Lane 3 review is the cover meanwhile.
 2. **Session A's logs hold counts, not fingerprints.** They say "67 files" and "all 67 hashes OK". They name no digest. That the same bytes were checked is shown by the matching counts and by the one fingerprint of the list, not by a digest in the log.
 3. **Typecheck settings are looser for `calvin`.** The seed was typechecked with `strict` only. Two of this repo's extra checks (unchecked indexed access, exact optional properties) flag 95 places in the seed's code, so they are off in `packages/calvin/tsconfig.json`. `core` keeps all of them. Seed files were not edited to fit when the seed landed. **To be fixed here,** in this repo, by a normal pull request: Session C brings the code up to both checks, then turns them back on for `calvin`. There is no new seal and no new seed.
-4. **No reviewed-version ledger came with the seed.** The folder held no such file. The seal tag above is the only version record. If one exists on the private side, Amy hands it over and it is added as it arrives.
-5. **Some comments in the seed use words the repo's word rules restrict** (see `CLAUDE.md`, "Words"). They are in comments, not in names. They were left as they came when the seed landed. They can be changed here by a normal pull request: the seed check reads the seed commit, not today's files. Amy decides whether they are fixed.
+4. **No reviewed-version ledger came with the seed.** The folder held no such file. The seal tag above is the only version record. If one exists on the private side, the maintainer hands it over and it is added as it arrives.
+5. **Some comments in the seed use words the repo's word rules restrict** (see `CLAUDE.md`, "Words"). They are in comments, not in names. They were left as they came when the seed landed. They can be changed here by a normal pull request: the seed check reads the seed commit, not today's files. The maintainer decides whether they are fixed.
 
 ## What is not byte for byte
 

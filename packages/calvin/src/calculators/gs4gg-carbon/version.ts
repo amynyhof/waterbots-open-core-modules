@@ -14,24 +14,24 @@
  *          4 L/p/d default instead of an uncited value; answers comments 1.1–1.4, 1.11
  *   0.5.0  2026-09-21 — V2 Table 9 age tiers on household runs (§7.3.11, SDWS 29 Option 1) weighted
  *          by census age shares from the UN WPP 2024 single-age file (exact 18/19 boundary); the
- *          suppressed-demand ×0.95 in one place; Amy's ruling R4, [#24]; answers comment 1.5
+ *          suppressed-demand ×0.95 in one place; ruling R4, [#24]; answers comment 1.5
  *   0.6.0  2026-09-21 — the charcoal guard ([#213]): V2's charcoal factors (SDWS 9 p.51 / SDWS 10
  *          p.52) in a cited data file; a v2.0 run refuses a charcoal entry that names no V2 convention
  *          or carries V1's 165.22 / 44.83; presets resolve charcoal per version
- *   0.7.0  2026-09-21 — the legacy fNRB comparator (Amy's ruling R1): a saved project's filed V1
+ *   0.7.0  2026-09-21 — the legacy fNRB comparator (ruling R1): a saved project's filed V1
  *          value, else fNRB held equal to the V2 value on both sides and said so; the workbook's
  *          leftover value retired and never called a default again; answers comments 1.9 / 2.1
- *   0.8.0  2026-09-21 — the fNRB rule update as its own report line (Amy's amended R1): legacy ER at
+ *   0.8.0  2026-09-21 — the fNRB rule update as its own report line (amended R1): legacy ER at
  *          the filed V1 value versus legacy ER at the current standardised value, kept apart from the
  *          methodology transition, which now holds fNRB equal on both sides and has no fNRB step;
  *          null with the reason when nothing is filed; the year and citation read from the data file
- *   0.9.0  2026-09-22 — the official fNRB source (Amy's rulings (2) and (4), 2026-09-21): national
+ *   0.9.0  2026-09-22 — the official fNRB source (rulings (2) and (4), 2026-09-21): national
  *          defaults cited to A6.4-AMT-009 v01.0 Table 3, with CDM TOOL33 v03.0 (EB 125, 12 June 2025)
  *          and MoFuSS as its origin — the data file's "both take the June 2024 report's Table 5" note
  *          struck (the tools took the adm0 dataset); the reference dataset re-anchored to the official
  *          Table 3 values (IND 0.07 / KEN 0.29 / UGA 0.39 / MWI 0.48 / TZA 0.51 / NER 0.61), 29
  *          entries re-derived. No engine arithmetic changed; the demo project's figure is unchanged
- *   0.10.0 2026-09-22 — the official fNRB fallback (Amy's ruling (3), 2026-09-21): a country with no
+ *   0.10.0 2026-09-22 — the official fNRB fallback (ruling (3), 2026-09-21): a country with no
  *          A6.4-AMT-009 Table 3 national value takes Table 2's multi-national value for its UN M49
  *          region (Asia 0.18 / Latin America 0.32 / Sub-Saharan Africa 0.40), labelled and carrying
  *          footnote 5's condition wherever the number is shown; a country in none of the three
@@ -40,7 +40,7 @@
  *          quartile fallback dial is retired for fNRB (struck in the data file, kept as the record)
  *          and `fnrbFallbackStop` is dropped from state and ScenarioInput; the dial stays for
  *          household size. Region map: calculators/data/regions/un-m49.json (registry unsd-m49)
- *   0.11.0 2026-09-24 — [#225](a)-(g), then REBUILT the same day after Amy rejected the first cut at
+ *   0.11.0 2026-09-24 — [#225](a)-(g), then REBUILT the same day after the maintainer rejected the first cut at
  *          the eyeball. THE DERIVATION WAS NEVER WRONG AND IS NOW VISIBLE. Traced end to end on the
  *          seeded demo project's own record: households × household size = people, N_p the household
  *          count, HN_p the size — HN_p and the size used are exactly equal, and Q_pop reconciles by
@@ -57,7 +57,7 @@
  *          the QPW_hh header's "filter limit not checked" flag; the report masthead's
  *          "Ex-ante estimate" / "Ex-post" from the mode toggle. No ER math changed — every addition
  *          is display-only or an override that defaults to the prior behaviour
- *   0.12.0 2026-09-24 — RULING R1 AMENDED (Amy, 2026-09-24), two parts, both on [#208].
+ *   0.12.0 2026-09-24 — RULING R1 AMENDED (ruling 2026-09-24), two parts, both on [#208].
  *          (1) A TRANSITION RUN REQUIRES THE PROJECT'S FILED V1.0 fNRB. No filed value, no
  *          transition run: `resolveFnrbLegacy` no longer takes a V2 value to fall back to, and
  *          throws `FiledFnrbRequiredError` instead; `computeTransitionWaterfall` refuses at entry;
@@ -82,7 +82,7 @@
  *          NO ER ARITHMETIC CHANGED. The reference suite is untouched: its 120 deltas call
  *          `computeLegacyEr` / `computePaaEr` with fNRB supplied directly as an input, so they never
  *          reach `resolveFnrbLegacy`, and its only two `computeScenario` cases are `version: "paa"`
- *   0.13.0 2026-09-24 — THE WORDS-AND-LABELS ROUND (Amy, five rulings, all on the report's wording;
+ *   0.13.0 2026-09-24 — THE WORDS-AND-LABELS ROUND (five rulings, all on the report's wording;
  *          no engine math changed and the reference numbers did not move).
  *          (1) THE GOLD STANDARD REGISTRY'S TIME WORDS: *crediting period*, *monitoring period*,
  *          *vintage*. "Crediting year" and "monitoring year" are retired everywhere — they read as
@@ -108,7 +108,7 @@
  *          (5) A NEW RECORD FIELD, *PAA validation* (date + validator), entered from the validation
  *          report and never set by the site. The vintage rule reads it; with either half missing,
  *          2026+ vintages read "not settled". This closes the gap v0.12.0 logged on [#208].
- *   0.14.0 2026-09-25 — THE CALCULATOR-SCREEN WALK-THROUGH (Amy). Screen wording and controls only;
+ *   0.14.0 2026-09-25 — THE CALCULATOR-SCREEN WALK-THROUGH. Screen wording and controls only;
  *          no engine math changed and the reference numbers did not move.
  *          THE SLIDERS ARE GONE. Eight rows used an `<input type="range">` — η, M_q, C_b,
  *          X_cleanboil, QPW_p, the operational days and U_p on both methods — and a drag cannot
@@ -125,11 +125,11 @@
  *          THE OPERATIONAL-DAYS ROW HAD NO CITATION: its citation slot printed "365 d", a unit.
  *          It cites the parameter now, versioned per rulebook and per method (V1.0 SDWS 27 / 31,
  *          V2.0 SDWS 32 / 36).
- *          Reported for Amy's word, not built: the baseline preset's stove and fuel rows wear teal
+ *          Reported for the maintainer's word, not built: the baseline preset's stove and fuel rows wear teal
  *          but have no box and no pencil (the editable-presets slice); the equation headline values
  *          and the four summary metrics carry no tag though all are derived; U_p appears twice on a
  *          V2.0 Method 2 screen, read-only in Eq.6 and editable in Eq.8.
- *   0.15.0 2026-09-26 — THE FOUR HELD QUESTIONS, RULED (Amy, 26 Sep). One engine addition; the
+ *   0.15.0 2026-09-26 — THE FOUR HELD QUESTIONS, RULED (ruling 26 Sep). One engine addition; the
  *          reference numbers did not move and two entries were ADDED.
  *          (1) THE BASELINE STOVE AND FUEL ROWS ARE TYPED BOXES. `resolveBaselineEdit` (presets.ts)
  *          turns typed SHARES — stove classes per V2.0 SDWS 6 (four: three-stone, other conventional,
@@ -148,7 +148,7 @@
  *          survey, water tests, sales records — M_q, X_cleanboil, U_p, t_p, N_p, DN_p). The legend
  *          shows both. Whether each box is editable in each mode is logged ([#230]), not built.
  *   0.16.0 2026-09-26 — THE PER-COUNTRY BASELINE MIX AS A CITED DEFAULT ([#227], pulled forward by
- *          Amy's ruling (5); her six mapping rulings of the same day). Where the project has typed no
+ *          ruling (5); the six mapping rulings of the same day). Where the project has typed no
  *          shares, `countryBaselineDefault` (presets.ts) supplies them from
  *          calculators/data/baseline-mix/countries.json: fuel shares from the WHO household energy
  *          series (GHO PHE_HHAIR_PROP_POP_CATEGORY_FUELS, data year 2023, published 2025-07-29; 160
@@ -180,11 +180,11 @@
  *          (it said "Annex 01"). Fifteen selectable territories the table does not list keep the
  *          1.25% floor under the tool's fallback rule (§5.7.1(b)), and every screen that shows the
  *          DAF says so beside it. Where Table 03 and the tool's own rule disagree (Russia, Guyana),
- *          the published value is used (Amy's rulings, 19 Oct). No arithmetic changed and no
+ *          the published value is used (rulings 19 Oct). No arithmetic changed and no
  *          reference case moved: every PAA reference entry passes its DAF explicitly, and the
  *          real filings are V1.0, which has no DAF. Sealed 19 Oct 2026; the record was written before
  *          the tag, as at v0.16.1.
- *   0.18.0 2026-10-23 — NO PROJECT FACT IS ASSUMED (Amy, CALCULATOR_SPEC §0.2). `computeScenario`
+ *   0.18.0 2026-10-23 — NO PROJECT FACT IS ASSUMED (CALCULATOR_SPEC §0.2). `computeScenario`
  *          refuses (`ProjectFactMissingError`) instead of assuming: (1) a technology — it used to take
  *          Method 1 from its default preset when a caller named neither a method nor a preset; (2) the
  *          counting unit — a count with no people/households choice was read as people; (3) a household
@@ -196,13 +196,13 @@
  *          and safest cap. No arithmetic changed and no
  *          reference case moved: every reference run names a method or a preset and a counting unit,
  *          and none used the household-size stand-in.
- *   0.18.1 2026-10-23 — NAMES OUT, AND THE DAF DEFAULT NOTE (Amy's rulings, 23 Oct). NO ARITHMETIC
+ *   0.18.1 2026-10-23 — NAMES OUT, AND THE DAF DEFAULT NOTE (rulings 23 Oct). NO ARITHMETIC
  *          CHANGED and no reference case moved. Comments name a role ("the reviewer", "the demo
  *          project") where they named a person, an organisation or a project. A country with no row in
  *          the DAF data file is labelled "Default value: 0.0125 (Gold Standard DAF tool's fallback)."
- *          (Amy, 25 Oct) where the label spoke of the DAF tool's table, which was false in a copy of the
+ *          (ruling 25 Oct) where the label spoke of the DAF tool's table, which was false in a copy of the
  *          engine that carries fewer rows.
- *   0.19.0 2026-10-25 — A MISSING COUNTING UNIT IS REFUSED EVERYWHERE (Amy, 25 Oct). `derivePopulation`
+ *   0.19.0 2026-10-25 — A MISSING COUNTING UNIT IS REFUSED EVERYWHERE (ruling 25 Oct). `derivePopulation`
  *          used to read a count with no people/households choice as people; it now refuses
  *          (`ProjectFactMissingError("countedAs")`), as `computeScenario` already did at 0.18.0.
  *          `resolveHouseholdSize` is exported, so the project record's grey household-size default

@@ -51,9 +51,9 @@ import { showSliders, withSliderStarts } from "./exAnte";
  */
 export interface CalculatorOptions {
   /**
-   * THIS SEAT CANNOT BE CHANGED BY THIS CALLER ([#97], Amy 2026-08-12). Defaults to `false`.
+   * THIS SEAT CANNOT BE CHANGED BY THIS CALLER ([#97], ruling 2026-08-12). Defaults to `false`.
    *
-   * **Amy's ruling is stronger than "the save will fail": *"a Contributor must not be able to
+   * **The ruling is stronger than "the save will fail": *"a Contributor must not be able to
    * modify calculator inputs at all — not even on-screen."*** So when this is true, `patch` is
    * **inert** and `save` **never calls `onSave`**. With the mutators dead, `dirty` can never become
    * true, so *"modified · unsaved"* cannot appear and there is nothing left to fail at save time.
@@ -108,13 +108,13 @@ export interface CalculatorState {
 
   /* ── Engine results (computed by the engine, never here) ─────────────────── */
   /**
-   * THE PROJECT FACTS NOBODY HAS PROVIDED (CALCULATOR_SPEC §0.2, Amy 2026-10-23): technology,
+   * THE PROJECT FACTS NOBODY HAS PROVIDED (CALCULATOR_SPEC §0.2, ruling 2026-10-23): technology,
    * country, people served, and whether they were counted as people or households. While any is
    * missing nothing below is computed, and the seat shows one plain prompt naming them instead.
    */
   missingFacts: ProjectFact[];
   /**
-   * THE ENGINE HAS NO fNRB IT WILL STAND BEHIND FOR THIS COUNTRY (Amy's ruling (3)(b), 2026-09-21).
+   * THE ENGINE HAS NO fNRB IT WILL STAND BEHIND FOR THIS COUNTRY (ruling (3)(b), 2026-09-21).
    * A6.4-AMT-009 publishes national values for 90 countries and multi-national values for three
    * regions; a project in neither list gets no number, so nothing below is computed and the seat
    * shows the refusal instead. Entering a filed fNRB clears it. Null on every ordinary run.
@@ -171,7 +171,7 @@ export function useCalculatorState(project: CalvinProject, options: CalculatorOp
   const [savedState, setSavedState] = useState<CalcState>(seed);
 
   /*
-   * THE SEAT FOLLOWS THE RECORD (found on Amy's eyeball, 2026-09-22; fixed in the ruling (3) PR).
+   * THE SEAT FOLLOWS THE RECORD (found on eyeball, 2026-09-22; fixed in the ruling (3) PR).
    *
    * `state` is seeded ONCE, at mount. So a project record saved while the seat was open left the
    * calculator computing on the PREVIOUS country: change the country on Project context, save,

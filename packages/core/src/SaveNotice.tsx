@@ -24,7 +24,7 @@ const NOTICE_COLOR: Record<"pending" | "ok" | "fail", string> = {
   fail: "var(--state-warn)",
 };
 
-/** The same states as TYPE (BRAND V4.1 §2.5, Amy 2026-08-31). A state colour as a dot is
+/** The same states as TYPE (BRAND V4.1 §2.5, ruling 2026-08-31). A state colour as a dot is
  *  not the same colour as a state colour as text — the dot, the keyline and the wash keep
  *  NOTICE_COLOR above; only the words use these. `pending` has no ruled text value, so it
  *  points at its dot colour rather than at a hex nobody approved. */

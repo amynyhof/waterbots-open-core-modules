@@ -1,6 +1,6 @@
 # @waterbots/core
 
-What every module shares. It arrived with the Calvin seed, a one-time copy of the Calvin module carried over by Amy. `SEEDS.md` at the root of this repo records what arrived, when, and what was checked.
+What every module shares. It arrived with the Calvin seed, a one-time copy of the Calvin module carried over by the maintainer. `SEEDS.md` at the root of this repo records what arrived, when, and what was checked.
 
 What is in `src/`:
 

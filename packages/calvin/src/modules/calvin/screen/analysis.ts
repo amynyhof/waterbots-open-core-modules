@@ -40,7 +40,7 @@ export interface SavedAnalysis {
   ageSharesEntered?: { under5: number; age5_18: number; adult19plus: number };
   /**
    * The project's own baseline mix, typed on the calculator's stove and fuel rows (V2.0 SDWS 6 /
-   * SDWS 8; Amy's ruling (1), 2026-09-26). Shares are fractions; each list must sum to 1 for the
+   * SDWS 8; ruling (1), 2026-09-26). Shares are fractions; each list must sum to 1 for the
    * engine to use it. Unset = the labelled screening preset.
    */
   stoveSharesEntered?: { threeStone: number; otherConventional: number; ics: number; fossil: number };

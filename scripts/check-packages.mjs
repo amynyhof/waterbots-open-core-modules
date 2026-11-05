@@ -4,7 +4,7 @@
 //     package points to SEEDS.md, which must have a row for it
 //   - the copyright line is in the root LICENSE and every NOTICE; root engines.node is one exact version
 //   - names are the four from the plan, and nothing else sits in packages/
-// When a package is first released, Amy rules on it and this file changes in the same lane 3 pull request.
+// When a package is first released, the maintainer rules on it and this file changes in the same lane 3 pull request.
 import { readdirSync, readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -31,7 +31,7 @@ for (const name of found) {
   const dir = join(root, "packages", name);
   const pkg = JSON.parse(readFileSync(join(dir, "package.json"), "utf8"));
   if (pkg.name !== `@waterbots/${name}`) errors.push(`${name}: name is ${pkg.name}`);
-  if (pkg.private !== true) errors.push(`${name}: must be "private": true until Amy rules on its first release`);
+  if (pkg.private !== true) errors.push(`${name}: must be "private": true until the maintainer rules on its first release`);
   if (pkg.license !== "Apache-2.0") errors.push(`${name}: license must be Apache-2.0`);
   for (const f of ["LICENSE", "NOTICE", "README.md"]) {
     if (!existsSync(join(dir, f))) errors.push(`${name}: missing ${f}`);

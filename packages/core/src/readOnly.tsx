@@ -4,7 +4,7 @@ import { createContext, useContext, type ReactNode } from "react";
 
 /**
  * READ-ONLY SEAT — one answer to "may I change anything here?", read by the small set of input
- * primitives a seat is built from ([#97], Amy 2026-08-12: *"a Contributor must not be able to
+ * primitives a seat is built from ([#97], ruling 2026-08-12: *"a Contributor must not be able to
  * modify calculator inputs at all — not even on-screen"*).
  *
  * ── WHY A CONTEXT AND NOT A PROP, because a prop was tried on paper first ──────────────────
@@ -19,7 +19,7 @@ import { createContext, useContext, type ReactNode } from "react";
  * ── IT IS A SECOND LOCK, NOT THE LOCK ─────────────────────────────────────────────────────
  * The real guarantee is the database (`can_write_org`), and the guarantee that nothing reaches
  * the database is `useCalculatorState`, whose `patch` is inert when read-only. **This context
- * only stops the surface OFFERING what the other two would refuse** — Amy's framing exactly:
+ * only stops the surface OFFERING what the other two would refuse** — framing exactly:
  * *"the UI's job is to stop offering what the database will refuse."* If this context were
  * bypassed, nothing would persist; if it is missing, the product lies about what you may do.
  *
