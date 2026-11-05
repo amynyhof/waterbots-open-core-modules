@@ -4,6 +4,36 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-10-31 — V5 The first release held; test cases tagged; Calvin's color is Reef
+
+**Done (branch `plan-simple-view-release`):**
+- Prepared Calvin's first GitHub release from `main` at `dba49a8`, version 0.1.0. Packed two files with `npm pack`:
+  `calvin`, and `core`, which Calvin's package lists and npm fetches on install. Worked out each file's SHA-256
+  fingerprint and wrote the release notes. Amy then held the release (ruling 2026-10-31): nothing is published and no
+  tag is pushed. It is rebuilt from `main` after this pull request merges.
+- Took the note on how the test cases were worked out, `NOTE_test-case-methods_2026-10-31.md`, from the handoff
+  folder (`%USERPROFILE%\GitHub\handoff\`), read-only. Used only its case IDs and methods. No figure came with it.
+- `expected-outputs.json`: every one of the 47 made-up test cases now has a `workedOut` tag, and `workedOutTags`
+  says what each tag means. The tags: the official V1.0 calculator's output, unchanged (5); its output, then
+  recalculated by our engine at the official UN fNRB value (21); V1.0 worked from the methodology (3); V2.0 worked by
+  hand, as no official V2.0 calculator exists (16); fNRB look-ups (2). No expected result changed.
+- The report's sentence is now "Every build checks it against 47 made-up test cases. 5 of them match Gold Standard’s
+  official V1.0 calculator on made-up inputs." Both numbers are read from the file and its tags. Tests pin the
+  wording, both counts, and the total for each tag.
+- Calvin's color is Reef (`#0E8A94`), not Plum (ruling 2026-10-31). Violet's color, Orchid (`#A457D4`), is noted on V7.
+  The entry below, from an earlier pull request, still says Plum; it is left as written.
+- `BUILD_PLAN.md`: V3 marked merged. V5 no longer waits on the simple view. New items: M5.5, the simple view, the
+  bigger tap buttons and Reef ship together as the next release (V1); M2.6, put the 21 recalculated cases back
+  through the official V1.0 calculator (V2); the release tag rule in M1.4, with the engineer, once the GitHub organisation
+  exists (V1); a rebuild of the release on a second machine, under M2.2 (V2). M2.4 and M2.5 are closed by this pull
+  request.
+
+**Checked:** see the pull request for this branch's runs. Before the hold, on a clean checkout of `dba49a8`: CI, both
+secrets scanners, typecheck, test and build, 48 of 48, the engine-entry check, the seed check and the name scan all
+passed, in the repo and in the two packed files.
+
+**Open:** the release tag rule (M1.4). A rebuild on another machine has not yet been shown to give the same bytes.
+
 ## 2026-10-31 — V3 Sliders: brought up to date, and four v1 items planned
 
 **Done (same branch, `sliders`):**
