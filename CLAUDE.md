@@ -97,7 +97,12 @@ Every value shown to a user says where it came from. It never credits a ruling o
 - Derived: worked out from other values. It shows the source of its formula.
 - Assumed: expected project performance, starting from a cited value.
 
-If no published source gives a default for a value, the site leaves it blank, and the user enters it.
+Three kinds of value (Calvin carbon modules):
+- Project facts (the project record): the user gives them at intake, and Wellington collects them. Until then, the field shows 'awaiting user project input'. Never guessed.
+- Method defaults: at screening, the site fills them in from cited sources, chosen by the user's project facts.
+- Anticipated performance (screening and ex-ante): starts at a labelled 'assumed' value. Calvin encourages the user to adjust it to their planned project.
+
+This is settled. Do not raise it again.
 
 Stove and fuel presets: do not raise their sources with the maintainer until the pending permission replies arrive.
 
