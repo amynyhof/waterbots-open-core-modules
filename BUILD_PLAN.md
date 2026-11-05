@@ -113,6 +113,9 @@ gate's design before the real gate is built.
   - [!] The maintainer as required reviewer on the `npm-publish` environment, so every release needs their approval
   - [!] **(V1)** The release tag rule: only the maintainer and the engineer may create release tags (`v*`, and each module's own,
         such as `calvin-v*`). Set it once the GitHub organisation exists.
+  - [!] **(V1)** Move this repo to the WaterBots GitHub organisation (ruling 2026-11-02). Then Session C points the
+        repository link in each `package.json` at the new home, and the name scan's allowance for the owner's
+        account in that link can go.
 - [ ] **M1.5 Lane 1 auto-merge** — not built; the earlier dormant job was removed. Rebuild only when the real
       number gate (M1.2) exists and the maintainer says to switch it on. Design: lane 1 and not a draft → arm GitHub's
       auto-merge; any other lane → disarm it. Needs the branch protection above, or it would merge at once.
@@ -130,6 +133,8 @@ gate's design before the real gate is built.
   - [x] Get it ready (merged, pull request #6): an engine-only entry, `@waterbots/calvin/engine`, added in new files only;
         React made an optional peer of `calvin` and `core`; both set to version 0.1.0. Still `private`.
   - [!] Publish. The maintainer's call, after M1.4.
+  - [ ] **(V1)** Every release build runs the name scan on the packed files themselves, not only on the repo (ruling
+        2026-11-02). Each packed file is unpacked into an empty folder and scanned there. A finding stops the release.
   - [ ] **(V2)** Rebuild the release on a second machine and show it gives the same bytes: the same fingerprints.
 - [ ] **M2.3 Linting** (was M1.6): add a linter that runs as part of CI, with the strictest settings that fit. The maintainer
       ruled on 2026-10-23 that it comes right after the seed lands (after M2.2), not before it. The seed is carried
@@ -209,6 +214,27 @@ The first release does not wait for this.
 - [ ] **M9.2** Bridget (the map) to its first release
   - [ ] **(V1)** The map's + and - buttons are big enough to tap on a phone. Done when a test checks their tap size
         and the maintainer checks them on a phone.
+
+## M10 — Agent and module source sweep (V2)
+
+The permission replies may never arrive. A V2 sweep checks every agent's and module's sources, including these presets
+and the IPCC 2006 citations.
+
+- [ ] **M10.1 (V2) Stove and fuel preset sources** (was M6.2). The country-default notes in
+      `packages/calvin/src/calculators/gs4gg-carbon/presets.ts` keep their values unchanged until the pending permission
+      replies arrive: request #234 on the paid site. Today the baseline-mix data file holds no country rows, so none of
+      the country-default notes reaches a screen. Open, all together:
+  - Fuel shares and their label: the WHO household energy series. Its licence for use here is unconfirmed.
+  - Stove shares and their label: The DHS Program's survey tables. Permission is pending.
+  - Our own mappings, with no published source: biomass counted as wood; gaseous fuels counted as LPG; electricity
+    at zero baseline emissions; the survey's stove types mapped to the rulebook's three classes; traditional stoves
+    not split by chimney counted as other conventional; gas, electric and liquid-fuel stoves moved off the stove row.
+  - Do not raise these sources with the maintainer until a reply arrives.
+- [ ] **M10.2 (V2) IPCC 2006 citations.** The kerosene, coal and LPG notes cite the IPCC 2006 Guidelines, Vol. 2, Ch. 2,
+      Table 2.5 (residential) (ruling 2026-11-05). Still to do: add the page; check that LPG's 63.1 tCO₂/TJ matches the
+      table as corrected by the IPCC's corrigenda; then code kerosene's and coal's values, which count at zero today.
+- [ ] **M10.3 (V2) Every other agent and module.** The same check for each agent's and module's sources: each value
+      shown says where it came from, as `CLAUDE.md` sets out.
 
 ---
 
