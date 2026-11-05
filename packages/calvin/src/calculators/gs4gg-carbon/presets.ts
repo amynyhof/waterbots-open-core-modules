@@ -153,8 +153,8 @@ export const STOVE_CLASS_LABEL: Record<StoveShareKey, string> = {
  * 2026-09-26), each LABELLED with what its factor is and is not:
  *   • electricity — ZERO baseline emissions (ruling 3): nothing is burned at the point of boiling.
  *   • LPG — the 63.1 tCO₂/TJ the presets have always carried; kerosene and coal — NO CODED VALUE
- *     EXISTS, so they count at zero. All three say "source pending: IPCC 2006 Vol. 2 Ch. 2" until
- *     that document is held in Methodology/external-standards/ and the figures are cited (ruling 4).
+ *     EXISTS, so they count at zero. All three cite IPCC 2006 Guidelines, Vol. 2, Ch. 2, Table 2.5 (residential) (ruling 2026-11-05).
+ *     The page is logged for the V2 source sweep. No value changed with the citation.
  *     Zero for a fossil fuel UNDERSTATES the baseline, so it never over-credits.
  */
 export type FuelShareKey = "wood" | "charcoal" | "lpg" | "kerosene" | "coal" | "electricity";
@@ -170,9 +170,9 @@ export const FUEL_LABEL: Record<FuelShareKey, string> = {
 };
 /** The one-line label printed beside a fuel whose factor is not a rulebook figure (rulings 3 and 4). */
 export const FUEL_FACTOR_NOTE: Partial<Record<FuelShareKey, string>> = {
-  lpg: "63.1 tCO₂/TJ — source pending: IPCC 2006 Vol. 2 Ch. 2",
-  kerosene: "no coded value, counted at zero — source pending: IPCC 2006 Vol. 2 Ch. 2",
-  coal: "no coded value, counted at zero — source pending: IPCC 2006 Vol. 2 Ch. 2",
+  lpg: "63.1 tCO₂/TJ — IPCC 2006 Guidelines, Vol. 2, Ch. 2, Table 2.5 (residential)",
+  kerosene: "no coded value yet, counted at zero — its value is in IPCC 2006 Guidelines, Vol. 2, Ch. 2, Table 2.5 (residential)",
+  coal: "no coded value yet, counted at zero — its value is in IPCC 2006 Guidelines, Vol. 2, Ch. 2, Table 2.5 (residential)",
   electricity: "zero baseline emissions — nothing is burned where the water is boiled",
 };
 /** A saved share list from before a fuel was added reads that fuel as zero. */
@@ -327,7 +327,7 @@ const r1 = (x: number) => Math.round(x * 10) / 10;
  *   (1) WHO biomass (wood, crop residues, dung) → wood's factor, "reads high where residues or dung are common"
  *   (2) WHO gaseous fuels (LPG, natural gas, biogas) → LPG
  *   (3) electricity → zero baseline emissions
- *   (4) kerosene, coal (and LPG's figure) → "source pending: IPCC 2006 Vol. 2 Ch. 2"
+ *   (4) kerosene, coal (and LPG's figure) → cited to IPCC 2006 Guidelines, Vol. 2, Ch. 2, Table 2.5 (residential)
  *   (5) WHO shares scaled to exactly 100%
  *   (6) DHS: three-stone and traditional without chimney → traditional; with chimney → other
  *       conventional; manufactured → improved; gas, electric and liquid-fuel stoves leave the stove
@@ -360,7 +360,7 @@ export function countryBaselineDefault(
         ...(raw.wood > 0 ? ["Biomass, counted as wood; reads high where residues or dung are common."] : []),
         ...(raw.lpg > 0 ? ["Gaseous fuels (LPG, natural gas, biogas), counted as LPG."] : []),
         ...(raw.electricity > 0 ? ["Electricity, counted at zero baseline emissions."] : []),
-        ...(raw.kerosene > 0 || raw.coal > 0 || raw.lpg > 0 ? ["Kerosene, coal and LPG: source pending — IPCC 2006 Vol. 2 Ch. 2."] : []),
+        ...(raw.kerosene > 0 || raw.coal > 0 || raw.lpg > 0 ? ["Kerosene, coal and LPG: IPCC 2006 Guidelines, Vol. 2, Ch. 2, Table 2.5 (residential). Kerosene and coal have no coded value yet and count at zero."] : []),
         `Published shares add to ${r1(total)}%; scaled to exactly 100%.`,
         ...(stale ? [`Data year ${row.fuel.dataYear} is past the rulebook's three-year freshness rule (V2.0 SDWS 8); shown with its year until a newer edition or a survey replaces it.`] : []),
       ];
