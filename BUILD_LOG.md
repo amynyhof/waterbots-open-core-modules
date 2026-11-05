@@ -4,6 +4,21 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-11-05 — The source sweep family; the IPCC table cited
+
+**Done (same branch, `data-notes-sources`):** ruling 2026-11-05.
+- The plan has a new **V2** family, M10 "Agent and module source sweep". The permission replies may never arrive, so
+  a V2 sweep checks every agent's and module's sources. The stove and fuel preset sources moved there from M6.2 and
+  are now M10.1.
+- The kerosene, coal and LPG notes in `presets.ts` now cite the IPCC 2006 Guidelines, Vol. 2, Ch. 2, Table 2.5
+  (residential) instead of "source pending". The table number was checked against the IPCC's published contents; the
+  page was not, because this repo holds no standards PDF. The page is logged as M10.2, with a check of LPG's 63.1
+  against the corrected table. Kerosene and coal still have no coded value and still count at zero. No value changed.
+
+**Checked:** see the pull request.
+
+**Open:** M10.1 and M10.2.
+
 ## 2026-11-05 — Data notes on screen cite their source; preset sources logged; where a value comes from
 
 **Done (branch `data-notes-sources`, built on `role-wording`):** ruling 2026-11-02.

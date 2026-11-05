@@ -191,18 +191,6 @@ the litres check on the cap (N5). A step with no image yet has not started.
 indicator.
 
 - [ ] **M6.1** Fuel-mix floor, labelled
-- [ ] **M6.2 (V2) Stove and fuel preset sources.** The country-default notes in
-      `packages/calvin/src/calculators/gs4gg-carbon/presets.ts` keep their values unchanged until the pending permission
-      replies arrive: request #234 on the paid site. Today the baseline-mix data file holds no country rows, so none of
-      these notes reaches a screen. Open, all together:
-  - Fuel shares and their label: the WHO household energy series. Its licence for use here is unconfirmed.
-  - Stove shares and their label: The DHS Program's survey tables. Permission is pending.
-  - Our own mappings, with no published source: biomass counted as wood; gaseous fuels counted as LPG; electricity
-    at zero baseline emissions; the survey's stove types mapped to the rulebook's three classes; traditional stoves
-    not split by chimney counted as other conventional; gas, electric and liquid-fuel stoves moved off the stove row.
-  - Kerosene, coal and LPG factors: the source is named (IPCC 2006 Guidelines, Vol. 2, Ch. 2) but not yet held, so
-    the note says "source pending".
-  - Do not raise these sources with the maintainer until a reply arrives.
 
 ## M7 — Diesel and grid factors
 
@@ -226,6 +214,27 @@ The first release does not wait for this.
 - [ ] **M9.2** Bridget (the map) to its first release
   - [ ] **(V1)** The map's + and - buttons are big enough to tap on a phone. Done when a test checks their tap size
         and the maintainer checks them on a phone.
+
+## M10 — Agent and module source sweep (V2)
+
+The permission replies may never arrive. A V2 sweep checks every agent's and module's sources, including these presets
+and the IPCC 2006 citations.
+
+- [ ] **M10.1 (V2) Stove and fuel preset sources** (was M6.2). The country-default notes in
+      `packages/calvin/src/calculators/gs4gg-carbon/presets.ts` keep their values unchanged until the pending permission
+      replies arrive: request #234 on the paid site. Today the baseline-mix data file holds no country rows, so none of
+      the country-default notes reaches a screen. Open, all together:
+  - Fuel shares and their label: the WHO household energy series. Its licence for use here is unconfirmed.
+  - Stove shares and their label: The DHS Program's survey tables. Permission is pending.
+  - Our own mappings, with no published source: biomass counted as wood; gaseous fuels counted as LPG; electricity
+    at zero baseline emissions; the survey's stove types mapped to the rulebook's three classes; traditional stoves
+    not split by chimney counted as other conventional; gas, electric and liquid-fuel stoves moved off the stove row.
+  - Do not raise these sources with the maintainer until a reply arrives.
+- [ ] **M10.2 (V2) IPCC 2006 citations.** The kerosene, coal and LPG notes cite the IPCC 2006 Guidelines, Vol. 2, Ch. 2,
+      Table 2.5 (residential) (ruling 2026-11-05). Still to do: add the page; check that LPG's 63.1 tCO₂/TJ matches the
+      table as corrected by the IPCC's corrigenda; then code kerosene's and coal's values, which count at zero today.
+- [ ] **M10.3 (V2) Every other agent and module.** The same check for each agent's and module's sources: each value
+      shown says where it came from, as `CLAUDE.md` sets out.
 
 ---
 
