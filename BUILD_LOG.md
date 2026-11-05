@@ -6,7 +6,7 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ## 2026-11-02 — The maintainer, named by role
 
-**Done (branch `maintainer-wording`, built on the branches of #11 and #12):** ruling 2026-11-02. Every committed file
+**Done (branch `role-wording`, built on the branches of #11 and #12):** ruling 2026-11-02. Every committed file
 now says "the maintainer" where it named a person, and credits a ruling by its date ("ruling 2026-09-21"). That covers
 `CLAUDE.md`, the plan, this log (older entries included, by that ruling), the workflows, `SEEDS.md`, the package
 READMEs and Calvin's code comments and data notes. The pull request block is now **For the maintainer**. Copyright and
