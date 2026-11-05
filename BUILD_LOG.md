@@ -4,6 +4,16 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-11-05 — Three kinds of value
+
+**Done (same branch, `data-notes-sources`):** ruling 2026-11-05. In `CLAUDE.md`, under "Where a value comes from", the
+blank-when-no-source line is replaced, word for word, by the three kinds of value in Calvin's carbon modules:
+- project facts, which wait for the user's input and are never guessed;
+- method defaults, filled in from cited sources;
+- anticipated performance, which starts at a labelled assumed value.
+
+The ruling marks this as settled. No code changed.
+
 ## 2026-11-05 — The source sweep family; the IPCC table cited
 
 **Done (same branch, `data-notes-sources`):** ruling 2026-11-05.
