@@ -65,7 +65,7 @@ export default function VersionTabs({
    * genuinely close ([#97]).
    *
    * `version` LOOKS like a view toggle and IS a saved input: it lives in `CalcState` and is
-   * persisted by `toGs4ggCarbonContext`. Amy's ruling — *"not even on-screen"* — therefore
+   * persisted by `toGs4ggCarbonContext`. The ruling — *"not even on-screen"* — therefore
    * reaches it. And the alternative is worse than the cost: `patch` is inert on a read-only
    * seat, so leaving these tabs live would give a Contributor **a control that responds to
    * nothing**, which is the precise defect this item exists to remove.

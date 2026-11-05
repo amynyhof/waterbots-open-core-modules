@@ -11,7 +11,7 @@
   "absolute_floor": {
     "value": 0.0125,
     "cite": "457 §5.7.1(b), PDF p.8; Definitions 'Absolute DAF Floor'",
-    "desc": "1.25% global fallback, which the tool applies when no comparison group can be established. The engine also uses it for a country Table 03 does not list, under the same fallback rule (Amy's ruling, 19 Oct), and the screens say so beside the value."
+    "desc": "1.25% global fallback, which the tool applies when no comparison group can be established. The engine also uses it for a country Table 03 does not list, under the same fallback rule (ruling 19 Oct), and the screens say so beside the value."
   },
   "sector_carveout_floor": {
     "value": 0.0125,

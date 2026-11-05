@@ -1,6 +1,6 @@
 # @waterbots/calvin
 
-Calvin is the module that quantifies: the carbon calculator. It arrived as a seed, a one-time copy carried over by Amy. `SEEDS.md` at the root of this repo records what arrived, when, and what was checked.
+Calvin is the module that quantifies: the carbon calculator. It arrived as a seed, a one-time copy carried over by the maintainer. `SEEDS.md` at the root of this repo records what arrived, when, and what was checked.
 
 What is in `src/`:
 

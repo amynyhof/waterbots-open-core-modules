@@ -2,7 +2,7 @@
 #
 # The real gate, still to come:
 #   - The private side makes a keyed fingerprint (HMAC-SHA256) of every figure and word to hunt.
-#   - The key and the fingerprint list are GitHub Actions secrets set by Amy:
+#   - The key and the fingerprint list are GitHub Actions secrets set by the maintainer:
 #     NUMBER_GATE_KEY and NUMBER_GATE_FINGERPRINTS. They never sit in a file.
 #   - CI fingerprints every number and word in the tree with the same key. Any match fails.
 #   - A missing key FAILS the run. It never skips. Fork pull requests get no secrets, so they
@@ -11,7 +11,7 @@
 #     at every release.
 #
 # Until then this job passes with a warning, so its name ("number gate") can already be made a
-# required check. Meanwhile, lane 3 (Amy plus outside AI review) is what catches figures and names.
+# required check. Meanwhile, lane 3 (the maintainer plus outside AI review) is what catches figures and names.
 
 name: number gate
 

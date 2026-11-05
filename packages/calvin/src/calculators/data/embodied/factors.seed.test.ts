@@ -1,4 +1,4 @@
-// THE SEED VERSION of ./factors.test.ts (CARRY_RULES C7; Amy, 2026-10-23). The same checks, with
+// THE SEED VERSION of ./factors.test.ts (CARRY_RULES C7; ruling 2026-10-23). The same checks, with
 // every registry id checked against the public source index rather than the source registry, which
 // never crosses. A seed carries the index filtered to the rows it names; this site carries all of it,
 // so the test runs, and passes, on both. The full test stays here.

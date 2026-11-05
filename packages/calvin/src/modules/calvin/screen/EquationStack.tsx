@@ -55,10 +55,10 @@ function SubHeader({ label, note }: { label: string; note: string }) {
 // (carries "record: X · this analysis: Y" provenance). Every editable value shows the ✎ glyph.
 
 // THE THREE WORDS THE RECORD AND THE CALCULATOR SHARE are `entered`, `default` and `derived`
-// (Amy's glossary, 2026-09-24). `fixed`, `adjusted`, `override` and `record` remain for the rows
+// (glossary, 2026-09-24). `fixed`, `adjusted`, `override` and `record` remain for the rows
 // that genuinely mean something narrower — an override still says "changed from the record".
 /**
- * THE TAG KEY — FOUR WORDS, THE SAME ON EVERY SURFACE (Amy's ruling (2), 2026-09-24; [#225]).
+ * THE TAG KEY — FOUR WORDS, THE SAME ON EVERY SURFACE (ruling (2), 2026-09-24; [#225]).
  *
  * A tag answers ONE question: *where does this number come from?* Four answers cover every value
  * the product shows, and a value carries its tag everywhere it appears — seat, record and report.
@@ -89,7 +89,7 @@ const STATE_META: Record<EditState, { text: string; color: string; editable: boo
 };
 
 /**
- * THE KEY, PRINTED WHERE THE TAGS ARE READ (Amy's ruling (2), 2026-09-24). One line, four words,
+ * THE KEY, PRINTED WHERE THE TAGS ARE READ (ruling (2), 2026-09-24). One line, four words,
  * plain English — a legend a reader can check without leaving the page they are reading.
  */
 export function TagLegend() {
@@ -100,7 +100,7 @@ export function TagLegend() {
       <b>default</b> — the rulebook&rsquo;s or a cited reference&rsquo;s value, with its citation and
       version · <b>derived</b> — worked out from other values on the record ·{" "}
       <b>assumed</b> — our placeholder, where no default exists and nothing was entered.
-      {/* TWO MARKS, TWO MEANINGS, BOTH SHOWN (Amy's ruling (4), 2026-09-26). The marks are drawn
+      {/* TWO MARKS, TWO MEANINGS, BOTH SHOWN (ruling (4), 2026-09-26). The marks are drawn
           here exactly as they are on the rows, so the key is the thing itself, not a description. */}
       <span className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
         <span className="text-fg-2">What the marks mean:</span>
@@ -159,14 +159,14 @@ export function StateBadge({ state, tip }: { state: EditState; tip?: string }) {
   );
 }
 
-/** The `derived` badge on its own, for the summary metrics above the stack (Amy's ruling (2), 2026-09-26). */
+/** The `derived` badge on its own, for the summary metrics above the stack (ruling (2), 2026-09-26). */
 export function DerivedTag({ tip }: { tip: string }) {
   return <StateBadge state="derived" tip={tip} />;
 }
 
 /**
  * THE BASELINE MARKER — a teal chip saying a project's BASELINE SURVEY is where this value really
- * comes from (Amy, 2026-09-23: *"every baseline-settable field gets a teal marker, surveyed ages
+ * comes from (ruling 2026-09-23: *"every baseline-settable field gets a teal marker, surveyed ages
  * included"*; [#215], proposal part C2).
  *
  * ⚠ IT IS NOT A PENCIL AND PROMISES NOTHING ABOUT EDITING. The pencil says *you may change this
@@ -196,7 +196,7 @@ function BaselineChip({ sdws }: { sdws: string }) {
 
 /**
  * THE MONITORING MARKER — a slate chip saying MONITORING DATA sets this value: the usage survey,
- * water-quality tests or sales records (Amy's ruling (4), 2026-09-26). Two marks, two meanings:
+ * water-quality tests or sales records (ruling (4), 2026-09-26). Two marks, two meanings:
  * teal = a baseline sets it once, at the start; slate = monitoring sets it, year by year, during
  * the crediting period (V2.0 §14.3.1 lists these as parameters to be monitored).
  *
@@ -260,7 +260,7 @@ function VarRow({ label, value, unit, state, tip, baselineSdws }: { label: strin
  * site turns on for four anticipated values. Each carries a pencil for an exact value. This row stays a
  * typed box everywhere else.)
  *
- * AN ADJUSTABLE PARAMETER — A TYPED BOX, NOT A SLIDER (Amy's walk-through, 25 Sep 2026:
+ * AN ADJUSTABLE PARAMETER — A TYPED BOX, NOT A SLIDER (screen walk-through, 25 Sep 2026:
  * *"every field is a typed box with its tag and a pencil, no sliders on this site"*).
  *
  * ⚠ IT WAS A SLIDER, AND THE SLIDER WAS THE PROBLEM. Eight rows used one — η, M_q, C_b,
@@ -396,7 +396,7 @@ function EqRow({ eqNum, symbol, title, formula, value, oneLiner, binding, open, 
         {flag ? (
           <span className="t-mono shrink-0 rounded-sm px-1" style={{ fontSize: 8, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--fg-1)", background: "color-mix(in oklab, var(--amber) 12%, transparent)", boxShadow: "inset 0 0 0 1px color-mix(in oklab, var(--amber) 40%, transparent)" }}>{flag}</span>
         ) : null}
-        {/* EVERY HEADER VALUE IS AN EQUATION'S OUTPUT, SO EVERY ONE IS TAGGED DERIVED (Amy's ruling
+        {/* EVERY HEADER VALUE IS AN EQUATION'S OUTPUT, SO EVERY ONE IS TAGGED DERIVED (ruling
             (2), 2026-09-26). A number without a tag was the one place on the page the key did not
             reach. `HelpTip` stops the click, so opening the note never also toggles the row. */}
         <span className="self-center"><StateBadge state="derived" tip={`Worked out by this equation from the values inside it — change those and ${symbol} follows.`} /></span>
@@ -444,7 +444,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
   const m2 = state.method === 2;
   const etaPct = (state.etaOverride ?? result.etaWeighted) * 100;
   const preset = PRESETS["traditional-wood-cws"];
-  // THE MIX, NAMED (Amy's ruling (4), 2026-09-24). The row used to print "read-only", which told a
+  // THE MIX, NAMED (ruling (4), 2026-09-24). The row used to print "read-only", which told a
   // reader nothing about WHAT had been assumed on their behalf. It now prints the stoves and fuels
   // themselves, from the same values the engine used — never a second copy typed here.
   const presetMixSummary = [
@@ -466,7 +466,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
   const enteredAsHouseholds = state.populationMode === "households";
   /**
    * THE DERIVED COUNTERPART — the number that was NOT entered, worked out in whichever direction
-   * applies (Amy's two rulings of 2026-09-24). Households × size = people; people ÷ size =
+   * applies (two rulings of 2026-09-24). Households × size = people; people ÷ size =
    * households. Both are the ENGINE's figures — `result.people` and `result.premises` — never
    * recomputed here, so the row cannot print a number the calculator did not use.
    */
@@ -509,10 +509,10 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
       baseline={v2 ? "15% (three-stone, V2.0 SDWS 11 p.52)" : "10% (three-stone, V1.0 SDWS 11 p.24)"}
       tip="Weighted stove efficiency — three-stone fire ≈ V1 10% / V2 15%, improved cookstove 30%. From a Water Boiling Test." />
   );
-  // THE SLATE MARK GOES WHERE THE RULEBOOK NAMES A MONITORING INSTRUMENT FROM AMY'S THREE (ruling (4),
+  // THE SLATE MARK GOES WHERE THE RULEBOOK NAMES A MONITORING INSTRUMENT FROM THE THREE IN RULING (4),
   // 2026-09-26): water tests (M_q, V2.0 SDWS 22), the usage survey (X_cleanboil SDWS 26, U_p SDWS 34,
   // t_p SDWS 35), sales records (N_p SDWS 33, DN_p SDWS 37). QPW_p (the WCFT) and Q_m (a meter) are
-  // also monitored under §14.3.1 but by other instruments, so they are left unmarked pending her word.
+  // also monitored under §14.3.1 but by other instruments, so they are left unmarked pending a ruling.
   const mon = (key: string, instrument: string) => ({ sdws: sdwsRef(basis, key), instrument });
   // EX-ANTE SLIDERS (V3): when on, these four values are set on the sliders above the stack
   // (`ExAntePanel`). Their rows here show the credited value and point up; no second box.
@@ -532,7 +532,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
   const populationRow = (
     <div className="py-1">
       {/* THE LABEL SAYS WHAT THE NUMBER IS — "People served" or "Households served", following the
-          record's toggle (Amy's glossary, 2026-09-24). A box labelled "population" holding a
+          record's toggle (glossary, 2026-09-24). A box labelled "population" holding a
           household count was the first of the two faults that sent this back at the eyeball. */}
       <div className="flex items-baseline gap-2">
         {/* The count box carries the plain name; the "(N_p)" marker belongs to the Eq.7 parameter
@@ -562,7 +562,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
           <div className="t-caption text-fg-4" style={{ fontSize: 10 }}>{counterpart.working}</div>
         </div>
       ) : null}
-      {/* HOUSEHOLD SIZE — the UN default, editable, teal (Amy's glossary). It is the number that
+      {/* HOUSEHOLD SIZE — the UN default, editable, teal (glossary). It is the number that
           ties the two counts together, so it sits with them rather than in a dial somewhere else. */}
       {result.householdSizeUsed != null && state.method === 2 ? (
         <div className="py-1">
@@ -583,7 +583,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
     </div>
   );
   /**
-   * THE AGE SPLIT ROW (V2.0 SDWS 30) — [#215] part C1, built on Amy's ruling of 2026-09-23:
+   * THE AGE SPLIT ROW (V2.0 SDWS 30) — [#215] part C1, built on ruling of 2026-09-23:
    * *"use the existing pencil; every baseline-settable field gets a teal marker, surveyed ages
    * included."* So this row reuses `EditGlyph`, `StateBadge` and `InRowNum` exactly as the rows
    * around it do; nothing new was drawn for it.
@@ -671,7 +671,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
   })();
 
   /**
-   * THE BASELINE STOVE AND FUEL ROWS ARE TYPED BOXES (Amy's ruling (1), 2026-09-26; [#213]).
+   * THE BASELINE STOVE AND FUEL ROWS ARE TYPED BOXES (ruling (1), 2026-09-26; [#213]).
    *
    * What is typed is what a baseline survey reports: the share of each stove class (V2.0 SDWS 6)
    * and the share of each fuel (V2.0 SDWS 8). The η beside each class and the emission factors
@@ -781,7 +781,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
               <span key={k}>{box(fuel[k], (v) => patch({ fuelSharesEntered: { ...fuel, [k]: Math.max(0, v) / 100 } }), FUEL_LABEL[k])}</span>,
             )}
           </div>
-          {/* THE FACTOR LABELS (Amy's rulings 3 and 4, 2026-09-26): a fuel whose factor is not a
+          {/* THE FACTOR LABELS (rulings 3 and 4, 2026-09-26): a fuel whose factor is not a
               rulebook figure says so, beside the share it applies to — printed only where it is in use. */}
           {FUEL_SHARE_KEYS.filter((k) => fuel[k] > 0 && FUEL_FACTOR_NOTE[k]).map((k) => (
             <div key={k} className="t-caption text-fg-4" style={{ fontSize: 10 }}>
@@ -906,7 +906,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
         <EditGlyph title="Enter usage hours (t_p)" />
         <InRowNum value={state.usageHoursPerDay ?? 5} onChange={(v) => patch({ usageHoursPerDay: v })} onClear={() => patch({ usageHoursPerDay: undefined })} optional width={92} />
       </div>
-      {/* DN_p, DEVICES PER HOUSEHOLD — A PROJECT FACT, SHOWN ONLY WITH A FLOW RATE (Amy, 2026-10-23).
+      {/* DN_p, DEVICES PER HOUSEHOLD — A PROJECT FACT, SHOWN ONLY WITH A FLOW RATE (ruling 2026-10-23).
           It changes a number only through Eq.7's device cap, and that cap needs q_i, so without a
           flow rate the row would ask for a fact that changes nothing. It starts at 1, the lowest and
           safest cap; a value the person types must be a whole number, 1 or more, and anything else
@@ -979,7 +979,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
         open={open.has("q_pop")} onToggle={() => toggle("q_pop")} editable cite={citeShort(basis, "qMethod2")}>
         <VarRow label="N_p — premises (Eq.7)" value={result.premises != null ? fmt(result.premises, 0) : "—"} state="derived" tip="Premises count, entered in the QPW_hh row above." />
         <VarRow label="QPW_hh — per-premises volume (Eq.7)" value={qpwHhStr} state="derived" tip="Per-premises daily volume from Eq.7." />
-        {/* U_p SHOWS ONCE, IN ITS ENTRY BOX (Amy's ruling (3), 2026-09-26). Under V2.0 that box is in
+        {/* U_p SHOWS ONCE, IN ITS ENTRY BOX (ruling (3), 2026-09-26). Under V2.0 that box is in
             Eq.8, where U_p is applied; here it is only referenced, never printed as a second value. */}
         {v2 ? (
           <p className="t-caption py-1 text-fg-4" style={{ fontSize: 10 }}>
@@ -1022,7 +1022,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
       <EqRow eqNum="—" symbol="profile" title="Baseline profile (stoves & fuel replaced)" formula="stove strata × fuel mix" value={`η ${fmt(etaPct, 0)}%`}
         // [V1 §3.6.1 p.11 / V2 §7.3.7 p.28] — the old way people made water safe sets EF_b.
         oneLiner="The old way people made water safe — the stoves and fuels the project replaces. These assumptions set the emission factor." open={open.has("profile")} onToggle={() => toggle("profile")} editable cite={citeShort(basis, "profile")}>
-        {/* THE ROW NAMES WHAT IT ASSUMED, AND ADMITS THERE IS NO SOURCE (Amy's ruling (4),
+        {/* THE ROW NAMES WHAT IT ASSUMED, AND ADMITS THERE IS NO SOURCE (ruling (4),
             2026-09-24). "Not surveyed" reads as *not confirmed yet*; "screening preset, no source"
             says plainly that nothing stands behind the number. The two are different admissions and
             only the second is true here. A baseline survey (V2.0 SDWS 6 stove shares, V2.0 SDWS 8
@@ -1108,7 +1108,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
                         ? `No national default for this country — A6.4-AMT-009 Table 2 multi-national value for ${fnrbRegional.region}.`
                         : `A6.4-AMT-009 Table 3 national default (${result.fnrbVintage}).`}${readOnlySeat ? "" : " Overtype to file your own value; clear to revert."}`)}
           </div>
-          {/* THE QUARTILE DIAL IS RETIRED FOR fNRB (calculator v0.10.0, Amy's ruling (3), 2026-09-21).
+          {/* THE QUARTILE DIAL IS RETIRED FOR fNRB (calculator v0.10.0, ruling (3), 2026-09-21).
               A country with no national row now takes A6.4-AMT-009 Table 2's official multi-national
               value for its UN M49 region, and there is nothing for a consultant to pick among. When
               that value is in force the report and this note print footnote 5's condition, because a
@@ -1209,7 +1209,7 @@ function peLeRows(result: ScenarioResult, open: Set<string>, toggle: Toggle, bas
 function paaTail(result: ScenarioResult, open: Set<string>, toggle: Toggle, xcbParam: React.ReactNode, mqParam: React.ReactNode, cbParam: React.ReactNode, state: CalcState, patch: (p: Partial<CalcState>) => void, usageSlider: React.ReactNode) {
   const p = result.result as PaaErOutput;
   // A host country with no row in the engine's DAF data takes the default; the engine's provenance
-  // label carries the note, and this row only prints it (Amy's rulings, 19 and 23 Oct).
+  // label carries the note, and this row only prints it (rulings, 19 and 23 Oct).
   const dafProv = result.provenance.find((x) => x.field === "DAF");
   const dafFallbackNote = dafProv?.source === "global-default" ? dafProv.label : null;
   return (

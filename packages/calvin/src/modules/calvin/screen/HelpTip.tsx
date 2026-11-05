@@ -3,12 +3,12 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
 /**
- * HelpTip — a note that opens on CLICK as well as on hover (Amy, 2026-09-03 side quest, Job 3).
+ * HelpTip — a note that opens on CLICK as well as on hover (ruling 2026-09-03, side quest, Job 3).
  *
  * THE DEFECT. Every explanatory note on the calculator — the FIXED / DERIVED / DEFAULT badges,
  * the pencil glyph, the Beta tag — was an HTML `title` attribute with `cursor: help`. The
  * cursor PROMISED a note; hovering (on a mouse, after a delay) delivered it; clicking did
- * nothing at all, and on a touch screen nothing ever appeared. Amy: *"clicking a value tagged
+ * nothing at all, and on a touch screen nothing ever appeared. The maintainer: *"clicking a value tagged
  * FIXED shows nothing."*
  *
  * THE FIX, AND ITS LIMIT. The element becomes a real button: click toggles the SAME note,

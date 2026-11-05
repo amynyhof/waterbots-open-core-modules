@@ -9,7 +9,7 @@
  *     Q Method 2 §3.6.7–8, BE §3.6.3, PE §3.7, LE §3.8, ER §3.9.1).
  *   • V2 (PAA) numbers retained from the existing vetted derivation (§7.3.7/8/10, §7.4.1/4,
  *     §7.6, §8.2, §9.3, §10.1).
- * The full methodology-order audit + notation alignment is a POST-M9 pass (Amy, 2026-07-25);
+ * The full methodology-order audit + notation alignment is a POST-M9 pass (ruling 2026-07-25);
  * this file only makes the per-basis switch honest, it does not re-order or add equation rows.
  */
 
@@ -174,7 +174,7 @@ export function sym(basis: Basis, key: string): SymbolEntry {
  * "V1.0 SDWS n" / "V2.0 SDWS n" for the basis, or "" when the parameter has no number under that
  * rulebook.
  *
- * ⚠ THE VERSION IS PART OF THE CITATION, NOT DECORATION (Amy, ruling (3), 2026-09-24). The two
+ * ⚠ THE VERSION IS PART OF THE CITATION, NOT DECORATION (ruling (3), 2026-09-24). The two
  * rulebooks number their parameters DIFFERENTLY — QPW_p is SDWS 24 under V1.0 and SDWS 29 under
  * V2.0; N_p is 28 and 33; t_p is 30 and 35 — so a bare "SDWS 29" is not a citation at all in a
  * document whose whole subject is the comparison of the two. It is also how ERR-016 was found:

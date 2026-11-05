@@ -1,12 +1,12 @@
 # Build plan — the open core modules, steps M1 to M9
 
-Each step is one coherent, testable thing Amy can check in one sitting and undo in one motion. Each step is a family;
+Each step is one coherent, testable thing the maintainer can check in one sitting and undo in one motion. Each step is a family;
 its items are the pull requests or checks inside it. `[x]` done (merged), `[~]` open pull request, `[ ]` not started,
-`[!]` blocked until Amy acts. **(V1)** marks an item inside a family that v1 needs, even where the rest of its family
+`[!]` blocked until the maintainer acts. **(V1)** marks an item inside a family that v1 needs, even where the rest of its family
 comes after v1. **(V2)** marks an item planned for v2.
 
 **Every engine change is published first as a release candidate** (a trial version). The private side installs it,
-runs its real-filing tests, and reports back through Amy: pass or fail and the reference line, never a figure. Only
+runs its real-filing tests, and reports back through the maintainer: pass or fail and the reference line, never a figure. Only
 then is it released.
 
 All of M1 to M9 is `Grant: open`. Edits to this plan and the build log are `Grant: neither`.
@@ -15,7 +15,7 @@ All of M1 to M9 is `Grant: open`. Edits to this plan and the build log are `Gran
 
 ## Road to v1
 
-Amy set the v1 finish line on 2026-10-30 and revised it the same day. v1 is done when both are true:
+The maintainer set the v1 finish line on 2026-10-30 and revised it the same day. v1 is done when both are true:
 
 1. **Reliable.** The carbon calculators reproduce two real filings: one household water treatment filing and one
    community water supply filing. The private side checks this; we only hear pass or fail. The water-supply module
@@ -41,21 +41,21 @@ smaller tables, such as the six-row table of fallback factors, are fine as they 
 
 | # | Step | Waits on | Done when |
 |---|---|---|---|
-| V1 | [x] Amy reviews and merges the engine-only entry (pull request #6). Merged. | Amy. | It is on `main`. |
+| V1 | [x] The maintainer reviews and merges the engine-only entry (pull request #6). Merged. | The maintainer. | It is on `main`. |
 | V2 | [x] Make the engine's types complete for projects that use Node's own module rules. (Merged, pull request #8.) | V1. | A fresh project using Node's module rules typechecks against the built package, with no type falling back to "any". |
-| V3 | [x] (Merged, pull request #9.) Sliders for anticipated performance (ex-ante: before the project runs). Each slider is held between a cited floor and a cited ceiling. Each has a pencil to type an exact value, and shows the credited number. The engine works out that number; the screen computes nothing. The default and the cap stay two separate things. | V1; Amy's description of the sliders (from site pull request #156); a cited source for every floor and ceiling. | Tests show each slider stays inside its cited bounds, the pencil value is held to the same bounds, and the number shown is the engine's. Amy checks the screen. |
-| V4 | The simple view, shipped as the next release after V5 (ruling 2026-10-31): it hides the advanced material until asked, with bigger tap buttons (M5.3) and Reef (M5.4). See M5.5. | V5. | A test shows advanced parts are hidden at first and one control shows them. Amy checks the screen. |
-| V5 | [~] (Prepared from `main`; waiting on Amy's go.) The first GitHub release: the packed packages (`calvin` and the `core` it needs) and their fingerprints, with the sliders. Replaces the npm publish in M2.2. It does not wait for the simple view (ruling 2026-10-31). | V2, V3; Amy's approval; branch protection and the tag rule (M1.4). | The release holds the files and their fingerprints. Both sites pin it. The private side reports pass or fail on both carbon filings. |
+| V3 | [x] (Merged, pull request #9.) Sliders for anticipated performance (ex-ante: before the project runs). Each slider is held between a cited floor and a cited ceiling. Each has a pencil to type an exact value, and shows the credited number. The engine works out that number; the screen computes nothing. The default and the cap stay two separate things. | V1; the maintainer's description of the sliders (from site pull request #156); a cited source for every floor and ceiling. | Tests show each slider stays inside its cited bounds, the pencil value is held to the same bounds, and the number shown is the engine's. The maintainer checks the screen. |
+| V4 | The simple view, shipped as the next release after V5 (ruling 2026-10-31): it hides the advanced material until asked, with bigger tap buttons (M5.3) and Reef (M5.4). See M5.5. | V5. | A test shows advanced parts are hidden at first and one control shows them. The maintainer checks the screen. |
+| V5 | [~] (Prepared from `main`; waiting on go.) The first GitHub release: the packed packages (`calvin` and the `core` it needs) and their fingerprints, with the sliders. Replaces the npm publish in M2.2. It does not wait for the simple view (ruling 2026-10-31). | V2, V3; the maintainer's approval; branch protection and the tag rule (M1.4). | The release holds the files and their fingerprints. Both sites pin it. The private side reports pass or fail on both carbon filings. |
 | V6 | The method registry (M3): one entry per carbon method, so both sites pick a method the same way. | V5. | A trial release is out; the private side reports pass on both carbon filings. |
-| V7 | Violet, the water-benefit agent, as her own module: `@waterbots/violet`. She hosts the D-n modules, starting with D-3. Her color is Orchid (`#A457D4`) (ruling 2026-10-31). | V1; Amy's rulings on Violet. | The package builds, passes the package checks, and has a place for each D-n module. |
-| V8 | D-3, the water-supply module, inside Violet (M8.1). | V7; the activity-type signature; Amy's ruling on further gates (N6). | Violet's D-3 tests are hand-worked cases, with every step cited to the guidebook (cited, not copied). The VWBA spec is written alongside the build, in `docs/`, and Amy reviews it then. An outside expert checks the module once the prototype is up. |
+| V7 | Violet, the water-benefit agent, as her own module: `@waterbots/violet`. She hosts the D-n modules, starting with D-3. Her color is Orchid (`#A457D4`) (ruling 2026-10-31). | V1; rulings on Violet. | The package builds, passes the package checks, and has a place for each D-n module. |
+| V8 | D-3, the water-supply module, inside Violet (M8.1). | V7; the activity-type signature; ruling on further gates (N6). | Violet's D-3 tests are hand-worked cases, with every step cited to the guidebook (cited, not copied). The VWBA spec is written alongside the build, in `docs/`, and the maintainer reviews it then. An outside expert checks the module once the prototype is up. |
 | V9 | The screening hand-off: one project record in `core` that every module fills in and the paid site reads. Each module writes how many questions it asked on that walk. | V5; the paid site's save format (paid repo); Wellington's fields (free-site repo). | A test takes an invented project through all four modules' parts, saves it, reads it back unchanged, and gives each module's question count. |
 | V10 | Phoebe (eligibility) to its first release (M9.1). | V9; Phoebe's rulings. | Released; Phoebe fills its part of the record and counts its questions. |
 | V11 | Bridget (the map) to its first release (M9.2). | V9; Bridget's rulings; a rights read on every data file; a ruling on the shared map key. | Released; Bridget fills its part of the record and counts its questions. |
 | V12 | Calvin's screening part: Calvin fills its part of the record and counts its questions. | V9. | A test shows Calvin's part saved and its count written. |
 | V13 | Data on top: the engine takes a site's own tables over the package's, and lists every value that came from the site's tables. | V5. | A test with an invented table shows the answer and the list of changed values. |
 | V14 | The same-numbers check: a project saved by the screening, read back the way the paid site reads it, gives the same numbers, or a list of what changed and why. | V6, V10, V11, V12, V13. | A test passes here on invented projects. The private side runs it on both real filings with the pinned release and reports pass. |
-| V15 | The v1 release: a GitHub release that both sites pin. | V8, V14; Amy's approval. | Both sites run the same pinned file. Amy confirms the whole journey on the live sites, and the average question count is reported. |
+| V15 | The v1 release: a GitHub release that both sites pin. | V8, V14; the maintainer's approval. | Both sites run the same pinned file. The maintainer confirms the whole journey on the live sites, and the average question count is reported. |
 
 **Sources still to find** (from V3):
 
@@ -66,7 +66,7 @@ smaller tables, such as the six-row table of fallback factors, are fine as they 
 
 - npm publishing (M2.2's publish, and the npm scope and token in M1.4). This is v2.
 - Benchmarks and pass rates. This is v2.
-- M1.2 the real number gate, and M1.5 lane 1 auto-merge. Lane 3 review covers figures and names meanwhile. Amy may
+- M1.2 the real number gate, and M1.5 lane 1 auto-merge. Lane 3 review covers figures and names meanwhile. The maintainer may
   pull the number gate forward.
 - M2.3 linting.
 - M4 openings and labels.
@@ -82,7 +82,7 @@ smaller tables, such as the six-row table of fallback factors, are fine as they 
 
 ## M1 — Skeleton and guards, before any code
 
-*Stop for Amy:* read the CI run. *Waits on:* the npm scope (N13) — for publishing only. Amy may revisit the number
+*Stop for the maintainer:* read the CI run. *Waits on:* the npm scope (N13) — for publishing only. The maintainer may revisit the number
 gate's design before the real gate is built.
 
 - [x] **M1.1 Guards and rules**
@@ -95,7 +95,7 @@ gate's design before the real gate is built.
   - [x] Publish with provenance on a tag (`publish.yml`), refusing until the scope is real
   - [x] This plan and the build log
 - [ ] **M1.2 Real number gate:** keyed fingerprints (HMAC-SHA256); key and list as Actions secrets; a missing key
-      fails the run. *Waits on:* Amy's go on the design (N2), then the private side's first fingerprint list.
+      fails the run. *Waits on:* go on the design (N2), then the private side's first fingerprint list.
 - [~] **M1.3 Package skeleton** (open pull request): the empty boxes. No calculator code, no data.
   - [~] Workspace root with TypeScript, vitest and a build; versions pinned, lockfile committed; Node pinned to one
         exact version (24.20.0) in the workflows and `engines`
@@ -105,37 +105,37 @@ gate's design before the real gate is built.
   - [~] The real plug points in `core` (`ModuleProject`, `StandardId`, `SaveOutcome`, the agent contract) and Calvin's
         folders arrive with the seed (M2.1). Design tokens and the base stylesheet are still to do, in their own pull
         request.
-- **M1.4 Amy's hand-steps** — blocked until Amy; Session C cannot do these. **Due before the first release (M2.2).**
+- **M1.4 The maintainer's hand-steps** — blocked until the maintainer; Session C cannot do these. **Due before the first release (M2.2).**
   - [!] Branch protection on `main`: a pull request before merging, every check required, no force pushes or
         deletions, applied to admins too. Can be done now; steps are in pull request #1.
-  - [!] The npm scope: create the npm organisation or confirm Amy owns it (N13)
+  - [!] The npm scope: create the npm organisation or confirm the maintainer owns it (N13)
   - [!] The `NPM_TOKEN` Actions secret
-  - [!] Amy as required reviewer on the `npm-publish` environment, so every release needs her approval
-  - [!] **(V1)** The release tag rule: only Amy and the engineer may create release tags (`v*`, and each module's own,
+  - [!] The maintainer as required reviewer on the `npm-publish` environment, so every release needs their approval
+  - [!] **(V1)** The release tag rule: only the maintainer and the engineer may create release tags (`v*`, and each module's own,
         such as `calvin-v*`). Set it once the GitHub organisation exists.
 - [ ] **M1.5 Lane 1 auto-merge** — not built; the earlier dormant job was removed. Rebuild only when the real
-      number gate (M1.2) exists and Amy says to switch it on. Design: lane 1 and not a draft → arm GitHub's
+      number gate (M1.2) exists and the maintainer says to switch it on. Design: lane 1 and not a draft → arm GitHub's
       auto-merge; any other lane → disarm it. Needs the branch protection above, or it would merge at once.
 - [x] Secret scanning with push protection — already on in the repo settings.
 
 ## M2 — The seed lands
 
-*Stop for Amy:* the private side confirms the package matches the seed. *Waits on:* the seed (Amy's one-time carry).
+*Stop for the maintainer:* the private side confirms the package matches the seed. *Waits on:* the seed (the maintainer's one-time carry).
 
 - [x] **M2.1** Seed arrives unchanged, with its reviewed-version ledger kept exactly as it arrives. Show that the
       carried calculator builds and tests the same under this repo's tool versions (TypeScript 7.0.2, vitest 5.0.5,
       Node 24.20.0), and say so in the pull request. (Merged. `SEEDS.md` records it. No ledger file came with the
       seed; see its known gaps.)
-- [ ] **M2.2** Publish `0.1.0` with no changes to what arrived. *Blocked until* Amy's hand-steps in M1.4 are done.
+- [ ] **M2.2** Publish `0.1.0` with no changes to what arrived. *Blocked until* the maintainer's hand-steps in M1.4 are done.
   - [x] Get it ready (merged, pull request #6): an engine-only entry, `@waterbots/calvin/engine`, added in new files only;
         React made an optional peer of `calvin` and `core`; both set to version 0.1.0. Still `private`.
-  - [!] Publish. Amy's call, after M1.4.
+  - [!] Publish. The maintainer's call, after M1.4.
   - [ ] **(V2)** Rebuild the release on a second machine and show it gives the same bytes: the same fingerprints.
-- [ ] **M2.3 Linting** (was M1.6): add a linter that runs as part of CI, with the strictest settings that fit. Amy
+- [ ] **M2.3 Linting** (was M1.6): add a linter that runs as part of CI, with the strictest settings that fit. The maintainer
       ruled on 2026-10-23 that it comes right after the seed lands (after M2.2), not before it. The seed is carried
       as it is first.
 - [~] **M2.4 (V1)** Tag which of the 47 made-up test cases in `expected-outputs.json` are outputs of Gold Standard's
-      official V1.0 calculator on made-up inputs. Amy reports 26, from an audit on the private side (2026-10-25). The
+      official V1.0 calculator on made-up inputs. The maintainer reports 26, from an audit on the private side (2026-10-25). The
       file marks every case "synthetic" today, so the report's sentence about the official tools cannot be checked
       here. Done when each case carries its source and a test checks the report's claim against the tags.
       (Open pull request. From the note of 2026-10-31: 26 began as the calculator's output, and 5 of them are still
@@ -158,7 +158,7 @@ gate's design before the real gate is built.
 
 ## M4 — Openings and labels, one release candidate each
 
-*Stop for Amy:* the numbers, before and after. *Waits on:* the rulings in the brief.
+*Stop for the maintainer:* the numbers, before and after. *Waits on:* the rulings in the brief.
 
 - [ ] **M4.1** Household opening (usage, labelled "starting point")
 - [ ] **M4.2** Community opening and the operating-days cap, with its label
@@ -167,35 +167,35 @@ gate's design before the real gate is built.
 
 ## M5 — The friendly view
 
-*Stop for Amy:* pixels twice — the mockup, then the built page. *Waits on:* the captured image of today's paid page;
+*Stop for the maintainer:* pixels twice — the mockup, then the built page. *Waits on:* the captured image of today's paid page;
 the litres check on the cap (N5). A step with no image yet has not started.
 
 - [ ] **M5.1** Mockup from the captured image
 - [ ] **M5.2** Built page; the litres slider's **default** and **cap** kept as two separate things
 - [ ] **M5.3 (V1)** Calvin's question rows are big enough to tap on a phone. Done when a test checks their tap size
-      and Amy checks them on a phone.
+      and the maintainer checks them on a phone.
 - [ ] **M5.4 (V1)** Calvin's color is Reef (`#0E8A94`) on his screens (ruling 2026-10-31). Done when his screens use
-      one Reef color token and Amy checks the screen.
+      one Reef color token and the maintainer checks the screen.
 - [ ] **M5.5 (V1)** The simple view ships as Calvin's next release, after the first (ruling 2026-10-31). It is one
       release: the simple view (V4), the bigger tap buttons (M5.3) and Reef (M5.4). Done when that release holds the
-      packed files and their fingerprints, and Amy checks the screens on a phone.
+      packed files and their fingerprints, and the maintainer checks the screens on a phone.
 
 ## M6 — The fuel-mix floor
 
-*Stop for Amy:* before and after for a country with no survey. *Waits on:* a rights read of the WHO clean-fuel
+*Stop for the maintainer:* before and after for a country with no survey. *Waits on:* a rights read of the WHO clean-fuel
 indicator.
 
 - [ ] **M6.1** Fuel-mix floor, labelled
 
 ## M7 — Diesel and grid factors
 
-*Stop for Amy:* a worked pumped system. *Waits on:* the source document held, and a ruled grid-factor source.
+*Stop for the maintainer:* a worked pumped system. *Waits on:* the source document held, and a ruled grid-factor source.
 
 - [ ] **M7.1** Diesel and grid factors
 
 ## M8 — The water-supply method (VWBA D-3)
 
-*Stop for Amy:* the hand-worked cases and the VWBA spec; then an outside expert's check (see V8). *Waits on:* the activity-type signature; any further gates (N6).
+*Stop for the maintainer:* the hand-worked cases and the VWBA spec; then an outside expert's check (see V8). *Waits on:* the activity-type signature; any further gates (N6).
 The first release does not wait for this.
 
 - [ ] **M8.1** Water-supply method entry and engine
@@ -208,13 +208,13 @@ The first release does not wait for this.
 - [ ] **M9.1** Phoebe (eligibility) to its first release
 - [ ] **M9.2** Bridget (the map) to its first release
   - [ ] **(V1)** The map's + and - buttons are big enough to tap on a phone. Done when a test checks their tap size
-        and Amy checks them on a phone.
+        and the maintainer checks them on a phone.
 
 ---
 
 ## Safety passes
 
-Amy's safety passes cover all three repos. This repo's own parts are listed here.
+The maintainer's safety passes cover all three repos. This repo's own parts are listed here.
 
 - [ ] **SP6 — Human engineer review of the structure**, covering all three repos. A human engineer reads how the
       repos are laid out and how they fit together, and reports. Do it now. It does **not** block any M step.
@@ -238,7 +238,7 @@ Amy's safety passes cover all three repos. This repo's own parts are listed here
 
 ## Open questions
 
-- **N2:** Amy may revisit the number gate's design before M1.2.
+- **N2:** The maintainer may revisit the number gate's design before M1.2.
 - **N4:** how the transition splits (not ruled). The recommendation: build the maths, not the checklist.
 - **N5:** whether a higher litres cap applies with true meters — affects the cap only.
 - **N6:** whether further gates stand on D-3.

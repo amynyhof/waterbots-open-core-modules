@@ -2,7 +2,7 @@
   "pathway": "cross-cutting",
   "dataset": "age-shares-default",
   "version": "2.0.0",
-  "description": "National age-distribution shares (under-5 / 5-18 / 19+) — the DEFAULT split for the Table 9 age-split helper (CALCULATOR_SPEC §3.1.1) when a project lacks age-disaggregated data. FULL COVERAGE: every country the UN WPP source provides. Labelled a default; replaceable by real survey data. Table 9 age tiers applied on household runs under v2.0 from calculator v0.5.0 (Amy's ruling R4, 2026-09-21; [#24]).",
+  "description": "National age-distribution shares (under-5 / 5-18 / 19+) — the DEFAULT split for the Table 9 age-split helper (CALCULATOR_SPEC §3.1.1) when a project lacks age-disaggregated data. FULL COVERAGE: every country the UN WPP source provides. Labelled a default; replaceable by real survey data. Table 9 age tiers applied on household runs under v2.0 from calculator v0.5.0 (ruling R4, 2026-09-21; [#24]).",
   "registrySources": [
     "un-wpp-2024-pop-age1"
   ],

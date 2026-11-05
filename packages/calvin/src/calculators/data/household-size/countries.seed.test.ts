@@ -1,4 +1,4 @@
-// THE SEED VERSION of ./countries.test.ts (CARRY_RULES C7; Amy, 2026-10-23). The same checks, with
+// THE SEED VERSION of ./countries.test.ts (CARRY_RULES C7; ruling 2026-10-23). The same checks, with
 // every registry id checked against the public source index rather than the source registry, which
 // never crosses. A seed carries the index filtered to the rows it names; this site carries all of it,
 // so the test runs, and passes, on both. The full test stays here.
@@ -51,7 +51,7 @@ describe("UN household-size default (M8 population-input toggle)", () => {
     }
   });
 
-  it("holds no stand-in for a missing country — household size is then the project's own, asked for (Amy, 2026-10-23)", () => {
+  it("holds no stand-in for a missing country — household size is then the project's own, asked for (ruling 2026-10-23)", () => {
     // The 25th-percentile quartile dial was our own statistic, not a published default. Its record
     // left this file for the maintainers' archive on 2026-10-23.
     expect((householdSize as Record<string, unknown>).fallback).toBeUndefined();

@@ -27,7 +27,7 @@ import m49Json from "../data/regions/un-m49.json" with { type: "json" };
  * A country missing from a lookup gets NO stand-in statistic of ours. fNRB takes the official
  * multi-national value or refuses (ruling (3), 2026-09-21); DAF takes the tool's own fallback,
  * labelled; household size is the project's own or the cited UN figure, else the run refuses and
- * the screens ask for it (Amy, 2026-10-23). The quartile dial (`fallback.ts`) no longer fires.
+ * the screens ask for it (ruling 2026-10-23). The quartile dial (`fallback.ts`) no longer fires.
  */
 
 type HouseholdData = {
@@ -44,7 +44,7 @@ type FnrbVintage = {
   countries: Record<string, { name?: string; fnrb: number }>;
   /**
    * A6.4-AMT-009 Table 2's official multi-national values, keyed by the UN M49 tool region
-   * (Amy's ruling (3), 2026-09-21). Present on the default vintage. The quartile dial that
+   * (ruling (3), 2026-09-21). Present on the default vintage. The quartile dial that
    * stood here until calculator v0.10.0 is struck in the data file, not deleted.
    */
   multiNational?: FnrbMultiNational;
@@ -107,7 +107,7 @@ export interface ScenarioInput {
   countryIso: string;
   litresPerPersonPerDay: number;
   /**
-   * V2 volume basis (Amy's ruling R4, 2026-09-21; [#24]). Default `"table9"` on a PAA run when no
+   * V2 volume basis (ruling R4, 2026-09-21; [#24]). Default `"table9"` on a PAA run when no
    * per-person volume was entered: Table 9 age tiers weighted by the country's census age shares
    * (`ageShares` may replace them with a project survey). `"flat"` = use `litresPerPersonPerDay`
    * (an entered design or WCFT value). Legacy runs always use the flat value (V1 SDWS 24).
@@ -129,7 +129,7 @@ export interface ScenarioInput {
   stoveStrataOverride?: ResolvedStratum[];
   fuelMixOverride?: FuelSpec[];
   /**
-   * The shares typed on the seat's stove and fuel rows (Amy's ruling (1), 2026-09-26). Resolved
+   * The shares typed on the seat's stove and fuel rows (ruling (1), 2026-09-26). Resolved
    * here by `resolveBaselineEdit` — the engine, never the screen, turns shares into strata. A half
    * that fails the 100% guard is held and the preset stands for it; `baselineMix.held` says why.
    * Ignored for a half that a raw `…Override` above already sets.
@@ -138,7 +138,7 @@ export interface ScenarioInput {
   /** The V2.0 charcoal factor set for a charcoal share that is not typed (the country default). */
   charcoalConvention?: CharcoalConvention;
   /**
-   * Use the cited per-country mix where the country has data (default true — Amy's ruling (5)).
+   * Use the cited per-country mix where the country has data (default true — ruling (5)).
    * `false` pins the screening preset, for a caller that is testing the preset itself.
    */
   countryDefaults?: boolean;
@@ -254,7 +254,7 @@ interface Resolved {
 
 /**
  * HOUSEHOLD SIZE: the project's own, else the cited UN national average — and nothing else
- * (Amy, 2026-10-23). The 25th-percentile stop of the UN table that stood in for a country with no
+ * (ruling 2026-10-23). The 25th-percentile stop of the UN table that stood in for a country with no
  * UN figure was our own statistic, not a published default, and is gone (its record is in the
  * maintainers' archive). With neither, there is NO household size: a run that needs one refuses
  * (`ProjectFactMissingError("householdSize")`) and the screens ask for it.
@@ -288,7 +288,7 @@ export function householdSizeNeeded(input: { method?: QuantityMethod | null; pop
 
 /**
  * PEOPLE AND HOUSEHOLDS, DECIDED IN ONE PLACE AND IN BOTH DIRECTIONS
- * ([#225]; Amy's rulings of 2026-09-24, first and second rejections).
+ * ([#225]; rulings of 2026-09-24, first and second rejections).
  *
  * A household-treatment project is counted two ways and the two are one fact:
  *
@@ -302,7 +302,7 @@ export function householdSizeNeeded(input: { method?: QuantityMethod | null; pop
  * ⚠ WHY BOTH DIRECTIONS, AND WHY IT IS EXPORTED. The first build derived only one way and the
  * screens showed only one number, so a household count sat beside an N_p of the same value and
  * read as "that many people, one per house". The second rejection went further: entering PEOPLE on a
- * household project left the households unknown, so Eq.6 could not run at all. Amy withdrew the
+ * household project left the households unknown, so Eq.6 could not run at all. The maintainer withdrew the
  * earlier "nothing fires on People" instruction for exactly that reason — for HWT/IWT the
  * households are always knowable, and a number in force must be on screen. A second copy of this
  * rule in the UI would drift from the engine's, silently; one function, three readers.
@@ -312,7 +312,7 @@ export function householdSizeNeeded(input: { method?: QuantityMethod | null; pop
  * people ÷ households would stop equalling the household size shown. The figure is displayed as
  * it is used.
  *
- * ⚠ A MISSING COUNTING UNIT IS REFUSED, NEVER READ AS PEOPLE (Amy, 2026-10-25). With no
+ * ⚠ A MISSING COUNTING UNIT IS REFUSED, NEVER READ AS PEOPLE (ruling 2026-10-25). With no
  * people/households choice this throws `ProjectFactMissingError("countedAs")`, the same refusal
  * `computeScenario` gives, so no caller can get a "people" reading nobody chose.
  *
@@ -362,7 +362,7 @@ export function derivePopulation(input: {
 
 /**
  * fNRB has NO official default for this country — the engine refuses rather than inventing one
- * (Amy's ruling (3)(b), 2026-09-21). A6.4-AMT-009 publishes national values for 90 countries
+ * (ruling (3)(b), 2026-09-21). A6.4-AMT-009 publishes national values for 90 countries
  * (Table 3) and multi-national values for three regions (Table 2); a country in neither list has
  * no number the tool will stand behind, and a quartile of the countries that happen to be in a
  * table is our own statistic, not a published default. The only way forward is the project's own
@@ -451,7 +451,7 @@ function resolveFnrb(iso: string, vintageId: string, override?: number | null): 
   if (c) return { value: c.fnrb, vintage: vId, prov: { field: "fNRB", label: `${c.name ?? iso} fNRB — ${v.label}`, source: "country" } };
 
   // No national row. The OFFICIAL fallback is Table 2's multi-national value for the country's
-  // UN M49 region — never a quartile of the table (struck 2026-09-22, Amy's ruling (3)).
+  // UN M49 region — never a quartile of the table (struck 2026-09-22, ruling (3)).
   const region = toolRegionFor(iso);
   const mn = v.multiNational;
   const r = region.key && mn ? mn.regions[region.key] : undefined;
@@ -468,7 +468,7 @@ function resolveFnrb(iso: string, vintageId: string, override?: number | null): 
 }
 
 /**
- * Legacy (V1.0-faithful) fNRB — Amy's ruling R1 (2026-09-21; reviewer comment 1.9 / 2.1):
+ * Legacy (V1.0-faithful) fNRB — ruling R1 (2026-09-21; reviewer comment 1.9 / 2.1):
  *   A. a saved project's FILED V1 value, when entered;
  *   C. otherwise fNRB is HELD EQUAL to the V2 value on both sides, and the page says so in words.
  * Never B silently. The value that stood here until calculator v0.7.0 was the applied value left in
@@ -478,7 +478,7 @@ function resolveFnrb(iso: string, vintageId: string, override?: number | null): 
  */
 /**
  * THE FILED V1.0 fNRB IS REQUIRED FOR A TRANSITION RUN — "held equal on both sides" is RETIRED
- * (Amy's R1 amendment, 2026-09-24, part 1).
+ * (R1 amendment, 2026-09-24, part 1).
  *
  * Until today a legacy run with no filed value fell back to the V2 value and said so in words.
  * That fallback is gone. A transition compares THIS project's filing against the current rules,
@@ -499,7 +499,7 @@ export class FiledFnrbRequiredError extends Error {
 }
 
 /**
- * A PROJECT FACT THE RUN WOULD OTHERWISE HAVE TO ASSUME (CALCULATOR_SPEC §0.2, Amy 2026-10-23).
+ * A PROJECT FACT THE RUN WOULD OTHERWISE HAVE TO ASSUME (CALCULATOR_SPEC §0.2, ruling 2026-10-23).
  * Project facts are blank until provided, never defaulted. The engine used to take Method 1 from
  * its default baseline preset when a caller gave neither a method nor a preset — a technology
  * nobody said. A caller that names a preset has chosen that preset's method; one that names
@@ -562,9 +562,9 @@ function resolveDaf(iso: string, override?: number): { value: number; prov: Prov
   const c = daf.countries[iso];
   if (c) return { value: c.daf_2026_2030, prov: { field: "DAF", label: `${c.name} DAF 2026-2030 (${c.basis}; Tool 05 Table 03)`, source: "country" } };
   // A country with no row in the data file takes the floor, and the screens print this label beside the
-  // value (Amy, 19 Oct). The label states the value, that it is a default and whose fallback it is (Amy,
+  // value (ruling 19 Oct). The label states the value, that it is a default and whose fallback it is (ruling
   // 25 Oct), and nothing about which rows the table holds, because a copy of this engine may carry fewer rows
-  // than the tool publishes (Amy, 23 Oct).
+  // than the tool publishes (ruling 23 Oct).
   return { value: daf.absolute_floor.value, prov: { field: "DAF", label: `Default value: ${daf.absolute_floor.value} (Gold Standard DAF tool's fallback).`, source: "global-default" } };
 }
 
@@ -581,7 +581,7 @@ export function computeScenario(input: ScenarioInput): ScenarioResult {
   // Each half resolves on its own: a raw caller override, else entered shares that pass the 100%
   // guard, else the preset. The guard's refusals travel in `baselineMix.held` to be printed.
   const edit = input.baselineEdit ? resolveBaselineEdit(input.baselineEdit, input.version) : undefined;
-  // THE COUNTRY DEFAULT ([#227]; Amy's ruling (5), 2026-09-26) stands in for the screening preset,
+  // THE COUNTRY DEFAULT ([#227]; ruling (5), 2026-09-26) stands in for the screening preset,
   // per half, wherever the country has data. It runs through the SAME resolver and 100% guard as
   // typed shares, so a country figure and a typed figure are turned into strata the one same way.
   const charcoalConvention = input.baselineEdit?.charcoalConvention ?? input.charcoalConvention ?? defaultCharcoalConvention(input.countryIso);
@@ -603,7 +603,7 @@ export function computeScenario(input: ScenarioInput): ScenarioResult {
   if (input.method == null && input.preset == null) throw new ProjectFactMissingError("technology");
   const method: QuantityMethod = input.method ?? preset.method;
   // Whether the count is people or households is a PROJECT FACT too: never read as people when
-  // the caller did not say (Amy, 2026-10-23).
+  // the caller did not say (ruling 2026-10-23).
   if (input.populationMode == null) throw new ProjectFactMissingError("countedAs");
   const describe = (src: BaselineMixSource, half: "stove" | "fuel") =>
     src === "entered" ? `${half} shares entered for this project (SDWS ${half === "stove" ? 6 : 8})`
@@ -647,7 +647,7 @@ export function computeScenario(input: ScenarioInput): ScenarioResult {
   // the households it implies. The PEOPLE COUNT IS UNTOUCHED either way — on a people-entered run
   // it is the entered figure, exactly as before — so no existing scenario's arithmetic moves.
   const pop = derivePopulation({ ...input, method });
-  // A run that needs a household size and has none refuses rather than guess one (Amy, 2026-10-23).
+  // A run that needs a household size and has none refuses rather than guess one (ruling 2026-10-23).
   const countGiven = Number.isFinite(input.populationCount) && input.populationCount > 0;
   if (countGiven && !pop && householdSizeNeeded({ method, populationMode: input.populationMode, premises: input.premises })) {
     throw new ProjectFactMissingError("householdSize");
@@ -799,7 +799,7 @@ export interface WaterfallStep {
 }
 
 /**
- * The "fNRB rule update (<year>)" line — Amy's amended R1 (2026-09-21; reviewer comment 2.1).
+ * The "fNRB rule update (<year>)" line — amended R1 (2026-09-21; reviewer comment 2.1).
  * The fNRB change is a RULE UPDATE that applies under V1.0 and V2.0 alike, not a methodology-version
  * effect, so it is reported on its own and kept OUT of the transition table. It is the legacy (V1.0)
  * ER at the project's FILED fNRB versus the legacy ER at the current standardised-tool value. With no
