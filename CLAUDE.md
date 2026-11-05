@@ -89,6 +89,18 @@ Everything here is public: README, docs, cards, screen text, commit messages, PR
   computed number.
 - Keep the **default** and the **cap** of the litres slider as two separate things, in code and on screen.
 
+### Where a value comes from
+
+Every value shown to a user says where it came from. It never credits a ruling or a person.
+- Entered: the user typed it. The source is the user.
+- Default: the site filled it in from a published source (document, section, page). The user's own local value replaces it.
+- Derived: worked out from other values. It shows the source of its formula.
+- Assumed: expected project performance, starting from a cited value.
+
+If no published source gives a default for a value, the site leaves it blank, and the user enters it.
+
+Stove and fuel presets: do not raise their sources with the maintainer until the pending permission replies arrive.
+
 ### Never write
 
 - A real project's name or figure, or a reviewer's or partner's name or organisation.
