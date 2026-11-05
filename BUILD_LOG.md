@@ -6,7 +6,7 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ## 2026-11-05 — Data notes on screen cite their source; preset sources logged; where a value comes from
 
-**Done (branch `data-notes-sources`, built on `maintainer-wording`):** ruling 2026-11-02.
+**Done (branch `data-notes-sources`, built on `role-wording`):** ruling 2026-11-02.
 - Every note in Calvin's data files that reaches a screen, the report or Calvin's replies was read. None credits a
   ruling or a person. Each names its source: the fNRB labels, multi-national citation, footnote and refusal
   (A6.4-AMT-009 Tables 2 and 3), the rule-update line (its instrument), the DAF country rows (Tool 05 Table 03), the
