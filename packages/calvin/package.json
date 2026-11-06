@@ -20,7 +20,12 @@
     "./engine": {
       "types": "./dist/engine.d.ts",
       "default": "./dist/engine.js"
-    }
+    },
+    "./screen": {
+      "types": "./dist/screen.d.ts",
+      "default": "./dist/screen.js"
+    },
+    "./styles.css": "./dist/styles.css"
   },
   "files": [
     "dist",
@@ -30,8 +35,10 @@
   "scripts": {
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
-    "build": "tsc -p tsconfig.build.json && npm run build:engine",
-    "build:engine": "rolldown src/engine.ts --format esm --platform neutral --file dist/engine.js --sourcemap"
+    "build": "tsc -p tsconfig.build.json && npm run build:engine && npm run build:screen && npm run build:css",
+    "build:engine": "rolldown src/engine.ts --format esm --platform neutral --file dist/engine.js --sourcemap",
+    "build:screen": "rolldown -c rolldown.screen.config.mjs",
+    "build:css": "node -e \"require('node:fs').copyFileSync('src/modules/calvin/styles.css', 'dist/styles.css')\""
   },
   "dependencies": {
     "@waterbots/core": "0.1.0"

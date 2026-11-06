@@ -95,7 +95,7 @@ Every value shown to a user says where it came from. It never credits a ruling o
 - Entered: the user typed it. The source is the user.
 - Default: the site filled it in from a published source (document, section, page). The user's own local value replaces it.
 - Derived: worked out from other values. It shows the source of its formula.
-- Assumed: expected project performance, starting from a cited value.
+- Assumed: expected project performance, labelled 'assumed'. Calvin encourages the user to adjust it to their planned project.
 
 Three kinds of value (Calvin carbon modules):
 - Project facts (the project record): the user gives them at intake, and Wellington collects them. Until then, the field shows 'awaiting user project input'. Never guessed.

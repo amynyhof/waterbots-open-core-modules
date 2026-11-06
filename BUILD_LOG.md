@@ -4,6 +4,31 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-11-05 — The screen entry: both views, mountable from the packed files
+
+**Done (branch `screen-entry`):** ruling 2026-11-05. Before this, the packed Calvin package let a site import only its
+name and the engine. The screens were in the files, but no entry reached them, and the stylesheet was not packed.
+- `@waterbots/calvin/screen`: the state hook, the controls panel, the work surface, the report and the version tabs,
+  with their types. The build bundles it into one file, `dist/screen.js`. React and `@waterbots/core` stay outside it.
+- `@waterbots/calvin/styles.css`: the report's print rules, now copied into `dist` and exported.
+- `@waterbots/core/base.css` (plan M1.3): the design tokens and every class the screens use, for a site without a
+  design system of its own. The tokens have no weight, so a site's own values win. Every colour is a starting point.
+  A test fails if a screen uses a class or a token that no stylesheet defines.
+- `exAnteOnly`, a new option of the state hook: every run is ex-ante, a saved ex-post analysis opens as ex-ante, a
+  change to ex-post is dropped, and the sliders are on. The open site's screening uses it. The paid site leaves it
+  off and shows both views.
+- `scripts/check-screen-entry.mjs`, run by `npm test`: packs both packages, installs them alone with React, and
+  renders from the packed files the ex-ante view (also for a saved ex-post analysis), the ex-post view and its
+  report. It also finds both stylesheets by name and typechecks a file that imports the entry.
+- The `styles.css` comment names no one now.
+- `CLAUDE.md`: the "Assumed" line now matches the three kinds of value. The usage slider's start (100%, labelled
+  "assumed") is settled; its source is M10.4 in the source sweep.
+- The release (V5) stays held. It is rebuilt only after this merges.
+
+**Checked:** see the pull request.
+
+**Open:** nothing new. The packed files from 2026-11-05 are not shipped.
+
 ## 2026-11-05 — Three kinds of value
 
 **Done (same branch, `data-notes-sources`):** ruling 2026-11-05. In `CLAUDE.md`, under "Where a value comes from", the

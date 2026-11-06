@@ -17,6 +17,7 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./base.css": "./dist/base.css",
     "./*": {
       "types": "./dist/*.d.ts",
       "default": "./dist/*.js"
@@ -30,7 +31,8 @@
   "scripts": {
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
-    "build": "tsc -p tsconfig.build.json"
+    "build": "tsc -p tsconfig.build.json && npm run build:css",
+    "build:css": "node -e \"require('node:fs').copyFileSync('src/base.css', 'dist/base.css')\""
   },
   "peerDependencies": {
     "react": "19.3.1"

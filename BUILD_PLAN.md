@@ -45,7 +45,7 @@ smaller tables, such as the six-row table of fallback factors, are fine as they 
 | V2 | [x] Make the engine's types complete for projects that use Node's own module rules. (Merged, pull request #8.) | V1. | A fresh project using Node's module rules typechecks against the built package, with no type falling back to "any". |
 | V3 | [x] (Merged, pull request #9.) Sliders for anticipated performance (ex-ante: before the project runs). Each slider is held between a cited floor and a cited ceiling. Each has a pencil to type an exact value, and shows the credited number. The engine works out that number; the screen computes nothing. The default and the cap stay two separate things. | V1; the maintainer's description of the sliders (from site pull request #156); a cited source for every floor and ceiling. | Tests show each slider stays inside its cited bounds, the pencil value is held to the same bounds, and the number shown is the engine's. The maintainer checks the screen. |
 | V4 | The simple view, shipped as the next release after V5 (ruling 2026-10-31): it hides the advanced material until asked, with bigger tap buttons (M5.3) and Reef (M5.4). See M5.5. | V5. | A test shows advanced parts are hidden at first and one control shows them. The maintainer checks the screen. |
-| V5 | [~] (Prepared from `main`; waiting on go.) The first GitHub release: the packed packages (`calvin` and the `core` it needs) and their fingerprints, with the sliders. Replaces the npm publish in M2.2. It does not wait for the simple view (ruling 2026-10-31). | V2, V3; the maintainer's approval; branch protection and the tag rule (M1.4). | The release holds the files and their fingerprints. Both sites pin it. The private side reports pass or fail on both carbon filings. |
+| V5 | [~] (Held, ruling 2026-11-05: rebuilt only after the screen entry merges.) The first GitHub release: the packed packages (`calvin` and the `core` it needs) and their fingerprints, with both views: the ex-ante view with sliders, and the full ex-post view. A site mounts them through `@waterbots/calvin/screen`; the open site locks to ex-ante. Replaces the npm publish in M2.2. It does not wait for the simple view (ruling 2026-10-31). | V2, V3; the maintainer's approval; branch protection and the tag rule (M1.4). | The release holds the files and their fingerprints. Both sites pin it. The private side reports pass or fail on both carbon filings. |
 | V6 | The method registry (M3): one entry per carbon method, so both sites pick a method the same way. | V5. | A trial release is out; the private side reports pass on both carbon filings. |
 | V7 | Violet, the water-benefit agent, as her own module: `@waterbots/violet`. She hosts the D-n modules, starting with D-3. Her color is Orchid (`#A457D4`) (ruling 2026-10-31). | V1; rulings on Violet. | The package builds, passes the package checks, and has a place for each D-n module. |
 | V8 | D-3, the water-supply module, inside Violet (M8.1). | V7; the activity-type signature; ruling on further gates (N6). | Violet's D-3 tests are hand-worked cases, with every step cited to the guidebook (cited, not copied). The VWBA spec is written alongside the build, in `docs/`, and the maintainer reviews it then. An outside expert checks the module once the prototype is up. |
@@ -57,10 +57,7 @@ smaller tables, such as the six-row table of fallback factors, are fine as they 
 | V14 | The same-numbers check: a project saved by the screening, read back the way the paid site reads it, gives the same numbers, or a list of what changed and why. | V6, V10, V11, V12, V13. | A test passes here on invented projects. The private side runs it on both real filings with the pinned release and reports pass. |
 | V15 | The v1 release: a GitHub release that both sites pin. | V8, V14; the maintainer's approval. | Both sites run the same pinned file. The maintainer confirms the whole journey on the live sites, and the average question count is reported. |
 
-**Sources still to find** (from V3):
-
-- [ ] A cited source for the starting value of the share of homes that really use the device (100%). Until then
-      its slider says "assumed: no source yet". `startsWithoutSource` in `screen/exAnte.ts` lists every such start.
+**Sources still to find** (from V3): moved to the source sweep, M10.4 (ruling 2026-11-05).
 
 **After v1** (not needed for the finish line):
 
@@ -103,8 +100,8 @@ gate's design before the real gate is built.
         `LICENSE` and `NOTICE` (copyright line: WaterBots AI, LLC), and a README that says it is empty for now. All marked `private`: nothing goes to npm.
   - [~] `scripts/check-packages.mjs`, run by the test job: keeps every package private, licensed and empty-for-now
   - [~] The real plug points in `core` (`ModuleProject`, `StandardId`, `SaveOutcome`, the agent contract) and Calvin's
-        folders arrive with the seed (M2.1). Design tokens and the base stylesheet are still to do, in their own pull
-        request.
+        folders arrive with the seed (M2.1). Design tokens and the base stylesheet: `@waterbots/core/base.css`, for a site
+        without a design system of its own (ruling 2026-11-05).
 - **M1.4 The maintainer's hand-steps** — blocked until the maintainer; Session C cannot do these. **Due before the first release (M2.2).**
   - [!] Branch protection on `main`: a pull request before merging, every check required, no force pushes or
         deletions, applied to admins too. Can be done now; steps are in pull request #1.
@@ -235,6 +232,9 @@ and the IPCC 2006 citations.
       table as corrected by the IPCC's corrigenda; then code kerosene's and coal's values, which count at zero today.
 - [ ] **M10.3 (V2) Every other agent and module.** The same check for each agent's and module's sources: each value
       shown says where it came from, as `CLAUDE.md` sets out.
+- [ ] **M10.4 (V2) The usage slider's source.** The share of homes that really use the device starts at 100%,
+      labelled "assumed" (ruling 2026-11-05, settled). A cited source for it is found in the sweep.
+      `startsWithoutSource` in `screen/exAnte.ts` lists every start with no source.
 
 ---
 
