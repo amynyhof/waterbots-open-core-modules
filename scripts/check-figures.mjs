@@ -55,16 +55,34 @@ import { fileURLToPath } from "node:url";
  * The SHA-256 fingerprint of the figures list's marker line, trimmed. The text itself stays private. Empty means the
  * maintainer has not supplied it yet, and the gate cannot run on a real list.
  */
-export const MARKER_FINGERPRINT = "";
+export const MARKER_FINGERPRINT = "35efaa7086225cdf58f6499994c6d0882bc1f0a3ce993030ce6bcbecc7f9363f";
 
 /** Figures hunted only from this many significant digits. */
 export const MIN_SIGNIFICANT = 3;
 
 /**
- * Published method values that may appear in this repo, each with its source (document, section, page). A hit on one
- * is reported as allowed. Compared on the entry with its commas removed. Empty for now (ruling 2026-11-06).
+ * Published values that may appear in this repo, each with its source, held as narrowly as possible. A hit is let
+ * through only when all of these hold:
+ *   - the file is one of `files` (the source table, or a built copy of it);
+ *   - the number is the value of `field` inside one of the `records`, with no brace between the record's name and it;
+ *   - the number, as written, has the fingerprint pinned for that record.
+ * The same number anywhere else is still a hit. A hit let through is reported as allowed.
  */
-export const ALLOWED = [];
+export const ALLOWED = [
+  {
+    // Ruling 2026-11-06. Published national averages, not project data.
+    what: "UN average household size (people per household) for Lesotho, Malawi and Rwanda",
+    source: 'UN DESA, Population Division, "Household Size and Composition" (2022), column "Average household size (number of members)"',
+    field: "peoplePerHousehold",
+    // Each pinned value is held as its SHA-256 fingerprint, so the number itself is not written here (it is on the list).
+    records: {
+      LSO: "e5f1b17e201583091ae8669c78ff8c1f3a7bb8a6ec7168b404c17a9c295e0318",
+      MWI: "c6f66270ea03e4cd5c5b7868f6edbb4f22f5ee6192a0e01466ae37df0ad242e5",
+      RWA: "c6f66270ea03e4cd5c5b7868f6edbb4f22f5ee6192a0e01466ae37df0ad242e5",
+    },
+    files: [/(^|\/)calculators\/data\/household-size\/countries\.json$/, /(^|\/)dist\/(engine|screen)\.js$/],
+  },
+];
 
 const SKIP_DIRS = new Set([".git", "node_modules"]);
 const FIGURE = /^-?\d[\d,]*(?:\.\d+)?$/;
@@ -125,9 +143,9 @@ export function parseFigures(text, marker = MARKER_FINGERPRINT) {
         short++;
         return;
       }
-      item = { kind: "figure", forms, key: `figure:${plain}`, plain, from };
+      item = { kind: "figure", forms, key: `figure:${plain}`, plain, from, part: built ? "built" : "hand-kept" };
     } else {
-      item = { kind: "word", forms: [entry.toLowerCase()], key: `word:${entry.toLowerCase()}`, from };
+      item = { kind: "word", forms: [entry.toLowerCase()], key: `word:${entry.toLowerCase()}`, from, part: built ? "built" : "hand-kept" };
     }
     if (built) builtEntries++;
     entries.push(item);
@@ -187,45 +205,75 @@ function count(entries) {
 
 const isDigit = (ch) => ch !== undefined && ch >= "0" && ch <= "9";
 
-/** True when `form` appears in `line` with the boundaries its kind needs. */
-export function entryHits(entry, line) {
-  if (entry.kind === "word") return line.toLowerCase().includes(entry.forms[0]);
+/** Every place `entry` appears in `line` with the boundaries its kind needs: where it starts, and the text there. */
+export function entryMatches(entry, line) {
+  const found = [];
+  if (entry.kind === "word") {
+    const lower = line.toLowerCase();
+    const word = entry.forms[0];
+    for (let at = lower.indexOf(word); at !== -1; at = lower.indexOf(word, at + 1)) found.push({ at, text: line.slice(at, at + word.length) });
+    return found;
+  }
   for (const form of entry.forms) {
     for (let at = line.indexOf(form); at !== -1; at = line.indexOf(form, at + 1)) {
       const before = line[at - 1];
       const after = line[at + form.length];
       const beforeOk = entry.kind === "figure" ? !isDigit(before) && before !== "." : !isDigit(before);
-      if (beforeOk && !isDigit(after)) return true;
+      if (beforeOk && !isDigit(after)) found.push({ at, text: form });
     }
   }
-  return false;
+  return found;
 }
 
-/** True when a hit on this entry, in a file at `path`, is let through. Returns the reason, or null. */
-export function allowedReason(entry, path) {
-  if (entry.kind === "figure" && ALLOWED.some((a) => a.value.replace(/,/g, "") === entry.plain)) return "published value";
+export const entryHits = (entry, line) => entryMatches(entry, line).length > 0;
+
+// How much text before a match is read to find the record and field it sits in.
+const CONTEXT = 400;
+const recordField = (field) => new RegExp(`"?([A-Z]{3})"?\\s*:\\s*\\{[^{}]*"?${field}"?\\s*:\\s*$`);
+
+/** True when a match is a published value let through by ALLOWED. `before` is the text just before the match. */
+export function isPublishedValue(entry, path, before, text, rules = ALLOWED) {
+  if (entry.kind !== "figure" || !path || before === null) return false;
+  return rules.some((a) => {
+    if (!a.files.some((re) => re.test(path))) return false;
+    const m = recordField(a.field).exec(before);
+    return m !== null && a.records[m[1]] === fingerprint(text);
+  });
+}
+
+/**
+ * Why a match is let through, or null. `path` is null for a commit or tag message, and `before` is null for a file
+ * name: neither gets the published-value allowance.
+ */
+export function allowedReason(entry, path, before = null, text = null) {
+  if (isPublishedValue(entry, path, before, text)) return "published value";
   if (path && entry.allowedIn.some((end) => path.endsWith(end))) return "allowed in this file";
   return null;
 }
 
 /**
  * Lines of `text` that hold an entry. Returns { line, from, allowed } only, never the entry. `path` is used for the
- * "allowed in" option; it is null for a commit or tag message.
+ * allowances; it is null for a commit or tag message. A line is let through only if every match on it is.
  */
 export function scanText(text, lists, path = null) {
   const hits = [];
+  let start = 0;
   text.split(/\r?\n/).forEach((line, i) => {
     let found = null;
     for (const e of lists.entries) {
-      if (!entryHits(e, line)) continue;
-      const allowed = allowedReason(e, path);
-      if (!allowed) {
-        found = { line: i + 1, from: e.from, allowed: null };
-        break;
+      for (const m of entryMatches(e, line)) {
+        const at = start + m.at;
+        const allowed = allowedReason(e, path, text.slice(Math.max(0, at - CONTEXT), at), m.text);
+        if (!allowed) {
+          found = { line: i + 1, from: e.from, allowed: null };
+          break;
+        }
+        found ??= { line: i + 1, from: e.from, allowed };
       }
-      found ??= { line: i + 1, from: e.from, allowed };
+      if (found && !found.allowed) break;
     }
     if (found) hits.push(found);
+    start += line.length + (text[start + line.length] === "\r" ? 2 : 1);
   });
   return hits;
 }

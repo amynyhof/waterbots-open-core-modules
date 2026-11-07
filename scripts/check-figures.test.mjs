@@ -5,6 +5,7 @@ import { mkdtempSync, writeFileSync, mkdirSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { execFileSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 import {
   parseFigures,
   parseRegistry,
@@ -18,6 +19,8 @@ import {
   ListError,
   CI_NOTICE,
   MARKER_FINGERPRINT,
+  ALLOWED,
+  isPublishedValue,
 } from "./check-figures.mjs";
 
 const tmp = () => mkdtempSync(join(tmpdir(), "number-gate-"));
@@ -55,9 +58,8 @@ test("the list is split at the marker; figures, words and short figures are told
   assert.equal(entries[1].from, "case-k1");
 });
 
-test("the code ships with no marker fingerprint until the maintainer supplies one, so a real run stops", () => {
-  assert.equal(typeof MARKER_FINGERPRINT, "string");
-  assert.match(MARKER_FINGERPRINT, /^(|[0-9a-f]{64})$/);
+test("the marker is held only as a fingerprint, and an empty one stops the run", () => {
+  assert.match(MARKER_FINGERPRINT, /^[0-9a-f]{64}$/);
   assert.throws(() => parseFigures(FIGURES, ""), ListError);
 });
 
@@ -129,6 +131,44 @@ test("'allowed in' lets a value through in files whose path ends with it, and no
   assert.deepEqual(scanText("5190", l, null).map((h) => h.allowed), [null], "a message has no path, so no allowance");
 });
 
+// A made-up allowance, shaped like the real one, so no real value is written here.
+const RULES = [{ field: "madeUpField", records: { ZZA: fingerprint("812.4") }, files: [/(^|\/)made-up\/table\.json$/, /(^|\/)dist\/engine\.js$/] }];
+const FIG = { kind: "figure" };
+const allowedAt = (text, path, nth = 0) => {
+  let at = -1;
+  for (let i = 0; i <= nth; i++) at = text.indexOf("812.4", at + 1);
+  return isPublishedValue(FIG, path, text.slice(0, at), "812.4", RULES);
+};
+
+test("a published value is let through only in its field, in its record, in its files", () => {
+  const json = '{\n  "ZZB": {\n    "name": "Other",\n    "madeUpField": 812.4\n  },\n  "ZZA": {\n    "name": "Made-up",\n    "madeUpField": 812.4,\n    "otherField": 812.4\n  }\n}';
+  assert.equal(allowedAt(json, "data/made-up/table.json", 0), false, "the same value in another record");
+  assert.equal(allowedAt(json, "data/made-up/table.json", 1), true, "its own field in its own record");
+  assert.equal(allowedAt(json, "data/made-up/table.json", 2), false, "another field in the same record");
+  assert.equal(allowedAt(json, "data/other/table.json", 1), false, "another file");
+  assert.equal(allowedAt(json, null, 1), false, "a message");
+  const built = 'const x = {\n\t\t"ZZA": {\n\t\t\t"name": "Made-up",\n\t\t\t"madeUpField": 812.4,\n';
+  assert.equal(allowedAt(built, "dist/engine.js"), true, "a built copy");
+  assert.equal(allowedAt(built, "dist/other.js"), false, "a built file not named");
+  const nested = '"ZZA": {\n "inner": { "a": 1 },\n "madeUpField": 812.4';
+  assert.equal(allowedAt(nested, "made-up/table.json"), false, "a brace between the record and the field");
+  assert.equal(isPublishedValue(FIG, "made-up/table.json", '"ZZA": { "madeUpField": ', "812.40", RULES), false, "written another way");
+  assert.equal(isPublishedValue({ kind: "word" }, "made-up/table.json", '"ZZA": { "madeUpField": ', "812.4", RULES), false, "words never");
+});
+
+test("the real allowance pins, by fingerprint, the values its source table holds, and names that table", () => {
+  const path = "packages/calvin/src/calculators/data/household-size/countries.json";
+  const table = JSON.parse(readFileSync(fileURLToPath(new URL(`../${path}`, import.meta.url)), "utf8"));
+  assert.equal(ALLOWED.length, 1);
+  const [rule] = ALLOWED;
+  assert.equal(rule.field, "peoplePerHousehold");
+  assert.deepEqual(Object.keys(rule.records), ["LSO", "MWI", "RWA"]);
+  for (const [code, value] of Object.entries(rule.records)) assert.equal(fingerprint(JSON.stringify(table.countries[code][rule.field])), value, code);
+  assert.ok(rule.files.some((re) => re.test(path)));
+  assert.ok(rule.files.some((re) => re.test("dist/calculators/data/household-size/countries.json")));
+  assert.ok(rule.source.length > 0);
+});
+
 test("files: every text file is read, dist, source maps and files with no extension included; names too", () => {
   const dir = tmp();
   mkdirSync(join(dir, "dist"));
@@ -191,7 +231,7 @@ test("fails closed: no variable, a missing list, or an empty list gives exit 2 a
   writeFileSync(join(dir, "empty.txt"), "\n\n");
   assert.equal(capture([dir], { ...env, WB_FIGURES_LIST: join(dir, "empty.txt") }, dir).code, 2);
   const real = main([dir], env, dir, () => {}, () => {}, () => "");
-  assert.equal(real, MARKER_FINGERPRINT ? 0 : 2, "with no fingerprint in the code, a real run stops");
+  assert.equal(real, 2, "a list without the real marker has no built part, so the run stops");
 });
 
 test("--ci with no list says plainly that the gate ran only locally, with a warning and a summary", () => {
