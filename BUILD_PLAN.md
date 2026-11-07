@@ -63,8 +63,7 @@ smaller tables, such as the six-row table of fallback factors, are fine as they 
 
 - npm publishing (M2.2's publish, and the npm scope and token in M1.4). This is v2.
 - Benchmarks and pass rates. This is v2.
-- M1.2 the real number gate, and M1.5 lane 1 auto-merge. Lane 3 review covers figures and names meanwhile. The maintainer may
-  pull the number gate forward.
+- M1.5 lane 1 auto-merge. (The number gate, M1.2, came forward into v1: ruling 2026-11-06.)
 - M2.3 linting.
 - M4 openings and labels.
 - M5 the friendly view, beyond the sliders and simple view in V3 and V4 and its items marked **(V1)**.
@@ -88,11 +87,18 @@ gate's design before the real gate is built.
   - [x] Lane labelling job (`lanes.yml`) and the lane rule with tests. It labels only; it never merges.
   - [x] Typecheck, test and build jobs (`ci.yml`) (they now run for real: see M1.3)
   - [x] Gitleaks and a second secrets scan (`secrets.yml`)
-  - [x] Number gate placeholder (`number-gate.yml`)
+  - [x] Number gate placeholder (`number-gate.yml`). Replaced by M1.2: the job now says the gate ran only locally.
   - [x] Publish with provenance on a tag (`publish.yml`), refusing until the scope is real
   - [x] This plan and the build log
-- [ ] **M1.2 Real number gate:** keyed fingerprints (HMAC-SHA256); key and list as Actions secrets; a missing key
-      fails the run. *Waits on:* go on the design (N2), then the private side's first fingerprint list.
+- [~] **M1.2 (V1) Real number gate** (ruling 2026-11-06; open pull request): `scripts/check-figures.mjs`. It reads the
+      real project figures from a private list outside every repo, through the `WB_FIGURES_LIST` variable, the way the
+      name scan reads its list. It decides what counts as a figure the same way as the paid site's gate. It runs on the
+      maintainer's machine before every push (`.githooks/pre-push`, switched on with `npm run hooks`) and on every
+      release build (`npm run pack-release`). In CI it says plainly that it ran only locally.
+  - [!] The maintainer supplies the marker line's fingerprint, so the gate can run on the real list.
+  - [ ] Run it on the real list: the committed files and the packed files. Report pass or fail, never a figure.
+  - [ ] The earlier design, keyed fingerprints (HMAC-SHA256) checked in CI with the key and list as Actions secrets, is
+        not built. Whether it is still wanted is the maintainer's call (N2).
 - [~] **M1.3 Package skeleton** (open pull request): the empty boxes. No calculator code, no data.
   - [~] Workspace root with TypeScript, vitest and a build; versions pinned, lockfile committed; Node pinned to one
         exact version (24.20.0) in the workflows and `engines`
@@ -130,8 +136,9 @@ gate's design before the real gate is built.
   - [x] Get it ready (merged, pull request #6): an engine-only entry, `@waterbots/calvin/engine`, added in new files only;
         React made an optional peer of `calvin` and `core`; both set to version 0.1.0. Still `private`.
   - [!] Publish. The maintainer's call, after M1.4.
-  - [ ] **(V1)** Every release build runs the name scan on the packed files themselves, not only on the repo (ruling
+  - [~] **(V1)** Every release build runs the name scan on the packed files themselves, not only on the repo (ruling
         2026-11-02). Each packed file is unpacked into an empty folder and scanned there. A finding stops the release.
+        (Built with the number gate, open pull request: `npm run pack-release` runs both scans there.)
   - [ ] **(V2)** Rebuild the release on a second machine and show it gives the same bytes: the same fingerprints.
 - [ ] **M2.3 Linting** (was M1.6): add a linter that runs as part of CI, with the strictest settings that fit. The maintainer
       ruled on 2026-10-23 that it comes right after the seed lands (after M2.2), not before it. The seed is carried

@@ -4,6 +4,44 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-11-06 — The real number gate
+
+**Done (branch `number-gate`):** ruling 2026-11-06, a new V1 item. The number gate replaces the placeholder.
+- `scripts/check-figures.mjs` fails if a real project figure appears in committed files or in the packed release
+  files, `dist` included. It reads the figures from a private list outside every repo, in place, through the
+  `WB_FIGURES_LIST` variable, the same way the name scan reads its list. It also reads the name list's all-digit
+  entries, as registry numbers. It never copies, prints or logs a figure. Output is file, line and kind only.
+- What counts as a figure, and what counts as a match, follows the paid site's gate, as Session A described it on
+  2026-11-06. A figure has 3 or more significant digits (leading zeros never count; trailing zeros do). It is matched
+  by its text: as written, without commas, and from 1000 up with US thousands commas. No digit or point may sit just
+  before it, and no digit just after. The list's options ("allowed in", "from") and its marker line work the same way.
+- The marker line splits the list into a hand-kept part and a built part. Its text names private places, so the code
+  holds only its SHA-256 fingerprint (a scrambled code made from the line). The fingerprint is empty until the
+  maintainer supplies it, and until then the gate cannot run on the real list: it stops, as it should.
+- The allow-list of published method values is empty for now (ruling 2026-11-06).
+- Two gaps in the paid gate are closed here, not copied: this gate reads every text file, whatever its name (source
+  maps and files with no extension too), and it reads file names.
+- Before every push: `.githooks/pre-push`, switched on once per clone with `npm run hooks`. It checks every file in
+  every commit being pushed, so a figure added in one commit and taken out in the next still stops the push. It reads
+  commit and tag messages too.
+- Every release build: `npm run pack-release`. It runs the number gate and the name scan on the committed files, builds
+  and packs `core` and `calvin`, unpacks each packed file into an empty folder and runs both checks there, then writes
+  `release/SHA256SUMS.txt`. Any finding deletes the packed files. This also builds the name scan on the packed files
+  (M2.2, ruling 2026-11-02).
+- In CI the private lists are absent. The `number gate` job, and a step in `publish.yml`, say in plain words, as a
+  warning and in the run's summary, that the gate ran only locally. It is never a quiet pass.
+- `CLAUDE.md` Rule Zero now lets the number gate read the figures list and the name list in place, and nothing else
+  there.
+- Tests use made-up numbers, words and a made-up marker only (22 tests, run by `npm test`).
+
+**Checked:** `npm test`, typecheck and build pass. The gate has not yet run on the real list.
+
+**Still open:** the maintainer supplies the marker's fingerprint and the list's path. Then the gate runs on the real
+list, on the committed files and the packed files. Whether the earlier keyed-fingerprint design for CI is still
+wanted is the maintainer's call (N2).
+
+---
+
 ## 2026-11-05 — The screen entry: both views, mountable from the packed files
 
 **Done (branch `screen-entry`):** ruling 2026-11-05. Before this, the packed Calvin package let a site import only its
