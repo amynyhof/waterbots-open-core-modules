@@ -13,3 +13,6 @@ packages/calvin/src/calculators/** -text
 packages/calvin/src/agents/** -text
 packages/calvin/src/sources/** -text
 packages/calvin/src/expected-outputs.json -text
+
+# Git hooks are shell scripts: always LF, or `sh` cannot read them.
+.githooks/** text eol=lf
