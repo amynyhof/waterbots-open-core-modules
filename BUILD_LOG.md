@@ -4,6 +4,28 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-11-05 — Calvin 0.1.0 released
+
+**Done (branch `release-log`):** Session C built Calvin's first release from `main` at `3020ee7`, after the screen
+entry merged.
+- Session C ran every check on that commit: typecheck, tests, build, the 48 engine checks, the screen mount test
+  (4 views from the packed files), and the seed, package and paid-code checks. The name scan ran on the committed
+  files and on both packed files. All passed. Building and packing a second time gave the same fingerprints.
+- Session C made the annotated tag `calvin-v0.1.0` on `3020ee7`. The maintainer pushed it and created the GitHub
+  release, with the two packed files, `SHA256SUMS.txt` and the release notes.
+- Checked 2026-11-06, after the release was published: it holds those three files and is not a draft. Session C
+  downloaded both packed files. Each matches `SHA256SUMS.txt`, the fingerprints in `SEEDS.md`, and a fresh build and
+  pack from `3020ee7`. The tag `calvin-v0.1.0` is annotated and points at `3020ee7`.
+- Commit ids changed on 2026-11-05. History was rewritten so that every commit carries the maintainer's GitHub
+  no-reply address. Only those addresses and the seed commit's id changed; names, dates, messages and every other file
+  stayed the same. The seed commit is now `09f6ad1`, and `scripts/check-seed.mjs`, `SEEDS.md` and this log name it.
+- `SEEDS.md` gains a "Releases from this repo" table, with this release's tag, commit and fingerprints. `BUILD_PLAN`
+  marks V5 as released.
+
+**Still open:** both sites pin the release. The private side reports pass or fail on both carbon filings.
+
+---
+
 ## 2026-11-05 — The screen entry: both views, mountable from the packed files
 
 **Done (branch `screen-entry`):** ruling 2026-11-05. Before this, the packed Calvin package let a site import only its

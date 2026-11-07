@@ -70,3 +70,16 @@ The seed landed on `main` in commit `09f6ad15a7e211e1d834c36c56d73ede9a6837ac` (
 - The list must be unchanged, and its fingerprint must be the one in the ledger above.
 
 It also counts how many seeded files later pull requests have changed. That count is information, not a failure.
+
+## Releases from this repo
+
+A release is not a seed. It is a set of packed files built here and attached to a GitHub release, for the sites to
+pin. Each release gets one row. Rows are only ever added. Never rewrite a row.
+
+| Release | Tag | Commit | Date | SHA-256 of `waterbots-calvin-0.1.0.tgz` | SHA-256 of `waterbots-core-0.1.0.tgz` |
+|---|---|---|---|---|---|
+| Calvin 0.1.0 | `calvin-v0.1.0` | `3020ee7` | 2026-11-05 | `3d8585973a9178987f31f39a1966cf8fd4876aa6b43c33c7fcf9f7a8c931a63e` | `beff9f45cc2aae2b705fe399ff62c55a3b150e582016d8773948295b9672aa1b` |
+
+Calvin 0.1.0 holds both views: the ex-ante view with sliders, and the full ex-post view. The engine is version
+0.19.0, and every made-up test case gives the same answer as when the seed landed. The release carries the two packed
+files, `SHA256SUMS.txt` and its release notes. The release notes say what was checked before release.
