@@ -16,9 +16,12 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
   by its text: as written, without commas, and from 1000 up with US thousands commas. No digit or point may sit just
   before it, and no digit just after. The list's options ("allowed in", "from") and its marker line work the same way.
 - The marker line splits the list into a hand-kept part and a built part. Its text names private places, so the code
-  holds only its SHA-256 fingerprint (a scrambled code made from the line). The fingerprint is empty until the
-  maintainer supplies it, and until then the gate cannot run on the real list: it stops, as it should.
-- The allow-list of published method values is empty for now (ruling 2026-11-06).
+  holds only its SHA-256 fingerprint (a scrambled code made from the line). The maintainer supplied it on 2026-11-06.
+- One published value is allowed (ruling 2026-11-06): the UN average household size for Lesotho, Malawi and Rwanda
+  (UN DESA, "Household Size and Composition", column "Average household size (number of members)"). It is let
+  through only as the `peoplePerHousehold` value of those three records, in the household-size table and its built
+  copies, and only when written exactly as pinned. Each pin is held as a fingerprint, so the number itself is not
+  written in the gate. The same number anywhere else is still a hit.
 - Two gaps in the paid gate are closed here, not copied: this gate reads every text file, whatever its name (source
   maps and files with no extension too), and it reads file names.
 - Before every push: `.githooks/pre-push`, switched on once per clone with `npm run hooks`. It checks every file in
@@ -32,13 +35,22 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
   warning and in the run's summary, that the gate ran only locally. It is never a quiet pass.
 - `CLAUDE.md` Rule Zero now lets the number gate read the figures list and the name list in place, and nothing else
   there.
-- Tests use made-up numbers, words and a made-up marker only (22 tests, run by `npm test`).
+- Tests use made-up numbers, words and a made-up marker only (24 tests, run by `npm test`).
 
-**Checked:** `npm test`, typecheck and build pass. The gate has not yet run on the real list.
+**Checked:** `npm test`, typecheck and build pass. Session C ran the gate on the real list, on 2026-11-06:
+- Committed files: **fails.** 257 findings; 3 allowed (the household sizes).
+- The published release `calvin-v0.1.0`: the `core` packed file passes. The `calvin` packed file **fails**: 454
+  findings; 9 allowed (the household sizes, in the table and its two built copies).
+- Every finding is in Calvin's seeded method data, its reference test cases, its presets and its screens, and in two
+  log lines that quote a published emission factor. They look like published method defaults that real filings also
+  use. That is the maintainer's call, not the gate's.
+- The detail, file by file and line by line, went to the maintainer only. It is not written here: a public pointer to
+  a line would show which value on it matches a real figure.
 
-**Still open:** the maintainer supplies the marker's fingerprint and the list's path. Then the gate runs on the real
-list, on the committed files and the packed files. Whether the earlier keyed-fingerprint design for CI is still
-wanted is the maintainer's call (N2).
+**Still open:** the maintainer rules on the findings: allow published method values, each with its source (as the
+paid site's gate does), or change the list. Until the gate passes, `npm run pack-release` stops, and the pre-push hook
+would stop every push, so the hook stays off. Whether the earlier keyed-fingerprint design for CI is still wanted is
+the maintainer's call (N2).
 
 ---
 

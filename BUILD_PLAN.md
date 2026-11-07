@@ -95,8 +95,11 @@ gate's design before the real gate is built.
       name scan reads its list. It decides what counts as a figure the same way as the paid site's gate. It runs on the
       maintainer's machine before every push (`.githooks/pre-push`, switched on with `npm run hooks`) and on every
       release build (`npm run pack-release`). In CI it says plainly that it ran only locally.
-  - [!] The maintainer supplies the marker line's fingerprint, so the gate can run on the real list.
-  - [ ] Run it on the real list: the committed files and the packed files. Report pass or fail, never a figure.
+  - [x] The maintainer supplies the marker line's fingerprint, so the gate can run on the real list.
+  - [x] Run it on the real list: the committed files and the packed files. Report pass or fail, never a figure.
+        (2026-11-06: fails on the committed files and on the `calvin` packed file; `core` passes. See the build log.)
+  - [!] The maintainer rules on the findings: which published method values are allowed, each with its source.
+  - [ ] Then the gate passes on the committed files and the packed files, and the maintainer switches the hook on.
   - [ ] The earlier design, keyed fingerprints (HMAC-SHA256) checked in CI with the key and list as Actions secrets, is
         not built. Whether it is still wanted is the maintainer's call (N2).
 - [~] **M1.3 Package skeleton** (open pull request): the empty boxes. No calculator code, no data.
