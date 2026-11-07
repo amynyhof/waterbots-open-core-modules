@@ -13,6 +13,9 @@ entry merged.
   files and on both packed files. All passed. Building and packing a second time gave the same fingerprints.
 - Session C made the annotated tag `calvin-v0.1.0` on `3020ee7`. The maintainer pushed it and created the GitHub
   release, with the two packed files, `SHA256SUMS.txt` and the release notes.
+- Checked 2026-11-06, after the release was published: it holds those three files and is not a draft. Session C
+  downloaded both packed files. Each matches `SHA256SUMS.txt`, the fingerprints in `SEEDS.md`, and a fresh build and
+  pack from `3020ee7`. The tag `calvin-v0.1.0` is annotated and points at `3020ee7`.
 - Commit ids changed on 2026-11-05. History was rewritten so that every commit carries the maintainer's GitHub
   no-reply address. Only those addresses and the seed commit's id changed; names, dates, messages and every other file
   stayed the same. The seed commit is now `09f6ad1`, and `scripts/check-seed.mjs`, `SEEDS.md` and this log name it.
