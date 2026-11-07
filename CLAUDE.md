@@ -19,8 +19,9 @@ pass-or-fail results with a reference line — **never a figure.**
 
 1. **Rule Zero — stay in this repo.** Never open, read or search the private WaterBots repos, the harness repo or the
    carry folder on this machine. The only outside file Session C may read is the brief the maintainer hands over, read-only.
-   The one other exception: the name scan may read the private name list in place, through the `WB_NAMES_LIST`
-   variable, and nothing else in that place.
+   The other exceptions: the name scan may read the private name list in place, through the `WB_NAMES_LIST`
+   variable. The number gate may read the private figures list in place, through the `WB_FIGURES_LIST` variable, and
+   the name list the same way. Nothing else in those places. Session C never opens, copies or prints either list.
 2. **Nothing private goes in.** No real project figures, no real project names, no reviewer or partner names or
    organisations, no secrets or keys. Not in code, tests, fixtures, comments, presets, commit messages or PR text.
    Fixtures are **invented** projects only.
@@ -49,8 +50,9 @@ in `.github/lanes/lane-rule.mjs`.
 - A pull request touching more than one lane takes the highest.
 - A pull request that changes the lane rule, CI or a rules file (`CLAUDE.md`, `.claude/**`) → lane 3.
 
-**The number gate is a placeholder for now.** It passes with a warning and checks nothing. Until the real
-keyed-fingerprint gate exists, lane 3 — the maintainer's review plus outside AI review — is what catches real figures and names.
+**The number gate runs only on the maintainer's machine** (ruling 2026-11-06): before every push, and on every release
+build. In CI the private lists are absent, so the CI job says plainly that the gate ran only locally. Its green tick
+says nothing about figures. Lane 3 — the maintainer's review plus outside AI review — still reads every pull request.
 
 ## The grant line
 

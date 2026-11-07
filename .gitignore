@@ -7,3 +7,6 @@ dist/
 *.tgz
 .env
 .env.*
+
+# Packed release files and their fingerprints (npm run pack-release)
+release/

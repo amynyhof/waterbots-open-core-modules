@@ -60,6 +60,11 @@ jobs:
       - run: npm test
       - run: npm run build
 
+      # The private lists never reach CI, so this says plainly that the number gate ran only locally.
+      # The release build that counts is npm run pack-release, on the maintainer's machine.
+      - name: Number gate (runs only locally)
+        run: node scripts/check-figures.mjs --ci
+
       - name: Publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

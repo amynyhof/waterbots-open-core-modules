@@ -1,0 +1,8 @@
+#!/bin/sh
+# Number gate, before every push. It checks everything the push sends for real project figures:
+# every file in every commit on the way, every file at each pushed tip, and every commit and tag message.
+# A finding, or a gate that cannot run (no private lists), stops the push.
+#
+# Switch it on once per clone:  npm run hooks
+# It reads the private lists in place through WB_FIGURES_LIST and WB_NAMES_LIST. See scripts/check-figures.mjs.
+exec node "$(git rev-parse --show-toplevel)/scripts/check-figures.mjs" --push
