@@ -35,6 +35,7 @@ both sites live in other repos. They appear here only as things a step waits on.
 **How the sites get the package in v1.** Not npm. Each release is a GitHub release that holds the packed package (one
 file, made by `npm pack`) and its fingerprint (a scrambled code that changes if one byte of the file changes). Both
 sites pin that file by its fingerprint. The first pinned version includes the sliders. npm is v2.
+Before each release is published, Session A runs its number gate on the packed files in the handoff folder.
 
 **The paid site's own data.** The paid site keeps its own, more precise data on top of the package. The package's
 smaller tables, such as the six-row table of fallback factors, are fine as they are.
