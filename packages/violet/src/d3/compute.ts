@@ -206,7 +206,7 @@ export function computeD3(input: D3Input): D3Result {
     if (flow !== undefined && hoursUsed !== null) {
       capacityM3 = flow * hoursUsed;
       values.push({
-        key: "supplyCapacityM3PerYear",
+        key: "supplyCapacityM3PerYear", // gitleaks:allow (a field name, not a secret)
         label: "What the system can supply in a year",
         unit: "m³ per year",
         kind: "result",
@@ -459,7 +459,7 @@ export function computeD3(input: D3Input): D3Result {
     if (people !== null && perCapita !== null && daysUsed !== null) {
       const beneficiaryM3 = (people * perCapita * daysUsed) / LITRES_PER_M3;
       values.push({
-        key: "beneficiaryVolumeM3PerYear",
+        key: "beneficiaryVolumeM3PerYear", // gitleaks:allow (a field name, not a secret)
         label: "Water for the people served",
         unit: "m³ per year",
         kind: "result",
