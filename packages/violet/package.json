@@ -1,0 +1,50 @@
+{
+  "name": "@waterbots/violet",
+  "version": "0.0.0",
+  "private": true,
+  "description": "WaterBots open core module: violet (the water-benefit agent). Hosts the VWBA 2.0 D-n methods, starting with D-3, Volume Provided. Not published.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amynyhof/waterbots-open-core-modules.git",
+    "directory": "packages/violet"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./engine": {
+      "types": "./dist/engine.d.ts",
+      "default": "./dist/engine.js"
+    },
+    "./screen": {
+      "types": "./dist/screen.d.ts",
+      "default": "./dist/screen.js"
+    }
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "NOTICE"
+  ],
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "build": "tsc -p tsconfig.build.json"
+  },
+  "dependencies": {
+    "@waterbots/core": "0.1.0"
+  },
+  "peerDependencies": {
+    "react": "19.3.1"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  }
+}

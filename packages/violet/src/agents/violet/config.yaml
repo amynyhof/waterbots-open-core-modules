@@ -1,0 +1,17 @@
+# Violet — the water-benefit agent. She hosts the VWBA 2.0 D-n methods, starting with D-3, Volume Provided.
+# Her colour is Orchid, #A457D4 (ruling 2026-10-31).
+# Status is draft: nothing here claims a grade or a credential.
+agent: violet
+version: 0.1.0
+persona: violet
+colour: "#A457D4"
+role_prompt: prompt.md
+base_rules: ../_base-rules.md
+knowledge: knowledge.md
+context_packs: [] # none in the shared Violet; a host that adds a search tool adds the packs it searches
+tools:
+  - calc/vwba-d3.computeD3
+doors:
+  agent-commons: works alone; asks the user for every value; never points to another agent (ruling 2026-11-12)
+  site: reads the project record; hands back to Wellington when done
+status: draft
