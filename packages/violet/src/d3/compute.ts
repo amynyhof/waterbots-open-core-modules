@@ -18,6 +18,9 @@ import {
   DAYS_DEFAULT_SOURCE,
   HOURS_CAP,
   HOURS_CAP_SOURCE,
+  HOURS_DEFAULT,
+  HOURS_DEFAULT_LABEL,
+  HOURS_DEFAULT_SOURCE,
   PER_CAPITA_DEFAULT_L,
   PER_CAPITA_DEFAULT_SOURCE,
   SLIDER_FLOOR,
@@ -104,27 +107,30 @@ export function computeD3(input: D3Input): D3Result {
     return v;
   };
 
-  // The capacity path: flow × hours. Used by "capacity", and as the cap on "beneficiaries" when both are known.
-  const needsCapacity = option === "capacity" || option === "beneficiaries";
+  // The capacity path: flow × hours. "capacity" is for motor-pumped and treatment-plant systems; only they have an
+  // hours slider (ruling 2026-11-12). Projects counted by people served (handpumps, household systems) never show
+  // one. When a flow and hours are both given for such a project, its volume is still held to what the system can
+  // supply (p.46).
+  const byCapacity = option === "capacity";
+  const capacityCheck =
+    option === "beneficiaries" && input.flowM3PerHour !== undefined && input.operatingHoursPerYear !== undefined;
   let capacityM3: number | null = null;
-  if (needsCapacity) {
+  if (byCapacity || capacityCheck) {
     const flow = input.flowM3PerHour;
     if (flow === undefined) {
-      const v: D3Value = {
-        key: "flowM3PerHour",
-        label: "Flow of the system",
-        unit: "m³ per hour",
-        kind: "project fact",
-        value: null,
-        used: null,
-        origin: null,
-        source: RECORD,
-        note:
-          option === "capacity"
-            ? AWAITING
-            : "Not given. When it is known, the volume is held to what the system can supply.",
-      };
-      values.push(option === "capacity" ? awaited(v) : v);
+      values.push(
+        awaited({
+          key: "flowM3PerHour",
+          label: "Flow of the system",
+          unit: "m³ per hour",
+          kind: "project fact",
+          value: null,
+          used: null,
+          origin: null,
+          source: RECORD,
+          note: AWAITING,
+        }),
+      );
     } else {
       values.push({
         key: "flowM3PerHour",
@@ -140,19 +146,33 @@ export function computeD3(input: D3Input): D3Result {
 
     const hoursTyped = input.operatingHoursPerYear;
     let hoursUsed: number | null = null;
-    if (hoursTyped === undefined) {
-      const v: D3Value = {
+    if (hoursTyped === undefined && view === "ex-ante") {
+      // Before the project runs, the slider starts at 12 hours a day, labelled as having no source yet (N15).
+      hoursUsed = HOURS_DEFAULT;
+      values.push({
         key: "operatingHoursPerYear",
         label: "Hours the system runs in a year",
         unit: "hours",
         kind: "anticipated performance",
-        value: null,
-        used: null,
-        origin: null,
-        source: view === "ex-ante" ? "no cited starting value: set it to the planned project" : "operating logs",
-        note: option === "capacity" ? AWAITING : "Not given. Needed, with the flow, to hold the volume to what the system can supply.",
-      };
-      values.push(option === "capacity" ? awaited(v) : v);
+        value: HOURS_DEFAULT,
+        used: HOURS_DEFAULT,
+        origin: "assumed",
+        source: HOURS_DEFAULT_SOURCE,
+      });
+    } else if (hoursTyped === undefined) {
+      values.push(
+        awaited({
+          key: "operatingHoursPerYear",
+          label: "Hours the system runs in a year",
+          unit: "hours",
+          kind: "anticipated performance",
+          value: null,
+          used: null,
+          origin: null,
+          source: "operating logs",
+          note: AWAITING,
+        }),
+      );
     } else {
       const b = bound(view, hoursTyped, HOURS_CAP, "hours", notes);
       hoursUsed = b.used;
@@ -168,7 +188,7 @@ export function computeD3(input: D3Input): D3Result {
         ...(b.note !== undefined ? { note: b.note } : {}),
       });
     }
-    if (view === "ex-ante" && (option === "capacity" || flow !== undefined)) {
+    if (view === "ex-ante" && byCapacity) {
       sliders.push({
         key: "operatingHoursPerYear",
         label: "Hours the system runs in a year",
@@ -178,8 +198,8 @@ export function computeD3(input: D3Input): D3Result {
         ceiling: HOURS_CAP,
         ceilingSource: HOURS_CAP_SOURCE,
         start: hoursUsed,
-        startLabel: hoursUsed === null ? AWAITING : "assumed",
-        startSource: hoursUsed === null ? "no cited starting value" : "set by the user",
+        startLabel: hoursTyped !== undefined ? "assumed" : HOURS_DEFAULT_LABEL,
+        startSource: hoursTyped !== undefined ? "set by the user" : HOURS_DEFAULT_SOURCE,
       });
     }
 

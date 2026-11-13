@@ -13,6 +13,12 @@ describe("the D-3 screen", () => {
     expect(html).toMatch(/Table D3\.3, p\.46/);
   });
 
+  it("offers no hours and no flow for a project counted by people served", () => {
+    const html = renderToStaticMarkup(<D3Screen project={project} />);
+    expect(html).not.toMatch(/Hours the system/);
+    expect(html).not.toMatch(/Flow of the system/);
+  });
+
   it("shows typed boxes and no sliders ex-post", () => {
     const html = renderToStaticMarkup(<D3Screen project={project} view="ex-post" />);
     expect(html).not.toMatch(/type="range"/);

@@ -17,6 +17,16 @@ export const DAYS_DEFAULT_SOURCE = formatCitation(D3_CITES.daysFullAccess);
 export const DAYS_CAP = 365;
 export const DAYS_CAP_SOURCE = `a year has 365 days (${formatCitation(D3_CITES.daysFullAccess)})`;
 
+/**
+ * Where the hours slider starts, before the project runs: 12 hours a day, every day of the year (ruling 2026-11-12).
+ * The guidebook gives no figure, so it is labelled as having no source yet. Open item N15 asks the outside expert
+ * group for one. Kept apart from the cap below.
+ */
+export const HOURS_DEFAULT_PER_DAY = 12;
+export const HOURS_DEFAULT = HOURS_DEFAULT_PER_DAY * 365;
+export const HOURS_DEFAULT_LABEL = "assumed: no source yet";
+export const HOURS_DEFAULT_SOURCE = "assumed: no source yet (12 hours a day × 365 days)";
+
 /** The most hours a system can run in a year: 365 days × 24 hours. */
 export const HOURS_CAP = 8760;
 export const HOURS_CAP_SOURCE = "a year has 365 days × 24 hours";

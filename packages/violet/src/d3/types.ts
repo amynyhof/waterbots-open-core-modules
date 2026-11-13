@@ -104,8 +104,9 @@ export interface D3Slider {
   ceilingSource: string;
   /** Where the slider starts: the value the engine used, or null when nothing is known yet. */
   start: number | null;
-  /** "assumed" when it starts at a cited value; AWAITING when there is none. */
-  startLabel: "assumed" | typeof AWAITING;
+  /** "assumed" when it starts at a cited value or one the user set; "assumed: no source yet" when it starts at a
+   *  ruled value with no source; AWAITING when there is none. */
+  startLabel: "assumed" | "assumed: no source yet" | typeof AWAITING;
   startSource: string;
 }
 

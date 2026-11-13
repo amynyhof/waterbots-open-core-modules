@@ -28,8 +28,8 @@ export function seedD3Input(project: ModuleProject | undefined, view: D3View): D
 
 const OPTION_LABEL: Record<D3Option, string> = {
   metered: "From meter readings",
-  capacity: "From what the system can supply",
-  beneficiaries: "From the people served",
+  capacity: "From what the system can supply (motor pumps, treatment plants)",
+  beneficiaries: "From the people served (handpumps, household systems)",
 };
 
 /** Shows a number the engine returned. Display only. */
@@ -177,7 +177,7 @@ export default function D3Screen({ project, view = "ex-ante", lockView, onChange
       <fieldset>
         <legend>Project facts</legend>
         <NumberBox label="Water this supply gave before the project (m³ a year)" value={input.withoutProjectM3PerYear} disabled={readOnly} set={(n) => update(patchNumber(input, "withoutProjectM3PerYear", n))} />
-        {input.option !== "metered" ? (
+        {input.option === "capacity" ? (
           <NumberBox label="Flow of the system (m³ an hour)" value={input.flowM3PerHour} disabled={readOnly} set={(n) => update(patchNumber(input, "flowM3PerHour", n))} />
         ) : null}
         {input.option === "beneficiaries" ? (
@@ -204,7 +204,7 @@ export default function D3Screen({ project, view = "ex-ante", lockView, onChange
           {input.option === "metered" ? (
             <NumberBox label="Metered water for the year (m³)" value={input.meteredM3PerYear} disabled={readOnly} set={(n) => update(patchNumber(input, "meteredM3PerYear", n))} />
           ) : null}
-          {input.option !== "metered" ? (
+          {input.option === "capacity" ? (
             <NumberBox label="Hours the system ran in the year" value={input.operatingHoursPerYear} disabled={readOnly} set={(n) => update(patchNumber(input, "operatingHoursPerYear", n))} />
           ) : null}
           {input.option === "beneficiaries" ? (

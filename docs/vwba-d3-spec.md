@@ -12,7 +12,8 @@ We copy no text from it. Every summary below is in our own words.
 
 - Household and community water supply. Table C-1 points these projects to D-3 (Appendix C, p.39).
 - **Not covered yet:** irrigation supply (Appendix D, Table D3.2, p.45), and rainwater harvesting. The guidebook
-  works out rainwater harvesting with the Recharge method, D-4 (p.45).
+  works out rainwater harvesting with the Recharge method, D-4 (p.45). Both come in later pull requests (plan items
+  M8.3 and M8.4).
 
 ## 2. The sum
 
@@ -20,9 +21,11 @@ We copy no text from it. Every summary below is in our own words.
    (Appendix D, D-3, p.45).
 2. **The water with the project** comes from one of three ways. The guidebook ranks them (p.45 to 46):
    1. **Meter readings.** Only after the project runs.
-   2. **Capacity.** The system's design flow, or its expected average flow, times the hours it runs (p.46).
-   3. **People served.** People with access × litres per person per day × days of access ÷ 1,000 (p.46).
-3. **The capacity check.** With the people-served way, when the system's capacity is known, the engine uses the
+   2. **Capacity.** The system's design flow, or its expected average flow, times the hours it runs (p.46). This is
+      for motor-pumped and treatment-plant systems.
+   3. **People served.** People with access × litres per person per day × days of access ÷ 1,000 (p.46). This is
+      for handpumps and household systems. They never show an hours slider (ruling 2026-11-12).
+3. **The capacity check.** With the people-served way, when a flow and hours are both given, the engine uses the
    smaller of the two. This keeps the benefit from being overstated (p.46; Table D3.3, p.46).
 
 ## 3. Every input
@@ -40,8 +43,8 @@ Three kinds of value. **Project facts** come from the project record or the user
 | Default litres per person per day | Method default | 20 for full access, 2 for limited access | Same | Appendix D, Table D3.3, p.46 |
 | Litres per person per day used | Method default, or the user's own figure | The default, or a local figure with its source | The default, or a monitored figure | Appendix D, D-3, Option 3, p.46 |
 | Days of access in a year | Anticipated performance | Slider. Full access starts at 365, labelled "assumed". Limited access has no default: awaited. | Typed, from monitoring | Appendix D, D-3, Option 3, p.46 |
-| Flow of the system (m³ an hour) | Project fact | Typed | Typed | The record or the user |
-| Hours the system runs in a year | Anticipated performance | Slider. No cited start: awaited until set. | Typed, from operating logs | Appendix D, D-3, Option 2, p.46 |
+| Flow of the system (m³ an hour), capacity systems only | Project fact | Typed | Typed | The record or the user |
+| Hours the system runs in a year, capacity systems only | Anticipated performance | Slider. Starts at 4,380 (12 hours a day × 365 days), labelled "assumed: no source yet" (open item N15). | Typed, from operating logs. Awaited until given. | Appendix D, D-3, Option 2, p.46 |
 | Metered water for the year (m³) | Project fact | Not offered | Typed | Meter readings |
 
 **Bounds.** Each slider runs from 0 (a starting point) to its ceiling: 365 days, or 8,760 hours (365 days × 24
@@ -91,7 +94,12 @@ What each side says, in our own words, for the group to read in full:
   page for each step. They are in `packages/violet/src/d3/compute.test.ts`.
 - An **outside expert** checks the cases once the prototype is up.
 
-## 7. Open for the maintainer
+## 7. Open for the outside expert group
 
-- **Hours the system runs.** The guidebook gives no starting value. The slider starts empty, as awaited, rather
-  than at a number we would have to make up.
+- **N14:** water and carbon claims on one project (section 5).
+- **N15:** a cited starting value for the hours a motor-pumped or treatment-plant system runs. The guidebook gives
+  none. Until one is found, the
+  slider starts at 12 hours a day, labelled "assumed: no source yet" (ruling 2026-11-12).
+
+D-3 is a prototype. It does not wait for the activity-type signature or for N6 (ruling 2026-11-12). The outside
+expert checks it later.

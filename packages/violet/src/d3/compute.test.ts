@@ -2,7 +2,7 @@
 // step, from the method in VWBA 2.0, Appendix D, D-3 (p.44 to 46). The working is written beside each case.
 import { describe, expect, it } from "vitest";
 import { computeD3 } from "./compute.js";
-import { DAYS_CAP, DAYS_DEFAULT_FULL_ACCESS, PER_CAPITA_DEFAULT_L } from "./defaults.js";
+import { DAYS_CAP, DAYS_DEFAULT_FULL_ACCESS, HOURS_CAP, HOURS_DEFAULT, PER_CAPITA_DEFAULT_L } from "./defaults.js";
 import { D3_CITES } from "./sources.js";
 import { AWAITING, type D3Input, type D3Result, type D3ValueKey } from "./types.js";
 
@@ -158,6 +158,43 @@ describe("hand-worked cases (invented projects)", () => {
     expect(r.vwbM3PerYear).toBe(-500);
     expect(r.notes.join(" ")).toMatch(/below zero/);
   });
+
+  it("M. ex-ante, the hours slider starts at 12 hours a day, with no source yet (ruling 2026-11-12)", () => {
+    // 2 m³/h × (12 h × 365 days = 4,380 h) = 8,760 m³. Before: 0. Benefit: 8,760 m³.
+    const r = computeD3({ view: "ex-ante", option: "capacity", flowM3PerHour: 2, withoutProjectM3PerYear: 0 });
+    const hours = val(r, "operatingHoursPerYear");
+    expect(hours.value).toBe(4380);
+    expect(hours.origin).toBe("assumed");
+    expect(hours.source).toBe("assumed: no source yet (12 hours a day × 365 days)");
+    const slider = r.sliders.find((s) => s.key === "operatingHoursPerYear");
+    expect(slider?.start).toBe(4380);
+    expect(slider?.startLabel).toBe("assumed: no source yet");
+    expect(r.vwbM3PerYear).toBe(8760);
+  });
+
+  it("N. a handpump counted by people served never shows an hours slider (ruling 2026-11-12)", () => {
+    // 250 people × 20 L × 365 days ÷ 1,000 = 1,825 m³. A flow alone, with no hours, changes nothing.
+    for (const flow of [undefined, 0.8]) {
+      const r = computeD3({
+        view: "ex-ante",
+        option: "beneficiaries",
+        population: { mode: "people", served: 250 },
+        accessLevel: "full",
+        withoutProjectM3PerYear: 0,
+        ...(flow !== undefined ? { flowM3PerHour: flow } : {}),
+      });
+      expect(r.sliders.map((s) => s.key)).toEqual(["daysOfAccessPerYear"]);
+      expect(r.values.some((v) => v.key === "operatingHoursPerYear")).toBe(false);
+      expect(r.vwbM3PerYear).toBe(1825);
+    }
+  });
+
+  it("O. ex-post, hours not yet logged are awaited, not filled in", () => {
+    const r = computeD3({ view: "ex-post", option: "capacity", flowM3PerHour: 2, withoutProjectM3PerYear: 0 });
+    expect(val(r, "operatingHoursPerYear").value).toBeNull();
+    expect(r.awaiting).toContain("Hours the system runs in a year");
+    expect(r.vwbM3PerYear).toBeNull();
+  });
 });
 
 describe("refusals", () => {
@@ -177,6 +214,8 @@ describe("defaults, caps and sources", () => {
   it("keeps the default and the cap as two separate things", () => {
     expect(DAYS_DEFAULT_FULL_ACCESS).toBe(365);
     expect(DAYS_CAP).toBe(365);
+    expect(HOURS_DEFAULT).toBe(4380);
+    expect(HOURS_CAP).toBe(8760);
     const r = computeD3({ view: "ex-ante", option: "beneficiaries", population: { mode: "people", served: 10 }, accessLevel: "full", withoutProjectM3PerYear: 0 });
     const slider = r.sliders.find((s) => s.key === "daysOfAccessPerYear");
     expect(slider?.ceilingSource).toMatch(/a year has 365 days/);
