@@ -4,6 +4,35 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-11-12 — Violet and D-3, the Volume Provided method (V7, V8, M8.1)
+
+**Done (branch `violet-d3`):**
+- A new package, `@waterbots/violet`, built here, not seeded. Violet is the water-benefit agent. Her colour is
+  Orchid (`#A457D4`).
+- D-3, the Volume Provided method of VWBA 2.0, for household and community water supply. The engine does every sum.
+  It works out the water from meter readings, from the system's capacity, or from the people served. With the
+  people served, it uses the smaller of that volume and what the system can supply. Every value says where it came
+  from; every step cites the guidebook by section and page. No text is copied.
+- Caps (ruling 2026-11-12): ex-post, a typed value above a cap is kept, the sum uses the cap, and a note says so.
+  Ex-ante, a value past a slider's ceiling is held to it.
+- A small screen with both views: sliders before the project runs, typed boxes after. It computes nothing.
+- Violet's agent files and her calculator tool. Her base rules are Calvin's, word for word; a test keeps them so.
+- Her doors: the Agent Commons, where she works alone (ruling 2026-11-12); the sites, where she reads the record and
+  hands back to Wellington; and the screening, where carbon shows beside water only when Phoebe reads it as
+  "likely" or "not enough known" (ruling 2026-10-01).
+- `docs/vwba-d3-spec.md`: the spec, every input with its kind and source, and the sources for open item N14.
+- `BUILD_PLAN.md`: N14 added as a V1 open item. V7, V8 and M8.1 marked as an open pull request.
+- `.gitignore`: `sources-local/`, the local folder where the maintainer places source documents to read.
+- The package check and the paid-code scan now know Violet. The root build builds her.
+
+**Checked:** typecheck, test and build pass. Violet's tests: 33 of 33, including 12 hand-worked cases on invented
+projects. The package check, seed check, engine-entry check, screen-entry check, paid-code scan and name scan pass.
+
+**Open:** the activity-type signature and N6, which V8 waits on. An outside expert's check of the hand-worked cases,
+once the prototype is up. Hours the system runs has no cited starting value, so its slider starts empty.
+
+---
+
 ## 2026-11-05 — Calvin 0.1.0 released
 
 **Done (branch `release-log`):** Session C built Calvin's first release from `main` at `3020ee7`, after the screen
