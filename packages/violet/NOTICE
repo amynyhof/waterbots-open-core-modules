@@ -1,0 +1,10 @@
+@waterbots/violet
+Part of the WaterBots open core modules.
+
+Copyright 2026 WaterBots AI, LLC
+
+Licensed under the Apache License, Version 2.0. See the LICENSE file in this folder.
+
+D-3 follows the method in Volumetric Water Benefit Accounting 2.0 (World Resources Institute, 2025,
+https://doi.org/10.46830/wrigb.23.00112), published under CC BY 4.0. This package cites it by section and page.
+It copies no text from it.

@@ -3,15 +3,18 @@
 //   - every package carries a copy of the root LICENSE, a NOTICE and a README. An empty package says so; a seeded
 //     package points to SEEDS.md, which must have a row for it
 //   - the copyright line is in the root LICENSE and every NOTICE; root engines.node is one exact version
-//   - names are the four from the plan, and nothing else sits in packages/
+//   - names are the five from the plan, and nothing else sits in packages/
+//   - a package built here (not seeded, not empty) says so in its README
 // When a package is first released, the maintainer rules on it and this file changes in the same lane 3 pull request.
 import { readdirSync, readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const EXPECTED = ["bridget", "calvin", "core", "phoebe"];
+const EXPECTED = ["bridget", "calvin", "core", "phoebe", "violet"];
 // Packages that have received a seed. Each one is recorded in SEEDS.md. The rest stay empty for now.
 const SEEDED = ["calvin", "core"];
+// Packages Session C builds here, step by step, from the plan. Their README says "Built here, not seeded".
+const BUILT = ["violet"];
 const root = fileURLToPath(new URL("..", import.meta.url));
 const licence = readFileSync(join(root, "LICENSE"), "utf8");
 const errors = [];
@@ -46,6 +49,8 @@ for (const name of found) {
     const readme = readFileSync(join(dir, "README.md"), "utf8");
     if (SEEDED.includes(name)) {
       if (!readme.includes("SEEDS.md")) errors.push(`${name}: README must point to SEEDS.md, which records the seed`);
+    } else if (BUILT.includes(name)) {
+      if (!/built here, not seeded/i.test(readme)) errors.push(`${name}: README must say it is built here, not seeded`);
     } else if (!/empty for now/i.test(readme)) {
       errors.push(`${name}: README must say it is empty for now`);
     }

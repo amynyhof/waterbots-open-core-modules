@@ -21,7 +21,7 @@ const SKIP_DIRS = new Set([".git", "node_modules", "dist", "checks"]);
 const CODE_FILE = /\.(?:[mc]?[jt]sx?)$/;
 const TEST_FILE = /\.test\.[mc]?[jt]sx?$/;
 
-const OWN_OR_REACT = /^(?:react|react-dom)(?:\/[\w.-]+)*$|^@waterbots\/(?:core|calvin|phoebe|bridget)(?:\/[\w.-]+)*$/;
+const OWN_OR_REACT = /^(?:react|react-dom)(?:\/[\w.-]+)*$|^@waterbots\/(?:core|calvin|phoebe|bridget|violet)(?:\/[\w.-]+)*$/;
 const TEST_ONLY = new Set(["vitest", "node:fs", "node:path", "node:url", "node:assert", "node:assert/strict", "node:test"]);
 const SERVER_MODULES = /^(?:node:)?(?:http|https|http2|net|dgram|dns|tls|child_process|cluster|worker_threads|express|koa|fastify|next(?:\/.*)?)$/;
 const DATABASE_MODULES = /^(?:pg|mysql2?|sqlite3|better-sqlite3|mongodb|mongoose|redis|ioredis|knex|drizzle-orm(?:\/.*)?|@prisma\/client|prisma|firebase(?:\/.*)?|@supabase\/.*|@neondatabase\/.*)$/;

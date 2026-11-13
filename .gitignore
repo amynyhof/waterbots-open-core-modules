@@ -7,3 +7,6 @@ dist/
 *.tgz
 .env
 .env.*
+
+# Source documents the maintainer places for reading. Never committed.
+sources-local/

@@ -1,0 +1,6 @@
+# Findings the gitleaks scan may skip. Each line is one finding's exact fingerprint: commit, file, rule and line.
+# Add a line only for a finding the maintainer has agreed is not a secret.
+#
+# Pull request #18, commit 6bedd95: two field names in Violet's D-3 engine, read as keys. Not secrets.
+6bedd950937bd8682925dae7e4dea310e9c953cd:packages/violet/src/d3/compute.ts:generic-api-key:189
+6bedd950937bd8682925dae7e4dea310e9c953cd:packages/violet/src/d3/compute.ts:generic-api-key:442
