@@ -6,7 +6,7 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ## 2026-11-12 — Violet and D-3, the Volume Provided method (V7, V8, M8.1)
 
-**Done (branch `violet-d3`):**
+**Done (branch `add-violet-d3`):**
 - A new package, `@waterbots/violet`, built here, not seeded. Violet is the water-benefit agent. Her colour is
   Orchid (`#A457D4`).
 - D-3, the Volume Provided method of VWBA 2.0, for household and community water supply. The engine does every sum.
