@@ -3,7 +3,8 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
-const read = (rel: string) => readFileSync(fileURLToPath(new URL(rel, import.meta.url)), "utf8");
+// Line endings are set aside: one copy of the repo may give one file CRLF and the other LF.
+const read = (rel: string) => readFileSync(fileURLToPath(new URL(rel, import.meta.url)), "utf8").replace(/\r\n/g, "\n");
 
 describe("Violet's agent files", () => {
   it("carry the same base rules as Calvin, word for word", () => {
