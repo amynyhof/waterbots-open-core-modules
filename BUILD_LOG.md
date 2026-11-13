@@ -4,6 +4,27 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-11-12 — Violet and D-3: the rulings on pull request #18
+
+**Done (branch `add-violet-d3`, same pull request):**
+- D-3 does not wait for the activity-type signature or N6. It is a prototype the outside expert checks later
+  (ruling 2026-11-12). V8 and M8 in `BUILD_PLAN.md` now say so.
+- Hours a system runs (ruling 2026-11-12). Only systems counted by capacity, such as motor pumps and treatment
+  plants, have an hours slider. It starts at 12 hours a day (4,380 hours a year), labelled "assumed: no source
+  yet". Handpumps and household systems are counted by people served and never show an hours slider or a flow box.
+  After the project runs, hours not yet logged are awaited, never filled in.
+- N15 added to the V1 open questions, beside N14, for the outside expert group: a cited starting value for those
+  hours.
+- M8.3 (irrigation supply) and M8.4 (rainwater harvesting) added to the plan as later pull requests.
+- The spec in `docs/vwba-d3-spec.md` follows all of the above.
+
+**Checked:** typecheck, test and build pass. Violet's tests: 37 of 37, now 15 hand-worked cases. The package,
+seed, engine-entry, screen-entry, paid-code and name checks pass.
+
+**Open:** the outside expert group on N14 and N15. The outside expert's check of D-3.
+
+---
+
 ## 2026-11-12 — Violet and D-3, the Volume Provided method (V7, V8, M8.1)
 
 **Done (branch `add-violet-d3`):**

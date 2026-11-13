@@ -49,7 +49,7 @@ smaller tables, such as the six-row table of fallback factors, are fine as they 
 | V5 | [~] (Released 2026-11-05: tag `calvin-v0.1.0` on commit `3020ee7`, recorded in `SEEDS.md`. Still to come: both sites pin it, and the private side reports pass or fail.) The first GitHub release: the packed packages (`calvin` and the `core` it needs) and their fingerprints, with both views: the ex-ante view with sliders, and the full ex-post view. A site mounts them through `@waterbots/calvin/screen`; the open site locks to ex-ante. Replaces the npm publish in M2.2. It does not wait for the simple view (ruling 2026-10-31). | V2, V3; the maintainer's approval; branch protection and the tag rule (M1.4). | The release holds the files and their fingerprints. Both sites pin it. The private side reports pass or fail on both carbon filings. |
 | V6 | The method registry (M3): one entry per carbon method, so both sites pick a method the same way. | V5. | A trial release is out; the private side reports pass on both carbon filings. |
 | V7 | [~] (Open pull request, branch `add-violet-d3`.) Violet, the water-benefit agent, as her own module: `@waterbots/violet`. She hosts the D-n modules, starting with D-3. Her color is Orchid (`#A457D4`) (ruling 2026-10-31). | V1; rulings on Violet. | The package builds, passes the package checks, and has a place for each D-n module. |
-| V8 | [~] (Open pull request, branch `add-violet-d3`. The maintainer rules there on the activity-type signature and N6.) D-3, the water-supply module, inside Violet (M8.1). | V7; the activity-type signature; ruling on further gates (N6). | Violet's D-3 tests are hand-worked cases, with every step cited to the guidebook (cited, not copied). The VWBA spec is written alongside the build, in `docs/`, and the maintainer reviews it then. An outside expert checks the module once the prototype is up. |
+| V8 | [~] (Open pull request, branch `add-violet-d3`.) D-3, the water-supply module, inside Violet (M8.1). | V7. It does not wait for the activity-type signature or N6: D-3 is a prototype the outside expert checks later (ruling 2026-11-12). | Violet's D-3 tests are hand-worked cases, with every step cited to the guidebook (cited, not copied). The VWBA spec is written alongside the build, in `docs/`, and the maintainer reviews it then. An outside expert checks the module once the prototype is up. |
 | V9 | The screening hand-off: one project record in `core` that every module fills in and the paid site reads. Each module writes how many questions it asked on that walk. | V5; the paid site's save format (paid repo); Wellington's fields (free-site repo). | A test takes an invented project through all four modules' parts, saves it, reads it back unchanged, and gives each module's question count. |
 | V10 | Phoebe (eligibility) to its first release (M9.1). | V9; Phoebe's rulings. | Released; Phoebe fills its part of the record and counts its questions. |
 | V11 | Bridget (the map) to its first release (M9.2). | V9; Bridget's rulings; a rights read on every data file; a ruling on the shared map key. | Released; Bridget fills its part of the record and counts its questions. |
@@ -198,11 +198,13 @@ indicator.
 
 ## M8 — The water-supply method (VWBA D-3)
 
-*Stop for the maintainer:* the hand-worked cases and the VWBA spec; then an outside expert's check (see V8). *Waits on:* the activity-type signature; any further gates (N6).
+*Stop for the maintainer:* the hand-worked cases and the VWBA spec; then an outside expert's check (see V8). *Waits on:* nothing more. D-3 is a prototype; it does not wait for the activity-type signature or N6 (ruling 2026-11-12).
 The first release does not wait for this.
 
 - [~] **M8.1** Water-supply method entry and engine
 - [ ] **M8.2** The free site's water file brought in
+- [ ] **M8.3** D-3 for irrigation supply (VWBA 2.0, Appendix D, Table D3.2, p.45). A later pull request (ruling 2026-11-12).
+- [ ] **M8.4** Rainwater harvesting for direct use. The guidebook works it out with the Recharge method, D-4 (p.45). A later pull request (ruling 2026-11-12).
 
 ## M9 — Phoebe and Bridget
 
@@ -274,3 +276,7 @@ The maintainer's safety passes cover all three repos. This repo's own parts are 
   cap) and a VWBA claim (only the water above that cap). A group of outside professionals, brought together by the
   maintainer, will rule (ruling 2026-11-12). Until then, the carbon and water calculators sit side by side and are
   never added together. The sources each side cites are listed in `docs/vwba-d3-spec.md`.
+- **N15 (V1):** a cited starting value for the hours a motor-pumped or treatment-plant system runs in a year.
+  VWBA 2.0 gives none. Until the outside expert group finds one, Violet's hours slider starts at 12 hours a day
+  (4,380 hours a year), labelled "assumed: no source yet". Only systems counted by capacity have this slider;
+  handpumps and household systems are counted by people served and never show it (ruling 2026-11-12).
