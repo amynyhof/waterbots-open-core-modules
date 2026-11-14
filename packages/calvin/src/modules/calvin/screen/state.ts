@@ -6,7 +6,7 @@ import {
   householdSizeKnown,
   validDevicesPerPremises,
   householdSizeNeeded,
-  type CharcoalConvention, type FuelShares, type ScenarioInput, type StoveShares,
+  type CharcoalConvention, type FuelShares, type ScenarioInput, type SiteTables, type StoveShares,
 } from "../engine";
 import type { SavedAnalysis } from "./analysis";
 import { technologyToMethod } from "./method";
@@ -146,7 +146,7 @@ export interface ProjectFact {
  * order is the paid site's record check's (technology, country, people served), with "counted as
  * people or households" last, because it only matters once there is a count.
  */
-export function missingProjectFacts(s: CalcState): ProjectFact[] {
+export function missingProjectFacts(s: CalcState, tables?: SiteTables): ProjectFact[] {
   const out: ProjectFact[] = [];
   if (s.method == null) out.push({ key: "technology", label: "technology" });
   if (s.countryIso == null) out.push({ key: "country", label: "country" });
@@ -157,7 +157,7 @@ export function missingProjectFacts(s: CalcState): ProjectFact[] {
   else if (
     s.countryIso != null &&
     householdSizeNeeded({ method: s.method, populationMode: s.populationMode, premises: s.premises }) &&
-    !householdSizeKnown(s.countryIso, s.householdSizeOverride)
+    !householdSizeKnown(s.countryIso, s.householdSizeOverride, tables)
   ) {
     out.push({ key: "householdSize", label: "household size (there is no UN figure for this country)" });
   }
@@ -200,8 +200,8 @@ export function peopleServed(s: CalcState): number {
  * All four project facts, for the engine. The seat computes nothing while `missingProjectFacts` is
  * non-empty, so reaching here with one missing is a wiring fault — it FAILS LOUDLY.
  */
-export function projectFacts(s: CalcState): { method: 1 | 2; countryIso: string; populationMode: "people" | "households"; populationCount: number } {
-  const missing = missingProjectFacts(s);
+export function projectFacts(s: CalcState, tables?: SiteTables): { method: 1 | 2; countryIso: string; populationMode: "people" | "households"; populationCount: number } {
+  const missing = missingProjectFacts(s, tables);
   if (missing.length > 0) throw new Error(`project facts missing (${missing.map((f) => f.key).join(", ")}); the seat shows its prompt instead`);
   return { method: s.method!, countryIso: s.countryIso!, populationMode: s.populationMode!, populationCount: s.populationCount! };
 }
@@ -295,7 +295,7 @@ export function toSavedAnalysis(s: CalcState): SavedAnalysis {
  * seat passed nothing here for the demo project and printed "—" for the one number it had
  * (reviewer comment 1.1).
  */
-export function effectivePremises(s: CalcState): number | undefined {
+export function effectivePremises(s: CalcState, tables?: SiteTables): number | undefined {
   if (s.method !== 2) return undefined;
   if (s.premises != null && s.premises > 0) return s.premises;
   // A missing project fact means nothing to derive (CALCULATOR_SPEC §0.2).
@@ -311,7 +311,7 @@ export function effectivePremises(s: CalcState): number | undefined {
     populationMode: s.populationMode,
     populationCount: s.populationCount,
     householdSizeOverride: s.householdSizeOverride,
-  })?.households;
+  }, tables)?.households;
 }
 
 /**
@@ -339,9 +339,21 @@ export function validAgeShares(
   return Math.abs(under5 + age5_18 + adult19plus - 1) < 0.005 ? entered : undefined;
 }
 
-/** Map the left-rail state to a full ScenarioInput (transition on → both versions). */
-export function toScenarioInput(s: CalcState): ScenarioInput {
-  const facts = projectFacts(s);
+/**
+ * Three anticipated values exactly as the engine is given them. `toScenarioInput` uses this, and the
+ * sliders read the credited value from it, so the two can never differ.
+ */
+export function anticipatedInput(s: CalcState): Pick<ScenarioInput, "operationalDays" | "M_qy" | "usageRate"> {
+  return { operationalDays: s.operationalDays, M_qy: s.waterQualityFactor, usageRate: s.method === 2 ? s.usageRate : undefined };
+}
+
+/**
+ * Map the left-rail state to a full ScenarioInput (transition on → both versions). `tables` is the
+ * site's own country tables (V13), passed by `useCalculatorState`: it decides whether a household size
+ * is known, and the charcoal default.
+ */
+export function toScenarioInput(s: CalcState, tables?: SiteTables): ScenarioInput {
+  const facts = projectFacts(s, tables);
   return {
     version: s.version,
     method: facts.method,
@@ -356,14 +368,12 @@ export function toScenarioInput(s: CalcState): ScenarioInput {
     // SDWS 30: a surveyed split wins over the country's census shares inside `resolveAgeShares`.
     // Only a Table 9 run reads it, so an entered flat QPW makes it moot rather than conflicting.
     ageShares: validAgeShares(s.ageSharesEntered),
-    operationalDays: s.operationalDays,
+    ...anticipatedInput(s),
     // Q_m is a Method 1 (CWT/CWS) parameter — SDWS 28; the engine ignores it for Method 2 too.
     meteredVolumeL: s.method === 1 ? (s.meteredVolumeL ?? null) : null,
-    M_qy: s.waterQualityFactor,
     C_b: s.cBaseline,
     X_cleanboil: s.xCleanboil,
-    usageRate: s.method === 2 ? s.usageRate : undefined,
-    premises: effectivePremises(s),
+    premises: effectivePremises(s, tables),
     deviceCapacityLPerHour: s.method === 2 ? s.deviceCapacityLPerHour : undefined,
     usageHoursPerDay: s.method === 2 ? s.usageHoursPerDay : undefined,
     devicesPerPremises: s.method === 2 && validDevicesPerPremises(s.devicesPerPremises) ? s.devicesPerPremises : undefined,
@@ -379,11 +389,11 @@ export function toScenarioInput(s: CalcState): ScenarioInput {
           stoveShares: s.stoveSharesEntered,
           fossilStoveEta: s.fossilStoveEta,
           fuelShares: s.fuelSharesEntered,
-          charcoalConvention: s.charcoalConvention ?? defaultCharcoalConvention(facts.countryIso),
+          charcoalConvention: s.charcoalConvention ?? defaultCharcoalConvention(facts.countryIso, tables),
         }
       : undefined,
     // For a charcoal share that comes from the COUNTRY DEFAULT rather than a typed box ([#227]).
-    charcoalConvention: s.charcoalConvention ?? defaultCharcoalConvention(facts.countryIso),
+    charcoalConvention: s.charcoalConvention ?? defaultCharcoalConvention(facts.countryIso, tables),
     // The country default's freshness (V2.0 SDWS 6/8, three years from the data year) is judged
     // against today's year — a date, not a methodology value, so the seat may supply it.
     asOfYear: new Date().getFullYear(),

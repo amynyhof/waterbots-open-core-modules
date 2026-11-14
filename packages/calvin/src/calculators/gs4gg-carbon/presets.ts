@@ -2,6 +2,7 @@ import type { MethodologyVersion, QuantityMethod } from "./quantity.js";
 import paaFuel from "../data/paa/fuel-factors.json" with { type: "json" };
 import m49Json from "../data/regions/un-m49.json" with { type: "json" };
 import baselineMixJson from "../data/baseline-mix/countries.json" with { type: "json" };
+import { checkSiteTables, fromSiteTable, siteRow, type BaselineMixRow, type SiteTables } from "./siteTables.js";
 
 /**
  * presets.ts — conservative, cited, country-informed baseline profiles that pre-fill
@@ -278,8 +279,10 @@ export function resolveBaselineEdit(edit: BaselineEdit, version: MethodologyVers
  * nothing is pre-selected — the LDC list is not in our data, and which ratio a non-SSA country takes
  * is the reviewer's open question Q8 ([#213]) — so the person chooses, and the choice is on the row.
  */
-export function defaultCharcoalConvention(iso: string): CharcoalConvention | undefined {
-  const row = (m49Json.countries as Record<string, { toolRegion: string | null }>)[iso.toUpperCase()];
+export function defaultCharcoalConvention(iso: string, tables?: SiteTables): CharcoalConvention | undefined {
+  // A site's region row first (V13), then the package's UN M49 row.
+  const t = checkSiteTables(tables);
+  const row = siteRow(t?.regions, iso) ?? (m49Json.countries as Record<string, { toolRegion: string | null }>)[iso.toUpperCase()];
   return row?.toolRegion === "sub-saharan-africa" ? "6:1" : undefined;
 }
 
@@ -292,12 +295,8 @@ export function defaultCharcoalConvention(iso: string): CharcoalConvention | und
 // calculators/data/baseline-mix/countries.json; every mapping below is ruling, labelled on the
 // page and logged for the reviewer's next read ([#232]).
 
-type WhoFuel = "biomass" | "charcoal" | "gas" | "kerosene" | "coal" | "electricity";
-interface CountryMixRow {
-  name: string;
-  fuel?: { dataYear: number; published: string; percent: Partial<Record<WhoFuel, number>> };
-  stove?: { surveyId: string; surveyType: string | null; surveyYear: number; fieldwork: string | null; published: string | null; percent: Record<string, number> };
-}
+/** One country's published mix: the shape lives with the site tables (`BaselineMixRow`), so a site's row and the package's match. */
+type CountryMixRow = BaselineMixRow;
 const COUNTRY_MIX = baselineMixJson as unknown as {
   retrieval_date: string;
   fuelSource: { cite: string; url: string };
@@ -318,6 +317,8 @@ export interface CountryDefaultHalf<T> {
   dataYear: number;
   /** True when the data year is more than three years before `asOfYear` (ruling (3): shown anyway, with its year and a note). */
   stale: boolean;
+  /** Present when the half came from a site's own table (V13): that table's source, which the label also names. */
+  siteSource?: string;
 }
 
 const r1 = (x: number) => Math.round(x * 10) / 10;
@@ -336,8 +337,13 @@ const r1 = (x: number) => Math.round(x * 10) / 10;
 export function countryBaselineDefault(
   iso: string,
   asOfYear: number = BASELINE_MIX_RETRIEVAL_YEAR,
+  tables?: SiteTables,
 ): { fuel?: CountryDefaultHalf<FuelShares>; stove?: CountryDefaultHalf<StoveShares> } {
-  const row = COUNTRY_MIX.countries[iso.toUpperCase()];
+  // A site's row first (V13), then the package's. The same six mapping rulings apply to either.
+  const t = checkSiteTables(tables);
+  const siteMix = siteRow(t?.baselineMix, iso);
+  const siteSource = siteMix ? t!.baselineMix!.source : undefined;
+  const row = siteMix ?? COUNTRY_MIX.countries[iso.toUpperCase()];
   if (!row) return {};
   const out: { fuel?: CountryDefaultHalf<FuelShares>; stove?: CountryDefaultHalf<StoveShares> } = {};
 
@@ -366,10 +372,13 @@ export function countryBaselineDefault(
       ];
       out.fuel = {
         shares,
-        label: `Country default — WHO household energy series, ${row.name}, data year ${row.fuel.dataYear} (published ${row.fuel.published})`,
+        label: siteSource
+          ? `Country default — ${row.name}, data year ${row.fuel.dataYear} (published ${row.fuel.published}), ${fromSiteTable(siteSource)}`
+          : `Country default — WHO household energy series, ${row.name}, data year ${row.fuel.dataYear} (published ${row.fuel.published})`,
         notes,
         dataYear: row.fuel.dataYear,
         stale,
+        ...(siteSource ? { siteSource } : {}),
       };
     }
   }
@@ -407,10 +416,13 @@ export function countryBaselineDefault(
       ];
       out.stove = {
         shares,
-        label: `Country default — ${row.stove.surveyId} (${row.stove.surveyType ?? "survey"} ${row.stove.surveyYear}, The DHS Program), household cooking technology`,
+        label: siteSource
+          ? `Country default — ${row.stove.surveyId} (${row.stove.surveyType ?? "survey"} ${row.stove.surveyYear}), household cooking technology, ${fromSiteTable(siteSource)}`
+          : `Country default — ${row.stove.surveyId} (${row.stove.surveyType ?? "survey"} ${row.stove.surveyYear}, The DHS Program), household cooking technology`,
         notes,
         dataYear: row.stove.surveyYear,
         stale,
+        ...(siteSource ? { siteSource } : {}),
       };
     }
   }

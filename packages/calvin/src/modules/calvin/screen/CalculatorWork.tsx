@@ -270,7 +270,7 @@ export default function CalculatorWork({
 
           <TagLegend />
 
-          <EquationStack result={result} state={state} patch={patch} canonPopulation={project.population?.served} seed={seed} sliders={calc.sliders} />
+          <EquationStack result={result} state={state} patch={patch} canonPopulation={project.population?.served} seed={seed} sliders={calc.sliders} tables={calc.tables} />
 
           {/* ── Beta footer — one line, honest state, shown to visitors (ruling 2026-09-07) ── */}
           <div className="border-t border-line pt-2">
@@ -319,6 +319,7 @@ export default function CalculatorWork({
           canonPopulation={project.population?.served}
           creditingPeriodYears={creditingPeriodYears}
           slots={report}
+          tables={calc.tables}
         />
       </div>
     </ReadOnlySeat>

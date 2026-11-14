@@ -8,7 +8,10 @@
 // process there loads the screen entry and renders, on a made-up project:
 //   - the ex-ante view on a site locked to ex-ante: the sliders show, even for a saved ex-post analysis;
 //   - the ex-post view on a site that shows both: no sliders, the metered volume row instead;
-//   - the report tab of the ex-post view.
+//   - the report tab of the ex-post view;
+//   - the ex-post view and its report again, with a site's own DAF table passed in (V13). The table is invented. The
+//     check proves the screens print the site's value and its source, and that the view with no table still prints the
+//     package's own value.
 // It also checks that both stylesheets are in the packed files and reachable by their names, and it typechecks a
 // small file that imports the entry, the way a site's bundler reads the types.
 // Exit codes: 0 all pass, 1 something is wrong, 2 the check could not run.
@@ -19,6 +22,13 @@ import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
+
+/** The site's table for the mount test: one invented DAF row for the project's country, which the package's DAF table lacks. */
+export const SITE_SOURCE = "Invented site table for the screen-entry check";
+export const SITE_DAF = "0.0321";
+/** What the package prints for that country with no site table: the DAF tool's cited floor. */
+export const PACKAGE_DAF = "Default value: 0.0125";
+const SITE_TABLES = { daf: { source: SITE_SOURCE, countries: { LSO: { name: "Lesotho", daf_2026_2030: Number(SITE_DAF), basis: "invented basis" } } } };
 
 // What a site writes to mount a seat: the state hook, the controls panel and the work surface.
 const RUN = `import { createElement as h } from "react";
@@ -35,6 +45,7 @@ function Seat({ project, options, tab }) {
   return h("div", null, h(S.CalculatorLens, { calc }), h(S.CalculatorWork, { calc, project, appVersion: "0.0.0", tab }));
 }
 const render = (p, options, tab = "calculator") => renderToStaticMarkup(h(Seat, { project: p, options, tab }));
+const tables = ${JSON.stringify(SITE_TABLES)};
 const found = (name) => existsSync(fileURLToPath(import.meta.resolve(name)));
 process.stdout.write(JSON.stringify({
   names: Object.keys(S),
@@ -43,13 +54,16 @@ process.stdout.write(JSON.stringify({
     exAnteFromSavedExPost: render(project({ mode: "ex-post" }), { exAnteOnly: true }),
     exPost: render(project({ mode: "ex-post" }), {}),
     exPostReport: render(project({ mode: "ex-post" }), {}, "report"),
+    siteTable: render(project({ mode: "ex-post" }), { tables }),
+    siteTableReport: render(project({ mode: "ex-post" }), { tables }, "report"),
   },
   stylesheets: { "@waterbots/calvin/styles.css": found("@waterbots/calvin/styles.css"), "@waterbots/core/base.css": found("@waterbots/core/base.css") },
 }));
 `;
 
-const TYPES = `import { useCalculatorState, CalculatorLens, CalculatorWork, ReportView, VersionTabs, type CalculatorOptions, type CalvinProject } from "@waterbots/calvin/screen";
-const options: CalculatorOptions = { exAnteOnly: true };
+const TYPES = `import { useCalculatorState, CalculatorLens, CalculatorWork, ReportView, VersionTabs, type CalculatorOptions, type CalvinProject, type SiteTables } from "@waterbots/calvin/screen";
+const tables: SiteTables = { daf: { source: "invented", countries: { LSO: { name: "Lesotho", daf_2026_2030: 0.03, basis: "invented" } } } };
+const options: CalculatorOptions = { exAnteOnly: true, tables };
 export const parts = [useCalculatorState, CalculatorLens, CalculatorWork, ReportView, VersionTabs] as const;
 export const project: CalvinProject | null = null;
 export { options };
@@ -64,8 +78,10 @@ const TSCONFIG = {
 export const EXPECT = {
   exAnte: { has: ['aria-label="Anticipated performance"', "Q_m — planned production"], lacks: ["Q_m — metered volume"] },
   exAnteFromSavedExPost: { has: ['aria-label="Anticipated performance"', "Q_m — planned production"], lacks: ["Q_m — metered volume"] },
-  exPost: { has: ["Q_m — metered volume"], lacks: ['aria-label="Anticipated performance"'] },
-  exPostReport: { has: ["print-report", "Ex-post"], lacks: ['aria-label="Anticipated performance"'] },
+  exPost: { has: ["Q_m — metered volume", PACKAGE_DAF], lacks: ['aria-label="Anticipated performance"', SITE_SOURCE] },
+  exPostReport: { has: ["print-report", "Ex-post"], lacks: ['aria-label="Anticipated performance"', SITE_SOURCE] },
+  siteTable: { has: ["Q_m — metered volume", SITE_DAF, SITE_SOURCE], lacks: [PACKAGE_DAF] },
+  siteTableReport: { has: ["print-report", SITE_DAF, SITE_SOURCE], lacks: [PACKAGE_DAF] },
 };
 export const NAMES = ["useCalculatorState", "CalculatorLens", "CalculatorWork", "ReportView", "VersionTabs"];
 

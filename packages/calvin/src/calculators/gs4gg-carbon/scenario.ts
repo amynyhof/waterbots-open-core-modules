@@ -11,6 +11,7 @@ import { computeEfb } from "./baseline-ef.js";
 import { resolveAgeShares, type ResolvedAgeShares } from "./table9.js";
 import type { LegacyErOutput, PaaErOutput, PaaLeakage } from "./types.js";
 import type { FallbackStop, FallbackStopKey } from "./fallback.js";
+import { checkSiteTables, fromSiteTable, siteRow, type SiteTables, type SiteTableValue } from "./siteTables.js";
 
 import embodiedJson from "../data/embodied/factors.json" with { type: "json" };
 import householdJson from "../data/household-size/countries.json" with { type: "json" };
@@ -75,7 +76,8 @@ const daf = dafJson as unknown as DafData;
 export const DEFAULT_SE_O = 360.83; // kJ/L, SDWS / ER tool (§2.6)
 
 
-export type ScenarioSource = "country" | "global-default" | "override" | "preset" | "default";
+/** `site-table` = a row from a site's own table, passed in while it runs (V13); its label names the site's source. */
+export type ScenarioSource = "country" | "global-default" | "override" | "preset" | "default" | "site-table";
 /**
  * `preset` = the labelled screening preset; `country-default` = the cited per-country mix ([#227]);
  * `entered` = typed for this project; `override` = a caller's raw strata/fuel list.
@@ -244,6 +246,11 @@ export interface ScenarioResult {
   /** Fallbacks that fired (with their dials); empty when every input had real data. */
   fallbacks: FiredFallback[];
   notes: string[];
+  /**
+   * Present only when a site passed its own tables: every value this run took from them, with the
+   * site's source. Empty when the tables had no row this run used.
+   */
+  siteTableValues?: SiteTableValue[];
 }
 
 interface Resolved {
@@ -264,18 +271,22 @@ interface Resolved {
  * null. Exported so the project record can show the size's grey default without a counting unit,
  * which `derivePopulation` now refuses to go without.
  */
-export function resolveHouseholdSize(iso: string, override?: number | null): Resolved | null {
+export function resolveHouseholdSize(iso: string, override?: number | null, tables?: SiteTables): Resolved | null {
   if (override !== undefined && override !== null && override > 0) {
     return { value: override, prov: { field: "householdSize", label: "Entered — project's surveyed household size", source: "override" } };
   }
+  // A site's row first (V13), then the package's UN row.
+  const t = checkSiteTables(tables);
+  const s = siteRow(t?.householdSize, iso);
+  if (s) return { value: s.peoplePerHousehold, prov: { field: "householdSize", label: `${s.name} household size, ${fromSiteTable(t!.householdSize!.source)}`, source: "site-table" } };
   const c = household.countries[iso];
   if (c) return { value: c.peoplePerHousehold, prov: { field: "householdSize", label: `${c.name} — UN 2022 household size`, source: "country" } };
   return null;
 }
 
 /** Whether a household size exists for this run: the project's own, or a UN figure for the country. */
-export function householdSizeKnown(iso: string, override?: number | null): boolean {
-  return resolveHouseholdSize(iso, override) !== null;
+export function householdSizeKnown(iso: string, override?: number | null, tables?: SiteTables): boolean {
+  return resolveHouseholdSize(iso, override, tables) !== null;
 }
 
 /**
@@ -326,7 +337,7 @@ export function derivePopulation(input: {
   populationMode?: "people" | "households" | null;
   populationCount?: number | null;
   householdSizeOverride?: number | null;
-}): {
+}, tables?: SiteTables): {
   /** The people count every equation is computed from. */
   people: number;
   /** The household count (N_p). Undefined on Method 1 — a water-point project has no households. */
@@ -339,7 +350,7 @@ export function derivePopulation(input: {
   if (input.populationMode == null) throw new ProjectFactMissingError("countedAs");
   const count = input.populationCount;
   if (count == null || !Number.isFinite(count) || count <= 0) return null;
-  const hh = resolveHouseholdSize(input.countryIso, input.householdSizeOverride);
+  const hh = resolveHouseholdSize(input.countryIso, input.householdSizeOverride, tables);
   if (!hh) return null;
   if (input.populationMode === "households") {
     return {
@@ -388,20 +399,29 @@ export interface FnrbRefusal {
 }
 
 /** The UN M49 tool region for a country, or null when it is in none of AMT-009 Table 2's three. */
-function toolRegionFor(iso: string): { key: string; countryName: string } | { key: null; countryName: string } {
+function toolRegionFor(iso: string, tables?: SiteTables): { key: string | null; countryName: string } {
+  // A site's region row first (V13), then the package's UN M49 row.
+  const s = siteRow(tables?.regions, iso);
+  if (s) return { key: s.toolRegion, countryName: s.name };
   const row = (m49Json.countries as Record<string, { name: string; toolRegion: string | null }>)[iso];
   if (!row) return { key: null, countryName: iso };
   return { key: row.toolRegion, countryName: row.name };
 }
 
-function fnrbRefusal(iso: string, countryName: string): FnrbRefusal {
+/**
+ * The refusal's sentence counts the TOOLS' values, which stays true whatever a site holds. When a site
+ * passed its own fNRB rows for this set of values, the sentence also says the site's table has no row
+ * for the country: the refusal fires only when neither table has it (V13).
+ */
+function fnrbRefusal(iso: string, countryName: string, siteSource?: string): FnrbRefusal {
   return {
     parameter: "fNRB",
     countryIso: iso,
     countryName,
     message:
       `No official fNRB default covers ${countryName}. Enter your project's own value with its source; ` +
-      `the tools publish national values for 90 countries and multi-national values for three regions only.`,
+      `the tools publish national values for 90 countries and multi-national values for three regions only.` +
+      (siteSource ? ` The site's own fNRB table (${siteSource}) has no row for ${countryName} either.` : ""),
     cite: "A6.4-AMT-009 v01.0 Table 2 (multi-national) and Table 3 (national); UN M49 geoscheme for the region map",
   };
 }
@@ -414,14 +434,17 @@ export function fnrbAvailability(
   iso: string,
   vintageId?: string,
   override?: number | null,
+  tables?: SiteTables,
 ): { ok: true } | { ok: false; refusal: FnrbRefusal } {
   if (override !== undefined && override !== null) return { ok: true };
+  const t = checkSiteTables(tables);
   const vId = vintageId && fnrb.vintages[vintageId] ? vintageId : fnrb.defaultVintage;
   const v = fnrb.vintages[vId];
+  if (siteRow(t?.fnrb?.[vId], iso)) return { ok: true };
   if (v.countries[iso]) return { ok: true };
-  const region = toolRegionFor(iso);
+  const region = toolRegionFor(iso, t);
   if (region.key && v.multiNational?.regions[region.key]) return { ok: true };
-  return { ok: false, refusal: fnrbRefusal(iso, region.countryName) };
+  return { ok: false, refusal: fnrbRefusal(iso, region.countryName, t?.fnrb?.[vId]?.source) };
 }
 
 /** AMT-009 footnote 5, as the data file holds it — never retyped in a component. */
@@ -441,21 +464,25 @@ function describeFuelMix(mix: FuelSpec[]): string {
     .join(", ") + " by fuel energy";
 }
 
-function resolveFnrb(iso: string, vintageId: string, override?: number | null): Resolved & { vintage: string } {
+function resolveFnrb(iso: string, vintageId: string, override?: number | null, tables?: SiteTables): Resolved & { vintage: string } {
   if (override !== undefined && override !== null) {
     return { value: override, vintage: "filed-override", prov: { field: "fNRB", label: "filed fNRB (project override)", source: "override" } };
   }
   const vId = fnrb.vintages[vintageId] ? vintageId : fnrb.defaultVintage;
   const v = fnrb.vintages[vId];
+  // Row by row within the matching set (ruling 6, 2026-11-14): the site's row for this set, else the package's.
+  const siteSet = tables?.fnrb?.[vId];
+  const s = siteRow(siteSet, iso);
+  if (s) return { value: s.fnrb, vintage: vId, prov: { field: "fNRB", label: `${s.name ?? iso} fNRB — ${v.label}, ${fromSiteTable(siteSet!.source)}`, source: "site-table" } };
   const c = v.countries[iso];
   if (c) return { value: c.fnrb, vintage: vId, prov: { field: "fNRB", label: `${c.name ?? iso} fNRB — ${v.label}`, source: "country" } };
 
   // No national row. The OFFICIAL fallback is Table 2's multi-national value for the country's
   // UN M49 region — never a quartile of the table (struck 2026-09-22, ruling (3)).
-  const region = toolRegionFor(iso);
+  const region = toolRegionFor(iso, tables);
   const mn = v.multiNational;
   const r = region.key && mn ? mn.regions[region.key] : undefined;
-  if (!r || !mn) throw new FnrbUnavailableError(fnrbRefusal(iso, region.countryName));
+  if (!r || !mn) throw new FnrbUnavailableError(fnrbRefusal(iso, region.countryName, siteSet?.source));
   return {
     value: r.fnrb,
     vintage: vId,
@@ -557,8 +584,11 @@ function resolveFnrbLegacy(filed: number | null | undefined): Resolved & { vinta
   throw new FiledFnrbRequiredError(filedFnrbRefusal());
 }
 
-function resolveDaf(iso: string, override?: number): { value: number; prov: Provenance } {
+function resolveDaf(iso: string, override?: number, tables?: SiteTables): { value: number; prov: Provenance } {
   if (override !== undefined) return { value: override, prov: { field: "DAF", label: "DAF (project override)", source: "override" } };
+  // A site's row first (V13). The floors stay the package's, so the fallback stays cited (ruling 3, 2026-11-14).
+  const s = siteRow(tables?.daf, iso);
+  if (s) return { value: s.daf_2026_2030, prov: { field: "DAF", label: `${s.name} DAF 2026-2030 (${s.basis}), ${fromSiteTable(tables!.daf!.source)}`, source: "site-table" } };
   const c = daf.countries[iso];
   if (c) return { value: c.daf_2026_2030, prov: { field: "DAF", label: `${c.name} DAF 2026-2030 (${c.basis}; Tool 05 Table 03)`, source: "country" } };
   // A country with no row in the data file takes the floor, and the screens print this label beside the
@@ -569,8 +599,13 @@ function resolveDaf(iso: string, override?: number): { value: number; prov: Prov
   return { value: daf.absolute_floor.value, prov: { field: "DAF", label: `Default value: ${daf.absolute_floor.value} (Gold Standard DAF tool's fallback; ${daf.absolute_floor.cite}).`, source: "global-default" } };
 }
 
-/** Run one scenario end-to-end, returning the calculator output + a labeled evidence trail. */
-export function computeScenario(input: ScenarioInput): ScenarioResult {
+/**
+ * Run one scenario end-to-end, returning the calculator output + a labeled evidence trail.
+ * `tables` is a site's own country tables (V13): read row by row over the package's, checked first,
+ * and every value taken from them listed in `siteTableValues`. Without it, nothing changes.
+ */
+export function computeScenario(input: ScenarioInput, tables?: SiteTables): ScenarioResult {
+  const t = checkSiteTables(tables);
   const provenance: Provenance[] = [];
   const fallbacks: FiredFallback[] = [];
   const notes: string[] = [];
@@ -585,8 +620,9 @@ export function computeScenario(input: ScenarioInput): ScenarioResult {
   // THE COUNTRY DEFAULT ([#227]; ruling (5), 2026-09-26) stands in for the screening preset,
   // per half, wherever the country has data. It runs through the SAME resolver and 100% guard as
   // typed shares, so a country figure and a typed figure are turned into strata the one same way.
-  const charcoalConvention = input.baselineEdit?.charcoalConvention ?? input.charcoalConvention ?? defaultCharcoalConvention(input.countryIso);
-  const country = input.countryDefaults === false ? {} : countryBaselineDefault(input.countryIso, input.asOfYear);
+  const charcoalGiven = input.baselineEdit?.charcoalConvention ?? input.charcoalConvention;
+  const charcoalConvention = charcoalGiven ?? defaultCharcoalConvention(input.countryIso, t);
+  const country = input.countryDefaults === false ? {} : countryBaselineDefault(input.countryIso, input.asOfYear, t);
   const countryResolved = resolveBaselineEdit(
     { stoveShares: country.stove?.shares, fuelShares: country.fuel?.shares, charcoalConvention },
     input.version,
@@ -647,7 +683,7 @@ export function computeScenario(input: ScenarioInput): ScenarioResult {
   // ⚠ THE HOUSEHOLD SIZE IS RESOLVED ON A PEOPLE-ENTERED RUN TOO, because the screens now show
   // the households it implies. The PEOPLE COUNT IS UNTOUCHED either way — on a people-entered run
   // it is the entered figure, exactly as before — so no existing scenario's arithmetic moves.
-  const pop = derivePopulation({ ...input, method });
+  const pop = derivePopulation({ ...input, method }, t);
   // A run that needs a household size and has none refuses rather than guess one (ruling 2026-10-23).
   const countGiven = Number.isFinite(input.populationCount) && input.populationCount > 0;
   if (countGiven && !pop && householdSizeNeeded({ method, populationMode: input.populationMode, premises: input.premises })) {
@@ -669,7 +705,7 @@ export function computeScenario(input: ScenarioInput): ScenarioResult {
   // --- unadjusted quantity (version + method aware; emits UNADJUSTED Q_pop) ---
   // --- V2 volume basis: Table 9 tiers on a PAA run unless a flat value was entered (R4) ---
   const useTable9 = input.version === "paa" && (input.volumeBasis ?? "table9") === "table9";
-  const ageShares = useTable9 ? resolveAgeShares(input.countryIso, input.ageShares) : undefined;
+  const ageShares = useTable9 ? resolveAgeShares(input.countryIso, input.ageShares, t) : undefined;
   if (ageShares) {
     provenance.push({ field: "ageShares", label: ageShares.label, source: ageShares.source === "entered" ? "override" : ageShares.source });
     provenance.push({ field: "volume", label: `V2 Table 9 age-tiered defaults (§7.3.11, SDWS 29 Option 1)${input.suppressedDemand ? " with the suppressed-demand ×0.95" : ""}`, source: "default" });
@@ -700,7 +736,7 @@ export function computeScenario(input: ScenarioInput): ScenarioResult {
   // --- fNRB (VERSION-SCOPED): PAA on the current vintage (override/lookup/dial); Legacy on the
   //     project's FILED V1 value, or the run refuses (R1 as amended 2026-09-24 — the
   //     "held equal" fallback is retired; see `resolveFnrbLegacy`). ---
-  const fPaa = resolveFnrb(input.countryIso, input.fnrbVintage ?? fnrb.defaultVintage, input.fnrbOverride);
+  const fPaa = resolveFnrb(input.countryIso, input.fnrbVintage ?? fnrb.defaultVintage, input.fnrbOverride, t);
   const f = input.version === "legacy" ? resolveFnrbLegacy(input.fnrbFiledV1) : fPaa;
   provenance.push(f.prov);
   if (f.fired) fallbacks.push(f.fired);
@@ -729,7 +765,7 @@ export function computeScenario(input: ScenarioInput): ScenarioResult {
     Q_pop: q.Q_pop, Q_m: q.Q_m, C_b, X_cleanboil, M_qy,
     PE: input.PE, LE: input.LE, leakageFivePercent: input.leakageFivePercent,
   };
-  const d = resolveDaf(input.countryIso, input.DAF);
+  const d = resolveDaf(input.countryIso, input.DAF, t);
   // PAA market leakage (V2 §9.3.2, p.38): an entered LE is a detailed assessment (Option 2, Eq.21);
   // otherwise the methodology's own default, Option 1 — 2% of net reductions (Eq.20). The choice is
   // stated to the engine and written to the trail; the engine never assumes it.
@@ -764,6 +800,25 @@ export function computeScenario(input: ScenarioInput): ScenarioResult {
   }
   if (input.transition) notes.push("Transition: the other version is run with the SAME baseline profile (η held constant) to isolate the methodology-structure delta (matches the reference convention).");
 
+  // EVERY VALUE THIS RUN TOOK FROM A SITE'S TABLE (V13), in the order the run used them. Only values
+  // the run actually used: the DAF only where a PAA side ran, the household size only where it was used.
+  const siteTableValues: SiteTableValue[] | undefined = t ? [] : undefined;
+  if (siteTableValues) {
+    const iso = input.countryIso.toUpperCase();
+    const site = (field: SiteTableValue["field"], value: SiteTableValue["value"], source: string) =>
+      siteTableValues.push({ field, countryIso: iso, value, source });
+    const region = siteRow(t!.regions, iso);
+    if (region && (charcoalGiven === undefined || fnrbMultiNational)) site("toolRegion", region.toolRegion, t!.regions!.source);
+    if (stoveSource === "country-default" && country.stove?.siteSource) site("baselineMix.stove", { ...country.stove.shares }, country.stove.siteSource);
+    if (fuelSource === "country-default" && country.fuel?.siteSource) site("baselineMix.fuel", { ...country.fuel.shares }, country.fuel.siteSource);
+    if (pop && provenance.includes(pop.prov) && pop.prov.source === "site-table") site("householdSize", pop.householdSize, t!.householdSize!.source);
+    if (ageShares?.source === "site-table") {
+      site("ageShares", { under5: ageShares.under5, age5_18: ageShares.age5_18, adult19plus: ageShares.adult19plus }, t!.ageShares!.source);
+    }
+    if (f.prov.source === "site-table") site("fNRB", f.value, t!.fnrb![f.vintage].source);
+    if (d.prov.source === "site-table" && provenance.includes(d.prov)) site("DAF", d.value, t!.daf!.source);
+  }
+
   return {
     version: input.version, method, mode,
     people, householdSizeUsed, qpwEffective: q.qpwEffective,
@@ -783,6 +838,7 @@ export function computeScenario(input: ScenarioInput): ScenarioResult {
       shares: sharesInForce,
     },
     result, transitionResult, provenance, fallbacks, notes,
+    ...(siteTableValues ? { siteTableValues } : {}),
   };
 }
 
@@ -866,13 +922,13 @@ export interface TransitionWaterfall {
  * separate lines instead of one blended number — that is R1's own amendment of 2026-09-21, and it
  * needs the filed value to exist, not to be substituted for.
  */
-export function computeTransitionWaterfall(input: ScenarioInput): TransitionWaterfall {
+export function computeTransitionWaterfall(input: ScenarioInput, tables?: SiteTables): TransitionWaterfall {
   // Ask before computing, so the refusal names the missing filing rather than surfacing from
   // somewhere deep in the decomposition with no context attached.
   const available = transitionAvailability(input.fnrbFiledV1);
   if (!available.ok) throw new FiledFnrbRequiredError(available.refusal);
-  const legacy = computeScenario({ ...input, version: "legacy" });
-  const paa = computeScenario({ ...input, version: "paa" });
+  const legacy = computeScenario({ ...input, version: "legacy" }, tables);
+  const paa = computeScenario({ ...input, version: "paa" }, tables);
   const legacyER = legacy.result.ER;
   const paaER = paa.result.ER;
 
@@ -889,7 +945,7 @@ export function computeTransitionWaterfall(input: ScenarioInput): TransitionWate
   // The fNRB rule update — OUTSIDE the transition (amended R1). V1.0 at the filed value vs V1.0 at the
   // current standardised-tool value. With nothing filed the two are the same run and the line is null.
   const er0 = legacyER;
-  const er1 = computeScenario({ ...input, version: "legacy", fnrbFiledV1: paaFnrb }).result.ER;                       // V1.0 at the current fNRB
+  const er1 = computeScenario({ ...input, version: "legacy", fnrbFiledV1: paaFnrb }, tables).result.ER;                       // V1.0 at the current fNRB
   const ru = fnrb.ruleUpdate;
   const ruleYear = ru.effective.slice(0, 4);
   const fnrbRuleUpdate: FnrbRuleUpdate = {
@@ -909,12 +965,12 @@ export function computeTransitionWaterfall(input: ScenarioInput): TransitionWate
 
   // Sequential path — each config is the previous plus ONE v2.0 change; recompute ER. Starts at the
   // V1.0 ER with fNRB already at the current value, so fNRB is held equal through every step.
-  const er2 = computeScenario({ ...input, version: "legacy", fnrbFiledV1: paaFnrb, etaOverride: v2Eta }).result.ER;   // η → V2 default
+  const er2 = computeScenario({ ...input, version: "legacy", fnrbFiledV1: paaFnrb, etaOverride: v2Eta }, tables).result.ER;   // η → V2 default
   // V2 formula on the FLAT volume first (no DAF, no leakage), so the placement step is placement only…
-  const er2b = computeScenario({ ...input, version: "paa", volumeBasis: "flat", fnrbOverride: paaFnrb, etaOverride: v2Eta, DAF: 0, LE: 0, embodied: undefined }).result.ER;
+  const er2b = computeScenario({ ...input, version: "paa", volumeBasis: "flat", fnrbOverride: paaFnrb, etaOverride: v2Eta, DAF: 0, LE: 0, embodied: undefined }, tables).result.ER;
   // …then the V2 volume basis (Table 9 tiers on a household run; identical to er2b when a flat value was entered).
-  const er3 = computeScenario({ ...input, version: "paa", fnrbOverride: paaFnrb, etaOverride: v2Eta, DAF: 0, LE: 0, embodied: undefined }).result.ER; // + volume basis
-  const er3b = computeScenario({ ...input, version: "paa", fnrbOverride: paaFnrb, etaOverride: v2Eta, DAF: 0 }).result.ER;      // + V2 leakage: market (Option 1 default, or the entered Option 2 figure) and embodied (if entered)
+  const er3 = computeScenario({ ...input, version: "paa", fnrbOverride: paaFnrb, etaOverride: v2Eta, DAF: 0, LE: 0, embodied: undefined }, tables).result.ER; // + volume basis
+  const er3b = computeScenario({ ...input, version: "paa", fnrbOverride: paaFnrb, etaOverride: v2Eta, DAF: 0 }, tables).result.ER;      // + V2 leakage: market (Option 1 default, or the entered Option 2 figure) and embodied (if entered)
   const er4 = paaER;                                                                                                  // DAF (full V2)
   const leakageEntered = input.LE !== undefined && input.LE !== null;
 
@@ -924,7 +980,7 @@ export function computeTransitionWaterfall(input: ScenarioInput): TransitionWate
     { key: "eta", label: "Stove-efficiency default (η)", driver: `V1 credits at its default stove efficiency (${pctf(legacy.etaWeighted)}); v2.0 requires the V2 default (${pctf(v2Eta)}) — a more efficient baseline stove burns less fuel, so fewer credits.`, impact: er2 - er1, runningER: er2 },
     { key: "placement", label: "Discount placement (X_cleanboil / M_q)", driver: `Both rulebooks reduce credits for water that doesn't displace boiling (people who boil anyway, or water that fails quality tests). v2.0 simply applies these reductions at a different point in the math. ${Math.abs(er2b - er2) < 0.05 ? "For this project the effect is zero." : `For this project the effect is ${er2b - er2 >= 0 ? "+" : ""}${(er2b - er2).toFixed(1)} tCO₂e.`}`, impact: er2b - er2, runningER: er2b },
     { key: "volume", label: paa.volumeBasis === "table9" ? "Water volume (Table 9 age tiers)" : "Water volume (entered value)", driver: paa.volumeBasis === "table9"
-        ? `v2.0 credits each person's drinking water by age (Table 9: under-5 0.9 L, 5–18 3.0 L, adults 4.0 L a day) instead of one adult figure for everyone. With ${paa.table9?.ageShares.source === "country" ? "this country's census age split" : paa.table9?.ageShares.source === "entered" ? "the project's surveyed age split" : "a global default age split"} the weighted volume is ${n(paa.qpwEffective)} L per person a day${paa.table9?.suppressedDemandApplied ? ", after the 5% suppressed-demand deduction" : ""}. A Water Consumption Field Test can replace it.`
+        ? `v2.0 credits each person's drinking water by age (Table 9: under-5 0.9 L, 5–18 3.0 L, adults 4.0 L a day) instead of one adult figure for everyone. With ${paa.table9?.ageShares.source === "country" ? "this country's census age split" : paa.table9?.ageShares.source === "site-table" ? "the site's age split for this country" : paa.table9?.ageShares.source === "entered" ? "the project's surveyed age split" : "a global default age split"} the weighted volume is ${n(paa.qpwEffective)} L per person a day${paa.table9?.suppressedDemandApplied ? ", after the 5% suppressed-demand deduction" : ""}. A Water Consumption Field Test can replace it.`
         : `Both rulebooks use the entered per-person volume (${n(paa.qpwEffective)} L a day, capped at 5.5), so no change here.`, impact: er3 - er2b, runningER: er3 },
     { key: "leakage", label: input.embodied ? "Leakage (market 2% default + embodied)" : "Market leakage (2% default)", driver: (leakageEntered
         ? `v2.0 deducts market leakage from net reductions; this project entered a detailed assessment (Option 2, §9.3.2, Eq. 21) of ${n(input.LE as number)} tCO₂e. V1 allowed zero ex-ante.`

@@ -8,8 +8,10 @@ import {
   computeTransitionWaterfall,
   fnrbAvailability,
   transitionAvailability,
+  checkSiteTables,
   type FnrbRefusal,
   type FiledFnrbRefusal,
+  type SiteTables,
 } from "../engine";
 import { calculatorPageContext } from "../agent/pageContext";
 import type { SavedAnalysis } from "./analysis";
@@ -87,6 +89,15 @@ export interface CalculatorOptions {
    * and the sliders are on. The open site's screening uses it. The paid site leaves it off and shows both.
    */
   exAnteOnly?: boolean;
+  /**
+   * THE SITE'S OWN COUNTRY TABLES (V13, rulings 2026-11-14). A site passes its own DAF, fNRB, household
+   * size, age shares, UN regions and baseline mix here, and the hook passes them to every engine call.
+   * The engine reads them row by row: the site's row first, then the package's, then today's fallback.
+   * Each value taken from them is labelled with the table's source, and listed in the result's
+   * `siteTableValues`. A table that fails the engine's check is refused loudly: the hook throws
+   * `SiteTableError` rather than use part of it. Absent, the package's own tables are used, as before.
+   */
+  tables?: SiteTables;
 }
 
 export interface CalculatorState {
@@ -112,6 +123,8 @@ export interface CalculatorState {
   saveState: RecordSaveState;
   /** True when the host passed `onSave`. False means no Save button is offered at all. */
   canSave: boolean;
+  /** The site's own country tables, checked (`CalculatorOptions.tables`). The panels pass them on; they read no data file. */
+  tables?: SiteTables;
   save: () => Promise<void>;
 
   /* ── Engine results (computed by the engine, never here) ─────────────────── */
@@ -166,6 +179,8 @@ export interface CalculatorState {
 
 export function useCalculatorState(project: CalvinProject, options: CalculatorOptions = {}): CalculatorState {
   const { readOnly = false, onSave, onDirtyChange, onExport, creditingPeriodYears, exAnteOnly = false } = options;
+  // Checked once per tables object, before any of it is used. A bad table throws here, loudly.
+  const tables = useMemo(() => checkSiteTables(options.tables), [options.tables]);
   const exAnteSliders = options.exAnteSliders || exAnteOnly;
   const seed = useMemo(
     () => withSliderStarts(exAnteOnlySeed(seedCalcState(project), exAnteOnly), project.analysis, exAnteSliders),
@@ -278,14 +293,14 @@ export function useCalculatorState(project: CalvinProject, options: CalculatorOp
   // A MISSING PROJECT FACT, NO FIGURES (CALCULATOR_SPEC §0.2). Every figure depends on the
   // technology, the country and the count, and a fact nobody provided is not this project's. So
   // nothing is computed and the seat asks for what is missing.
-  const missingFacts = useMemo(() => missingProjectFacts(state), [state]);
+  const missingFacts = useMemo(() => missingProjectFacts(state, tables), [state, tables]);
   // Both versions computed every render — each tab shows its own version-correct total.
-  const inputBase = useMemo(() => (missingFacts.length > 0 ? null : toScenarioInput(state)), [state, missingFacts]);
+  const inputBase = useMemo(() => (missingFacts.length > 0 ? null : toScenarioInput(state, tables)), [state, missingFacts, tables]);
   // ASK BEFORE COMPUTING. `computeScenario` REFUSES (it throws) for a country with no official
   // fNRB and no filed value; the seat must show that refusal, not crash on it, so it checks first.
   const availability = useMemo(
-    () => (inputBase ? fnrbAvailability(inputBase.countryIso, inputBase.fnrbVintage, inputBase.fnrbOverride) : null),
-    [inputBase],
+    () => (inputBase ? fnrbAvailability(inputBase.countryIso, inputBase.fnrbVintage, inputBase.fnrbOverride, tables) : null),
+    [inputBase, tables],
   );
   const fnrbRefusal = availability && !availability.ok ? availability.refusal : null;
   // THE TRANSITION ASKS FOR THE FILED VALUE BEFORE IT COMPUTES (R1 amended, 2026-09-24 part 1).
@@ -296,16 +311,16 @@ export function useCalculatorState(project: CalvinProject, options: CalculatorOp
   const canRun = Boolean(inputBase && availability?.ok);
   const canRunLegacy = canRun && Boolean(transitionOk?.ok);
   const legacyResult = useMemo(
-    () => (canRunLegacy && inputBase ? computeScenario({ ...inputBase, version: "legacy" }) : null),
-    [inputBase, canRunLegacy],
+    () => (canRunLegacy && inputBase ? computeScenario({ ...inputBase, version: "legacy" }, tables) : null),
+    [inputBase, canRunLegacy, tables],
   );
   const paaResult = useMemo(
-    () => (canRun && inputBase ? computeScenario({ ...inputBase, version: "paa" }) : null),
-    [inputBase, canRun],
+    () => (canRun && inputBase ? computeScenario({ ...inputBase, version: "paa" }, tables) : null),
+    [inputBase, canRun, tables],
   );
   const waterfall = useMemo(
-    () => (canRunLegacy && inputBase ? computeTransitionWaterfall(inputBase) : null),
-    [inputBase, canRunLegacy],
+    () => (canRunLegacy && inputBase ? computeTransitionWaterfall(inputBase, tables) : null),
+    [inputBase, canRunLegacy, tables],
   );
   const result = state.version === "paa" ? paaResult : legacyResult;
 
@@ -346,6 +361,7 @@ export function useCalculatorState(project: CalvinProject, options: CalculatorOp
     /** The full outcome for the notice; `saving` above is the button's half (#98 2b). */
     saveState,
     canSave: Boolean(onSave),
+    tables,
     save,
     missingFacts,
     fnrbRefusal,

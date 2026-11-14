@@ -1,6 +1,6 @@
 import type { ScenarioResult } from "../engine";
 import { sdwsRef, type Basis } from "./citations";
-import { toScenarioInput, type CalcState } from "./state";
+import { anticipatedInput, type CalcState } from "./state";
 
 /**
  * THE EX-ANTE SLIDERS (Road to v1, step V3; rulings 2026-10-30).
@@ -195,7 +195,7 @@ export function applySlider(state: CalcState, spec: SliderSpec, display: number)
  */
 export function creditedValue(state: CalcState, result: ScenarioResult, key: SliderKey): number | null {
   if (key === "litres") return result.qpwEffective;
-  const input = toScenarioInput(state);
+  const input = anticipatedInput(state);
   if (key === "days") return input.operationalDays;
   if (key === "testsPass") return input.M_qy ?? null;
   return input.usageRate ?? null;

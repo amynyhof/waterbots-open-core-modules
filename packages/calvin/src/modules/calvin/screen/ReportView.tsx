@@ -3,12 +3,13 @@
 import type { ReactNode } from "react";
 
 import {
-  COUNTRIES,
+  countryName,
   GS4GG_CALCULATOR_VERSION,
   PRESETS,
   type LegacyErOutput,
   type PaaErOutput,
   type ScenarioResult,
+  type SiteTables,
   type TransitionWaterfall,
 } from "../engine";
 import { peopleServed, type CalcState, type CalvinProject } from "./state";
@@ -201,6 +202,7 @@ export default function ReportView({
   canonPopulation,
   creditingPeriodYears,
   slots = {},
+  tables,
 }: {
   project: CalvinProject;
   state: CalcState;
@@ -215,6 +217,8 @@ export default function ReportView({
   /** The first crediting period's length, from the host; absent means no crediting-period total. */
   creditingPeriodYears?: number;
   slots?: ReportSlots;
+  /** The site's own country tables (V13), from `useCalculatorState`; they give a site-only country its name. */
+  tables?: SiteTables;
 }) {
   const v2 = state.version === "paa";
   const basis: Basis = state.version;
@@ -223,7 +227,7 @@ export default function ReportView({
   const l = result.result as LegacyErOutput;
   const preset = PRESETS["traditional-wood-cws"];
   const countryLabel =
-    (project.country ? COUNTRIES.find((c) => c.iso === project.country!.toUpperCase())?.name : undefined) ??
+    (project.country ? countryName(project.country, tables) : undefined) ??
     state.countryIso;
   const delta = paaER - legacyER;
   const totalFirstCP = creditingPeriodYears != null ? result.result.ER * creditingPeriodYears : null;
@@ -285,9 +289,13 @@ export default function ReportView({
   // the condition travels with the number wherever the number goes. The sentence is built by the
   // engine (`result.fnrbMultiNational.condition`) and printed here, never assembled here.
   const mn = result.fnrbMultiNational;
+  // A value from the site's own fNRB table (V13) is not the tool's national default: the line names the site's source.
+  const fnrbProv = result.provenance.find((p) => p.field === "fNRB");
   const srcFnrbV2 = fnrbOverridden
     ? "Entered — filed current value (V2.0 SDWS 25)"
-    : mn
+    : fnrbProv?.source === "site-table"
+      ? `${fnrbProv.label} (V2.0 SDWS 25)`
+      : mn
       ? `Methodology V2.0 standardised tool — no A6.4-AMT-009 Table 3 national value covers this country, so Table 2's multi-national value for ${mn.region} is used (V2.0 SDWS 25; the same value as CDM TOOL33 v03.0 Table 2, origin MoFuSS 2024), ${result.fnrbVintage}. ${mn.condition}`
       : `Methodology V2.0 standardised tool — A6.4-AMT-009 v01.0 Table 3 national default (V2.0 SDWS 25; the same value as CDM TOOL33 v03.0 Table 3, origin MoFuSS 2024), ${result.fnrbVintage}`;
   const srcFnrb = v2 ? srcFnrbV2 : "Entered — the project's filed V1.0 value (V1.0 SDWS 21, CDM TOOL30)";
@@ -315,6 +323,8 @@ export default function ReportView({
   // label says so, and the report prints it beside the value (rulings, 19 and 23 Oct).
   const dafProv = result.provenance.find((p) => p.field === "DAF");
   const dafFallbackNote = dafProv?.source === "global-default" ? ` — ${dafProv.label}` : "";
+  // A DAF from the site's own table (V13) is not the package's default, so the report names the site's source instead.
+  const dafSiteSource = dafProv?.source === "site-table" ? `${dafProv.label} — host country × 2026–2030 window` : null;
   // N_p: the household count IS the premises count when population is entered as households
   // (V2 Eq.6; V2.0 SDWS 33 sales/distribution records) — the v0.1.0 report printed "—" here (comment 1.1).
   const srcNp = result.premises != null
@@ -329,7 +339,7 @@ export default function ReportView({
         // [#215] part C3, R4 wording: where the age split is NOT this project's survey, the
         // report says the word "estimate". A national census share standing in for a project's own
         // people is an estimate, and a reader acting on the number is entitled to know which it is.
-        ? (t9 ? `Methodology V2.0 default — Table 9 age tiers weighted by ${t9.ageShares.source === "country" ? "the national census age split (UN WPP 2024 — an estimate for the country, not this project's survey)" : t9.ageShares.source === "entered" ? "the project's surveyed age split" : "a global default age split (an estimate; no national row for this country)"} (V2.0 SDWS 29 Option 1; V2.0 SDWS 30)${t9.suppressedDemandApplied ? "; suppressed demand ×0.95" : ""}` : "Methodology V2.0 default — Table 9, adults 4.0 L/p/d (V2.0 SDWS 29, Option 1; cap 5.5)")
+        ? (t9 ? `Methodology V2.0 default — Table 9 age tiers weighted by ${t9.ageShares.source === "country" ? "the national census age split (UN WPP 2024 — an estimate for the country, not this project's survey)" : t9.ageShares.source === "site-table" ? `the country's age split (${t9.ageShares.label} — an estimate for the country, not this project's survey)` : t9.ageShares.source === "entered" ? "the project's surveyed age split" : "a global default age split (an estimate; no national row for this country)"} (V2.0 SDWS 29 Option 1; V2.0 SDWS 30)${t9.suppressedDemandApplied ? "; suppressed demand ×0.95" : ""}` : "Methodology V2.0 default — Table 9, adults 4.0 L/p/d (V2.0 SDWS 29, Option 1; cap 5.5)")
         : "Methodology V1.0 default — V1.0 SDWS 24, 4 L/p/d (cap 5.5)");
   const qpwDesc = v2 && t9
     ? `Litres per person per day, weighted by age — ${t9.tiers.map((t) => `${t.key === "under5" ? "under 5" : t.key === "age5_18" ? "5–18" : "19+"} ${fmt(t.share * 100, 1)}% × ${t.volume} L`).join(", ")}`
@@ -611,7 +621,7 @@ export default function ReportView({
             eqNo="10" eq={<S basis={basis} k="BEadj" />} value={`${fmt(p.BE_downadj, 1)} tCO₂e`}
             rows={[
               { sym: <S basis={basis} k="BEunc" />, value: fmt(p.BE_u, 1), source: "Calculated as per Eq. 9", desc: "Uncertainty-adjusted baseline emissions (tCO₂e) — before the ambition trim" },
-              { sym: <S basis={basis} k="DAF" />, value: fmt(result.DAF, 4), source: `Methodology V2.0 default — GS4GG Tool 05 (DAF Determination, doc 457), host country × 2026–2030 window${dafFallbackNote}`, desc: "Downward adjustment factor — the country-specific ambition trim" },
+              { sym: <S basis={basis} k="DAF" />, value: fmt(result.DAF, 4), source: dafSiteSource ?? `Methodology V2.0 default — GS4GG Tool 05 (DAF Determination, doc 457), host country × 2026–2030 window${dafFallbackNote}`, desc: "Downward adjustment factor — the country-specific ambition trim" },
             ]}
           />
           <EqBlock
@@ -715,7 +725,7 @@ export default function ReportView({
           <AppxRow p={<S basis={basis} k="Cb" />} d="Already-safe share — people not credited" u="—" v={fmt(state.cBaseline, 2)} s={srcCb} />
           <AppxRow p={<S basis={basis} k="X" />} d="Share still boiling the safe water" u="—" v={fmt(state.xCleanboil, 2)} s={srcX} />
           {m2 ? <AppxRow p={<S basis={basis} k="Up" />} d="Usage rate — how often the technology is used" u="—" v={fmt(state.usageRate, 2)} s={srcUp} /> : null}
-          {v2 ? <AppxRow p={<S basis={basis} k="DAF" />} d="Downward adjustment factor — country-specific ambition trim" u="—" v={fmt(result.DAF, 4)} s={`Methodology V2.0 default — GS4GG Tool 05 (doc 457), host country × window${dafFallbackNote}`} /> : null}
+          {v2 ? <AppxRow p={<S basis={basis} k="DAF" />} d="Downward adjustment factor — country-specific ambition trim" u="—" v={fmt(result.DAF, 4)} s={dafSiteSource ?? `Methodology V2.0 default — GS4GG Tool 05 (doc 457), host country × window${dafFallbackNote}`} /> : null}
           <AppxRow p={<span className="t-mono" style={{ fontSize: 11 }}>HH<sub style={{ fontSize: 8 }}>p,y</sub> × HN<sub style={{ fontSize: 8 }}>p,y</sub></span>} d={state.populationMode === "households" ? "Households served (N_p)" : "People served"} u={state.populationMode === "households" ? "households" : "people"} v={peopleServed(state).toLocaleString()} s={srcPop} />
           {m2 ? <AppxRow p={<S basis={basis} k="Np" />} d="Households served (N_p) — Eq.6" u="households" v={result.premises != null ? fmt(result.premises, 0) : "—"} s={srcNp} /> : null}
           {m2 ? <AppxRow p={<S basis={basis} k="qi" />} d="Device capacity" u="L/h" v={state.deviceCapacityLPerHour != null ? fmt(state.deviceCapacityLPerHour, 2) : "—"} s={state.deviceCapacityLPerHour != null ? "Entered — manufacturer specification (V2.0 SDWS 13)" : "Not entered — V2.0 SDWS 13"} /> : null}
