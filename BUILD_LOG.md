@@ -4,6 +4,20 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-11-14 — A site's own country tables merged (plan and log only)
+
+**Done (branch `tick-site-tables-merged`):**
+- `BUILD_PLAN.md`: V13 ticked as merged, pull request #20.
+- `docs/archive/PROPOSAL_site-tables.md`: the proposal for V13, kept as it stood before the build. Its status line
+  says it is archived, and two examples are reworded so they hold no count from a site.
+- Rulings 2026-11-14 on the release: the engine version stays 0.19.0, and the release is `calvin-v0.2.0`.
+
+**Checked:** the name scan found nothing in the changed files.
+
+**Open:** the `calvin-v0.2.0` release, after this pull request is merged.
+
+---
+
 ## 2026-11-14 — A site's own country tables in Calvin (V13)
 
 **Done (branch `add-site-tables`):**
