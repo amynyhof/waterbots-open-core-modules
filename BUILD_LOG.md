@@ -4,6 +4,20 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-11-13 — Violet and D-3 merged (plan and log only)
+
+**Done (branch `tick-violet-merged`):**
+- `BUILD_PLAN.md`: V7, V8 and M8.1 ticked as merged, pull request #18. V8 notes what is still to come: the outside
+  expert's check, and N14 and N15 for the outside expert group.
+- `docs/archive/PROPOSAL_violet-d3.md`: the proposal for Violet's first module, kept as it stood before the build.
+  Only its status line changed, to say it is archived.
+
+**Checked:** the name scan found nothing in the changed files.
+
+**Open:** nothing new.
+
+---
+
 ## 2026-11-12 — Violet and D-3: the rulings on pull request #18
 
 **Done (branch `add-violet-d3`, same pull request):**
