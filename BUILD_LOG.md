@@ -4,6 +4,41 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-11-14 — A site's own country tables in Calvin (V13)
+
+**Done (branch `add-site-tables`):**
+- A site can pass Calvin its own country tables while it runs: the DAF (downward adjustment factor), the fNRB
+  (fraction of non-renewable biomass), household size, age shares, UN regions and the baseline fuel and stove mix.
+  Nothing a site passes is stored in the package.
+- The engine reads them row by row: the site's row first, then the package's, then the same fallback as before
+  (ruling 2026-11-14). A site whose table has more countries than the package's gets every one of them.
+- The engine entry: each call that reads a country table takes the tables as an optional last argument, for example
+  `computeScenario(input, tables)`. New: `countryList(tables)` and `countryName(iso, tables)`.
+- The screen entry: `useCalculatorState` takes `options.tables` and passes them to every engine call. The panels
+  read no data file.
+- A site's fNRB rows fill in the package's matching set of values, row by row (ruling 2026-11-14). The fNRB refusal
+  fires only when neither table has the country, and then says the site's table has no row either.
+- What a site may not pass (rulings 2026-11-14): the DAF floors, and the method's own values (the charcoal and
+  embodied-emission factors). A site may pass a baseline-mix table now.
+- Each value from a site's table is labelled with the site's source, on the screen and in the report. The result
+  lists every such value.
+- A site's table is checked before any of it is used. A bad row, an empty source or a part the engine does not take
+  refuses the run with a plain message naming the table, the row and the problem.
+- The mount test: `scripts/check-screen-entry.mjs` mounts the screen from the packed files with an invented DAF
+  table, and checks the screen prints the site's value and source. The mount with no table still prints the
+  package's value.
+- `BUILD_PLAN.md`: V13 marked as an open pull request; it comes before V6, in the next Calvin release.
+
+**Checked:** typecheck, test and build pass. Calvin's tests: 269 of 269, of which 32 are new. With no tables passed,
+the 48 reference cases match exactly. The package, seed, engine-entry, screen-entry (6 views), paid-code and name
+checks pass.
+
+**Open:** the engine version is still 0.19.0: no arithmetic changed and no reference case moved. The release
+candidate, its version number and the private side's pass or fail with the paid site's tables passed in, are
+the maintainer's next steps.
+
+---
+
 ## 2026-11-13 — Violet and D-3 merged (plan and log only)
 
 **Done (branch `tick-violet-merged`):**
