@@ -4,6 +4,22 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-11-14 — Calvin's package version 0.2.0, for the release
+
+**Done (branch `calvin-version-0-2-0`):**
+- `packages/calvin/package.json`, its line in `package-lock.json` and the package README: Calvin's version is 0.2.0,
+  so the release `calvin-v0.2.0` packs as `waterbots-calvin-0.2.0.tgz` (rulings 2026-11-14).
+- The engine version stays 0.19.0: no arithmetic changed and no reference case moved (ruling 2026-11-14).
+- `core` stays 0.1.0. It has not changed since `calvin-v0.1.0`, so the release carries the same core file.
+
+**Checked:** typecheck, test and build pass. The package, seed, engine-entry (48 of 48), screen-entry (6 views),
+paid-code and name checks pass.
+
+**Open:** after this merges, Session C builds the release from `main` into the handoff folder and stops for the
+maintainer's go.
+
+---
+
 ## 2026-11-14 — A site's own country tables merged (plan and log only)
 
 **Done (branch `tick-site-tables-merged`):**
