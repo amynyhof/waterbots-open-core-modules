@@ -6,7 +6,7 @@ import { useReadOnlySeat } from "../../core/readOnly";
 import {
   PRESETS, DEFAULT_STOVE_ETA, STOVE_SHARE_KEYS, STOVE_CLASS_LABEL, FUEL_SHARE_KEYS, FUEL_LABEL, FUEL_FACTOR_NOTE,
   presetShares, defaultCharcoalConvention, validDevicesPerPremises, DEVICES_PER_PREMISES_RULE, type CharcoalConvention,
-  type LegacyErOutput, type PaaErOutput, type ScenarioResult,
+  type LegacyErOutput, type PaaErOutput, type ScenarioResult, type SiteTables,
 } from "../engine";
 import { peopleServed, projectFacts, type CalcState } from "./state";
 import { fmt, fmtExp, parseNumericInput } from "./format";
@@ -424,9 +424,11 @@ function EqRow({ eqNum, symbol, title, formula, value, oneLiner, binding, open, 
 
 // ── the stack ────────────────────────────────────────────────────────────────
 
-export default function EquationStack({ result, state, patch, canonPopulation, seed, sliders = false }: { result: ScenarioResult; state: CalcState; patch: (p: Partial<CalcState>) => void; canonPopulation?: number; seed?: CalcState;
+export default function EquationStack({ result, state, patch, canonPopulation, seed, sliders = false, tables }: { result: ScenarioResult; state: CalcState; patch: (p: Partial<CalcState>) => void; canonPopulation?: number; seed?: CalcState;
   /** Show the ex-ante sliders in place of the typed boxes for the four anticipated values (`exAnte.ts`). */
-  sliders?: boolean }) {
+  sliders?: boolean;
+  /** The site's own country tables (V13), from `useCalculatorState`. Read only through the engine. */
+  tables?: SiteTables }) {
   // Read once here for the legend below; the input primitives read it for themselves ([#97]).
   const readOnlySeat = useReadOnlySeat();
   // Method 2 (HWT/IWT) opens the Eq.6/7 quantity rows by default so its per-premises derivation
@@ -458,6 +460,8 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
   // footnote 5's condition — both come from the engine, so this component only prints them.
   const fnrbRegional = result.fnrbMultiNational;
   const fnrbRegionalLabel = result.provenance.find((p) => p.field === "fNRB")?.label;
+  // A value from the site's own fNRB table (V13): its label names the site's source, and the row prints it.
+  const fnrbFromSite = result.provenance.find((p) => p.field === "fNRB")?.source === "site-table";
   // Population lives in the Q_pop row; an analysis figure differing from canon is an override.
   const popOverride = typeof canonPopulation === "number" && state.populationCount !== canonPopulation;
   // N_p CAME FROM THE RECORD when nothing was typed here and the engine worked it out from the
@@ -569,7 +573,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
           <div className="flex items-baseline gap-2">
             <span className="t-caption flex-1 text-fg-2">Household size</span>
             <BaselineChip sdws="V2.0 SDWS 30" />
-            <StateBadge state={state.householdSizeOverride != null ? "entered" : "default"} tip="The cited UN 2022 country average until this project's own surveyed figure is entered here." />
+            <StateBadge state={state.householdSizeOverride != null ? "entered" : "default"} tip="The cited country average until this project's own surveyed figure is entered here." />
             <EditGlyph title="Enter a surveyed household size to override the country average" />
             <InRowNum value={state.householdSizeOverride ?? result.householdSizeUsed} onChange={(v) => patch({ householdSizeOverride: v })} onClear={() => patch({ householdSizeOverride: undefined })} optional step={0.01} width={92} />
           </div>
@@ -654,7 +658,9 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
             ? `Override — default: UN WPP 2024 ${fmt(t9.ageShares.under5 * 100, 1)} / ${fmt(t9.ageShares.age5_18 * 100, 1)} / ${fmt(t9.ageShares.adult19plus * 100, 1)} · this analysis: ${fmt(shown.under5 * 100, 1)} / ${fmt(shown.age5_18 * 100, 1)} / ${fmt(shown.adult19plus * 100, 1)} (survey).`
             : t9.ageShares.source === "country"
               ? "UN WPP 2024 national shares — a census estimate for the country, not this project's survey. The held V1.0 baseline questionnaire never asks an age, so this is the honest fallback until a survey that does is uploaded."
-              : "Global default age shares — no national row for this country. An estimate, not this project's survey."}
+              : t9.ageShares.source === "site-table"
+                ? `${t9.ageShares.label}. An estimate for the country, not this project's survey.`
+                : "Global default age shares — no national row for this country. An estimate, not this project's survey."}
         </div>
         <div className="t-caption text-fg-4" style={{ fontSize: 10 }}>
           Weighted volume {fmt(result.qpwEffective, 2)} L/p/d — Table 9 tiers (under-5 0.9 · 5–18 3.0 · adults 4.0) weighted by these shares
@@ -705,7 +711,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
     const countryFuel = result.baselineMix.country?.fuel;
     const tagFor = (src: string): EditState => (src === "entered" ? "entered" : src === "country-default" ? "default" : "assumed");
     const pct = (v: number) => Math.round(v * 1000) / 10;
-    const charcoalChosen = state.charcoalConvention ?? defaultCharcoalConvention(projectFacts(state).countryIso);
+    const charcoalChosen = state.charcoalConvention ?? defaultCharcoalConvention(projectFacts(state, tables).countryIso, tables);
     const charcoalPreselected = state.charcoalConvention === undefined && charcoalChosen !== undefined;
     const box = (value: number, onChange: (v: number) => void, label: string, aside?: string) => (
       <span className="flex items-baseline gap-1">
@@ -1106,7 +1112,9 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
                   ? `Entered — filed current fNRB ${fmt(fnrbField ?? 0, 3)}.${readOnlySeat ? "" : ` Clear to revert to the ${result.fnrbVintage} lookup.`}`
                   : `${fnrbRegional
                         ? `No national default for this country — A6.4-AMT-009 Table 2 multi-national value for ${fnrbRegional.region}.`
-                        : `A6.4-AMT-009 Table 3 national default (${result.fnrbVintage}).`}${readOnlySeat ? "" : " Overtype to file your own value; clear to revert."}`)}
+                        : fnrbFromSite
+                          ? `${fnrbRegionalLabel}.`
+                          : `A6.4-AMT-009 Table 3 national default (${result.fnrbVintage}).`}${readOnlySeat ? "" : " Overtype to file your own value; clear to revert."}`)}
           </div>
           {/* THE QUARTILE DIAL IS RETIRED FOR fNRB (calculator v0.10.0, ruling (3), 2026-09-21).
               A country with no national row now takes A6.4-AMT-009 Table 2's official multi-national
@@ -1211,7 +1219,8 @@ function paaTail(result: ScenarioResult, open: Set<string>, toggle: Toggle, xcbP
   // A host country with no row in the engine's DAF data takes the default; the engine's provenance
   // label carries the note, and this row only prints it (rulings, 19 and 23 Oct).
   const dafProv = result.provenance.find((x) => x.field === "DAF");
-  const dafFallbackNote = dafProv?.source === "global-default" ? dafProv.label : null;
+  // A value from the site's own table (V13) prints its label too, so the site's source is on screen.
+  const dafFallbackNote = dafProv?.source === "global-default" || dafProv?.source === "site-table" ? dafProv.label : null;
   return (
     <>
       {/* PAA-only adjustment sub-stage — the layout teaches V2's extra stage vs V1. */}

@@ -14,5 +14,6 @@ export * from "./calculators/gs4gg-carbon/baseline-ef.js";
 export * from "./calculators/gs4gg-carbon/table9.js";
 export * from "./calculators/gs4gg-carbon/fallback.js";
 export * from "./calculators/gs4gg-carbon/version.js";
+export * from "./calculators/gs4gg-carbon/siteTables.js";
 export type * from "./calculators/gs4gg-carbon/types.js";
 export * from "./calculators/data/countries.js";

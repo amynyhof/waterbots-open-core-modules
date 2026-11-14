@@ -42,4 +42,11 @@ export {
 export { DEVICES_PER_PREMISES_RULE, QPW_PERSON_DEFAULT, validDevicesPerPremises } from "../../calculators/gs4gg-carbon/quantity";
 export type { FallbackStopKey } from "../../calculators/gs4gg-carbon/fallback";
 export { GS4GG_CALCULATOR_VERSION } from "../../calculators/gs4gg-carbon/version";
-export { COUNTRIES } from "../../calculators/data/countries";
+export { COUNTRIES, countryList, countryName } from "../../calculators/data/countries";
+export {
+  SiteTableError,
+  checkSiteTables,
+  type SiteTable,
+  type SiteTableValue,
+  type SiteTables,
+} from "../../calculators/gs4gg-carbon/siteTables";

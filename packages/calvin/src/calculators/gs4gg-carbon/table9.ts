@@ -19,6 +19,7 @@
  * Pure. Ruling R4 (2026-09-21, [#24]); calculator v0.5.0.
  */
 import ageSharesJson from "../data/age-shares/countries.json" with { type: "json" };
+import { checkSiteTables, fromSiteTable, siteRow, type SiteTables } from "./siteTables.js";
 
 export interface AgeShares {
   under5: number;
@@ -52,15 +53,21 @@ type SharesFile = {
 const shares = ageSharesJson as unknown as SharesFile;
 
 export interface ResolvedAgeShares extends AgeShares {
-  /** "country" = the national census-based shares; "global-default" = the World row fallback. */
-  source: "country" | "global-default" | "entered";
+  /** "country" = the national census-based shares; "site-table" = a site's own row (V13); "global-default" = the World row fallback. */
+  source: "country" | "site-table" | "global-default" | "entered";
   label: string;
 }
 
-/** National age shares for a country (ISO3), else the labelled global default. Entered shares win. */
-export function resolveAgeShares(iso3: string, entered?: AgeShares): ResolvedAgeShares {
+/** National age shares for a country (ISO3), else the labelled global default. Entered shares win; a site's row (V13) comes before the package's. */
+export function resolveAgeShares(iso3: string, entered?: AgeShares, tables?: SiteTables): ResolvedAgeShares {
   if (entered) {
     return { ...entered, source: "entered", label: "age shares entered — project survey (SDWS 30)" };
+  }
+  const t = checkSiteTables(tables);
+  const s = siteRow(t?.ageShares, iso3);
+  if (s) {
+    return { under5: s.under5, age5_18: s.age5_18, adult19plus: s.adult19plus, source: "site-table",
+      label: `${s.name} age shares, ${fromSiteTable(t!.ageShares!.source)} (SDWS 30)` };
   }
   const c = shares.countries[iso3];
   if (c) {

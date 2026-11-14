@@ -24,3 +24,5 @@ export type { ReportSlots } from "./modules/calvin/screen/ReportView.js";
 export { default as VersionTabs } from "./modules/calvin/screen/VersionTabs.js";
 export type { CalcState, CalvinProject } from "./modules/calvin/screen/state.js";
 export type { SavedAnalysis } from "./modules/calvin/screen/analysis.js";
+// A site's own country tables, passed to `useCalculatorState` as `options.tables` (V13).
+export type { SiteTable, SiteTables, SiteTableValue } from "./modules/calvin/engine.js";
