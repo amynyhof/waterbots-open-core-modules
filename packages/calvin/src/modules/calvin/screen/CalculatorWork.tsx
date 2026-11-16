@@ -40,14 +40,22 @@ import type { CalculatorState } from "./useCalculatorState";
  * carries the host's own report sections (seam S13: the paid record rows and the monitoring
  * periods with their vintages). The project arrives as a plain `ModuleProject` (seam S3).
  */
+/** The narrowest a figure tile may be: wide enough for its number and its tag side by side. */
+const TILE_MIN_WIDTH = "9.5rem";
+/** The figure strip's columns: as many as the panel fits at `TILE_MIN_WIDTH`, sharing the rest. */
+const TILE_COLUMNS = `repeat(auto-fit, minmax(min(${TILE_MIN_WIDTH}, 100%), 1fr))`;
+
 /**
  * A summary figure. EVERY ONE IS TAGGED DERIVED (ruling (2), 2026-09-26): the four are
  * outputs of the equations below, and the tag says so in the same four-word key as the stack.
+ *
+ * The number and its tag may wrap: in a narrow tile the tag drops under the number rather than
+ * running into the next tile.
  */
 function Metric({ label, value, sub, tip }: { label: string; value: string; sub?: string; tip: string }) {
   return (
-    <div>
-      <div className="flex items-center gap-2">
+    <div className="min-w-0">
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
         <span className="t-mono text-fg-1" style={{ fontSize: 17, fontWeight: 600, lineHeight: 1.1 }}>{value}</span>
         <DerivedTag tip={tip} />
       </div>
@@ -244,7 +252,11 @@ export default function CalculatorWork({
             className="sticky top-0 z-10 rounded-lg border border-line bg-card shadow-sm"
             style={{ padding: "14px 20px" }}
           >
-            <div className="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-4">
+            {/* THE COLUMNS FOLLOW THE PANEL, NOT THE WINDOW. A count picked from the window's width gave
+                four narrow columns in a panel beside a side rail and chat, and the figures ran into each
+                other at laptop width. Each tile now gets at least TILE_MIN_WIDTH; tiles that do not fit
+                move to the next row, and three tiles never leave an empty fourth column. */}
+            <div className="grid gap-x-6 gap-y-4" style={{ gridTemplateColumns: TILE_COLUMNS }} data-figure-tiles>
               <Metric label="ER / person / yr" value={`${fmt(erPerPerson, 4)}`} sub="tCO₂e" tip="Worked out from the credits (ER_y) and the people served — change either and this follows." />
               <Metric label="Baseline EF_b (Eq.1)" value={fmtExp(result.result.EF_b, 3)} sub="tCO₂e / L" tip="Worked out by Eq.1 from the stoves, fuels and fNRB below." />
               <Metric label="Water volume Q_y" value={`${fmt(result.result.Q_y / 1e6, 2)}`} sub="ML / yr" tip="Worked out by Eq.4 — the smaller of the water people use and the water supplied." />
