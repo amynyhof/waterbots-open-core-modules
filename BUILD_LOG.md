@@ -4,6 +4,25 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-11-16 — Calvin's figure tiles fit a narrow panel
+
+**Done (branch `fix-figure-tiles`):**
+- The open site found the three figure tiles above the equations running into each other at laptop width.
+- The cause: the strip picked four columns from the browser window's width (640 px or wider), not from the width of
+  the panel it sits in. Beside a side rail and chat, the panel is narrow, so each column was about 87 to 112 px. Each
+  tile's number and "derived" tag need about 106 to 125 px, so they spilled into the next tile.
+- `CalculatorWork.tsx`: the strip now fits as many columns as the panel holds at 9.5rem each, and moves the rest to
+  the next row. Three tiles no longer leave an empty fourth column. In a narrow tile, the tag drops under its number.
+- `figureTiles.test.tsx`: checks the markup that does this. A unit test cannot measure a layout.
+
+**Checked:** typecheck and the full test suite pass (Calvin 273 of 273). The engine checks (48 of 48) and the screen
+mount test (6 views) pass. No figure changed. Measured in a browser at panel widths of 460, 560, 680 and 900 px: no
+tile's contents run past its edge. At 460 px the third tile moves to a second row.
+
+**Open:** the maintainer checks the screen at laptop width. Next: the V2.0-only view for new projects, then 0.3.0.
+
+---
+
 ## 2026-11-14 — Calvin's package version 0.2.0, for the release
 
 **Done (branch `calvin-version-0-2-0`):**
