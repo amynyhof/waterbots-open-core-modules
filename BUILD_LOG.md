@@ -8,8 +8,8 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 **Done (branch `calvin-version-0-3-0`):**
 - Calvin's version is 0.3.0. It carries the figure-tile fix and the V2.0-only view.
-- The `url` line is out of the `calvin` and `core` package files (ruling 2026-11-16). It is not needed before npm
-  publishing, which is v2. The `calvin-v0.2.0` tag stays exactly as it is.
+- The `url` line is out of every package file: `calvin`, `core`, `violet`, `phoebe` and `bridget` (rulings
+  2026-11-16). It is not needed before npm publishing, which is v2. The `calvin-v0.2.0` tag stays exactly as it is.
 - `core` is 0.1.1 (ruling 2026-11-16). Its package file changed, so its packed file changes too. A new version
   keeps one name to one fingerprint. `calvin` and `violet` depend on core 0.1.1.
 
