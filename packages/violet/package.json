@@ -37,7 +37,7 @@
     "build": "tsc -p tsconfig.build.json"
   },
   "dependencies": {
-    "@waterbots/core": "0.1.0"
+    "@waterbots/core": "0.1.1"
   },
   "peerDependencies": {
     "react": "19.3.1"

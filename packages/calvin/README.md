@@ -42,7 +42,7 @@ function Seat({ project }) {
   return (
     <>
       <CalculatorLens calc={calc} />
-      <CalculatorWork calc={calc} project={project} appVersion="0.2.0" tab="calculator" />
+      <CalculatorWork calc={calc} project={project} appVersion="0.3.0" tab="calculator" />
     </>
   );
 }
@@ -85,6 +85,6 @@ No sum changed. The engine version and every reference case stay as they are.
 
 Since the seed landed, this repo is Calvin's home. Changes are made here, by pull request. `scripts/check-seed.mjs` proves what arrived against the commit where the seed landed, so later changes are allowed.
 
-- Version 0.2.0. Not published. Nothing in this repo goes to npm yet; the package is marked `private`.
+- Version 0.3.0. Not published. Nothing in this repo goes to npm yet; the package is marked `private`.
 - The build writes plain files for a bundler to pick up. Apart from `dist/engine.js` and `dist/screen.js`, they do not run on their own in Node.
 - Apache License 2.0. See `LICENSE` and `NOTICE` in this folder.
