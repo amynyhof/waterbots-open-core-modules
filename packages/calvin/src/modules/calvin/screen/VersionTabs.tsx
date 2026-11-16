@@ -49,6 +49,24 @@ function VerTab({
   );
 }
 
+/**
+ * THE HEADER FOR A NEW PROJECT (ruling 2026-09-21). A project not credited under V1.0 has one version, so it
+ * gets one card: V2.0 and its own total, with no V1.0 tab and no transition line. Nothing is offered that
+ * would need a V1.0 filing the project does not have.
+ */
+export function V2OnlyTab({ paaER }: { paaER: number }) {
+  return (
+    <div data-view="v2-only">
+      <div className="flex items-end gap-1 border-b border-line">
+        <VerTab name="PAA v2.0" total={`${fmt(paaER, 0)} tCO₂e/yr`} active onClick={() => {}} disabled />
+      </div>
+      <p className="t-caption mt-2 text-fg-3" style={{ fontSize: 11 }}>
+        A new project: its credits are worked out under V2.0, the methodology in force.
+      </p>
+    </div>
+  );
+}
+
 export default function VersionTabs({
   legacyER,
   paaER,

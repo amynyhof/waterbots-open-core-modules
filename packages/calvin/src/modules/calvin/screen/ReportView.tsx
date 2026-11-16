@@ -207,9 +207,14 @@ export default function ReportView({
   project: CalvinProject;
   state: CalcState;
   result: ScenarioResult;
-  legacyER: number;
+  /**
+   * The V1.0 figure and the transition breakdown, for a project credited under V1.0. Leave both out for a new
+   * project: the report then covers V2.0 only, with no V1.0 row, no difference and no transition table
+   * (ruling 2026-09-21). The transition sections print only when both are given.
+   */
+  legacyER?: number;
   paaER: number;
-  waterfall: TransitionWaterfall;
+  waterfall?: TransitionWaterfall;
   warning: string | null;
   generatedAt: string;
   appVersion: string;
@@ -229,7 +234,7 @@ export default function ReportView({
   const countryLabel =
     (project.country ? countryName(project.country, tables) : undefined) ??
     state.countryIso;
-  const delta = paaER - legacyER;
+  const tr = legacyER !== undefined && waterfall !== undefined ? { legacyER, waterfall, delta: paaER - legacyER, ru: waterfall.fnrbRuleUpdate } : null;
   const totalFirstCP = creditingPeriodYears != null ? result.result.ER * creditingPeriodYears : null;
 
   // Render-time self-check: the waterfall MUST reconcile with the displayed endpoints and delta
@@ -237,15 +242,19 @@ export default function ReportView({
   // integrity warning. Client-facing exports carry mapping tests + this self-check (canon).
   // Two identities, both checked: legacyER + rule update (0 when nothing is filed) + Σ steps == paaER,
   // and transitionStartER + Σ steps == paaER (the transition table's own arithmetic).
-  const stepSum = waterfall.steps.reduce((s, x) => s + x.impact, 0);
-  const ru = waterfall.fnrbRuleUpdate;
-  const ruleImpact = ru.impact ?? 0;
-  const integrityOk =
-    Math.abs(waterfall.legacyER + ruleImpact + stepSum - waterfall.paaER) < 0.5 &&
-    Math.abs(waterfall.transitionStartER + stepSum - waterfall.paaER) < 0.5 &&
-    Math.abs(waterfall.legacyER - legacyER) < 0.5 &&
-    Math.abs(waterfall.paaER - paaER) < 0.5 &&
-    Math.abs(paaER - legacyER - waterfall.delta) < 0.5;
+  // A V2.0-only report has no transition, so there is nothing for these two identities to check.
+  const integrityOk = !tr || (() => {
+    const { waterfall: w, legacyER: l } = tr;
+    const stepSum = w.steps.reduce((s, x) => s + x.impact, 0);
+    const ruleImpact = w.fnrbRuleUpdate.impact ?? 0;
+    return (
+      Math.abs(w.legacyER + ruleImpact + stepSum - w.paaER) < 0.5 &&
+      Math.abs(w.transitionStartER + stepSum - w.paaER) < 0.5 &&
+      Math.abs(w.legacyER - l) < 0.5 &&
+      Math.abs(w.paaER - paaER) < 0.5 &&
+      Math.abs(paaER - l - w.delta) < 0.5
+    );
+  })();
 
   // Method is NEVER bare "Method 1" (could read as a version) — always technology-qualified.
   const methodLabel = state.method === 1
@@ -371,7 +380,7 @@ export default function ReportView({
           blanked, and a future reviewer is built on the record, never on a string here. */}
       <div className="border-b-2 border-line pb-2">
         <div className="flex items-start justify-between gap-4">
-          <span className="eyebrow tinted solo" style={{ fontSize: 11 }}>WaterBots.AI · PAA Transition Report</span>
+          <span className="eyebrow tinted solo" style={{ fontSize: 11 }}>WaterBots.AI · {tr ? "PAA Transition Report" : "PAA V2.0 Report"}</span>
           {/* THE STAGE, PRINTED WHERE A READER LOOKS FIRST — [#225](f). Read straight from the
               mode toggle (`state.mode`), never inferred: an ex-ante report projects; an ex-post
               report reports what monitoring measured. The two must never be mistaken for each
@@ -381,14 +390,20 @@ export default function ReportView({
           </span>
         </div>
 
-        <h1 className="t-h3" style={{ fontSize: 20, marginTop: 6 }}>PAA Transition Analysis</h1>
+        <h1 className="t-h3" style={{ fontSize: 20, marginTop: 6 }}>{tr ? "PAA Transition Analysis" : "PAA V2.0 Emission Reductions"}</h1>
         <div className="t-mono text-fg-2" style={{ fontSize: 12, marginTop: 1 }}>{project.name}</div>
 
         {/* Orientation — client-facing, plain-English (pending practitioner review). */}
         <p className="t-caption text-fg-2" style={{ fontSize: 11, marginTop: 8, lineHeight: 1.5 }}>
           This report quantifies this project&rsquo;s emission reductions under Gold Standard&rsquo;s current PAA
-          methodology (GS4GG PAA M400-12 V2.0) and compares what this issuance would credit under the legacy V1.0 rules against
-          the current PAA V2.0 requirement — <strong>same project, same period, two rulebooks.</strong> Every figure is
+          methodology (GS4GG PAA M400-12 V2.0){tr ? (
+            <>
+              {" "}and compares what this issuance would credit under the legacy V1.0 rules against
+              the current PAA V2.0 requirement — <strong>same project, same period, two rulebooks.</strong>
+            </>
+          ) : (
+            <>. This is a new project, not credited under V1.0, so V2.0 is the only rulebook that applies and no comparison is made.</>
+          )} Every figure is
           a deterministic output of the methodology&rsquo;s own equations; each parameter&rsquo;s value, unit, and
           source is documented below. Figures are {basisWord}; final credited volumes depend on monitoring and
           verification (see &ldquo;On the use of these figures&rdquo;).
@@ -426,9 +441,10 @@ export default function ReportView({
 
       {/* ── Headline result — both versions + transition delta ── */}
       <H>Emission reductions — result</H>
-      <Row k={`Selected basis — ${v2 ? "PAA V2.0" : "Legacy V1.0"} ER`} v={`${fmt(result.result.ER, 1)} tCO₂e/yr`} field="selectedER" />
-      <Row k="Legacy V1.0 ER" v={`${fmt(legacyER, 1)} tCO₂e/yr`} field="legacyER" />
+      {tr ? <Row k={`Selected basis — ${v2 ? "PAA V2.0" : "Legacy V1.0"} ER`} v={`${fmt(result.result.ER, 1)} tCO₂e/yr`} field="selectedER" /> : null}
+      {tr ? <Row k="Legacy V1.0 ER" v={`${fmt(tr.legacyER, 1)} tCO₂e/yr`} field="legacyER" /> : null}
       <Row k="PAA V2.0 ER" v={`${fmt(paaER, 1)} tCO₂e/yr`} field="paaER" />
+      {tr ? (() => { const { delta, ru, waterfall } = tr; return (<>
       <Row
         k="Total difference (PAA − Legacy)"
         v={`${delta >= 0 ? "+" : ""}${fmt(delta, 1)} tCO₂e/yr (${fmt((legacyER ? delta / legacyER : 0) * 100, 1)}%)`}
@@ -443,6 +459,7 @@ export default function ReportView({
           <Row k="— of which methodology transition (V1.0 → V2.0)" v={`${waterfall.transitionDelta >= 0 ? "+" : ""}${fmt(waterfall.transitionDelta, 1)} tCO₂e/yr`} note="The rulebook change on its own. The same fNRB is used on both sides of this comparison, so the change in the fNRB value is reported as its own line below, rather than mixed in here." field="transitionDelta" />
         </>
       ) : null}
+      </>); })() : null}
       {totalFirstCP != null ? (
         <Row
           k={`Total over 1st crediting period (${creditingPeriodYears} yr)`}
@@ -452,6 +469,9 @@ export default function ReportView({
         />
       ) : null}
 
+      {/* THE TRANSITION SECTIONS: the fNRB rule update and the transition table. A transitioning project only;
+          a new project's report has neither (ruling 2026-09-21). */}
+      {tr ? (() => { const { ru, waterfall } = tr; return (<>
       {/* ── The fNRB rule update — its own line, apart from the methodology transition (amended R1, 2026-09-21).
           The year and the citation come from the fNRB data file, never from this component. With no filed
           V1.0 value on the record the block prints the reason and no number — never an invented comparator. ── */}
@@ -530,13 +550,14 @@ export default function ReportView({
           </tr>
         </tbody>
       </table>
+      </>); })() : null}
 
       {/* Bridge to the Transition Analysis — plain-English; no further judgment content here (#29). */}
       <p className="t-caption text-fg-2" style={{ fontSize: 10, marginTop: 6, lineHeight: 1.5 }}>
         <strong>Recovering value:</strong> where a conservative default is driving the reduction, a field measurement
         can sometimes replace it with a higher, project-specific value and recover credits — for example a Water
         Consumption Field Test (WCFT, V2.0 SDWS 29) for the volume of water people actually drink, or a Water Boiling Test
-        (WBT, V2.0 SDWS 11) for the efficiency of the stoves. These are assessed in the accompanying Transition Analysis.
+        (WBT, V2.0 SDWS 11) for the efficiency of the stoves.{tr ? " These are assessed in the accompanying Transition Analysis." : ""}
       </p>
 
       {/* ── Derivation — GS filing convention (section · plain-English intro · citation · equation · Where, table) ── */}

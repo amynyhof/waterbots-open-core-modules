@@ -4,6 +4,39 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-11-16 — Calvin's V2.0-only view for new projects
+
+**Done (branch `new-project-view`):**
+- The open site found that `calvin-v0.2.0` offers only the transition view, which needs a filed V1.0 fNRB. A new
+  project, on paper or newly built, has no V1.0 filing, so it saw an ask it could never answer and no figures.
+- Calvin's project input has a new project fact, `creditedUnderV1` (rulings 2026-11-16). The site sets it from its
+  own intake. `true` gives today's transition view. `false` or left out gives the V2.0-only view (ruling
+  2026-09-21): no V1.0 figure, no transition, and no ask for a V1.0 filing. Left out means V2.0 only because the
+  V2.0 figure is true for every project.
+- `useCalculatorState`: on a new project the version stays V2.0, and no V1.0 result or transition breakdown is
+  worked out. `CalculatorState.transition` says which view the screens show.
+- `CalculatorWork` and `VersionTabs`: one V2.0 header with its own total, in place of the two tabs and the
+  transition line.
+- `ReportView`: `legacyER` and `waterfall` may be left out. The report then covers V2.0 only: no V1.0 row, no
+  difference, no fNRB rule update section and no transition table.
+- `pageContext.ts`: Calvin's chat context has a V2.0-only wording. It also no longer fails while a transitioning
+  project's filed V1.0 fNRB is missing. Before, it read a V1.0 result that did not exist.
+- `check-screen-entry.mjs`: 5 more views from the packed files (11 in all): a new project and its report, a
+  transitioning project and its report, and a transitioning project with no filed value.
+- The package README: how a site passes the fact, and a release note for 0.3.0. Before upgrading, a site that shows
+  the transition passes `creditedUnderV1: true` on every project credited under V1.0.
+- `BUILD_PLAN.md`: V16, Calvin 0.3.0, and V17, Calvin's two doors. V17 is design only: on the sites the
+  screening sets `creditedUnderV1`; in the Agent Commons, Calvin offers "new project estimate" or "compare old and
+  new rules". The choices belong in the open core, as Violet's door does (ruling 2026-11-12).
+
+**Checked:** typecheck and the full test suite pass (Calvin 283 of 283, with 14 new tests in `v2OnlyView.test.tsx`).
+The engine checks (48 of 48), the screen mount test (11 views), and the seed, package, paid-code and name checks
+pass. No sum changed and no reference case moved.
+
+**Open:** the maintainer checks a new project's screen and report. Then the 0.3.0 version pull request.
+
+---
+
 ## 2026-11-16 — Calvin's figure tiles fit a narrow panel
 
 **Done (branch `fix-figure-tiles`):**
