@@ -1,13 +1,12 @@
 {
   "name": "@waterbots/calvin",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "WaterBots open core module: calvin (quantify: the carbon calculator). Arrived with the Calvin seed. Not published.",
   "license": "Apache-2.0",
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/amynyhof/waterbots-open-core-modules.git",
     "directory": "packages/calvin"
   },
   "main": "./dist/index.js",
@@ -41,7 +40,7 @@
     "build:css": "node -e \"require('node:fs').copyFileSync('src/modules/calvin/styles.css', 'dist/styles.css')\""
   },
   "dependencies": {
-    "@waterbots/core": "0.1.0"
+    "@waterbots/core": "0.1.1"
   },
   "peerDependencies": {
     "react": "19.3.1"

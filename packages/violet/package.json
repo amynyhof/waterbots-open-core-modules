@@ -7,7 +7,6 @@
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/amynyhof/waterbots-open-core-modules.git",
     "directory": "packages/violet"
   },
   "main": "./dist/index.js",
@@ -37,7 +36,7 @@
     "build": "tsc -p tsconfig.build.json"
   },
   "dependencies": {
-    "@waterbots/core": "0.1.0"
+    "@waterbots/core": "0.1.1"
   },
   "peerDependencies": {
     "react": "19.3.1"
