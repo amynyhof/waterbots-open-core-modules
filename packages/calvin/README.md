@@ -69,7 +69,7 @@ const project = { name: "Invented project", standards: [], technology: "CWS", co
 
 The build bundles the entry into one file, `dist/screen.js`. React and `@waterbots/core` stay outside it, so a site has one copy of each. `scripts/check-screen-entry.mjs`, at the repo root, packs both packages, installs them alone with React, and renders the ex-ante view, the ex-post view and its report, a new project's V2.0-only view and report, and a transitioning project's view and report from the packed files.
 
-## Changes in the next release (0.3.0)
+## Changes in 0.3.0
 
 **Before you upgrade, a site that shows the transition must pass `creditedUnderV1: true` on every project credited under V1.0.** From 0.3.0, a project without it gets the V2.0-only view. Its transition, and the ask for its filed V1.0 fNRB, stop showing.
 
@@ -78,6 +78,7 @@ The build bundles the entry into one file, `dist/screen.js`. React and `@waterbo
 - `CalculatorState` has `transition`: true when the screens show the transition.
 - Fixed: Calvin's chat context no longer fails while a transitioning project's filed V1.0 fNRB is missing.
 - Fixed: the figure tiles fit the width of their panel and no longer overlap at laptop width.
+- Calvin needs `@waterbots/core` 0.1.1. Core's only change is its package file, which no longer has a `url` line.
 
 No sum changed. The engine version and every reference case stay as they are.
 
