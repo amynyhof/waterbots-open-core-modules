@@ -7,7 +7,7 @@ import EquationStack from "./EquationStack";
 import ExAntePanel from "./ExAntePanel";
 import { DerivedTag, InRowNum, TagLegend } from "./EquationStack";
 import ReportView, { type ReportSlots } from "./ReportView";
-import VersionTabs from "./VersionTabs";
+import VersionTabs, { V2OnlyTab } from "./VersionTabs";
 import BetaTag from "./BetaTag";
 import { fmt, fmtExp } from "./format";
 import { missingFactsPrompt, type CalvinProject } from "./state";
@@ -95,7 +95,10 @@ export default function CalculatorWork({
     printAt,
     exportReport,
     readOnly,
+    transition,
   } = calc;
+  /** The V1.0 side and the transition, for a project credited under V1.0. A new project has neither. */
+  const comparison = transition && legacyResult && waterfall ? { legacyER: legacyResult.result.ER, waterfall } : null;
 
   /**
    * A MISSING PROJECT FACT, NO FIGURES (CALCULATOR_SPEC §0.2, ruling 2026-10-23). The seat used to fill
@@ -137,8 +140,8 @@ export default function CalculatorWork({
    * borrowed number makes the comparison look complete when half of it was invented. So the seat
    * ASKS, and the ask names the document and the page, which is what makes it answerable.
    *
-   * This is the transition seat. A new project has no V1.0 history and never comes here — it runs
-   * the current official value on the ordinary calculator.
+   * Only a transitioning project comes here. A new project has no V1.0 history: the hook never asks it for a
+   * filing, and its seat shows V2.0 alone (ruling 2026-09-21).
    */
   if (filedFnrbRefusal) {
     return (
@@ -184,7 +187,7 @@ export default function CalculatorWork({
     );
   }
 
-  if (fnrbRefusal || !result || !legacyResult || !paaResult || !waterfall) {
+  if (fnrbRefusal || !result || !paaResult || (transition && !comparison)) {
     return (
       <ReadOnlySeat readOnly={readOnly}>
         <section
@@ -214,12 +217,16 @@ export default function CalculatorWork({
       {/* ── Calculator tab ── */}
       {tab === "calculator" ? (
         <>
-          <VersionTabs
-            legacyER={legacyResult.result.ER}
-            paaER={paaResult.result.ER}
-            selected={state.version}
-            onSelect={(v) => patch({ version: v })}
-          />
+          {comparison ? (
+            <VersionTabs
+              legacyER={comparison.legacyER}
+              paaER={paaResult.result.ER}
+              selected={state.version}
+              onSelect={(v) => patch({ version: v })}
+            />
+          ) : (
+            <V2OnlyTab paaER={paaResult.result.ER} />
+          )}
 
           {warning ? (
             <div
@@ -286,7 +293,7 @@ export default function CalculatorWork({
       {tab === "report" ? (
         <div className="flex flex-col gap-1">
           <div className="flex items-baseline gap-3">
-            <span className="eyebrow solo">PAA Transition Report — preview</span>
+            <span className="eyebrow solo">{comparison ? "PAA Transition Report" : "PAA V2.0 Report"} — preview</span>
             <button
               type="button"
               onClick={exportReport}
@@ -310,9 +317,9 @@ export default function CalculatorWork({
           project={project}
           state={state}
           result={result}
-          legacyER={legacyResult.result.ER}
+          legacyER={comparison?.legacyER}
           paaER={paaResult.result.ER}
-          waterfall={waterfall}
+          waterfall={comparison?.waterfall}
           warning={warning}
           generatedAt={printAt ?? ""}
           appVersion={appVersion}

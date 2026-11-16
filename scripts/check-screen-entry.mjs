@@ -11,7 +11,11 @@
 //   - the report tab of the ex-post view;
 //   - the ex-post view and its report again, with a site's own DAF table passed in (V13). The table is invented. The
 //     check proves the screens print the site's value and its source, and that the view with no table still prints the
-//     package's own value.
+//     package's own value;
+//   - a new project (the site passes no `creditedUnderV1`) and its report: V2.0 only, with no V1.0 figure, no
+//     transition and no ask for a filed V1.0 fNRB (ruling 2026-09-21);
+//   - a project credited under V1.0 and its report: both versions and the transition;
+//   - a project credited under V1.0 with no filed V1.0 fNRB on the record: the ask for it.
 // It also checks that both stylesheets are in the packed files and reachable by their names, and it typechecks a
 // small file that imports the entry, the way a site's bundler reads the types.
 // Exit codes: 0 all pass, 1 something is wrong, 2 the check could not run.
@@ -28,6 +32,12 @@ export const SITE_SOURCE = "Invented site table for the screen-entry check";
 export const SITE_DAF = "0.0321";
 /** What the package prints for that country with no site table: the DAF tool's cited floor. */
 export const PACKAGE_DAF = "Default value: 0.0125";
+/** Marks the V2.0-only header, the one a new project gets. */
+export const V2_ONLY = 'data-view="v2-only"';
+/** Text only the transition view and its report print. */
+export const TRANSITION = ["Transition delta (PAA − Legacy)", "PAA Transition Analysis", "Legacy V1.0 ER", "What changed — methodology transition"];
+/** The ask for a filed V1.0 fNRB. */
+export const FILED_ASK = "Filed V1.0 fNRB needed";
 const SITE_TABLES = { daf: { source: SITE_SOURCE, countries: { LSO: { name: "Lesotho", daf_2026_2030: Number(SITE_DAF), basis: "invented basis" } } } };
 
 // What a site writes to mount a seat: the state hook, the controls panel and the work surface.
@@ -56,6 +66,11 @@ process.stdout.write(JSON.stringify({
     exPostReport: render(project({ mode: "ex-post" }), {}, "report"),
     siteTable: render(project({ mode: "ex-post" }), { tables }),
     siteTableReport: render(project({ mode: "ex-post" }), { tables }, "report"),
+    newProject: render({ ...project({}), analysis: {} }, {}),
+    newProjectReport: render({ ...project({}), analysis: {} }, {}, "report"),
+    transition: render({ ...project({ mode: "ex-post" }), creditedUnderV1: true }, {}),
+    transitionReport: render({ ...project({ mode: "ex-post" }), creditedUnderV1: true }, {}, "report"),
+    transitionNeedsFiling: render({ ...project({}), analysis: {}, creditedUnderV1: true }, {}),
   },
   stylesheets: { "@waterbots/calvin/styles.css": found("@waterbots/calvin/styles.css"), "@waterbots/core/base.css": found("@waterbots/core/base.css") },
 }));
@@ -66,6 +81,7 @@ const tables: SiteTables = { daf: { source: "invented", countries: { LSO: { name
 const options: CalculatorOptions = { exAnteOnly: true, tables };
 export const parts = [useCalculatorState, CalculatorLens, CalculatorWork, ReportView, VersionTabs] as const;
 export const project: CalvinProject | null = null;
+export const transitioning: CalvinProject = { name: "invented", standards: [], creditedUnderV1: true };
 export { options };
 `;
 
@@ -82,6 +98,11 @@ export const EXPECT = {
   exPostReport: { has: ["print-report", "Ex-post"], lacks: ['aria-label="Anticipated performance"', SITE_SOURCE] },
   siteTable: { has: ["Q_m — metered volume", SITE_DAF, SITE_SOURCE], lacks: [PACKAGE_DAF] },
   siteTableReport: { has: ["print-report", SITE_DAF, SITE_SOURCE], lacks: [PACKAGE_DAF] },
+  newProject: { has: [V2_ONLY, "PAA v2.0"], lacks: [...TRANSITION, FILED_ASK] },
+  newProjectReport: { has: ["PAA V2.0 Emission Reductions", "PAA V2.0 Report"], lacks: [...TRANSITION, FILED_ASK] },
+  transition: { has: ["Transition delta (PAA − Legacy)", "Legacy V1.0"], lacks: [V2_ONLY, FILED_ASK] },
+  transitionReport: { has: ["PAA Transition Analysis", "Legacy V1.0 ER", "What changed — methodology transition"], lacks: [V2_ONLY, "PAA V2.0 Emission Reductions"] },
+  transitionNeedsFiling: { has: [FILED_ASK], lacks: [V2_ONLY, ...TRANSITION] },
 };
 export const NAMES = ["useCalculatorState", "CalculatorLens", "CalculatorWork", "ReportView", "VersionTabs"];
 

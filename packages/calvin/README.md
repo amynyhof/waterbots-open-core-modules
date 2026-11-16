@@ -54,7 +54,32 @@ There are two views:
 
 A site that shows both (the paid site) offers its own switch between them. A site that shows only the ex-ante view (the open site's screening) passes `exAnteOnly: true`. Then every run is ex-ante, a saved ex-post analysis opens as ex-ante, and the sliders are on.
 
-The build bundles the entry into one file, `dist/screen.js`. React and `@waterbots/core` stay outside it, so a site has one copy of each. `scripts/check-screen-entry.mjs`, at the repo root, packs both packages, installs them alone with React, and renders the ex-ante view, the ex-post view and its report from the packed files.
+### New projects and transitioning projects
+
+Each project also says whether it was already credited under the V1.0 methodology. The site passes it on the project as `creditedUnderV1`, from its own intake (ruling 2026-09-21):
+
+- **`creditedUnderV1: true`**: a transitioning project. The screens show both versions and the transition: how the credits move from V1.0 to V2.0. They ask for the project's filed V1.0 fNRB (the share of firewood counted as unsustainably harvested) before they show the comparison.
+- **`false`, or left out**: a new project, on paper or newly built. The screens show V2.0 only. There is no V1.0 figure, no transition, and no ask for a V1.0 filing the project does not have.
+
+Left out means V2.0 only because the V2.0 figure is true for every project. Only the comparison needs a V1.0 filing.
+
+```jsx
+const project = { name: "Invented project", standards: [], technology: "CWS", country: "LSO", creditedUnderV1: true };
+```
+
+The build bundles the entry into one file, `dist/screen.js`. React and `@waterbots/core` stay outside it, so a site has one copy of each. `scripts/check-screen-entry.mjs`, at the repo root, packs both packages, installs them alone with React, and renders the ex-ante view, the ex-post view and its report, a new project's V2.0-only view and report, and a transitioning project's view and report from the packed files.
+
+## Changes in the next release (0.3.0)
+
+**Before you upgrade, a site that shows the transition must pass `creditedUnderV1: true` on every project credited under V1.0.** From 0.3.0, a project without it gets the V2.0-only view. Its transition, and the ask for its filed V1.0 fNRB, stop showing.
+
+- New: the V2.0-only view for a new project, on the work surface and in the report (see "New projects and transitioning projects" above).
+- `ReportView`: `legacyER` and `waterfall` may be left out. The report then covers V2.0 only.
+- `CalculatorState` has `transition`: true when the screens show the transition.
+- Fixed: Calvin's chat context no longer fails while a transitioning project's filed V1.0 fNRB is missing.
+- Fixed: the figure tiles fit the width of their panel and no longer overlap at laptop width.
+
+No sum changed. The engine version and every reference case stay as they are.
 
 ## Notes
 

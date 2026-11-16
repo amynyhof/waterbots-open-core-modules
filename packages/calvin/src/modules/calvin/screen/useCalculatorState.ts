@@ -19,7 +19,9 @@ import {
   missingProjectFacts,
   recordOwnedFacts,
   seedCalcState,
+  showsTransition,
   toSavedAnalysis,
+  transitionPatch,
   toScenarioInput,
   type CalcState,
   type CalvinProject,
@@ -108,6 +110,12 @@ export interface CalculatorState {
   sliders: boolean;
   /** See `CalculatorOptions.exAnteOnly`. A site that offers an ex-ante / ex-post switch hides it when this is true. */
   exAnteOnly: boolean;
+  /**
+   * TRUE ONLY FOR A PROJECT CREDITED UNDER V1.0 (`CalvinProject.creditedUnderV1`, ruling 2026-09-21). Then the seat
+   * shows both versions and the transition. False: the V2.0-only view. The version stays V2.0, and nothing for
+   * V1.0 is worked out or asked for: `legacyResult`, `waterfall` and `filedFnrbRefusal` stay null.
+   */
+  transition: boolean;
 
   /* ── Working inputs ─────────────────────────────────────────────────────── */
   /** The live input state. */
@@ -182,6 +190,7 @@ export function useCalculatorState(project: CalvinProject, options: CalculatorOp
   // Checked once per tables object, before any of it is used. A bad table throws here, loudly.
   const tables = useMemo(() => checkSiteTables(options.tables), [options.tables]);
   const exAnteSliders = options.exAnteSliders || exAnteOnly;
+  const transition = showsTransition(project);
   const seed = useMemo(
     () => withSliderStarts(exAnteOnlySeed(seedCalcState(project), exAnteOnly), project.analysis, exAnteSliders),
     [project, exAnteSliders, exAnteOnly],
@@ -189,10 +198,11 @@ export function useCalculatorState(project: CalvinProject, options: CalculatorOp
   const [state, setState] = useState<CalcState>(seed);
   // INERT WHEN READ-ONLY, and this is the layer that actually guarantees it. The surface
   // disables its controls too, but a disabled control is a courtesy — this is the lock.
-  // An ex-ante-only seat keeps its mode the same way: a change to it is dropped here.
+  // An ex-ante-only seat keeps its mode the same way: a change to it is dropped here. And a seat with no
+  // transition keeps V2.0: a change of version is dropped too.
   const patch = (p: Partial<CalcState>) => {
     if (readOnly) return;
-    setState((s) => ({ ...s, ...exAnteOnlyPatch(p, exAnteOnly) }));
+    setState((s) => ({ ...s, ...exAnteOnlyPatch(transitionPatch(p, transition), exAnteOnly) }));
   };
 
   // "modified · unsaved" landmark: working state differs from the last SAVED analysis.
@@ -231,6 +241,16 @@ export function useCalculatorState(project: CalvinProject, options: CalculatorOp
     setState((s) => ({ ...s, ...facts }));
     setSavedState((s) => ({ ...s, ...facts }));
   }, [factsKey]);
+  /*
+   * A PROJECT THAT STOPS BEING A TRANSITION WHILE THE SEAT IS OPEN goes back to V2.0. The record decides
+   * `creditedUnderV1`, so, as with the facts above, the saved side moves with it and no unsaved change appears.
+   */
+  useEffect(() => {
+    if (transition) return;
+    const toV2 = (s: CalcState) => (s.version === "paa" ? s : { ...s, version: "paa" as const });
+    setState(toV2);
+    setSavedState(toV2);
+  }, [transition]);
   const dirty = useMemo(() => JSON.stringify(state) !== JSON.stringify(savedState), [state, savedState]);
   const [saveState, setSaveState] = useState<RecordSaveState>({ kind: "idle" });
   const saving = saveState.kind === "saving";
@@ -306,10 +326,15 @@ export function useCalculatorState(project: CalvinProject, options: CalculatorOp
   // THE TRANSITION ASKS FOR THE FILED VALUE BEFORE IT COMPUTES (R1 amended, 2026-09-24 part 1).
   // The legacy side and the waterfall are the parts that need the project's own V1.0 filing, so
   // they are the parts withheld; the PAA side is unaffected and still runs.
-  const transitionOk = useMemo(() => (inputBase ? transitionAvailability(inputBase.fnrbFiledV1) : null), [inputBase]);
+  // A NEW PROJECT IS NEVER ASKED (ruling 2026-09-21): it has no V1.0 filing, and it has no V1.0 side to
+  // work out. Its seat runs V2.0 alone.
+  const transitionOk = useMemo(
+    () => (transition && inputBase ? transitionAvailability(inputBase.fnrbFiledV1) : null),
+    [inputBase, transition],
+  );
   const filedFnrbRefusal = transitionOk && !transitionOk.ok ? transitionOk.refusal : null;
   const canRun = Boolean(inputBase && availability?.ok);
-  const canRunLegacy = canRun && Boolean(transitionOk?.ok);
+  const canRunLegacy = canRun && transition && Boolean(transitionOk?.ok);
   const legacyResult = useMemo(
     () => (canRunLegacy && inputBase ? computeScenario({ ...inputBase, version: "legacy" }, tables) : null),
     [inputBase, canRunLegacy, tables],
@@ -322,7 +347,7 @@ export function useCalculatorState(project: CalvinProject, options: CalculatorOp
     () => (canRunLegacy && inputBase ? computeTransitionWaterfall(inputBase, tables) : null),
     [inputBase, canRunLegacy, tables],
   );
-  const result = state.version === "paa" ? paaResult : legacyResult;
+  const result = transition && state.version === "legacy" ? legacyResult : paaResult;
 
   // Everything below reads the engine's output. With no fNRB there IS no output, so each one
   // reports nothing rather than a zero — a zero is a number, and we do not have one.
@@ -347,12 +372,13 @@ export function useCalculatorState(project: CalvinProject, options: CalculatorOp
   const erPerPerson = result && result.people > 0 ? result.result.ER / result.people : 0;
 
   const pageContext = () =>
-    calculatorPageContext({ projectName: project.name, state, missingFacts, fnrbRefusal, result, legacyResult, paaResult, waterfall });
+    calculatorPageContext({ projectName: project.name, state, missingFacts, fnrbRefusal, filedFnrbRefusal, transition, result, legacyResult, paaResult, waterfall });
 
   return {
     readOnly,
     sliders: showSliders(exAnteSliders, state),
     exAnteOnly,
+    transition,
     state,
     patch,
     seed,

@@ -12,7 +12,33 @@ import type { SavedAnalysis } from "./analysis";
 import { technologyToMethod } from "./method";
 
 /** The project as Calvin receives it: the host's facts, plus Calvin's own saved analysis. */
-export type CalvinProject = ModuleProject<SavedAnalysis>;
+export type CalvinProject = ModuleProject<SavedAnalysis> & {
+  /**
+   * WHETHER THIS PROJECT WAS ALREADY CREDITED UNDER V1.0 (ruling 2026-09-21; rulings 2026-11-16). A project
+   * fact, set by the site from its own intake: on the sites, the screening sets it.
+   *
+   * - `true`: a transitioning project. The seat shows both versions and the transition, and asks for the
+   *   project's filed V1.0 fNRB before it shows the comparison.
+   * - `false` or absent: a new project, on paper or newly built. The seat shows V2.0 only: no V1.0 figure,
+   *   no transition, and no ask for a V1.0 filing the project does not have.
+   *
+   * Absent means V2.0 only because the V2.0 figure is true for every project. Only the comparison needs a
+   * V1.0 filing, so leaving it out guesses no figure.
+   */
+  creditedUnderV1?: boolean;
+};
+
+/** True when the seat shows the transition: only for a project the site says was credited under V1.0. */
+export function showsTransition(project: Pick<CalvinProject, "creditedUnderV1">): boolean {
+  return project.creditedUnderV1 === true;
+}
+
+/** A change to the seat's inputs, kept to V2.0 for a project with no transition: a change of version is dropped. */
+export function transitionPatch(p: Partial<CalcState>, transition: boolean): Partial<CalcState> {
+  if (transition || p.version === undefined) return p;
+  const { version: _dropped, ...rest } = p;
+  return rest;
+}
 
 /**
  * The calculator's left-rail input state — the subset a consultant edits on the page.
@@ -211,7 +237,8 @@ export function seedCalcState(project: CalvinProject): CalcState {
   const enteredQpw = g.litresPerPersonPerDay ?? project.lpcd;
   return {
     ...recordOwnedFacts(project),
-    version: g.version ?? "paa", // PAA v2.0 primary; legacy is the transition comparison
+    // PAA v2.0 primary; legacy is the transition comparison, and only a transitioning project has one.
+    version: showsTransition(project) ? (g.version ?? "paa") : "paa",
     mode: g.mode ?? "ex-ante",
     // COUNT seeds from a saved analysis override if one exists (persists with provenance vs
     // canon), else the record fact. canonPopulation (the fact) drives the in-row override provenance.
