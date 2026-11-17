@@ -1,6 +1,6 @@
 # Name scan: checks every file of a pull request, and of main, against the private name list.
-# The list is a repository secret, WB_NAMES: the full text of the list file. It is never printed. The scan prints
-# file, line and kind only, never a name (scripts/check-names.mjs).
+# The list is a repository secret, NAMES_TO_BLOCK (the name the other repos use): the full text of the list file.
+# It is never printed. The scan prints file, line and kind only, never a name (scripts/check-names.mjs).
 #
 # FAILS CLOSED. With no secret, an empty secret, or a list the scan cannot read, the job fails and says so. It never
 # passes without having scanned.
@@ -59,12 +59,12 @@ jobs:
 
       - name: Scan for listed names
         env:
-          NAMES: ${{ secrets.WB_NAMES }}
+          NAMES: ${{ secrets.NAMES_TO_BLOCK }}
         working-directory: scan
         run: |
           set -euo pipefail
           if [ -z "${NAMES}" ]; then
-            echo "::error::The repository secret WB_NAMES is not set or is empty. The name scan cannot run, so this check fails."
+            echo "::error::The repository secret NAMES_TO_BLOCK is not set or is empty. The name scan cannot run, so this check fails."
             exit 2
           fi
           list="$RUNNER_TEMP/names.txt"
