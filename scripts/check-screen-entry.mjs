@@ -92,8 +92,8 @@ const TSCONFIG = {
 
 /** What each rendered view must and must not hold. Plain text from the screens, not numbers. */
 export const EXPECT = {
-  exAnte: { has: ['aria-label="Anticipated performance"', "Q_m — planned production"], lacks: ["Q_m — metered volume"] },
-  exAnteFromSavedExPost: { has: ['aria-label="Anticipated performance"', "Q_m — planned production"], lacks: ["Q_m — metered volume"] },
+  exAnte: { has: ['aria-label="Anticipated performance"', "How much water will the system produce in a year?"], lacks: ["Q_m — metered volume"] },
+  exAnteFromSavedExPost: { has: ['aria-label="Anticipated performance"', "How much water will the system produce in a year?"], lacks: ["Q_m — metered volume"] },
   exPost: { has: ["Q_m — metered volume", PACKAGE_DAF], lacks: ['aria-label="Anticipated performance"', SITE_SOURCE] },
   exPostReport: { has: ["print-report", "Ex-post"], lacks: ['aria-label="Anticipated performance"', SITE_SOURCE] },
   siteTable: { has: ["Q_m — metered volume", SITE_DAF, SITE_SOURCE], lacks: [PACKAGE_DAF] },

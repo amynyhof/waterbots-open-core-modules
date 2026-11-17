@@ -368,7 +368,7 @@ export function countryBaselineDefault(
         ...(raw.electricity > 0 ? ["Electricity, counted at zero baseline emissions."] : []),
         ...(raw.kerosene > 0 || raw.coal > 0 || raw.lpg > 0 ? ["Kerosene, coal and LPG: IPCC 2006 Guidelines, Vol. 2, Ch. 2, Table 2.5 (residential). Kerosene and coal have no coded value yet and count at zero."] : []),
         `Published shares add to ${r1(total)}%; scaled to exactly 100%.`,
-        ...(stale ? [`Data year ${row.fuel.dataYear} is past the rulebook's three-year freshness rule (V2.0 SDWS 8); shown with its year until a newer edition or a survey replaces it.`] : []),
+        ...(stale ? [`Data year ${row.fuel.dataYear} is past the methodology's three-year freshness rule (V2.0 SDWS 8); shown with its year until a newer edition or a survey replaces it.`] : []),
       ];
       out.fuel = {
         shares,
@@ -412,7 +412,7 @@ export function countryBaselineDefault(
         "Three-stone and traditional stoves without a chimney → traditional; traditional with a chimney → other conventional; manufactured → improved.",
         ...(split ? [] : ["This survey does not split traditional stoves by chimney; they are counted as other conventional (the higher default efficiency, so fewer credits)."]),
         `Gas, electric and liquid-fuel stoves (${r1(clean)}% of households) leave the stove row — their fuels are counted on the fuel row; the biomass stoves (${r1(solid)}%) are scaled to 100%.`,
-        ...(stale ? [`Survey year ${row.stove.surveyYear} is past the rulebook's three-year freshness rule (V2.0 SDWS 6).`] : []),
+        ...(stale ? [`Survey year ${row.stove.surveyYear} is past the methodology's three-year freshness rule (V2.0 SDWS 6).`] : []),
       ];
       out.stove = {
         shares,

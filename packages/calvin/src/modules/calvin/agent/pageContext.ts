@@ -15,6 +15,8 @@ export interface PageContextInput {
   state: CalcState;
   /** Project facts nobody has provided: the screen asks for them and shows no figures. */
   missingFacts?: ProjectFact[];
+  /** Set when the pump runs on diesel or grid power and its emissions are not entered: no figures. */
+  activityAsk?: { power: "diesel" | "grid" } | null;
   fnrbRefusal: FnrbRefusal | null;
   /** Set when a transitioning project's filed V1.0 fNRB is not on the record: the screen asks for it. */
   filedFnrbRefusal?: FiledFnrbRefusal | null;
@@ -30,6 +32,7 @@ export function calculatorPageContext({
   projectName,
   state,
   missingFacts,
+  activityAsk = null,
   fnrbRefusal,
   filedFnrbRefusal = null,
   transition = true,
@@ -46,6 +49,13 @@ export function calculatorPageContext({
       `Missing project facts: ${missingFacts.map((f) => f.label).join("; ")}. There are NO figures on this screen. ` +
       "Ask the user for each missing fact. Do not estimate a figure, and do not assume a technology, country, population or counting unit. " +
       "Once the facts are on the project record, the calculator runs."
+    );
+  }
+  if (activityAsk) {
+    return (
+      `The user is on the GS Safe Water calculator for project "${projectName}", and it is asking for the pump's activity emissions rather than showing a result. ` +
+      `The project record says the pump runs on ${activityAsk.power === "diesel" ? "diesel" : "grid power"}, so running it gives off greenhouse gas. There are NO figures on this screen. ` +
+      "Ask the user for the pump's emissions for a year, in tCO2e. Do not estimate them, and do not assume zero."
     );
   }
   // THE AGENT IS TOLD THERE IS NOTHING ON THE SCREEN, AND TOLD NOT TO FILL THE GAP. A refusal

@@ -1,0 +1,77 @@
+# Name scan: checks every file of a pull request, and of main, against the private name list.
+# The list is a repository secret, NAMES_TO_BLOCK (the name the other repos use): the full text of the list file.
+# It is never printed. The scan prints file, line and kind only, never a name (scripts/check-names.mjs).
+#
+# FAILS CLOSED. With no secret, an empty secret, or a list the scan cannot read, the job fails and says so. It never
+# passes without having scanned.
+#
+# Why pull_request_target: it runs the copy of this workflow and of scripts/check-names.mjs that is already on main,
+# so a pull request cannot change the scanner and then be scanned by its own copy. The pull request's files are
+# checked out only as data, into their own folder, and nothing from them runs.
+#
+# A pull request from a fork fails rather than runs. Otherwise a stranger could send guessed names in a pull request
+# and learn from the result which ones are on the list.
+#
+# Changing this file is a lane 3 change.
+
+name: names
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: names-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  scan:
+    name: name scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Refuse a pull request from a fork
+        if: github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name != github.repository
+        run: |
+          echo "::error::The name scan runs only on branches of this repository. A pull request from a fork cannot be scanned here."
+          exit 1
+
+      # The scanner: main's copy, never the pull request's.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: base
+          persist-credentials: false
+
+      # The files to scan: the pull request's head, or main on a push. Data only; nothing in it runs.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: scan
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24.20.0
+
+      - name: Scan for listed names
+        env:
+          NAMES: ${{ secrets.NAMES_TO_BLOCK }}
+        working-directory: scan
+        run: |
+          set -euo pipefail
+          if [ -z "${NAMES}" ]; then
+            echo "::error::The repository secret NAMES_TO_BLOCK is not set or is empty. The name scan cannot run, so this check fails."
+            exit 2
+          fi
+          list="$RUNNER_TEMP/names.txt"
+          umask 077
+          printf '%s\n' "$NAMES" > "$list"
+          unset NAMES
+          status=0
+          WB_NAMES_LIST="$list" node ../base/scripts/check-names.mjs || status=$?
+          rm -f "$list"
+          exit "$status"

@@ -80,13 +80,12 @@ describe("the ends", () => {
     const saved = seedCalcState(invented("CWS", { operationalDays: 300 }));
     expect(withSliderStarts(saved, { operationalDays: 300 }, true).operationalDays).toBe(300);
   });
-  it("household days start at 365 and can only move down", () => {
-    expect(withSliderStarts(hwt(), {}, true).operationalDays).toBe(365);
-    expect(spec(hwt(), "days").start).toEqual({ value: 365, source: "natural limit: the days in a year" });
-    const s = hwt();
-    expect(spec(s, "days").start.value).toBe(365);
-    expect(spec(s, "days").ceiling.value).toBe(365);
-    expect(s.operationalDays).toBe(365);
+  it("household days start at 347, a starting point (ruling 2026-11-16), and run up to 365", () => {
+    expect(withSliderStarts(hwt(), {}, true).operationalDays).toBe(347);
+    expect(spec(hwt(), "days").start).toEqual({ value: 347, source: "starting point (ruling 2026-11-16)" });
+    expect(spec(hwt(), "days").ceiling.value).toBe(365);
+    expect(spec(hwt(), "days").claimMore).toBe("Claiming more than 347 days needs monitoring to prove it.");
+    expect(spec(cws(), "days").claimMore).toBeUndefined();
   });
 });
 

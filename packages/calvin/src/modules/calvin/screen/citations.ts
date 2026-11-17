@@ -13,6 +13,11 @@
  * this file only makes the per-basis switch honest, it does not re-order or add equation rows.
  */
 
+import fnrbJson from "../../../calculators/data/fnrb/countries.json" with { type: "json" };
+import dafJson from "../../../calculators/data/daf/countries.json" with { type: "json" };
+import type { ScenarioResult } from "../engine";
+import type { CalcState } from "./state";
+
 export type Basis = "legacy" | "paa";
 
 interface CiteEntry {
@@ -188,4 +193,64 @@ export function sdwsRef(basis: Basis, key: string): string {
 /** A versioned SDWS reference for a parameter this table does not carry a symbol for. */
 export function sdwsNum(basis: Basis, n: number): string {
   return `${RULEBOOK[basis].version} SDWS ${n}`;
+}
+
+// ── Where the fNRB comes from, by name (the maintainer's walk of the open site, 2026-11-16) ──────────
+// The screens showed the data set's own key ("mofuss-adm0-csv"), which means nothing to a reader. They now
+// show the set's label from `fnrb/countries.json`, and say that its values come from MoFuSS.
+
+/** The line that says where the official fNRB tables' values come from. */
+export const FNRB_ORIGIN = "Its values come from MoFuSS.";
+
+/** The name of an fNRB set of values, as `fnrb/countries.json` labels it. An unknown key is shown as it is. */
+export function fnrbTableLabel(vintage: string): string {
+  const v = (fnrbJson.vintages as Record<string, { label?: string }>)[vintage];
+  return v?.label ?? vintage;
+}
+
+/** One short line on where this run's fNRB came from, for the figure block. A label only: no number. */
+export function fnrbSourceLine(
+  result: Pick<ScenarioResult, "fnrbVintage" | "fnrbMultiNational" | "provenance">,
+  state: Pick<CalcState, "version" | "fnrbOverride">,
+): string {
+  if (state.version === "legacy") return "the project's filed V1.0 value";
+  if (state.fnrbOverride != null) return "entered for this project";
+  const site = result.provenance.find((p) => p.field === "fNRB" && p.source === "site-table");
+  if (site?.label) return site.label;
+  const table = result.fnrbMultiNational
+    ? `A6.4-AMT-009 Table 2 (multi-national value for ${result.fnrbMultiNational.region})`
+    : fnrbTableLabel(result.fnrbVintage);
+  return `${table}. ${FNRB_ORIGIN}`;
+}
+
+// ── How the DAF comes out, step by step (the maintainer's walk of the open site, 2026-11-16, item 14) ──────────────
+// The DAF is read, not worked out here: the Gold Standard tool sets each country's value and the engine picks the row.
+// These steps name the tool, the inputs, the table and the row, from the package's own DAF data file. No sum.
+
+const DAF_TOOL = "Gold Standard's Downward Adjustment Factor (DAF) tool, GS4GG PAA MT400-05 v1.0 (22 December 2025)";
+
+/** The DAF's working in plain words, one step per line. */
+export function dafSteps(
+  result: Pick<ScenarioResult, "DAF" | "provenance">,
+  countryIso: string | null,
+  shown: string,
+): string[] {
+  const prov = result.provenance.find((p) => p.field === "DAF");
+  if (prov?.source === "override") return [`Entered for this project: ${shown}.`];
+  const row = countryIso ? (dafJson.countries as Record<string, { name: string; basis: string }>)[countryIso] : undefined;
+  const name = row?.name ?? countryIso ?? "the host country";
+  const steps = [
+    `Tool: ${DAF_TOOL}.`,
+    `Inputs: the host country, ${name}, and the crediting years. Those years fall in the 2026–2030 window, so the 2026–2030 values apply (457 §6.2.1(a)–(b)). A project registered before 2026 uses the same values from its 2026 vintage (457 §6.2.2). Nothing else goes in.`,
+    "Table: Table 03, the default DAF values for 2026–2030 (PDF pp.15–31).",
+  ];
+  if (prov?.source === "site-table") {
+    steps.push(`Result: ${shown}, from the site's own table: ${prov.label}`);
+  } else if (prov?.source === "global-default") {
+    steps.push(`Result: ${name} has no row in this package's copy of Table 03, so the tool's fallback applies: the absolute floor, ${shown} (${dafJson.absolute_floor.cite}).`);
+  } else {
+    steps.push(`Result: ${name}'s row reads ${shown} in the "Default DAF" column (basis: ${row?.basis ?? "as published"}). The tool works this value out; Calvin uses it as published.`);
+  }
+  steps.push("Use: the crediting baseline is cut by this share, BE_unc,y × (1 − DAF) (V2.0 Eq.10).");
+  return steps;
 }

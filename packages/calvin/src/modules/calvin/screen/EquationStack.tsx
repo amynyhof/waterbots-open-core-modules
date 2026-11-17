@@ -11,7 +11,7 @@ import {
 import { peopleServed, projectFacts, type CalcState } from "./state";
 import { fmt, fmtExp, parseNumericInput } from "./format";
 import HelpTip from "./HelpTip";
-import { sdwsRef, citeShort, type Basis } from "./citations";
+import { sdwsRef, citeShort, dafSteps, fnrbTableLabel, FNRB_ORIGIN, type Basis } from "./citations";
 import { creditedValue, shownValue, sliderLabel, sliderSpecs, type SliderKey } from "./exAnte";
 
 /*
@@ -79,27 +79,72 @@ function SubHeader({ label, note }: { label: string; note: string }) {
  * can replace this value* (`BaselineChip`) — so a badge may not wear it. `assumed` takes amber
  * because a placeholder with nothing behind it is the thing a reader most needs to notice.
  */
-type EditState = "entered" | "default" | "derived" | "assumed";
+export type EditState = "entered" | "default" | "calculated" | "assumed";
 
 const STATE_META: Record<EditState, { text: string; color: string; editable: boolean; tip: string }> = {
-  entered: { text: "entered", color: "var(--iris)",  editable: true,  tip: "Typed for this project, from a named source — not a rulebook default and not computed here." },
-  default: { text: "default", color: "var(--ink-4)", editable: true,  tip: "The rulebook's own value, or a cited reference's, shown with its citation and rulebook version." },
-  derived: { text: "derived", color: "var(--ink-4)", editable: false, tip: "Worked out from other values on the record — change those and this follows." },
-  assumed: { text: "assumed", color: "var(--amber)", editable: true,  tip: "Our placeholder. No rulebook default covers this and nothing has been entered, so nothing stands behind the number yet." },
+  entered: { text: "entered", color: "var(--iris)",  editable: true,  tip: "Entered: typed in for this project, with its source named." },
+  default: { text: "default", color: "var(--ink-4)", editable: true,  tip: "Default: the value from the methodology or a cited reference, with its source and version." },
+  calculated: { text: "calculated", color: "var(--ink-4)", editable: false, tip: "Calculated: worked out from other values." },
+  assumed: { text: "assumed", color: "var(--amber)", editable: true,  tip: "Assumed: a cautious estimate of how the project will perform. Change it to match your project." },
 };
 
 /**
- * THE KEY, PRINTED WHERE THE TAGS ARE READ (ruling (2), 2026-09-24). One line, four words,
- * plain English — a legend a reader can check without leaving the page they are reading.
+ * THE KEY'S WORDS, ONE LINE PER TAG (the maintainer's walk of the open site, 2026-11-16). Each line is
+ * shown as "Word: meaning." The badge tips in `STATE_META` say the same thing.
+ */
+export const TAG_KEY: { tag: EditState; meaning: string }[] = [
+  { tag: "entered", meaning: "typed in for this project, with its source named." },
+  { tag: "default", meaning: "the value from the methodology or a cited reference, with its source and version." },
+  { tag: "calculated", meaning: "worked out from other values." },
+  { tag: "assumed", meaning: "a cautious estimate of how the project will perform. Change it to match your project." },
+];
+
+/** A small "i" in a circle: the mark for "more about this". Decoration only. */
+export function InfoIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden style={{ flexShrink: 0 }}>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 16v-4" />
+      <path d="M12 8h.01" />
+    </svg>
+  );
+}
+
+/**
+ * THE KEY, BEHIND AN INFO ICON (the maintainer's walk of the open site, 2026-11-16). It was one line of
+ * small print above the equations. Now a small button opens it, so the work surface stays clear and the
+ * key is one tap away wherever the tags are read.
  */
 export function TagLegend() {
+  const [open, setOpen] = useState(false);
   return (
-    <p className="t-caption text-fg-3" style={{ fontSize: 10, lineHeight: 1.6 }}>
-      <span className="text-fg-2">What the tags mean:</span>{" "}
-      <b>entered</b> — typed for this project, from a named source ·{" "}
-      <b>default</b> — the rulebook&rsquo;s or a cited reference&rsquo;s value, with its citation and
-      version · <b>derived</b> — worked out from other values on the record ·{" "}
-      <b>assumed</b> — our placeholder, where no default exists and nothing was entered.
+    <div className="flex flex-col items-start gap-1" data-tag-key="">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="inline-flex items-center gap-1 rounded-sm t-caption text-fg-3 outline-none hover:text-fg-1 focus-visible:ring-2 focus-visible:ring-tide"
+        style={{ fontSize: 11 }}
+      >
+        <InfoIcon />
+        What the tags mean
+      </button>
+      {open ? <TagKey /> : null}
+    </div>
+  );
+}
+
+/** The key itself: the four tags, then the two marks. */
+export function TagKey() {
+  return (
+    <div role="note" className="rounded-md border border-line bg-raised px-3 py-2 t-caption text-fg-2" style={{ fontSize: 11, lineHeight: 1.6 }}>
+      <ul className="flex flex-col gap-1">
+        {TAG_KEY.map(({ tag, meaning }) => (
+          <li key={tag}>
+            <b>{tag[0].toUpperCase() + tag.slice(1)}</b>: {meaning}
+          </li>
+        ))}
+      </ul>
       {/* TWO MARKS, TWO MEANINGS, BOTH SHOWN (ruling (4), 2026-09-26). The marks are drawn
           here exactly as they are on the rows, so the key is the thing itself, not a description. */}
       <span className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
@@ -109,7 +154,7 @@ export function TagLegend() {
         <SourceMark kind="monitoring" />
         <span>monitoring data sets this value — the usage survey, water tests or sales records.</span>
       </span>
-    </p>
+    </div>
   );
 }
 
@@ -145,9 +190,9 @@ export function EditGlyph({ title }: { title?: string }) {
  * nothing, and on a touch screen it never appeared at all. The note is the one that already
  * existed (`tip`, or the state's own line); nothing new is written here.
  */
-export function StateBadge({ state, tip }: { state: EditState; tip?: string }) {
+export function StateBadge({ state, tip, mark }: { state: EditState; tip?: string; mark?: Mark }) {
   const b = STATE_META[state];
-  return (
+  const badge = (
     <HelpTip text={tip ?? b.tip} label={`What does "${b.text}" mean here?`}>
       <span
         className="t-mono shrink-0 rounded-sm px-1"
@@ -157,11 +202,59 @@ export function StateBadge({ state, tip }: { state: EditState; tip?: string }) {
       </span>
     </HelpTip>
   );
+  if (!mark) return badge;
+  const chip = mark.kind === "baseline"
+    ? <BaselineChip sdws={mark.sdws} />
+    : <MonitoringChip sdws={mark.sdws} instrument={mark.instrument} text={mark.text} />;
+  // ENTERED NOW, PROVEN LATER (item 10): the two marks read as one, "ENTERED · MONITORING".
+  if (state === "entered") {
+    return (
+      <span className="inline-flex shrink-0 items-center gap-1" data-prove-later={mark.kind}>
+        {badge}
+        <span aria-hidden className="text-fg-4" style={{ fontSize: 8 }}>·</span>
+        {chip}
+      </span>
+    );
+  }
+  return <>{chip}{badge}</>;
 }
 
-/** The `derived` badge on its own, for the summary metrics above the stack (ruling (2), 2026-09-26). */
-export function DerivedTag({ tip }: { tip: string }) {
-  return <StateBadge state="derived" tip={tip} />;
+/**
+ * A VALUE'S SECOND MARK: what must prove it later (the maintainer's walk of the open site, 2026-11-16, item 10).
+ * A baseline survey proves a baseline value once, at the start. Monitoring proves a monitored value during the
+ * crediting period. `text` replaces the monitoring mark's note where the usual one does not fit the row.
+ */
+export type Mark =
+  | { kind: "baseline"; sdws: string }
+  | { kind: "monitoring"; sdws: string; instrument: string; text?: string };
+
+/** The plain line under a value that was entered now and must be proven later. */
+export function proveLaterLine(mark: Mark): string {
+  if (mark.kind === "baseline") return "You entered this. A baseline survey must prove it later.";
+  const what = /s$/.test(mark.instrument) ? mark.instrument : `a ${mark.instrument}`;
+  return `You entered this. Monitoring must prove it later, for example with ${what}.`;
+}
+
+/** The line itself, shown only for an entered value that carries a mark. */
+export function ProveLater({ entered, mark }: { entered: boolean; mark?: Mark }) {
+  if (!entered || !mark) return null;
+  return (
+    <p className="t-caption text-fg-3" data-prove-later-line="" style={{ fontSize: 10 }}>
+      {proveLaterLine(mark)}
+    </p>
+  );
+}
+
+/** The mark a row carries, from the row's two optional props. Baseline comes first when both are set. */
+function rowMark(baselineSdws?: string, monitor?: { sdws: string; instrument: string }): Mark | undefined {
+  if (baselineSdws) return { kind: "baseline", sdws: baselineSdws };
+  if (monitor) return { kind: "monitoring", ...monitor };
+  return undefined;
+}
+
+/** The `calculated` badge on its own, for the summary metrics above the stack (ruling (2), 2026-09-26). */
+export function CalculatedTag({ tip }: { tip: string }) {
+  return <StateBadge state="calculated" tip={tip} />;
 }
 
 /**
@@ -205,10 +298,10 @@ function BaselineChip({ sdws }: { sdws: string }) {
  * read-only seat. WHETHER THE BOX IS EDITABLE IN EACH MODE (ex-ante vs ex-post) is logged, not
  * built — [#230].
  */
-function MonitoringChip({ sdws, instrument }: { sdws: string; instrument: string }) {
+function MonitoringChip({ sdws, instrument, text }: { sdws: string; instrument: string; text?: string }) {
   return (
     <HelpTip
-      text={`Monitoring data sets this value — the ${instrument} (${sdws}), measured during the crediting period. Before monitoring starts, the figure here is entered by hand or left at its starting value.`}
+      text={text ?? `Monitoring data sets this value — the ${instrument} (${sdws}), measured during the crediting period. Before monitoring starts, the figure here is entered by hand or left at its starting value.`}
       label="Where does this value really come from?"
     >
       <SourceMark kind="monitoring" />
@@ -240,17 +333,35 @@ function SourceMark({ kind }: { kind: "baseline" | "monitoring" }) {
   );
 }
 
-/** A LOCKED value row — only FIXED or DERIVED (never carries the edit glyph). */
-function VarRow({ label, value, unit, state, tip, baselineSdws }: { label: string; value: string; unit?: string; state: EditState; tip?: string; baselineSdws?: string }) {
+/**
+ * ONE SMALL STYLE FOR EVERY EQUATION NUMBER (the maintainer's walk of the open site, 2026-11-16, item 12). The row
+ * headers printed a small "Eq.4"; the rows inside printed a full-size "(Eq.5)". Both now use this.
+ */
+export function EqNum({ n }: { n: string | number }) {
+  return <span className="t-mono text-fg-4" data-eq="" style={{ display: "inline-block", fontSize: 9, marginLeft: 6, letterSpacing: "0.02em", whiteSpace: "nowrap" }}>Eq.{n}</span>;
+}
+
+/** A label with any "(Eq.N)" in it printed as `EqNum`. Text only: it changes no number. */
+export function WithEqNums({ text }: { text: string }) {
+  const parts = text.split(/\s*\(Eq\.\s?([0-9][0-9–\-]*)\)/);
+  if (parts.length === 1) return <>{text}</>;
+  return <>{parts.map((p, i) => (i % 2 === 1 ? <EqNum key={i} n={p} /> : p))}</>;
+}
+
+/** A value row with no box of its own: calculated, or set somewhere else (never carries the edit glyph). */
+function VarRow({ label, value, unit, state, tip, baselineSdws, monitor }: { label: string; value: string; unit?: string; state: EditState; tip?: string; baselineSdws?: string; monitor?: { sdws: string; instrument: string } }) {
+  const mark = rowMark(baselineSdws, monitor);
   return (
-    <div className="flex items-baseline gap-2 py-1">
-      <span className="t-caption flex-1 text-fg-3">{label}</span>
-      <span className="t-mono text-fg-1" style={{ fontSize: 11 }}>
-        {value}
-        {unit ? <span className="text-fg-4"> {unit}</span> : null}
-      </span>
-      {baselineSdws ? <BaselineChip sdws={baselineSdws} /> : null}
-      <StateBadge state={state} tip={tip} />
+    <div className="py-1">
+      <div className="flex items-baseline gap-2">
+        <span className="t-caption min-w-0 flex-1 text-fg-3" style={{ overflowWrap: "anywhere" }}><WithEqNums text={label} /></span>
+        <span className="t-mono shrink-0 text-fg-1" style={{ fontSize: 11 }}>
+          {value}
+          {unit ? <span className="text-fg-4"> {unit}</span> : null}
+        </span>
+        <StateBadge state={state} tip={tip} mark={mark} />
+      </div>
+      <ProveLater entered={state === "entered"} mark={mark} />
     </div>
   );
 }
@@ -292,11 +403,9 @@ function Param({ label, sdwsRef, value, onChange, min, max, step, unit, baseline
   return (
     <div className="py-1">
       <div className="flex items-baseline gap-2">
-        <span className="t-caption flex-1 text-fg-2">{label}</span>
+        <span className="t-caption min-w-0 flex-1 text-fg-2" style={{ overflowWrap: "anywhere" }}><WithEqNums text={label} /></span>
         <span className="t-mono shrink-0 rounded-sm px-1" style={{ fontSize: 8, letterSpacing: "0.06em", color: "var(--fg-1)", background: "color-mix(in oklab, var(--tide) 12%, transparent)", boxShadow: "inset 0 0 0 1px color-mix(in oklab, var(--tide) 40%, transparent)" }}>{sdwsRef}</span>
-        {baselineSdws ? <BaselineChip sdws={baselineSdws} /> : null}
-        {monitor ? <MonitoringChip sdws={monitor.sdws} instrument={monitor.instrument} /> : null}
-        <StateBadge state={changed ? "entered" : resting} tip={tip} />
+        <StateBadge state={changed ? "entered" : resting} tip={tip} mark={rowMark(baselineSdws, monitor)} />
         {/* The pencil removes itself on a read-only seat — see `EditGlyph` ([#97]). */}
         <EditGlyph title={`Type a value between ${min} and ${max}`} />
         <InRowNum
@@ -309,6 +418,7 @@ function Param({ label, sdwsRef, value, onChange, min, max, step, unit, baseline
         {unit ? <span className="t-mono shrink-0 text-fg-4" style={{ fontSize: 10, minWidth: 18 }}>{unit}</span> : null}
       </div>
       <div className="t-caption text-fg-4" style={{ fontSize: 10 }}>{resting === "assumed" ? "assumed" : "default"} {baseline}</div>
+      <ProveLater entered={changed} mark={rowMark(baselineSdws, monitor)} />
     </div>
   );
 }
@@ -383,14 +493,14 @@ interface RowProps {
 function EqRow({ eqNum, symbol, title, formula, value, oneLiner, binding, open, onToggle, children, editable, cite, flag }: RowProps) {
   return (
     <div className="border-t border-line">
-      <button type="button" onClick={onToggle} className="flex w-full items-baseline gap-2 rounded-sm py-2 pl-1 pr-1 text-left outline-none transition-colors duration-fast hover:bg-paper focus-visible:ring-2 focus-visible:ring-tide">
+      <button type="button" onClick={onToggle} className="flex w-full flex-wrap items-baseline gap-2 rounded-sm py-2 pl-1 pr-1 text-left outline-none transition-colors duration-fast hover:bg-paper focus-visible:ring-2 focus-visible:ring-tide">
         <span className="self-center text-fg-4"><Chevron open={open} /></span>
-        <span className="t-mono shrink-0 text-fg-1" style={{ width: 54, fontWeight: 700 }}>{symbol}</span>
-        <span className="t-caption flex-1 text-fg-2">
+        <span className="t-mono shrink-0 text-fg-1" style={{ minWidth: 54, paddingRight: 4, fontWeight: 700 }}>{symbol}</span>
+        <span className="t-caption flex-1 text-fg-2" style={{ minWidth: "7rem", overflowWrap: "anywhere" }}>
           {title}
           {/* Eq. number inline with the label — the methodology numbering is non-sequential, so a
               leading Eq. column read as rows being out of order. */}
-          <span className="t-mono text-fg-4" style={{ fontSize: 9, marginLeft: 6, letterSpacing: "0.02em" }}>Eq.{eqNum}</span>
+          <EqNum n={eqNum} />
         </span>
         {editable ? <span className="self-center"><EditGlyph title="This row has adjustable / overridable values" /></span> : null}
         {flag ? (
@@ -399,14 +509,14 @@ function EqRow({ eqNum, symbol, title, formula, value, oneLiner, binding, open, 
         {/* EVERY HEADER VALUE IS AN EQUATION'S OUTPUT, SO EVERY ONE IS TAGGED DERIVED (ruling
             (2), 2026-09-26). A number without a tag was the one place on the page the key did not
             reach. `HelpTip` stops the click, so opening the note never also toggles the row. */}
-        <span className="self-center"><StateBadge state="derived" tip={`Worked out by this equation from the values inside it — change those and ${symbol} follows.`} /></span>
-        <span className="t-mono text-fg-1" style={{ fontSize: 12 }}>{value}</span>
+        <span className="self-center"><StateBadge state="calculated" tip={`Worked out by this equation from the values inside it — change those and ${symbol} follows.`} /></span>
+        <span className="t-mono shrink-0 text-fg-1" style={{ fontSize: 12 }}>{value}</span>
       </button>
       {open ? (
-        <div className="pb-3" style={{ paddingLeft: 40 }}>
-          {/* Explanation opens with its methodology section citation (muted), then the plain-English line. */}
-          {cite ? <p className="t-mono text-fg-4" style={{ fontSize: 10, letterSpacing: "0.02em" }}>{cite}</p> : null}
-          <p className="t-caption text-fg-3" style={{ fontStyle: "italic", fontSize: 12, marginTop: cite ? 2 : 0 }}>{oneLiner}</p>
+        <div className="min-w-0 pb-3" style={{ paddingLeft: 40, overflowWrap: "anywhere" }}>
+          {/* THE PLAIN EXPLANATION FIRST, THEN ITS REFERENCE, SMALL, LIKE A CITATION (item 15). */}
+          <p className="t-caption text-fg-3" style={{ fontStyle: "italic", fontSize: 12 }}>{oneLiner}</p>
+          {cite ? <p className="t-mono text-fg-4" data-cite="" style={{ fontSize: 9, letterSpacing: "0.02em", marginTop: 2 }}>{cite}</p> : null}
           <div className="t-mono mt-2 text-fg-2" style={{ fontSize: 11 }}>{symbol} = {formula}</div>
           {binding ? <div className="t-caption mt-1" style={{ color: "var(--iris)", fontSize: 11 }}>{binding}</div> : null}
           {children ? (
@@ -424,7 +534,11 @@ function EqRow({ eqNum, symbol, title, formula, value, oneLiner, binding, open, 
 
 // ── the stack ────────────────────────────────────────────────────────────────
 
-export default function EquationStack({ result, state, patch, canonPopulation, seed, sliders = false, tables }: { result: ScenarioResult; state: CalcState; patch: (p: Partial<CalcState>) => void; canonPopulation?: number; seed?: CalcState;
+export default function EquationStack({ result, state, patch, canonPopulation, seed, sliders = false, tables, screening = false, initialOpen = [] }: { result: ScenarioResult; state: CalcState; patch: (p: Partial<CalcState>) => void; canonPopulation?: number; seed?: CalcState;
+  /** The screening view (`CalculatorOptions.exAnteOnly`): values only a baseline survey can give are shown, not typed. */
+  screening?: boolean;
+  /** Rows open at first, beside the ones that always start open (a site, or a test, can open more). */
+  initialOpen?: string[];
   /** Show the ex-ante sliders in place of the typed boxes for the four anticipated values (`exAnte.ts`). */
   sliders?: boolean;
   /** The site's own country tables (V13), from `useCalculatorState`. Read only through the engine. */
@@ -434,7 +548,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
   // Method 2 (HWT/IWT) opens the Eq.6/7 quantity rows by default so its per-premises derivation
   // (N_p · U_p · QPW_hh · DP_p) is visible without a click — it is the point of a Method-2 run.
   const [open, setOpen] = useState<Set<string>>(() =>
-    new Set(state.method === 2 ? ["ef_b", "q_y", "q_pop", "qpw_hh"] : ["ef_b", "q_y"]),
+    new Set([...(state.method === 2 ? ["ef_b", "q_y", "q_pop", "qpw_hh"] : ["ef_b", "q_y"]), ...initialOpen]),
   );
   // DN_p typed as something the engine refuses (0, negative, a decimal, blank): the box keeps what
   // was typed, the row says why, and the engine keeps the last value that was allowed.
@@ -525,14 +639,38 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
     if (!sliders || !spec) return null;
     return (
       <VarRow label={`${spec.label}, set on the sliders above`} value={shownValue(spec, creditedValue(state, result, key))}
+        monitor={key === "testsPass" ? mon("Mq", "water-quality tests") : key === "usage" ? mon("Up", "usage survey") : undefined}
         state={sliderLabel(state, key)} tip="Set on the anticipated-performance sliders above the equations. This is the value the engine credits." />
     );
   };
   const mqParam = slider("testsPass") ?? <Param monitor={mon("Mq", "water-quality tests")} label="M_q,y — water-quality modifier" sdwsRef={sdwsRef(basis, "Mq")} value={state.waterQualityFactor} changed={changed.mq} onChange={(v) => patch({ waterQualityFactor: v })} min={0} max={1} step={0.01} unit="" baseline="1.0 (all samples pass at point of use)" tip="Fraction of water-quality samples that pass at the point of use. 0 = all failing → no credits." />;
-  const cbParam = <Param resting="assumed" label="C_b — already-safe share" sdwsRef={sdwsRef(basis, "Cb")} baselineSdws="V2.0 SDWS 12" value={state.cBaseline} changed={changed.cb} onChange={(v) => patch({ cBaseline: v })} min={0} max={1} step={0.01} unit="" baseline="0% — your baseline survey replaces this" tip="Share of end-users already using a safe supply that didn't require boiling. 1 = everyone → no credits. Assumed 0% until your baseline survey (V2.0 SDWS 12) replaces it." />;
+  // C_b ON THE SCREENING VIEW (the maintainer's walk of the open site, 2026-11-16, item 13). V2.0 sets no default for
+  // it: SDWS 12 (p.53) leaves it to the activity, from a baseline survey or published sources. So the screening view
+  // shows the 0% it uses, locked, and says plainly that 0% is the most generous value. The value is unchanged.
+  const cbScreening = (
+    <div data-cb-screening="">
+      <VarRow label="C_b — already-safe share" value={`${fmt(state.cBaseline * 100, 0)}%`} state="assumed" baselineSdws="V2.0 SDWS 12"
+        tip="The share of people who already had safe water before the project. V2.0 sets no default for it (V2.0 SDWS 12, p.53)." />
+      <p className="t-caption text-fg-3" style={{ fontSize: 10 }}>
+        V2.0 sets no default for this share (V2.0 SDWS 12, p.53). 0% is the most generous value, not a cautious one: it
+        counts no one as already having safe water.
+      </p>
+      <p className="t-caption text-fg-3" style={{ fontSize: 10 }}>Your baseline survey will set this later.</p>
+    </div>
+  );
+  const activityRow = <ActivityRow result={result} state={state} patch={patch} />;
+  const cbParam = screening ? cbScreening : <Param resting="assumed" label="C_b — already-safe share" sdwsRef={sdwsRef(basis, "Cb")} baselineSdws="V2.0 SDWS 12" value={state.cBaseline} changed={changed.cb} onChange={(v) => patch({ cBaseline: v })} min={0} max={1} step={0.01} unit="" baseline="0% — your baseline survey replaces this" tip="Share of end-users already using a safe supply that didn't require boiling. 1 = everyone → no credits. Assumed 0% until your baseline survey (V2.0 SDWS 12) replaces it." />;
   const xcbParam = <Param monitor={mon("X", "usage survey")} label="X_cleanboil,y — still boiling the safe water" sdwsRef={sdwsRef(basis, "X")} value={state.xCleanboil} changed={changed.xcb} onChange={(v) => patch({ xCleanboil: v })} min={0} max={1} step={0.01} unit="" baseline="0 (not yet surveyed)" tip="Share of end-users who still boil the project's safe water after it arrives — that boiling still burns fuel. 1 = everyone → no credits." />;
 
   // ── shared quantity inputs (reused by the Method-1 Eq.5 row and the Method-2 Eq.6/7 rows) ──
+  // PEOPLE SERVED IS ENTERED NOW AND PROVEN LATER (item 10): monitoring shows how many people really use the
+  // water, for example with a usage survey.
+  const peopleMark: Mark = {
+    kind: "monitoring",
+    sdws: sdwsRef(basis, "Up"),
+    instrument: "usage survey",
+    text: `Monitoring must show how many people really use the water, for example with a usage survey (${sdwsRef(basis, "Up")}).`,
+  };
   const populationRow = (
     <div className="py-1">
       {/* THE LABEL SAYS WHAT THE NUMBER IS — "People served" or "Households served", following the
@@ -542,7 +680,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
         {/* The count box carries the plain name; the "(N_p)" marker belongs to the Eq.7 parameter
             row below, so the two are not two identical labels one above the other. */}
         <span className="t-caption flex-1 text-fg-2">{enteredAsHouseholds ? "Households served" : "People served"}</span>
-        <StateBadge state="entered" tip="The figure on the project record. Change it here only to record a surveyed figure for this analysis — an override; the record stays untouched." />
+        <StateBadge state="entered" tip="The figure on the project record. Change it here only to record a surveyed figure for this analysis — an override; the record stays untouched." mark={peopleMark} />
         <EditGlyph title="Enter a surveyed figure to override the record" />
         <InRowNum value={state.populationCount} onChange={(v) => patch({ populationCount: v })} width={92} />
       </div>
@@ -553,6 +691,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
             ? `Entered here — record: ${canonPopulation.toLocaleString()} · this analysis: ${peopleServed(state).toLocaleString()} (survey).`
             : "From the project record."}
       </div>
+      <ProveLater entered mark={peopleMark} />
       {/* THE DERIVED COUNTERPART, IN WHICHEVER DIRECTION IT RUNS — people when households were
           entered, households when people were. Both are printed with the arithmetic spelled out so
           the three numbers can be checked against each other without doing sums in one's head. */}
@@ -560,7 +699,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
         <div className="pt-1">
           <div className="flex items-baseline gap-2">
             <span className="t-caption flex-1 text-fg-2">{counterpart.label}</span>
-            <StateBadge state="derived" tip="Worked out from the figure above and the household size below — this is what the equations are computed on." />
+            <StateBadge state="calculated" tip="Worked out from the figure above and the household size below — this is what the equations are computed on." />
             <span className="t-mono text-fg-1" style={{ fontSize: 11 }}>{counterpart.value}</span>
           </div>
           <div className="t-caption text-fg-4" style={{ fontSize: 10 }}>{counterpart.working}</div>
@@ -572,11 +711,11 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
         <div className="py-1">
           <div className="flex items-baseline gap-2">
             <span className="t-caption flex-1 text-fg-2">Household size</span>
-            <BaselineChip sdws="V2.0 SDWS 30" />
-            <StateBadge state={state.householdSizeOverride != null ? "entered" : "default"} tip="The cited country average until this project's own surveyed figure is entered here." />
+            <StateBadge mark={{ kind: "baseline", sdws: "V2.0 SDWS 30" }} state={state.householdSizeOverride != null ? "entered" : "default"} tip="The cited country average until this project's own surveyed figure is entered here." />
             <EditGlyph title="Enter a surveyed household size to override the country average" />
             <InRowNum value={state.householdSizeOverride ?? result.householdSizeUsed} onChange={(v) => patch({ householdSizeOverride: v })} onClear={() => patch({ householdSizeOverride: undefined })} optional step={0.01} width={92} />
           </div>
+          <ProveLater entered={state.householdSizeOverride != null} mark={{ kind: "baseline", sdws: "V2.0 SDWS 30" }} />
           <div className="t-caption text-fg-4" style={{ fontSize: 10 }}>
             {state.householdSizeOverride != null
               ? "Entered — this project's own surveyed household size."
@@ -638,8 +777,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
         <div className="flex items-baseline gap-2">
           <span className="t-caption flex-1 text-fg-2">age split — share of people, %</span>
           <span className="t-mono shrink-0 rounded-sm px-1" style={{ fontSize: 8, letterSpacing: "0.06em", color: "var(--fg-1)", background: "color-mix(in oklab, var(--tide) 12%, transparent)", boxShadow: "inset 0 0 0 1px color-mix(in oklab, var(--tide) 40%, transparent)" }}>V2.0 SDWS 30</span>
-          <BaselineChip sdws="V2.0 SDWS 30" />
-          <StateBadge
+          <StateBadge mark={{ kind: "baseline", sdws: "V2.0 SDWS 30" }}
             state={entered ? "entered" : "default"}
             tip={entered
               ? "The project's own surveyed age split, entered for this analysis. Clear the fields to fall back to the national shares."
@@ -647,6 +785,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
           />
           <EditGlyph title="Enter the baseline survey's age split (V2.0 SDWS 30)" />
         </div>
+        <ProveLater entered={Boolean(entered)} mark={{ kind: "baseline", sdws: "V2.0 SDWS 30" }} />
         <div className="mt-1 flex flex-wrap items-baseline gap-3">
           {field("under5", "under 5")}
           {field("age5_18", "5–18")}
@@ -731,8 +870,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
         <div className="py-1">
           <div className="flex items-baseline gap-2">
             <span className="t-caption flex-1 text-fg-2">stove shares — share of premises, %</span>
-            <BaselineChip sdws="V2.0 SDWS 6" />
-            <StateBadge
+            <StateBadge mark={{ kind: "baseline", sdws: "V2.0 SDWS 6" }}
               state={tagFor(result.baselineMix.stove)}
               tip={result.baselineMix.stove === "entered"
                 ? "Entered for this project — the share of premises using each stove class (V2.0 SDWS 6)."
@@ -742,6 +880,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
             />
             <EditGlyph title="Type the baseline survey's stove shares (V2.0 SDWS 6)" />
           </div>
+          <ProveLater entered={tagFor(result.baselineMix.stove) === "entered"} mark={{ kind: "baseline", sdws: "V2.0 SDWS 6" }} />
           <div className="mt-1 flex flex-wrap items-baseline gap-3">
             {STOVE_SHARE_KEYS.map((k) =>
               <span key={k}>{box(
@@ -755,7 +894,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
           {stove.fossil > 0 ? (
             <div className="mt-1 flex items-baseline gap-2">
               <span className="t-caption flex-1 text-fg-3" style={{ fontSize: 10 }}>
-                fossil fuel system η, % — manufacturer specification or a Water Boiling Test; the rulebook gives no default ({sdwsRef(basis, "eta")})
+                fossil fuel system η, % — manufacturer specification or a Water Boiling Test; the methodology gives no default ({sdwsRef(basis, "eta")})
               </span>
               <StateBadge state={state.fossilStoveEta != null ? "entered" : "assumed"} tip="No default exists for this class (SDWS 11), so the stove shares are not used until it is entered." />
               <InRowNum value={state.fossilStoveEta != null ? pct(state.fossilStoveEta) : undefined} onChange={(v) => patch({ fossilStoveEta: Math.max(0, v) / 100 })} onClear={() => patch({ fossilStoveEta: undefined })} optional step={1} width={68} />
@@ -771,17 +910,17 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
         <div className="py-1">
           <div className="flex items-baseline gap-2">
             <span className="t-caption flex-1 text-fg-2">fuel shares — share of boiling fuel, %</span>
-            <BaselineChip sdws="V2.0 SDWS 8" />
-            <StateBadge
+            <StateBadge mark={{ kind: "baseline", sdws: "V2.0 SDWS 8" }}
               state={tagFor(result.baselineMix.fuel)}
               tip={result.baselineMix.fuel === "entered"
-                ? "Entered for this project — the share of each boiling fuel (V2.0 SDWS 8). Emission factors per fuel are the rulebook's (SDWS 9/10)."
+                ? "Entered for this project — the share of each boiling fuel (V2.0 SDWS 8). Emission factors per fuel are the methodology's (SDWS 9/10)."
                 : countryFuel
                   ? `${countryFuel.label}. A cited national figure (V2.0 SDWS 8 accepts official statistics); the project's own baseline survey replaces it.`
                   : "The screening preset's fuels — no source yet; replaced by country data or your baseline survey. Type the survey's shares here (V2.0 SDWS 8)."}
             />
             <EditGlyph title="Type the baseline survey's fuel shares (V2.0 SDWS 8)" />
           </div>
+          <ProveLater entered={tagFor(result.baselineMix.fuel) === "entered"} mark={{ kind: "baseline", sdws: "V2.0 SDWS 8" }} />
           <div className="mt-1 flex flex-wrap items-baseline gap-3">
             {FUEL_SHARE_KEYS.map((k) =>
               <span key={k}>{box(fuel[k], (v) => patch({ fuelSharesEntered: { ...fuel, [k]: Math.max(0, v) / 100 } }), FUEL_LABEL[k])}</span>,
@@ -842,9 +981,9 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
         // rather than leaving a reader to reconcile them.
         baseline={v2
           ? (t9
-              ? `rulebook 4.0 L/p/d (Table 9, adults) — the CREDITED volume is the age-weighted ${fmt(result.qpwEffective, 2)} L/p/d on the age-split row below; cap 5.5`
-              : "rulebook default 4.0 L/p/d (Table 9, adults); cap 5.5")
-          : "rulebook default 4 L/p/d (V1.0 SDWS 24); cap 5.5"}
+              ? `methodology default 4.0 L/p/d (Table 9, adults) — the CREDITED volume is the age-weighted ${fmt(result.qpwEffective, 2)} L/p/d on the age-split row below; cap 5.5`
+              : "methodology default 4.0 L/p/d (Table 9, adults); cap 5.5")
+          : "methodology default 4 L/p/d (V1.0 SDWS 24); cap 5.5"}
         tip={v2
           ? "Daily drinking water per person. Default 4.0 L/p/d for adults (V2.0 Table 9, V2.0 SDWS 29 Option 1) unless a design value or a Water Consumption Field Test is entered; capped at 5.5."
           : "Daily drinking water per person. Default 4 L/p/d (V1.0 SDWS 24) unless a design value or a Water Consumption Field Test is entered; capped at 5.5."} />}
@@ -867,11 +1006,11 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
     <div className="py-1">
       <div className="flex items-baseline gap-2">
         <span className="t-caption flex-1 text-fg-2">Households served (N_p)</span>
-        <MonitoringChip sdws={sdwsRef(basis, "Np")} instrument="sales or distribution records" />
-        <StateBadge state={state.premises != null || npFromRecord ? "entered" : "derived"} tip="The households with a treatment device. It comes from the project record — the household count itself, or the people count divided by the household size. Type a figure to record a different count for this analysis." />
+        <StateBadge mark={{ kind: "monitoring", sdws: sdwsRef(basis, "Np"), instrument: "sales or distribution records" }} state={state.premises != null || npFromRecord ? "entered" : "calculated"} tip="The households with a treatment device. It comes from the project record — the household count itself, or the people count divided by the household size. Type a figure to record a different count for this analysis." />
         <EditGlyph title="Enter the households served (N_p)" />
         <InRowNum value={state.premises ?? result.premises} onChange={(v) => patch({ premises: v })} onClear={() => patch({ premises: undefined })} optional width={92} />
       </div>
+      <ProveLater entered={state.premises != null || npFromRecord} mark={{ kind: "monitoring", sdws: sdwsRef(basis, "Np"), instrument: "sales or distribution records" }} />
       {/* HN_p IS PRINTED TO THE SAME PRECISION AS THE HOUSEHOLD SIZE ABOVE, and says outright when
           the two are the same number ([#225] requirement 3). A household size from the project record
           shows to two decimals; printed to one decimal beside it, the same value would look like a
@@ -907,11 +1046,11 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
       </div>
       <div className="flex items-baseline gap-2">
         <span className="t-caption flex-1 text-fg-2">t_p — hours used / day</span>
-        <MonitoringChip sdws={sdwsRef(basis, "tp")} instrument="usage survey" />
-        <StateBadge state={state.usageHoursPerDay != null ? "entered" : "default"} tip={`Hours a day the device is used (${sdwsRef(basis, "tp")}). Default 5 h (Option 1).`} />
+        <StateBadge mark={{ kind: "monitoring", sdws: sdwsRef(basis, "tp"), instrument: "usage survey" }} state={state.usageHoursPerDay != null ? "entered" : "default"} tip={`Hours a day the device is used (${sdwsRef(basis, "tp")}). Default 5 h (Option 1).`} />
         <EditGlyph title="Enter usage hours (t_p)" />
         <InRowNum value={state.usageHoursPerDay ?? 5} onChange={(v) => patch({ usageHoursPerDay: v })} onClear={() => patch({ usageHoursPerDay: undefined })} optional width={92} />
       </div>
+      <ProveLater entered={state.usageHoursPerDay != null} mark={{ kind: "monitoring", sdws: sdwsRef(basis, "tp"), instrument: "usage survey" }} />
       {/* DN_p, DEVICES PER HOUSEHOLD — A PROJECT FACT, SHOWN ONLY WITH A FLOW RATE (ruling 2026-10-23).
           It changes a number only through Eq.7's device cap, and that cap needs q_i, so without a
           flow rate the row would ask for a fact that changes nothing. It starts at 1, the lowest and
@@ -921,8 +1060,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
         <div>
           <div className="flex items-baseline gap-2">
             <span className="t-caption flex-1 text-fg-2">DN_p — devices per household</span>
-            <MonitoringChip sdws={sdwsRef(basis, "DN")} instrument="sales or distribution records" />
-            <StateBadge state={state.devicesPerPremises != null ? "entered" : "assumed"} tip={`Average devices per household, from sales or distribution records (${sdwsRef(basis, "DN")}). A whole number, 1 or more.`} />
+            <StateBadge mark={{ kind: "monitoring", sdws: sdwsRef(basis, "DN"), instrument: "sales or distribution records" }} state={state.devicesPerPremises != null ? "entered" : "assumed"} tip={`Average devices per household, from sales or distribution records (${sdwsRef(basis, "DN")}). A whole number, 1 or more.`} />
             <EditGlyph title="Enter devices per household (DN_p)" />
             <InRowNum
               value={state.devicesPerPremises ?? 1}
@@ -938,6 +1076,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
               width={92}
             />
           </div>
+          <ProveLater entered={state.devicesPerPremises != null} mark={{ kind: "monitoring", sdws: sdwsRef(basis, "DN"), instrument: "sales or distribution records" }} />
           <div className="t-caption text-fg-4" style={{ fontSize: 10 }}>
             {dnRefused
               ? `${DEVICES_PER_PREMISES_RULE} The calculator keeps ${state.devicesPerPremises ?? 1} until then.`
@@ -949,7 +1088,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
       ) : null}
       <div className="t-caption text-fg-4" style={{ fontSize: 10 }}>
         {result.deviceLimitEvaluated
-          ? `Eq.7: q_i · t_p · DN_p = ${fmt(result.deviceCapacityLPerDay ?? 0, 1)} L/premises/day — ${result.deviceMinApplied ? "the device capacity binds." : "the people term binds."}`
+          ? `Eq.7: q_i · t_p · DN_p = ${fmt(result.deviceCapacityLPerDay ?? 0, 1)} L/premises/day — ${result.deviceMinApplied ? "the devices' capacity sets the limit." : "what the people drink sets the limit."}`
           : `Filter limit not checked (Eq.7) — enter q_i (${sdwsRef(basis, "qi")}). Until then QPW_hh = HN_p × QPW_p.`}
       </div>
     </div>
@@ -983,8 +1122,8 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
       <EqRow eqNum="6" symbol="Q_pop" title="Clean water all premises use / yr" formula={v2 ? "N_p · QPW_hh · DP_p" : "N_p · U_p · QPW_hh · DP_p"} value={ML(result.Q_pop) + "/yr"}
         oneLiner="The clean water all served premises use in a year — premises times per-premises volume times operating days. Serving more water avoids more boiling."
         open={open.has("q_pop")} onToggle={() => toggle("q_pop")} editable cite={citeShort(basis, "qMethod2")}>
-        <VarRow label="N_p — premises (Eq.7)" value={result.premises != null ? fmt(result.premises, 0) : "—"} state="derived" tip="Premises count, entered in the QPW_hh row above." />
-        <VarRow label="QPW_hh — per-premises volume (Eq.7)" value={qpwHhStr} state="derived" tip="Per-premises daily volume from Eq.7." />
+        <VarRow label="N_p — premises (Eq.7)" value={result.premises != null ? fmt(result.premises, 0) : "—"} state="calculated" tip="Premises count, entered in the QPW_hh row above." />
+        <VarRow label="QPW_hh — per-premises volume (Eq.7)" value={qpwHhStr} state="calculated" tip="Per-premises daily volume from Eq.7." />
         {/* U_p SHOWS ONCE, IN ITS ENTRY BOX (ruling (3), 2026-09-26). Under V2.0 that box is in
             Eq.8, where U_p is applied; here it is only referenced, never printed as a second value. */}
         {v2 ? (
@@ -1018,7 +1157,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
         </p>
       ) : (
         <p className="t-caption mt-1 flex items-center gap-1 text-fg-3" style={{ fontSize: 10 }}>
-          Values marked <EditGlyph title="edit affordance" /> can be typed over — doing so tags them ENTERED. DERIVED values are computed here and cannot be typed over.
+          Values marked <EditGlyph title="edit affordance" /> can be typed over — doing so tags them ENTERED. CALCULATED values are worked out here and cannot be typed over.
         </p>
       )}
 
@@ -1052,7 +1191,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
               value={presetMixSummary}
               state={anyEnteredMix ? "entered" : "default"}
               tip={anyEnteredMix
-                ? "The stove and fuel shares typed below, from this project's baseline survey or another source the rulebook accepts (V2.0 SDWS 6 and SDWS 8)."
+                ? "The stove and fuel shares typed below, from this project's baseline survey or another source the methodology accepts (V2.0 SDWS 6 and SDWS 8)."
                 : "Cited national figures for this country (V2.0 SDWS 6 and SDWS 8 accept official statistics) in place of the screening preset. The project's own baseline survey replaces them."}
             />
             <div className="t-caption text-fg-4" style={{ fontSize: 10 }}>
@@ -1073,7 +1212,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
       <EqRow eqNum="1" symbol="EF_b" title="Emissions per litre boiled (baseline)" formula="SE · (EF_CO₂ · fNRB + EF_nonCO₂) / 10⁹" value={`${fmtExp(result.result.EF_b, 3)} tCO₂e/L`}
         oneLiner="Greenhouse gas released per litre boiled with firewood the old way. The larger this factor, the more emissions the project avoids."
         open={open.has("ef_b")} onToggle={() => toggle("ef_b")} editable cite={citeShort(basis, "efb")}>
-        <VarRow label="SE (Eq.2)" value={fmt(result.SE, 1)} unit="kJ/L" state="derived" tip="Specific energy, computed in Eq.2 (SE = 360.83/η)." />
+        <VarRow label="SE (Eq.2)" value={fmt(result.SE, 1)} unit="kJ/L" state="calculated" tip="Specific energy, computed in Eq.2 (SE = 360.83/η)." />
         <VarRow label="EF_CO₂ — wood combustion" value="112" unit="tCO₂/TJ" state="default" tip={`Wood CO₂ emission factor — IPCC 2006 default (${sdwsRef(basis, "EFco2")}).`} />
         <VarRow label="EF_nonCO₂ — CH₄ + N₂O (AR5)" value="9.46" unit="tCO₂e/TJ" state="default" tip={`Wood non-CO₂ emission factor — IPCC 2006 / AR5 GWP (${sdwsRef(basis, "EFnonco2")}).`} />
         {/* fNRB — VERSION-SCOPED overridable value: PAA on the current vintage; Legacy on the V1
@@ -1082,7 +1221,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
             the seat asks for the value again. Source labeled per version. */}
         <div className="py-1">
           <div className="flex items-baseline gap-2">
-            <span className="t-caption flex-1 text-fg-2">fNRB — non-renewable biomass · {result.fnrbVintage}</span>
+            <span className="t-caption flex-1 text-fg-2">fNRB — non-renewable biomass</span>
             <StateBadge
               state={fnrbSet ? "entered" : "default"}
               tip={isLegacyV
@@ -1109,12 +1248,12 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
                   ? `Filed value — V1 filing (${fmt(fnrbField ?? 0, 3)}).${readOnlySeat ? "" : " Clearing it stops the transition; nothing is substituted for it."}`
                   : `No filed V1 fNRB on the record — the transition cannot run.${readOnlySeat ? "" : " Enter the value this project filed under V1.0 (V1.0 SDWS 21, p.32)."}`)
               : (fnrbSet
-                  ? `Entered — filed current fNRB ${fmt(fnrbField ?? 0, 3)}.${readOnlySeat ? "" : ` Clear to revert to the ${result.fnrbVintage} lookup.`}`
+                  ? `Entered — filed current fNRB ${fmt(fnrbField ?? 0, 3)}.${readOnlySeat ? "" : ` Clear to go back to the ${fnrbTableLabel(result.fnrbVintage)}.`}`
                   : `${fnrbRegional
                         ? `No national default for this country — A6.4-AMT-009 Table 2 multi-national value for ${fnrbRegional.region}.`
                         : fnrbFromSite
                           ? `${fnrbRegionalLabel}.`
-                          : `A6.4-AMT-009 Table 3 national default (${result.fnrbVintage}).`}${readOnlySeat ? "" : " Overtype to file your own value; clear to revert."}`)}
+                          : `${fnrbTableLabel(result.fnrbVintage)}. ${FNRB_ORIGIN}`}${readOnlySeat ? "" : " Overtype to file your own value; clear to revert."}`)}
           </div>
           {/* THE QUARTILE DIAL IS RETIRED FOR fNRB (calculator v0.10.0, ruling (3), 2026-09-21).
               A country with no national row now takes A6.4-AMT-009 Table 2's official multi-national
@@ -1142,27 +1281,34 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
 
       <EqRow eqNum="4" symbol="Q_y" title="Credited water volume" formula="MIN( Q_pop , Q_m )" value={ML(result.result.Q_y) + "/yr"}
         oneLiner="Credited volume is the smaller of what people need and what the project actually supplies — you can't claim more water than you deliver."
-        binding={result.Q_m === null ? "No metered volume entered — population (Q_pop) binds." : result.Q_m < result.Q_pop ? `Metered volume binds — Q_m ${ML(result.Q_m)} < Q_pop.` : `Population binds — Q_pop ≤ Q_m ${ML(result.Q_m)}.`}
+        binding={result.Q_m === null
+          ? `No ${state.mode === "ex-post" ? "metered volume" : "production"} entered, so credits follow the water people need.`
+          : result.Q_m < result.Q_pop
+            ? `The system ${state.mode === "ex-post" ? "supplied" : "produces"} less than people need (${ML(result.Q_m)} a year), so credits follow what it ${state.mode === "ex-post" ? "supplied" : "produces"}.`
+            : `The system ${state.mode === "ex-post" ? "supplied" : "produces"} at least what people need, so credits follow the water people need.`}
         open={open.has("q_y")} onToggle={() => toggle("q_y")} editable cite={citeShort(basis, "qy")}>
-        <VarRow label={`Q_pop (Eq.${m2 ? "6" : "5"})`} value={ML(result.Q_pop)} unit="/yr" state="derived" tip={`Quantity of safe water from Eq.${m2 ? "6" : "5"}.`} />
+        <VarRow label={`Q_pop (Eq.${m2 ? "6" : "5"})`} value={ML(result.Q_pop)} unit="/yr" state="calculated" tip={`Quantity of safe water from Eq.${m2 ? "6" : "5"}.`} />
         <div className="py-1">
           <div className="flex items-baseline gap-2">
-            <span className="t-caption flex-1 text-fg-2">Q_m — {state.mode === "ex-post" ? "metered volume" : "planned production"} / yr</span>
-            <StateBadge
-              state={state.meteredVolumeL != null ? "entered" : "assumed"}
-              tip={state.meteredVolumeL != null
-                ? "Metered or planned supplied volume, entered for this project."
-                : "Nothing entered, so no supply cap is assumed — Eq.4's MIN has only the population term to take, and Q_pop binds."}
-            />
-            <EditGlyph title="Enter a metered / planned volume" />
+            {/* PLANNED PRODUCTION STAYS BLANK UNTIL GIVEN (the maintainer's walk, 2026-11-16, item 11). Blank is no
+                value at all, so it carries no tag: nothing is assumed in its place. */}
+            <span className="t-caption flex-1 text-fg-2" data-production-question="">
+              {state.mode === "ex-post" ? "Q_m — metered volume / yr" : "How much water will the system produce in a year?"}
+            </span>
+            {state.meteredVolumeL != null ? (
+              <StateBadge state="entered" tip={state.mode === "ex-post" ? "Metered volume, entered for this project." : "Planned production, entered for this project."} />
+            ) : null}
+            <EditGlyph title={state.mode === "ex-post" ? "Enter the metered volume" : "Enter the planned production"} />
             <InRowNum value={state.meteredVolumeL} onChange={(v) => patch({ meteredVolumeL: v })} onClear={() => patch({ meteredVolumeL: null })} optional width={108} />
             <span className="t-mono shrink-0 text-fg-4" style={{ fontSize: 10 }}>L/yr</span>
           </div>
-          <div className="t-caption text-fg-4" style={{ fontSize: 10 }}>Optional — blank = no metering cap (population binds).</div>
+          <div className="t-caption text-fg-4" style={{ fontSize: 10 }}>
+            Leave blank if you don&rsquo;t know yet. If it {state.mode === "ex-post" ? "supplied" : "produces"} less than people need, credits follow what it {state.mode === "ex-post" ? "supplied" : "produces"}.
+          </div>
         </div>
       </EqRow>
 
-      {v2 ? paaTail(result, open, toggle, xcbParam, mqParam, cbParam, state, patch, slider("usage")) : legacyTail(result, open, toggle, cbParam, xcbParam, mqParam)}
+      {v2 ? paaTail(result, open, toggle, xcbParam, mqParam, cbParam, state, patch, slider("usage"), activityRow) : legacyTail(result, open, toggle, cbParam, xcbParam, mqParam, activityRow)}
       {/* version-scoped citations flow through citeShort(basis, key); see ./citations */}
 
       {/* ══ Emission reductions (credits) ══ */}
@@ -1171,9 +1317,9 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
         // [V1 §2 / V2 §7.7] — the sum of the sections above.
         oneLiner="The final credits — the baseline emissions above, minus the project's own emissions and any leakage."
         open={open.has("er")} onToggle={() => toggle("er")} cite={citeShort(basis, "er")}>
-        <VarRow label={v2 ? "BE_CB — crediting baseline (Eq.10)" : "BE — baseline emissions (Eq.3)"} value={fmt(v2 ? (result.result as PaaErOutput).BE_CB : (result.result as LegacyErOutput).BE, 1)} unit="tCO₂e" state="derived" tip="Baseline emissions total from the section above." />
-        <VarRow label="PE — project emissions" value={fmt(result.result.PE, 1)} unit="tCO₂e" state="derived" tip="Project emissions section." />
-        <VarRow label="LE — leakage" value={fmt(result.result.LE, 1)} unit="tCO₂e" state="derived" tip="Leakage section." />
+        <VarRow label={v2 ? "BE_CB — crediting baseline (Eq.10)" : "BE — baseline emissions (Eq.3)"} value={fmt(v2 ? (result.result as PaaErOutput).BE_CB : (result.result as LegacyErOutput).BE, 1)} unit="tCO₂e" state="calculated" tip="Baseline emissions total from the section above." />
+        <VarRow label="PE — project emissions" value={fmt(result.result.PE, 1)} unit="tCO₂e" state="calculated" tip="Project emissions section." />
+        <VarRow label="LE — leakage" value={fmt(result.result.LE, 1)} unit="tCO₂e" state="calculated" tip="Leakage section." />
       </EqRow>
     </section>
   );
@@ -1183,30 +1329,64 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
 
 type Toggle = (id: string) => void;
 
-function peLeRows(result: ScenarioResult, open: Set<string>, toggle: Toggle, basis: Basis) {
+/**
+ * THE PUMP'S ACTIVITY EMISSIONS (the maintainer's walk of the open site, 2026-11-16, item 15). Zero is right for a hand
+ * pump, gravity or solar supply. A figure entered here goes to the engine as its activity emissions input; the seat
+ * asks for one, and shows no figures, when the record says the pump runs on diesel or grid power.
+ */
+function ActivityRow({ result, state, patch }: { result: ScenarioResult; state: CalcState; patch: (p: Partial<CalcState>) => void }) {
+  const entered = state.activityEmissions != null;
+  const power = state.pumpPower;
+  const burnsNothing = power === "hand" || power === "gravity" || power === "solar";
+  const powerWords = { hand: "a hand pump", gravity: "gravity", solar: "solar power", diesel: "diesel", grid: "grid power" } as const;
+  return (
+    <div className="py-1" data-activity-row="">
+      <div className="flex items-baseline gap-2">
+        <span className="t-caption min-w-0 flex-1 text-fg-2">Pump and fuel emissions a year</span>
+        <StateBadge
+          state={entered ? "entered" : burnsNothing ? "default" : "assumed"}
+          tip={entered ? "Entered for this project: the pump's yearly emissions." : "Zero: nothing is burned to run the system."}
+        />
+        <EditGlyph title="Enter the pump's yearly emissions" />
+        <InRowNum value={entered ? state.activityEmissions : result.result.PE} onChange={(v) => patch({ activityEmissions: v })}
+          onClear={() => patch({ activityEmissions: null })} optional step={0.1} width={80} />
+        <span className="t-mono shrink-0 text-fg-4" style={{ fontSize: 10 }}>tCO₂e</span>
+      </div>
+      <div className="t-caption text-fg-4" style={{ fontSize: 10 }}>
+        {entered
+          ? `Entered for this project${power ? `: the pump runs on ${powerWords[power]}` : ""}.`
+          : burnsNothing
+            ? `Zero: the project record says the system runs on ${powerWords[power!]}, which burns nothing to run.`
+            : "Zero is right for a hand pump, gravity or solar supply. If the pump uses diesel or grid power, enter its yearly emissions here."}
+      </div>
+    </div>
+  );
+}
+
+function peLeRows(result: ScenarioResult, open: Set<string>, toggle: Toggle, basis: Basis, activityRow: React.ReactNode) {
   const v2 = basis === "paa";
   return (
     <>
       <Section title={v2 ? "Activity emissions (AE)" : "Project emissions (PE)"} />
       <EqRow eqNum={v2 ? "14" : "8"} symbol={v2 ? "AE_y" : "PE_y"} title="Emissions from running the new system" formula="fuel + electricity" value={`${fmt(result.result.PE, 1)} tCO₂e`}
         // [V1 §3.7 p.13 / V2 §7.6] — activity emissions; more PE = fewer net credits.
-        oneLiner="Emissions from running the new water system — pumps, transport, or any fuel it uses. Often near zero for gravity or solar supply, so it stays thin ex-ante."
+        oneLiner="Emissions from running the new water system: its pump, transport, or any fuel it uses. Zero is right for a hand pump, gravity or solar supply. A pump on diesel or grid power gives off greenhouse gas, so the calculator asks for it."
         open={open.has("pe")} onToggle={() => toggle("pe")} cite={citeShort(basis, "pe")}>
-        <VarRow label="fuel + electricity emissions" value={fmt(result.result.PE, 1)} unit="tCO₂e" state="derived" tip="Fossil-fuel + electricity emissions of the activity (V2.0 §8.2). Zero by default ex-ante." />
+        {activityRow}
       </EqRow>
 
       <Section title="Leakage (LE)" />
       <EqRow eqNum={v2 ? "17" : "—"} symbol="LE_y" title="Emissions that shift elsewhere" formula={v2 ? "LE_emb,y + LE_Market,y" : "non-renewable-biomass leakage"} value={`${fmt(result.result.LE, 1)} tCO₂e`}
         // [V1 §3.8 p.13 / V2 leakage MS] — deducted to stay conservative; more LE = fewer credits.
-        oneLiner="Emissions that move elsewhere because of the project (for example, displaced fuel use). Deducted to stay conservative; thin ex-ante."
+        oneLiner="Emissions that move elsewhere because of the project (for example, displaced fuel use). It is taken off the credits to keep them cautious. Before a project runs, there is usually little of it to count."
         open={open.has("le")} onToggle={() => toggle("le")} cite={citeShort(basis, "le")}>
         {basis === "paa" ? (
-          <VarRow label="LE_emb — embodied emissions of the devices" value={fmt((result.result as PaaErOutput).LE_embodied, 1)} unit="tCO₂e" state="derived"
+          <VarRow label="LE_emb — embodied emissions of the devices" value={fmt((result.result as PaaErOutput).LE_embodied, 1)} unit="tCO₂e" state="calculated"
             tip={(result.result as PaaErOutput).warnings.some((w) => /embodied emissions not entered/.test(w))
               ? "Not entered. V2.0 §9.2 deducts a default per new device (Table 10) once — upfront (Eq. 18) or over five years (Eq. 19). Nothing is deducted until the device class and unit count are entered."
               : "Embodied emissions per new device (V2.0 §9.2, Table 10), once per unit — upfront (Eq. 18) or amortised over five years (Eq. 19)."} />
         ) : null}
-        <VarRow label={basis === "paa" ? "LE_Market — market leakage" : "non-renewable biomass leakage"} value={fmt(basis === "paa" ? (result.result as PaaErOutput).LE_market : result.result.LE, 1)} unit="tCO₂e" state="derived" tip={basis === "paa"
+        <VarRow label={basis === "paa" ? "LE_Market — market leakage" : "non-renewable biomass leakage"} value={fmt(basis === "paa" ? (result.result as PaaErOutput).LE_market : result.result.LE, 1)} unit="tCO₂e" state="calculated" tip={basis === "paa"
           ? "Market leakage, applied: Option 1, the methodology's default — 2% of net emission reductions (V2.0 §9.3.2, Eq. 20; V2.0 SDWS 40). A detailed assessment (Option 2) may replace it."
           : "Leakage deduction. Zero by default ex-ante; a flat 5% can be elected (V1.0 §3.8.3)."} />
       </EqRow>
@@ -1214,7 +1394,32 @@ function peLeRows(result: ScenarioResult, open: Set<string>, toggle: Toggle, bas
   );
 }
 
-function paaTail(result: ScenarioResult, open: Set<string>, toggle: Toggle, xcbParam: React.ReactNode, mqParam: React.ReactNode, cbParam: React.ReactNode, state: CalcState, patch: (p: Partial<CalcState>) => void, usageSlider: React.ReactNode) {
+/**
+ * THE DAF ROW OPENS TO SHOW ITS WORKING (the maintainer's walk of the open site, 2026-11-16, item 14): the tool and
+ * its version, the inputs, the table, and how the value is read from the country's row. The value is the engine's;
+ * the steps are words from the package's DAF data file (`dafSteps`).
+ */
+function DafRow({ result, countryIso, open, onToggle }: { result: ScenarioResult; countryIso: string | null; open: boolean; onToggle: () => void }) {
+  const shown = fmt(result.DAF, 4);
+  const prov = result.provenance.find((x) => x.field === "DAF");
+  return (
+    <div className="py-1" data-daf-row="">
+      <button type="button" onClick={onToggle} aria-expanded={open} className="flex w-full items-baseline gap-2 rounded-sm text-left outline-none focus-visible:ring-2 focus-visible:ring-tide">
+        <span className="self-center text-fg-4"><Chevron open={open} /></span>
+        <span className="t-caption min-w-0 flex-1 text-fg-3" style={{ overflowWrap: "anywhere" }}>DAF — downward adjustment factor, how it is found</span>
+        <span className="t-mono shrink-0 text-fg-1" style={{ fontSize: 11 }}>{shown}</span>
+        <span className="self-center"><StateBadge state={prov?.source === "override" ? "entered" : "default"} tip="The DAF from Gold Standard's DAF tool, for the host country and the 2026–2030 window. Open the row for its working." /></span>
+      </button>
+      {open ? (
+        <ol className="mt-1 flex flex-col gap-1 t-caption text-fg-3" data-daf-steps="" style={{ fontSize: 10.5, paddingLeft: 22, listStyle: "decimal" }}>
+          {dafSteps(result, countryIso, shown).map((s) => <li key={s}>{s}</li>)}
+        </ol>
+      ) : null}
+    </div>
+  );
+}
+
+function paaTail(result: ScenarioResult, open: Set<string>, toggle: Toggle, xcbParam: React.ReactNode, mqParam: React.ReactNode, cbParam: React.ReactNode, state: CalcState, patch: (p: Partial<CalcState>) => void, usageSlider: React.ReactNode, activityRow: React.ReactNode) {
   const p = result.result as PaaErOutput;
   // A host country with no row in the engine's DAF data takes the default; the engine's provenance
   // label carries the note, and this row only prints it (rulings, 19 and 23 Oct).
@@ -1249,16 +1454,19 @@ function paaTail(result: ScenarioResult, open: Set<string>, toggle: Toggle, xcbP
       <EqRow eqNum="10–12" symbol="BE_y" title="Crediting baseline (after ambition adj.)" formula="MIN( BE_unc,y · (1 − DAF) , BAU_y )" value={`${fmt(p.BE_CB, 1)} tCO₂e`}
         oneLiner="Newer rules shave the total a little each period to keep claims ambitious over time (Eq. 10), then take the lower of that and business-as-usual (Eq. 11–12). A bigger adjustment means fewer credits."
         open={open.has("be_cb")} onToggle={() => toggle("be_cb")} cite={citeShort("paa", "beY")}>
-        <VarRow label="DAF — downward adjustment (457 tool)" value={fmt(result.DAF, 4)} state="derived" tip="Downward adjustment factor by country × vintage window, from the GS4GG 457 DAF tool (looked-up, locked)." />
+        <DafRow result={result} countryIso={state.countryIso} open={open.has("daf")} onToggle={() => toggle("daf")} />
         {dafFallbackNote ? <div className="t-caption mt-1 text-fg-3" style={{ fontSize: 10 }}>{dafFallbackNote}</div> : null}
+        {/* BAU_y IS IN THE FORMULA, SO IT IS LISTED HERE (item 14). Under V2.0 it equals BE_unc,y (Eq.11). */}
+        <VarRow label="BAU_y — business-as-usual baseline (Eq.11)" value={fmt(p.BE_BAU, 1)} unit="tCO₂e" state="calculated"
+          tip="The business-as-usual baseline. Under V2.0 it equals the emissions avoided before the ambition adjustment, BE_unc,y (V2.0 §7.5.1, Eq.11). The crediting baseline is the smaller of the two." />
       </EqRow>
 
-      {peLeRows(result, open, toggle, "paa")}
+      {peLeRows(result, open, toggle, "paa", activityRow)}
     </>
   );
 }
 
-function legacyTail(result: ScenarioResult, open: Set<string>, toggle: Toggle, cbParam: React.ReactNode, xcbParam: React.ReactNode, mqParam: React.ReactNode) {
+function legacyTail(result: ScenarioResult, open: Set<string>, toggle: Toggle, cbParam: React.ReactNode, xcbParam: React.ReactNode, mqParam: React.ReactNode, activityRow: React.ReactNode) {
   const l = result.result as LegacyErOutput;
   return (
     <>
@@ -1270,7 +1478,7 @@ function legacyTail(result: ScenarioResult, open: Set<string>, toggle: Toggle, c
         {xcbParam}
         {mqParam}
       </EqRow>
-      {peLeRows(result, open, toggle, "legacy")}
+      {peLeRows(result, open, toggle, "legacy", activityRow)}
     </>
   );
 }

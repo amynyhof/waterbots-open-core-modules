@@ -5,11 +5,12 @@ import type { ReactNode } from "react";
 import { ReadOnlySeat } from "../../core/readOnly";
 import EquationStack from "./EquationStack";
 import ExAntePanel from "./ExAntePanel";
-import { DerivedTag, InRowNum, TagLegend } from "./EquationStack";
+import { CalculatedTag, InRowNum, TagLegend, WithEqNums } from "./EquationStack";
 import ReportView, { type ReportSlots } from "./ReportView";
 import VersionTabs, { V2OnlyTab } from "./VersionTabs";
 import BetaTag from "./BetaTag";
 import { fmt, fmtExp } from "./format";
+import { fnrbSourceLine } from "./citations";
 import { missingFactsPrompt, type CalvinProject } from "./state";
 import type { CalculatorState } from "./useCalculatorState";
 
@@ -57,9 +58,9 @@ function Metric({ label, value, sub, tip }: { label: string; value: string; sub?
     <div className="min-w-0">
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
         <span className="t-mono text-fg-1" style={{ fontSize: 17, fontWeight: 600, lineHeight: 1.1 }}>{value}</span>
-        <DerivedTag tip={tip} />
+        <CalculatedTag tip={tip} />
       </div>
-      <div className="text-fg-4" style={{ fontSize: 10, marginTop: 4, lineHeight: 1.25 }}>{label}</div>
+      <div className="text-fg-4" style={{ fontSize: 10, marginTop: 4, lineHeight: 1.25 }}><WithEqNums text={label} /></div>
       {sub ? <div className="t-mono text-fg-4" style={{ fontSize: 9.5, marginTop: 1 }}>{sub}</div> : null}
     </div>
   );
@@ -130,6 +131,34 @@ export default function CalculatorWork({
         <div className="border-t border-line pt-2">
           <BetaTag caseCount={referenceCaseCount} />
         </div>
+      </ReadOnlySeat>
+    );
+  }
+
+  /**
+   * THE PUMP RUNS ON DIESEL OR GRID POWER (item 15). Zero is right only for a hand pump, gravity or solar supply, so
+   * the seat asks for the pump's yearly emissions and shows no figures until they are entered.
+   */
+  if (calc.activityAsk) {
+    return (
+      <ReadOnlySeat readOnly={readOnly}>
+        <section
+          className="rounded-lg p-4"
+          style={{ border: "1px solid var(--amber)", background: "color-mix(in oklab, var(--amber) 8%, transparent)" }}
+          role="status"
+          data-activity-ask=""
+        >
+          <span className="eyebrow warn">Pump emissions needed</span>
+          <p className="t-body mt-2 text-fg-1" style={{ fontSize: 13 }}>
+            The project record says the pump runs on {calc.activityAsk.power === "diesel" ? "diesel" : "grid power"}, so running it
+            gives off greenhouse gas. How much, in a year? Enter it in tonnes of CO₂e. No figures are shown until it is entered.
+          </p>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="t-caption text-fg-2">Pump emissions a year</span>
+            <InRowNum value={null} onChange={(v) => patch({ activityEmissions: v })} step={0.1} width={92} />
+            <span className="t-mono text-fg-4" style={{ fontSize: 10 }}>tCO₂e</span>
+          </div>
+        </section>
       </ReadOnlySeat>
     );
   }
@@ -247,10 +276,12 @@ export default function CalculatorWork({
             </div>
           ) : null}
 
-          {/* Summary row is sticky so the changed values stay visible while scrolling the derivation. */}
+          {/* Summary row is sticky so the changed values stay visible while scrolling the derivation.
+              A site can unpin it, so it scrolls with the page (`unpinFigureBlock`). */}
           <section
-            className="sticky top-0 z-10 rounded-lg border border-line bg-card shadow-sm"
+            className={`${calc.figureBlockPinned ? "sticky top-0 z-10 " : ""}rounded-lg border border-line bg-card shadow-sm`}
             style={{ padding: "14px 20px" }}
+            data-figure-block={calc.figureBlockPinned ? "pinned" : "scrolls"}
           >
             {/* THE COLUMNS FOLLOW THE PANEL, NOT THE WINDOW. A count picked from the window's width gave
                 four narrow columns in a panel beside a side rail and chat, and the figures ran into each
@@ -271,7 +302,7 @@ export default function CalculatorWork({
             </div>
             <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-line pt-2 text-fg-3" style={{ fontSize: 11 }}>
               {/* Provenance line. The single Beta marker (surface hedge) is the footer line below the equations. */}
-              <span className="t-mono">fNRB · {result.fnrbVintage}</span>
+              <span data-fnrb-source="">fNRB · {fnrbSourceLine(result, state)}</span>
               <span aria-hidden>·</span>
               <span className="t-mono">{defaultCount} default{defaultCount === 1 ? "" : "s"}</span>
               {fallbackCount > 0 ? (
@@ -289,7 +320,7 @@ export default function CalculatorWork({
 
           <TagLegend />
 
-          <EquationStack result={result} state={state} patch={patch} canonPopulation={project.population?.served} seed={seed} sliders={calc.sliders} tables={calc.tables} />
+          <EquationStack result={result} state={state} patch={patch} canonPopulation={project.population?.served} seed={seed} sliders={calc.sliders} tables={calc.tables} screening={calc.exAnteOnly} />
 
           {/* ── Beta footer — one line, honest state, shown to visitors (ruling 2026-09-07) ── */}
           <div className="border-t border-line pt-2">
@@ -306,6 +337,7 @@ export default function CalculatorWork({
         <div className="flex flex-col gap-1">
           <div className="flex items-baseline gap-3">
             <span className="eyebrow solo">{comparison ? "PAA Transition Report" : "PAA V2.0 Report"} — preview</span>
+            {calc.exportButton ? (
             <button
               type="button"
               onClick={exportReport}
@@ -313,6 +345,7 @@ export default function CalculatorWork({
             >
               Export (PDF)
             </button>
+            ) : null}
           </div>
           <p className="t-caption text-fg-4" style={{ fontSize: 10 }}>
             Assembled from the calculator — no separate report content. Release is handled manually
