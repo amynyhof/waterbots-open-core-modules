@@ -4,6 +4,25 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-11-16 — Calvin's package version 0.4.0, for the release
+
+**Done (branch `calvin-version-0-4-0`):**
+- `packages/calvin/package.json`, its line in `package-lock.json` and the package README: Calvin's version is 0.4.0,
+  so the release `calvin-v0.4.0` packs as `waterbots-calvin-0.4.0.tgz` (ruling 2026-11-16). It carries the walk of
+  the open site (pull request #26).
+- The README's release section is now "Changes in 0.4.0".
+- The engine version stays 0.19.0: no arithmetic changed and no reference case moved. `core` stays 0.1.1: it has not
+  changed since `calvin-v0.3.0`, so the release carries the same core file.
+- `BUILD_PLAN.md`: V16 marked released (`calvin-v0.3.0`) and V18 marked merged (pull request #26).
+
+**Checked:** typecheck, build and the full test suite pass (Calvin 316 of 316). The engine checks (48 of 48), the
+screen mount test (11 views), and the seed, package, paid-code and name checks pass.
+
+**Open:** after this merges, Session C packs both from `main` into the handoff folder with `SHA256SUMS.txt`. The
+tag `calvin-v0.4.0` waits until Session A sends a pass on the name scan and the number gate for those files.
+
+---
+
 ## 2026-11-16 — Calvin's screens after the walk of the open site (16 items)
 
 **Done (branch `open-site-walk-fixes`):** one pull request for the maintainer's walk of the open site (2026-11-16).
