@@ -19,8 +19,8 @@ No sum changed and no reference case moved.
   needs monitoring to prove it." (ruling 2026-11-16). The two 100% starts sit at the top of their range, so they
   read "the highest value" instead. The drinking-water row says how to claim more: a Water Consumption Field Test, up to the cap
   (V2.0 SDWS 29, p.65; Annex 2, p.89). V2.0 asks for a field test there, not a meter.
-- 8: `.github/workflows/names.yml` runs the name scan in CI from the repository secret `WB_NAMES`. It runs main's
-  copy of the scanner on the pull request's files, fails closed, never prints a name, and refuses a fork.
+- 8: `.github/workflows/names.yml` runs the name scan in CI from the repository secret `NAMES_TO_BLOCK`, the name
+  the other repos use. It runs main's copy of the scanner on the pull request's files, fails closed, never prints a name, and refuses a fork.
 - 9 and 10: the tag key behind an info icon, in the maintainer's words. "derived" is now "calculated", and visitor
   text says "methodology". Entered values that monitoring or a baseline survey must prove later show both marks
   and one plain line. People served carries the monitoring mark.
@@ -37,7 +37,7 @@ No sum changed and no reference case moved.
 **Checked:** typecheck, build and the full test suite pass (Calvin 316 of 316, 29 new). The engine checks (48 of
 48), the screen mount test from the packed files (11 views), and the seed, package, paid-code and name checks pass.
 
-**Open:** the maintainer's review; the secret `WB_NAMES`; then the version pull request.
+**Open:** the maintainer's review; the secret `NAMES_TO_BLOCK`; then the version pull request.
 
 ---
 
