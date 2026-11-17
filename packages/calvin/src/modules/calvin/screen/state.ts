@@ -26,7 +26,23 @@ export type CalvinProject = ModuleProject<SavedAnalysis> & {
    * V1.0 filing, so leaving it out guesses no figure.
    */
   creditedUnderV1?: boolean;
+  /**
+   * WHAT POWERS THE PUMP (the maintainer's walk of the open site, 2026-11-16, item 15). The site sets it from its own
+   * intake. A hand pump, gravity or solar supply burns nothing to run, so the activity emissions are zero. A pump on
+   * diesel or grid power gives off greenhouse gas: the seat then asks for its yearly emissions and shows no figures
+   * until they are entered. Left out, the seat keeps today's zero and says when zero is right.
+   */
+  pumpPower?: PumpPower;
 };
+
+/** What powers the water system's pump. */
+export type PumpPower = "hand" | "gravity" | "solar" | "diesel" | "grid";
+
+/** The ask for activity emissions: set when the pump runs on diesel or grid power and nothing is entered yet. */
+export function activityEmissionsAsk(s: Pick<CalcState, "pumpPower" | "activityEmissions">): { power: "diesel" | "grid" } | null {
+  if ((s.pumpPower === "diesel" || s.pumpPower === "grid") && s.activityEmissions == null) return { power: s.pumpPower };
+  return null;
+}
 
 /** True when the seat shows the transition: only for a project the site says was credited under V1.0. */
 export function showsTransition(project: Pick<CalvinProject, "creditedUnderV1">): boolean {
@@ -97,6 +113,10 @@ export interface CalcState {
   operationalDays: number;
   /** Optional metered / planned supplied volume Q_m (L/yr). Method 1 only; null = no metering cap. */
   meteredVolumeL: number | null;
+  /** What powers the pump, from the project record (`CalvinProject.pumpPower`). Null when the record does not say. */
+  pumpPower: PumpPower | null;
+  /** The pump's activity emissions a year, tCO₂e, entered for this project. Null: nothing entered. */
+  activityEmissions: number | null;
   /** Water-quality modifier M_qy (fraction of samples passing; 1 ex-ante default). */
   waterQualityFactor: number;
   /** C_b — proportion already using safe water not requiring boiling (in-row; 0 default). */
@@ -142,7 +162,26 @@ export interface CalcState {
  * seeded and when the record changes underneath it. Two copies of this list would drift, and the
  * drift would be silent.
  */
-export function recordOwnedFacts(project: CalvinProject): Pick<CalcState, "countryIso" | "method" | "populationMode"> {
+/**
+ * PROJECT DETAILS THAT ARRIVE AFTER THE SEAT OPENED (the maintainer's walk of the open site, 2026-11-16).
+ * On the open site the calculator can open before the water system type or the people served are given.
+ * When they arrive, the starting values that hang on them must move too: days of operation starts at 347
+ * for a community system and 365 for a household device, and people served starts from the record.
+ *
+ * The rule, for every field: a value the person has not changed (it still equals the old seed) takes the
+ * new seed's value; a value the person changed stays. The fields the record owns (`recordOwnedFacts`)
+ * always follow the record. Nothing here does arithmetic: it only chooses between two seeds.
+ */
+export function followNewSeed(s: CalcState, oldSeed: CalcState, newSeed: CalcState, project: CalvinProject): CalcState {
+  const out: Record<string, unknown> = { ...s };
+  const keys = new Set([...Object.keys(oldSeed), ...Object.keys(newSeed)]) as Set<keyof CalcState>;
+  for (const k of keys) {
+    if (JSON.stringify(s[k]) === JSON.stringify(oldSeed[k])) out[k] = newSeed[k];
+  }
+  return { ...(out as unknown as CalcState), ...recordOwnedFacts(project) };
+}
+
+export function recordOwnedFacts(project: CalvinProject): Pick<CalcState, "countryIso" | "method" | "populationMode" | "pumpPower"> {
   const g = project.analysis ?? {};
   const country = project.country?.trim();
   return {
@@ -157,6 +196,8 @@ export function recordOwnedFacts(project: CalvinProject): Pick<CalcState, "count
     // NOT here: it seeds from a saved analysis override when one exists, so it is working state.
     // No mode on the record or in the saved analysis means null — never "people" assumed.
     populationMode: project.population?.mode ?? g.populationMode ?? null,
+    // What powers the pump is a fact on the record too (item 15).
+    pumpPower: project.pumpPower ?? null,
   };
 }
 
@@ -256,6 +297,7 @@ export function seedCalcState(project: CalvinProject): CalcState {
     charcoalConvention: g.charcoalConvention,
     operationalDays: g.operationalDays ?? 365,
     meteredVolumeL: g.meteredVolumeL ?? null,
+    activityEmissions: g.activityEmissions ?? null,
     waterQualityFactor: g.mQuality ?? 1,
     cBaseline: g.cBaseline ?? 0,
     xCleanboil: g.xCleanboil ?? 0,
@@ -299,6 +341,7 @@ export function toSavedAnalysis(s: CalcState): SavedAnalysis {
     charcoalConvention: s.charcoalConvention,
     operationalDays: s.operationalDays,
     meteredVolumeL: s.meteredVolumeL,
+    activityEmissions: s.activityEmissions,
     mQuality: s.waterQualityFactor,
     cBaseline: s.cBaseline,
     xCleanboil: s.xCleanboil,
@@ -400,6 +443,8 @@ export function toScenarioInput(s: CalcState, tables?: SiteTables): ScenarioInpu
     meteredVolumeL: s.method === 1 ? (s.meteredVolumeL ?? null) : null,
     C_b: s.cBaseline,
     X_cleanboil: s.xCleanboil,
+    // The pump's activity emissions, when entered (item 15). The engine's own input; left out, it is zero.
+    PE: s.activityEmissions ?? undefined,
     premises: effectivePremises(s, tables),
     deviceCapacityLPerHour: s.method === 2 ? s.deviceCapacityLPerHour : undefined,
     usageHoursPerDay: s.method === 2 ? s.usageHoursPerDay : undefined,

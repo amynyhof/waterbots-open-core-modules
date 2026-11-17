@@ -69,6 +69,30 @@ const project = { name: "Invented project", standards: [], technology: "CWS", co
 
 The build bundles the entry into one file, `dist/screen.js`. React and `@waterbots/core` stay outside it, so a site has one copy of each. `scripts/check-screen-entry.mjs`, at the repo root, packs both packages, installs them alone with React, and renders the ex-ante view, the ex-post view and its report, a new project's V2.0-only view and report, and a transitioning project's view and report from the packed files.
 
+## Changes in the next release
+
+From the maintainer's walk of the open site (2026-11-16). No sum changed, and every reference case gives the same answer.
+
+**Two new settings on `useCalculatorState`.** Both are off by default, so a site that passes neither sees no change.
+
+- `unpinFigureBlock: true` lets the block of headline figures above the equations scroll away with the page. By default it stays pinned at the top.
+- `hideExportButton: true` hides Calvin's two export buttons: "Export report (PDF)" in the controls panel and "Export (PDF)" on the report tab. The report itself still shows.
+
+**A new project fact, `pumpPower`.** The site passes what powers the pump: `"hand"`, `"gravity"`, `"solar"`, `"diesel"` or `"grid"`. For diesel or grid power, the screens ask for the pump's yearly emissions (tCO₂e) and show no figures until they are entered. Left out, the activity emissions stay zero, and the screens say when zero is right. The entered figure is saved in the analysis as `activityEmissions`.
+
+**What a visitor sees.**
+
+- The fNRB source is named ("A6.4-AMT-009 Table 3 (national default)"), and the screens say its values come from MoFuSS.
+- The tag key sits behind an info icon, in four plain lines. The "derived" tag is now "calculated". Visitor text says "methodology" throughout.
+- A value entered now that monitoring or a baseline survey must prove later shows both marks, for example "ENTERED · MONITORING", with one plain line.
+- The sliders read "Assumed: [value], a cautious estimate.", with one line on which way credits move. Their citations sit behind an info icon. The drinking-water slider says how a project claims more: a Water Consumption Field Test, up to the 5.50-liter cap (V2.0 SDWS 29, p.65; Annex 2, p.89).
+- Planned production stays blank until given, and is asked in plain words.
+- On the screening view (`exAnteOnly`), C_b is shown, not typed. V2.0 sets no default for it (SDWS 12, p.53), so the screen says 0% is the most generous value and that the baseline survey sets it later.
+- The DAF row opens to show its working: the tool and its version, the inputs, Table 03 and the country's row. BAU_y is listed under "where".
+- Starting values follow project details that arrive after the calculator opens. A value the person changed stays.
+- Long symbols no longer run into their titles, notes wrap, and every equation number uses one small style.
+- The Beta footer is just the word "Beta".
+
 ## Changes in 0.3.0
 
 **Before you upgrade, a site that shows the transition must pass `creditedUnderV1: true` on every project credited under V1.0.** From 0.3.0, a project without it gets the V2.0-only view. Its transition, and the ask for its filed V1.0 fNRB, stop showing.

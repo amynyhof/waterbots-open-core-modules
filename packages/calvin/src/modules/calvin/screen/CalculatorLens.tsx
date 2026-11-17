@@ -44,7 +44,7 @@ export default function CalculatorLens({
   /** The host's sentence for why this seat is read-only. */
   readOnlyReason?: string;
 }) {
-  const { dirty, saving, saveState, save, canSave, exportReport, readOnly } = calc;
+  const { dirty, saving, saveState, save, canSave, exportReport, exportButton, readOnly } = calc;
 
   return (
     <ReadOnlySeat readOnly={readOnly}>
@@ -56,7 +56,7 @@ export default function CalculatorLens({
               where the values LIVE, which is the useful half and stays true either way. */}
           <p className="t-caption text-fg-4" style={{ fontSize: 10 }}>
             All values — population, metered volume, and every methodology parameter (η, M_q, C_b,
-            X_cleanboil, QPW, DO, U_p) — {readOnly ? "are shown inside their formula rows →" : "are adjusted inside their formula rows →"}
+            X_cleanboil, QPW, DO, U_p) — {readOnly ? "are shown in the calculator, each in its own formula row." : "are set in the calculator, each in its own formula row."}
           </p>
         </div>
       </div>
@@ -104,6 +104,8 @@ export default function CalculatorLens({
         {/* EXPORT STAYS FOR EVERYONE, INCLUDING A CONTRIBUTOR. contributor canon names
             exactly two allowances — "asking agents questions, and exporting reports" — so
             removing this alongside Save would take away half of what the role is FOR. */}
+        {/* A site can turn it off (`hideExportButton`). */}
+        {exportButton ? (
         <button
           type="button"
           onClick={exportReport}
@@ -112,6 +114,7 @@ export default function CalculatorLens({
         >
           Export report (PDF)
         </button>
+        ) : null}
       </div>
     </ReadOnlySeat>
   );

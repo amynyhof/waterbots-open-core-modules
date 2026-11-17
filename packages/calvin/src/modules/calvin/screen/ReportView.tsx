@@ -101,11 +101,11 @@ interface VRow { sym: React.ReactNode; value: string; source: string; desc: stri
  * deliverable is a false claim about where a number came from; a missing one is only a gap. The
  * walk checks for gaps by listing every untagged row (`data-vtag`), so a gap cannot hide.
  */
-type ValueTag = "entered" | "default" | "derived" | "assumed";
+type ValueTag = "entered" | "default" | "calculated" | "assumed";
 
 export function tagForSource(source: string): ValueTag | undefined {
   const s = source.trim();
-  if (/^Calculated as per\b/i.test(s) || /^Derived\b/i.test(s) || /^Computed\b/i.test(s)) return "derived";
+  if (/^Calculated as per\b/i.test(s) || /^Derived\b/i.test(s) || /^Computed\b/i.test(s)) return "calculated";
   // "… 0 assumed ex-ante" is an ASSUMED row wherever the sentence starts, so the word itself
   // decides — and it is checked BEFORE "entered", because "Baseline survey … not yet entered,
   // 0 assumed" names the survey it is waiting for and is still a placeholder today.
@@ -305,9 +305,16 @@ export default function ReportView({
     : fnrbProv?.source === "site-table"
       ? `${fnrbProv.label} (V2.0 SDWS 25)`
       : mn
-      ? `Methodology V2.0 standardised tool — no A6.4-AMT-009 Table 3 national value covers this country, so Table 2's multi-national value for ${mn.region} is used (V2.0 SDWS 25; the same value as CDM TOOL33 v03.0 Table 2, origin MoFuSS 2024), ${result.fnrbVintage}. ${mn.condition}`
-      : `Methodology V2.0 standardised tool — A6.4-AMT-009 v01.0 Table 3 national default (V2.0 SDWS 25; the same value as CDM TOOL33 v03.0 Table 3, origin MoFuSS 2024), ${result.fnrbVintage}`;
+      ? `Methodology V2.0 standardised tool — no A6.4-AMT-009 Table 3 national value covers this country, so Table 2's multi-national value for ${mn.region} is used (V2.0 SDWS 25; the same value as CDM TOOL33 v03.0 Table 2, origin MoFuSS 2024). ${mn.condition}`
+      : `Methodology V2.0 standardised tool — A6.4-AMT-009 v01.0 Table 3 national default (V2.0 SDWS 25; the same value as CDM TOOL33 v03.0 Table 3, origin MoFuSS 2024)`;
   const srcFnrb = v2 ? srcFnrbV2 : "Entered — the project's filed V1.0 value (V1.0 SDWS 21, CDM TOOL30)";
+  // ZERO ACTIVITY EMISSIONS SAY WHY (item 15): a record that says hand pump, gravity or solar stands behind the zero;
+  // otherwise the zero is assumed, and the line says when it is right.
+  const powerWords = { hand: "a hand pump", gravity: "gravity", solar: "solar power" } as const;
+  const zeroPE = (cite: string) =>
+    state.pumpPower === "hand" || state.pumpPower === "gravity" || state.pumpPower === "solar"
+      ? `Zero — the project record says the system runs on ${powerWords[state.pumpPower]}, which burns nothing (${cite})`
+      : `Zero — assumed: right for a hand pump, gravity or solar supply (${cite})`;
   const srcEta = state.etaOverride !== undefined ? `Entered — Water Boiling Test or filed value (${sdwsRef(basis, "eta")})` : `Methodology ${RULEBOOK[basis].version} default — ${sdwsRef(basis, "eta")}, weighted over the stove types (SDWS 6)`;
   const srcMq = state.waterQualityFactor !== 1 ? `Water-quality test results at the point of use (${sdwsRef(basis, "Mq")})` : `Water-quality test results (${sdwsRef(basis, "Mq")}) — no test yet, 1.00 assumed ex-ante`;
   // C_b IS AN ACTIVITY VALUE, NOT A DEFAULT (external review, 2026-09-03; V2.0 SDWS 12, p.53: "To be
@@ -337,7 +344,7 @@ export default function ReportView({
   // N_p: the household count IS the premises count when population is entered as households
   // (V2 Eq.6; V2.0 SDWS 33 sales/distribution records) — the v0.1.0 report printed "—" here (comment 1.1).
   const srcNp = result.premises != null
-    ? (state.premises != null ? "Entered — households served (V2.0 SDWS 33: sales / distribution records)" : "Derived from the project record — households served (V2.0 SDWS 33: sales / distribution records)")
+    ? (state.premises != null ? "Entered — households served (V2.0 SDWS 33: sales / distribution records)" : "Calculated from the project record — households served (V2.0 SDWS 33: sales / distribution records)")
     : "Not entered — Eq.6 could not run; people-basis aggregate used";
   // QPW: an entered design/WCFT value, or THE RULEBOOK'S OWN DEFAULT — V1.0 SDWS 24 (4 L), V2.0 Table 9
   // (adults 4.0) — labelled as such. "Default — SDWS 11" once named the stove parameter (comment 1.4).
@@ -355,7 +362,7 @@ export default function ReportView({
     : "Litres of safe water per person per day (capped at 5.5)";
   const deviceEvaluated = result.deviceLimitEvaluated === true;
   const srcQpwHh = deviceEvaluated
-    ? `Calculated as per Eq. 7 — ${result.deviceMinApplied ? "device capacity binds" : "people term binds"}`
+    ? `Calculated as per Eq. 7 — ${result.deviceMinApplied ? "the devices' capacity sets the limit" : "what the people drink sets the limit"}`
     : "Filter limit not checked (Eq. 7) — device capacity q_i (V2.0 SDWS 13) not entered; HN_p × QPW_p used";
 
   return (
@@ -399,10 +406,10 @@ export default function ReportView({
           methodology (GS4GG PAA M400-12 V2.0){tr ? (
             <>
               {" "}and compares what this issuance would credit under the legacy V1.0 rules against
-              the current PAA V2.0 requirement — <strong>same project, same period, two rulebooks.</strong>
+              the current PAA V2.0 requirement — <strong>same project, same period, two versions of the methodology.</strong>
             </>
           ) : (
-            <>. This is a new project, not credited under V1.0, so V2.0 is the only rulebook that applies and no comparison is made.</>
+            <>. This is a new project, not credited under V1.0, so V2.0 is the only version of the methodology that applies and no comparison is made.</>
           )} Every figure is
           a deterministic output of the methodology&rsquo;s own equations; each parameter&rsquo;s value, unit, and
           source is documented below. Figures are {basisWord}; final credited volumes depend on monitoring and
@@ -427,8 +434,8 @@ export default function ReportView({
           <Row
             k={state.populationMode === "households" ? "People served" : "Households served (N_p)"}
             v={state.populationMode === "households"
-              ? `${fmt(result.people, 0)} — derived`
-              : `${result.premises != null ? fmt(result.premises, Number.isInteger(result.premises) ? 0 : 1) : "—"} — derived`}
+              ? `${fmt(result.people, 0)} — calculated`
+              : `${result.premises != null ? fmt(result.premises, Number.isInteger(result.premises) ? 0 : 1) : "—"} — calculated`}
             note={state.populationMode === "households"
               ? `${peopleServed(state).toLocaleString()} households × ${fmt(result.householdSizeUsed, 2)} people/household`
               : `${peopleServed(state).toLocaleString()} people ÷ ${fmt(result.householdSizeUsed, 2)} people/household`}
@@ -506,7 +513,7 @@ export default function ReportView({
       <p className="t-caption text-fg-2" style={{ fontSize: 10, lineHeight: 1.5 }}>
         Gold Standard aligned its safe-water methodology with the Paris Agreement (&ldquo;PAA&rdquo; = Paris Agreement
         Aligned; {RULEBOOK.paa.long}). The update raises conservatism in key assumptions and adds new adjustments. The
-        table below shows what each rulebook change does to this project&rsquo;s credits — applied one change at a
+        table below shows what each change to the methodology does to this project&rsquo;s credits — applied one change at a
         time, so the steps sum exactly to the methodology-transition difference. Same project, same period, same fNRB
         on both sides; not a change over time.
       </p>
@@ -688,10 +695,10 @@ export default function ReportView({
         eqNo={v2 ? "14" : "8"} eq={v2 ? <S basis={basis} k="AE" /> : <S basis={basis} k="PE" />} value={`${fmt(result.result.PE, 1)} tCO₂e`}
         rows={v2
           ? [
-              { sym: <S basis={basis} k="AEff" />, value: fmt(result.result.PE, 1), source: result.result.PE === 0 ? "Zero — no fossil fuel used by the activity (V2.0 SDWS 38)" : "Entered — fuel purchase records (SDWS 38, 14, 15; Eq. 15)", desc: "Activity emissions from fossil fuel (backup generators)" },
-              { sym: <S basis={basis} k="AEec" />, value: fmt(0, 1), source: result.result.PE === 0 ? "Zero — no grid electricity used by the activity (V2.0 SDWS 39)" : "Entered — electricity bills or meters (SDWS 39, 16, 17; Eq. 16)", desc: "Activity emissions from electricity" },
+              { sym: <S basis={basis} k="AEff" />, value: fmt(result.result.PE, 1), source: result.result.PE === 0 ? zeroPE("V2.0 SDWS 38") : "Entered — fuel purchase records (SDWS 38, 14, 15; Eq. 15)", desc: "Activity emissions from fossil fuel (backup generators)" },
+              { sym: <S basis={basis} k="AEec" />, value: fmt(0, 1), source: result.result.PE === 0 ? zeroPE("V2.0 SDWS 39") : "Entered — electricity bills or meters (SDWS 39, 16, 17; Eq. 16)", desc: "Activity emissions from electricity" },
             ]
-          : [{ sym: <S basis={basis} k="PE" />, value: fmt(result.result.PE, 1), source: result.result.PE === 0 ? "Zero — no fuel or electricity used by the project (V1.0 SDWS 33, V1.0 SDWS 34)" : "Entered — fuel and electricity records (V1.0 SDWS 33, V1.0 SDWS 34; Eq. 9–10)", desc: "Fuel + electricity emissions of the project" }]}
+          : [{ sym: <S basis={basis} k="PE" />, value: fmt(result.result.PE, 1), source: result.result.PE === 0 ? zeroPE("V1.0 SDWS 33, V1.0 SDWS 34") : "Entered — fuel and electricity records (V1.0 SDWS 33, V1.0 SDWS 34; Eq. 9–10)", desc: "Fuel + electricity emissions of the project" }]}
       />
       <EqBlock
         section="Leakage"
@@ -797,16 +804,15 @@ export default function ReportView({
       <p className="t-caption text-fg-2" style={{ fontSize: 10.5, lineHeight: 1.55 }}>
         Every figure is computed by WaterBots.AI&rsquo;s deterministic GS4GG calculator — software built line-by-line
         from the methodology documents, with each equation cited to its section and page. {buildCheckSentence()} There is
-        no official tool for PAA V2.0; our V2.0 cases are derived by hand from the methodology. The V2.0 calculation
-        and this report are under external expert review (September 2026). That review has found corrections, and
-        they are being made. Read every V2.0 figure here as a screening estimate. No figures are generated by AI.
+        no official tool for PAA V2.0; our V2.0 cases are worked out by hand from the methodology. The V2.0 calculation
+        has had an external expert review. Read every V2.0 figure here as a screening estimate. No figures are generated by AI.
       </p>
 
       {/* ── On the use of these figures — professional-posture closing note (the full issuance statement) ── */}
       <H>On the use of these figures</H>
       <p className="t-caption text-fg-2" style={{ fontSize: 10.5, lineHeight: 1.55 }}>
         These calculations are tested against the test cases described above, and every input is labelled with
-        where it came from — a rulebook default, a project value, or an assumption. A methodology calculation is one
+        where it came from — a methodology default, a project value, or an assumption. A methodology calculation is one
         input to an issuance, not the issuance itself. Final credited volumes are determined by
         monitored field data, verification by an accredited auditor (VVB), and Gold Standard&rsquo;s registry review,
         and can differ from any ex-ante calculation — ours included. We recommend engaging experienced practitioners

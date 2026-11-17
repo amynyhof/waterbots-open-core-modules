@@ -46,12 +46,20 @@ export interface SliderSpec {
   ceiling: End;
   /** One plain line: which way the credits move. No number. */
   direction: string;
+  /** The line shown while the value is still assumed, where the general one does not fit (`assumedLine`). */
+  assumedText?: string;
+  /** One plain line on what a project must do to claim more, with its citation. */
+  claimMore?: string;
+  /** What must prove an entered value later: the monitoring instrument and its parameter (item 10). */
+  provenBy?: { sdws: string; instrument: string };
 }
 
 const YEAR = "natural limit: the days in a year";
 /** Days of operation above which a community system needs an operation sensor, and where that is stated. */
 export const SENSOR_DAYS = 347;
 const SENSOR_SOURCE = "V2.0 SDWS 32; V1.0 SDWS 27";
+/** Where a household device's starting days come from: a starting point, not a cited value (ruling 2026-11-16). */
+const HOUSEHOLD_DAYS_SOURCE = "starting point (ruling 2026-11-16)";
 const SHARE = "natural limit: a share";
 
 /** The sliders for this run, in screen order. Usage is household treatment only. */
@@ -76,7 +84,12 @@ export function sliderSpecs(state: Pick<CalcState, "version" | "method">): Slide
         kind: "cited",
         source: basis === "paa" ? "V2.0 Table 9, adult cap (§7.3.11, p.31)" : "V1.0 §3.6.6 (p.12)",
       },
-      direction: "More water per person means more credits, up to the cap.",
+      direction: "More water per person means more credits.",
+      // The default and the cap stay two separate things: 4.00 L is the default, 5.50 L the cap.
+      assumedText: "4.00 liters per person per day is a conservative estimate.",
+      claimMore: basis === "paa"
+        ? "To claim more than 4.00 liters, a project measures what people really drink with a Water Consumption Field Test, up to the 5.50-liter cap (V2.0 SDWS 29, p.65; Annex 2, p.89)."
+        : undefined,
     },
     {
       key: "days",
@@ -85,14 +98,16 @@ export function sliderSpecs(state: Pick<CalcState, "version" | "method">): Slide
       scale: 1,
       step: 1,
       dp: 0,
-      // Household treatment starts at 365 and only moves down (ruling 2026-10-30), the year's natural
-      // limit. Community systems start at 347, the most days without an operation sensor (ruling 2026-10-31).
-      start: hwt ? { value: 365, source: YEAR } : { value: SENSOR_DAYS, source: SENSOR_SOURCE },
+      // Both start at 347. Community systems: the most days without an operation sensor (ruling 2026-10-31).
+      // Household devices: a cautious starting point; more needs monitoring to prove it (ruling 2026-11-16).
+      start: hwt ? { value: SENSOR_DAYS, source: HOUSEHOLD_DAYS_SOURCE } : { value: SENSOR_DAYS, source: SENSOR_SOURCE },
       floor: { value: 0, kind: "open" },
       ceiling: { value: 365, kind: "natural", source: YEAR },
       direction: hwt
         ? "Fewer days with the device in the home means fewer credits."
         : "Fewer days of operation means fewer credits.",
+      assumedText: `Assumed: ${SENSOR_DAYS} days, a cautious estimate.`,
+      claimMore: hwt ? `Claiming more than ${SENSOR_DAYS} days needs monitoring to prove it.` : undefined,
     },
     {
       key: "testsPass",
@@ -105,6 +120,7 @@ export function sliderSpecs(state: Pick<CalcState, "version" | "method">): Slide
       floor: { value: 0, kind: "natural", source: SHARE },
       ceiling: { value: 1, kind: "natural", source: SHARE },
       direction: "A lower share of passing tests means fewer credits, in step with it.",
+      provenBy: { sdws: sdwsRef(basis, "Mq"), instrument: "water-quality tests" },
     },
   ];
   // V2.0 fixes usage at 100% for community systems, so they get no usage slider.
@@ -121,6 +137,7 @@ export function sliderSpecs(state: Pick<CalcState, "version" | "method">): Slide
       floor: { value: 0.01, kind: "natural", source: `${SHARE}, never 0` },
       ceiling: { value: 1, kind: "natural", source: SHARE },
       direction: "Fewer homes using the device means fewer credits, in step with it.",
+      provenBy: { sdws: sdwsRef(basis, "Up"), instrument: "usage survey" },
     });
   }
   return specs;
@@ -220,6 +237,26 @@ export function endLabel(spec: SliderSpec, end: End): string {
   return end.kind === "open" ? v : `${v} · ${end.source}`;
 }
 
+/**
+ * THE LINE WHILE A VALUE IS STILL ASSUMED (the maintainer's walk of the open site, 2026-11-16). It reads
+ * "Assumed: [value], a cautious estimate." A starting value at the top of its range is not cautious, so it
+ * says so instead and asks for the project's own figure.
+ */
+export function assumedLine(spec: SliderSpec): string {
+  if (spec.assumedText) return spec.assumedText;
+  const v = shownValue(spec, spec.start.value);
+  return spec.start.value >= spec.ceiling.value
+    ? `Assumed: ${v}, the highest value. Change it to match your project.`
+    : `Assumed: ${v}, a cautious estimate.`;
+}
+
+/** Where the starting value and the two ends come from, for the row's info icon. */
+export function sliderSources(spec: SliderSpec): string {
+  const start = `Starts at ${shownValue(spec, spec.start.value)}: ${spec.start.source ?? "no source yet"}.`;
+  const end = (word: string, e: End) => `${word} ${shownValue(spec, e.value)}${e.source ? `: ${e.source}` : ""}.`;
+  return [start, end("Lowest", spec.floor), end("Highest", spec.ceiling)].join(" ");
+}
+
 /** The note shown when a typed value went past the ceiling. Null when nothing was capped. */
 export function capNote(state: CalcState, spec: SliderSpec): string | null {
   const typed = state.slidersTyped?.[spec.key];
@@ -252,7 +289,7 @@ export function sliderNotes(state: CalcState, spec: SliderSpec): string[] {
 /**
  * THE SEAT'S STARTING STATE WHEN SLIDERS ARE ON. The seed starts days at 365 for every project, and the
  * typed boxes keep that. With sliders on, an unsaved days value starts at its slider's starting value
- * instead (347 for a community system), so the slider, its label and the engine all begin at the same
+ * instead (347 for every project, ruling 2026-11-16), so the slider, its label and the engine all begin at the same
  * number. A saved value always wins.
  */
 export function withSliderStarts(seed: CalcState, saved: { operationalDays?: number } | undefined, setting: boolean | undefined): CalcState {

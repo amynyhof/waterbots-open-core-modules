@@ -40,14 +40,27 @@ describe("a slider row", () => {
     expect(row(s, "litres")).toMatch(new RegExp(`data-credited=""[^>]*>${credited.replace(".", "\\.")}<`));
     expect(row(move(s, "litres", 3.2), "litres")).not.toContain("data-credited");
   });
-  it("labels a start with no source", () => {
-    expect(row(seedCalcState(invented("HWT")), "usage")).toContain("starts at 100%, assumed: no source yet");
-    expect(row(seedCalcState(invented("HWT")), "litres")).toContain("starts at 4.00 L, assumed (V2.0 Table 9");
+  it("reads Assumed: [value] at first, and says plainly when the start is the highest value", () => {
+    expect(row(seedCalcState(invented("CWS")), "days")).toContain("Assumed: 347 days, a cautious estimate.");
+    const hwtDays = row(seedCalcState(invented("HWT")), "days");
+    expect(hwtDays).toContain("Assumed: 347 days, a cautious estimate.");
+    expect(hwtDays).toContain("Claiming more than 347 days needs monitoring to prove it.");
+    expect(row(seedCalcState(invented("HWT")), "usage")).toContain("Assumed: 100%, the highest value. Change it to match your project.");
+    expect(row(seedCalcState(invented("HWT")), "litres")).toContain("4.00 liters per person per day is a conservative estimate.");
   });
-  it("labels natural limits, and leaves an uncited floor as a plain 0", () => {
-    const html = row(seedCalcState(invented("CWS")), "testsPass");
-    expect(html).toContain("0% · natural limit: a share");
-    expect(row(seedCalcState(invented("CWS")), "litres")).toContain(`data-end="floor">0.00 L<`);
+  it("keeps the citations behind the info icon, and shows only the values at the ends", () => {
+    const usage = row(seedCalcState(invented("HWT")), "usage");
+    expect(usage).toContain("Starts at 100%: no source yet.");
+    const litres = row(seedCalcState(invented("HWT")), "litres");
+    expect(litres).toContain("Starts at 4.00 L: V2.0 Table 9");
+    expect(litres).toContain(`data-end="floor">0.00 L<`);
+    expect(litres).toMatch(/data-end="ceiling"[^>]*>5.50 L</);
+    expect(row(seedCalcState(invented("CWS")), "testsPass")).toContain("Lowest 0%: natural limit: a share.");
+  });
+  it("says what a project must do to claim more water, with its pages", () => {
+    const litres = row(seedCalcState(invented("CWS")), "litres");
+    expect(litres).toContain("More water per person means more credits.");
+    expect(litres).toContain("Water Consumption Field Test, up to the 5.50-liter cap (V2.0 SDWS 29, p.65; Annex 2, p.89)");
   });
   it("shows the cap note, the sensor note and the corrective-action note", () => {
     const s = move(move(seedCalcState(invented("CWS")), "days", 400), "testsPass", 70);

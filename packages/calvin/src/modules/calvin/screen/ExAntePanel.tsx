@@ -26,8 +26,8 @@ export default function ExAntePanel({ state, result, patch }: {
         <span className="t-mono text-fg-4" style={{ fontSize: 10 }}>tCO₂e</span>
       </div>
       <p className="t-caption mt-1 text-fg-3" style={{ fontSize: 11 }}>
-        Before a project runs, these are the values you expect. Each starts at its starting value. Move it, or type
-        an exact value with the pencil.
+        For a planned project, move the sliders to match its expected performance. To type an exact number, tap the
+        pencil.
       </p>
       <div className="mt-1 divide-y divide-line">
         {sliderSpecs(state).map((spec) => (

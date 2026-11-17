@@ -94,7 +94,7 @@ Everything here is public: README, docs, cards, screen text, commit messages, PR
 Every value shown to a user says where it came from. It never credits a ruling or a person.
 - Entered: the user typed it. The source is the user.
 - Default: the site filled it in from a published source (document, section, page). The user's own local value replaces it.
-- Derived: worked out from other values. It shows the source of its formula.
+- Calculated: worked out from other values. It shows the source of its formula. (Called "derived" until ruling 2026-11-16.)
 - Assumed: expected project performance, labelled 'assumed'. Calvin encourages the user to adjust it to their planned project.
 
 Three kinds of value (Calvin carbon modules):

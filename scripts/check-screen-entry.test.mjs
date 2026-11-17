@@ -7,8 +7,8 @@ const SLIDERS = 'aria-label="Anticipated performance"';
 const goodRun = () => ({
   names: [...NAMES, "ReportHeading"],
   views: {
-    exAnte: `<section ${SLIDERS}></section><span>Q_m — planned production / yr</span>`,
-    exAnteFromSavedExPost: `<section ${SLIDERS}></section><span>Q_m — planned production / yr</span>`,
+    exAnte: `<section ${SLIDERS}></section><span>How much water will the system produce in a year?</span>`,
+    exAnteFromSavedExPost: `<section ${SLIDERS}></section><span>How much water will the system produce in a year?</span>`,
     exPost: `<span>Q_m — metered volume / yr</span><span>${PACKAGE_DAF}</span>`,
     exPostReport: '<div class="print-report">Ex-post</div>',
     siteTable: `<span>Q_m — metered volume / yr</span><span>${SITE_DAF}</span><span>${SITE_SOURCE}</span>`,
@@ -75,7 +75,7 @@ test("a site locked to ex-ante that opens a saved ex-post analysis as ex-post is
   run.views.exAnteFromSavedExPost = "<span>Q_m — metered volume / yr</span>";
   assert.deepEqual(compare(run), [
     `exAnteFromSavedExPost: missing ${SLIDERS}`,
-    "exAnteFromSavedExPost: missing Q_m — planned production",
+    "exAnteFromSavedExPost: missing How much water will the system produce in a year?",
     "exAnteFromSavedExPost: should not show Q_m — metered volume",
   ]);
 });

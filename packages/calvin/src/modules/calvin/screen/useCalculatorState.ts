@@ -17,7 +17,8 @@ import { calculatorPageContext } from "../agent/pageContext";
 import type { SavedAnalysis } from "./analysis";
 import {
   missingProjectFacts,
-  recordOwnedFacts,
+  followNewSeed,
+  activityEmissionsAsk,
   seedCalcState,
   showsTransition,
   toSavedAnalysis,
@@ -100,6 +101,18 @@ export interface CalculatorOptions {
    * `SiteTableError` rather than use part of it. Absent, the package's own tables are used, as before.
    */
   tables?: SiteTables;
+  /**
+   * UNPIN THE FIGURE BLOCK (the maintainer's walk of the open site, 2026-11-16). The block above the equations shows
+   * the headline figures and stays pinned at the top while the reader scrolls. A site turns this on to let it scroll
+   * away with the page. Off by default: the block stays pinned. Either way it shows.
+   */
+  unpinFigureBlock?: boolean;
+  /**
+   * HIDE CALVIN'S EXPORT BUTTONS (the maintainer's walk of the open site, 2026-11-16): "Export report (PDF)" in the
+   * controls panel and "Export (PDF)" on the report tab. A site that offers its own export, or none, turns them off
+   * here. Off by default: the buttons show. The report itself still shows on the report tab.
+   */
+  hideExportButton?: boolean;
 }
 
 export interface CalculatorState {
@@ -116,6 +129,10 @@ export interface CalculatorState {
    * V1.0 is worked out or asked for: `legacyResult`, `waterfall` and `filedFnrbRefusal` stay null.
    */
   transition: boolean;
+  /** See `CalculatorOptions.unpinFigureBlock`. True when the figure block stays pinned while the page scrolls. */
+  figureBlockPinned: boolean;
+  /** See `CalculatorOptions.hideExportButton`. True when the screens show Calvin's export buttons. */
+  exportButton: boolean;
 
   /* ── Working inputs ─────────────────────────────────────────────────────── */
   /** The live input state. */
@@ -142,6 +159,11 @@ export interface CalculatorState {
    * missing nothing below is computed, and the seat shows one plain prompt naming them instead.
    */
   missingFacts: ProjectFact[];
+  /**
+   * THE PUMP RUNS ON DIESEL OR GRID POWER AND ITS EMISSIONS ARE NOT ENTERED (item 15). Nothing is computed; the work
+   * surface asks for the yearly figure. Null on every other run.
+   */
+  activityAsk: { power: "diesel" | "grid" } | null;
   /**
    * THE ENGINE HAS NO fNRB IT WILL STAND BEHIND FOR THIS COUNTRY (ruling (3)(b), 2026-09-21).
    * A6.4-AMT-009 publishes national values for 90 countries and multi-national values for three
@@ -232,15 +254,22 @@ export function useCalculatorState(project: CalvinProject, options: CalculatorOp
    * not make. The record's new facts are by definition saved. Applying the same delta to both
    * preserves whatever genuine unsaved difference the user already had.
    */
-  const factsKey = JSON.stringify(recordOwnedFacts(project));
-  const lastFactsKey = useRef(factsKey);
+  /*
+   * AND THE STARTING VALUES MOVE WITH THE DETAILS (the maintainer's walk of the open site, 2026-11-16). When the
+   * water system type or the people served arrive after the seat opened, every value the person has not changed
+   * takes its new starting value (`followNewSeed`), so days of operation and people served are not left on the
+   * seed from before the details came. Values the person changed stay.
+   */
+  const seedKey = JSON.stringify(seed);
+  const lastSeed = useRef(seed);
   useEffect(() => {
-    if (lastFactsKey.current === factsKey) return; // mount, or the record did not move
-    lastFactsKey.current = factsKey;
-    const facts = JSON.parse(factsKey) as ReturnType<typeof recordOwnedFacts>;
-    setState((s) => ({ ...s, ...facts }));
-    setSavedState((s) => ({ ...s, ...facts }));
-  }, [factsKey]);
+    const old = lastSeed.current;
+    if (JSON.stringify(old) === seedKey) return; // mount, or nothing the seed reads moved
+    lastSeed.current = seed;
+    setState((s) => followNewSeed(s, old, seed, project));
+    setSavedState((s) => followNewSeed(s, old, seed, project));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [seedKey]);
   /*
    * A PROJECT THAT STOPS BEING A TRANSITION WHILE THE SEAT IS OPEN goes back to V2.0. The record decides
    * `creditedUnderV1`, so, as with the facts above, the saved side moves with it and no unsaved change appears.
@@ -315,7 +344,12 @@ export function useCalculatorState(project: CalvinProject, options: CalculatorOp
   // nothing is computed and the seat asks for what is missing.
   const missingFacts = useMemo(() => missingProjectFacts(state, tables), [state, tables]);
   // Both versions computed every render — each tab shows its own version-correct total.
-  const inputBase = useMemo(() => (missingFacts.length > 0 ? null : toScenarioInput(state, tables)), [state, missingFacts, tables]);
+  // A PUMP ON DIESEL OR GRID POWER WITH NOTHING ENTERED: no figures, and the seat asks (item 15).
+  const activityAsk = useMemo(() => activityEmissionsAsk(state), [state]);
+  const inputBase = useMemo(
+    () => (missingFacts.length > 0 || activityAsk ? null : toScenarioInput(state, tables)),
+    [state, missingFacts, activityAsk, tables],
+  );
   // ASK BEFORE COMPUTING. `computeScenario` REFUSES (it throws) for a country with no official
   // fNRB and no filed value; the seat must show that refusal, not crash on it, so it checks first.
   const availability = useMemo(
@@ -372,13 +406,15 @@ export function useCalculatorState(project: CalvinProject, options: CalculatorOp
   const erPerPerson = result && result.people > 0 ? result.result.ER / result.people : 0;
 
   const pageContext = () =>
-    calculatorPageContext({ projectName: project.name, state, missingFacts, fnrbRefusal, filedFnrbRefusal, transition, result, legacyResult, paaResult, waterfall });
+    calculatorPageContext({ projectName: project.name, state, missingFacts, activityAsk, fnrbRefusal, filedFnrbRefusal, transition, result, legacyResult, paaResult, waterfall });
 
   return {
     readOnly,
     sliders: showSliders(exAnteSliders, state),
     exAnteOnly,
     transition,
+    figureBlockPinned: !options.unpinFigureBlock,
+    exportButton: !options.hideExportButton,
     state,
     patch,
     seed,
@@ -390,6 +426,7 @@ export function useCalculatorState(project: CalvinProject, options: CalculatorOp
     tables,
     save,
     missingFacts,
+    activityAsk,
     fnrbRefusal,
     filedFnrbRefusal,
     result,

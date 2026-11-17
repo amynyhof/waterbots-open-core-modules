@@ -19,6 +19,7 @@ import {
   type ScenarioInput,
   type ScenarioResult,
 } from "../engine";
+import { fnrbTableLabel, FNRB_ORIGIN } from "../screen/citations";
 
 type TransitionWaterfall = ReturnType<typeof computeTransitionWaterfall>;
 
@@ -115,7 +116,7 @@ function parseScenarioInput(raw: unknown): ScenarioInput {
 /** Provenance trail → flat source strings for the evidence log. */
 function extractScenarioSources(out: ScenarioResult): string[] {
   const sources = out.provenance.map((p) => p.label);
-  sources.push(`fNRB vintage: ${out.fnrbVintage}`);
+  sources.push(`fNRB set of values: ${fnrbTableLabel(out.fnrbVintage)}. ${FNRB_ORIGIN}`);
   return sources;
 }
 

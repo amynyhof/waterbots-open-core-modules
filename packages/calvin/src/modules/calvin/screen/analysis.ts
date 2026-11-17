@@ -22,6 +22,8 @@ export interface SavedAnalysis {
   litresPerPersonPerDay?: number;
   operationalDays?: number;
   meteredVolumeL?: number | null;
+  /** The pump's activity emissions a year, tCO₂e, entered for this project (item 15). */
+  activityEmissions?: number | null;
   /** Usage rate U_p (Method 2 only). */
   usageRate?: number;
   /** Premises count N_p (HH_p) — Method 2 (HWT/IWT) only; decomposes people into premises × per-premises. */
