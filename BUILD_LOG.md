@@ -4,6 +4,43 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-11-16 — Calvin's screens after the walk of the open site (16 items)
+
+**Done (branch `open-site-walk-fixes`):** one pull request for the maintainer's walk of the open site (2026-11-16).
+No sum changed and no reference case moved.
+- 1: the fNRB source is named by its table, with "Its values come from MoFuSS.", in place of the data key.
+- 2 and 7: two settings, both off by default. `unpinFigureBlock` lets the figure block scroll with the page;
+  `hideExportButton` hides Calvin's export buttons.
+- 3: when the water system type or people served arrive after the calculator opens, every value the person has not
+  changed takes its new starting value. A changed value stays.
+- 4 and 5: the lens note and the slider intro, reworded.
+- 6: slider rows read "Assumed: [value], a cautious estimate." and one line on which way credits move, with their
+  citations behind an info icon. Days start at 347 for household devices too, with "Claiming more than 347 days
+  needs monitoring to prove it." (ruling 2026-11-16). The two 100% starts sit at the top of their range, so they
+  read "the highest value" instead. The drinking-water row says how to claim more: a Water Consumption Field Test, up to the cap
+  (V2.0 SDWS 29, p.65; Annex 2, p.89). V2.0 asks for a field test there, not a meter.
+- 8: `.github/workflows/names.yml` runs the name scan in CI from the repository secret `WB_NAMES`. It runs main's
+  copy of the scanner on the pull request's files, fails closed, never prints a name, and refuses a fork.
+- 9 and 10: the tag key behind an info icon, in the maintainer's words. "derived" is now "calculated", and visitor
+  text says "methodology". Entered values that monitoring or a baseline survey must prove later show both marks
+  and one plain line. People served carries the monitoring mark.
+- 11: planned production is asked in plain words and stays blank; "binds" is gone from the screens.
+- 12: long symbols get the room they need, notes wrap, and every equation number uses one small style. Checked in
+  a browser at 768, 1024 and 1280 px: nothing runs past the right edge, and Q_pop shows its value.
+- 13: on the screening view, C_b is shown, not typed. V2.0 sets no default for it (SDWS 12, p.53).
+- 14: the DAF row opens to its working, and BAU_y is listed under "where".
+- 15: each row's plain line comes before its citation; the jargon is gone. A new project fact, `pumpPower`: for
+  diesel or grid power the screens ask for the pump's yearly emissions and show no figures until they are entered.
+- 16: the Beta footer is just "Beta"; the report's methods note says the V2.0 calculation has had its review.
+- `CLAUDE.md`: the "Derived" line of "Where a value comes from" now says "Calculated" (ruling 2026-11-16).
+
+**Checked:** typecheck, build and the full test suite pass (Calvin 316 of 316, 29 new). The engine checks (48 of
+48), the screen mount test from the packed files (11 views), and the seed, package, paid-code and name checks pass.
+
+**Open:** the maintainer's review; the secret `WB_NAMES`; then the version pull request.
+
+---
+
 ## 2026-11-16 — Calvin 0.3.0 and core 0.1.1, for the release
 
 **Done (branch `calvin-version-0-3-0`):**
