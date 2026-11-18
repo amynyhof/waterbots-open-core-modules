@@ -42,7 +42,7 @@ function Seat({ project }) {
   return (
     <>
       <CalculatorLens calc={calc} />
-      <CalculatorWork calc={calc} project={project} appVersion="0.3.0" tab="calculator" />
+      <CalculatorWork calc={calc} project={project} appVersion="0.4.0" tab="calculator" />
     </>
   );
 }
@@ -69,7 +69,7 @@ const project = { name: "Invented project", standards: [], technology: "CWS", co
 
 The build bundles the entry into one file, `dist/screen.js`. React and `@waterbots/core` stay outside it, so a site has one copy of each. `scripts/check-screen-entry.mjs`, at the repo root, packs both packages, installs them alone with React, and renders the ex-ante view, the ex-post view and its report, a new project's V2.0-only view and report, and a transitioning project's view and report from the packed files.
 
-## Changes in the next release
+## Changes in 0.4.0
 
 From the maintainer's walk of the open site (2026-11-16). No sum changed, and every reference case gives the same answer.
 
@@ -110,6 +110,6 @@ No sum changed. The engine version and every reference case stay as they are.
 
 Since the seed landed, this repo is Calvin's home. Changes are made here, by pull request. `scripts/check-seed.mjs` proves what arrived against the commit where the seed landed, so later changes are allowed.
 
-- Version 0.3.0. Not published. Nothing in this repo goes to npm yet; the package is marked `private`.
+- Version 0.4.0. Not published. Nothing in this repo goes to npm yet; the package is marked `private`.
 - The build writes plain files for a bundler to pick up. Apart from `dist/engine.js` and `dist/screen.js`, they do not run on their own in Node.
 - Apache License 2.0. See `LICENSE` and `NOTICE` in this folder.
