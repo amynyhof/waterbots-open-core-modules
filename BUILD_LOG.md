@@ -4,6 +4,19 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-11-18 — Calvin 0.4.0 released
+
+**Done (branch `calvin-release-close`):**
+- Session A passed both packed files: the fingerprints, the name scan and the number gate, on every file inside
+  them, `.map` files included.
+- Session C made the annotated tag `calvin-v0.4.0` on commit `09dfc8d`. The maintainer pushed it and published the
+  GitHub release "Calvin 0.4.0" with the two packed files and `SHA256SUMS.txt`.
+- `BUILD_PLAN.md`: V18 marked released, and one line on where things stand.
+
+**Open:** the private side's report on 0.4.0. V17 waits on the maintainer's ruling on its wording.
+
+---
+
 ## 2026-11-16 — Calvin's package version 0.4.0, for the release
 
 **Done (branch `calvin-version-0-4-0`):**
