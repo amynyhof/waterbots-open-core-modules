@@ -6,7 +6,7 @@ its items are the pull requests or checks inside it. `[x]` done (merged), `[~]` 
 comes after v1. **(V2)** marks an item planned for v2.
 
 **Every engine change is published first as a release candidate** (a trial version). The private side installs it,
-runs its real-filing tests, and reports back through the maintainer: pass or fail and the reference line, never a figure. Only
+runs its real-filing tests, and reports back through the maintainer: pass or fail and the reference line. Only
 then is it released.
 
 All of M1 to M9 is `Grant: open`. Edits to this plan and the build log are `Grant: neither`.
@@ -35,7 +35,9 @@ both sites live in other repos. They appear here only as things a step waits on.
 **How the sites get the package in v1.** Not npm. Each release is a GitHub release that holds the packed package (one
 file, made by `npm pack`) and its fingerprint (a scrambled code that changes if one byte of the file changes). Both
 sites pin that file by its fingerprint. The first pinned version includes the sliders. npm is v2.
-Before each release is published, Session A runs its number gate on the packed files in the handoff folder.
+Before each release is published, Session C packs it into the handoff folder and runs the release check: two packs with the
+same fingerprints, the name scan on every file inside, and GitHub's checks. Session A no longer re-checks releases. After the
+maintainer says "release it", Session C pushes the tag and publishes the release (rulings 2026-11-21).
 
 **The paid site's own data.** The paid site keeps its own, more precise data on top of the package. The package's
 smaller tables, such as the six-row table of fallback factors, are fine as they are.
@@ -60,9 +62,9 @@ smaller tables, such as the six-row table of fallback factors, are fine as they 
 | V16 | [x] (Released: tag `calvin-v0.3.0` on commit `71ded5d`.) Calvin 0.3.0. The figure tiles fit a narrow panel (pull request #23). A new project, on paper or newly built, gets a V2.0-only view: no V1.0 figure and no transition (ruling 2026-09-21). The site passes `creditedUnderV1: true` for a project credited under V1.0; left out, the project is new. The release note tells a site to pass `true` for every transitioning project before it upgrades. The `url` line comes out of both package files (ruling 2026-11-16). | V13. | Session A passes the name scan and the number gate on the packed files, then the maintainer cuts `calvin-v0.3.0`. The private side reports pass after passing `creditedUnderV1: true` on its transitioning projects. |
 | V17 | Calvin's two doors. **Design only: build nothing yet.** One calculator, two doors. On the sites, the screening sets `creditedUnderV1`, and no door is shown. In the Agent Commons, Calvin opens with two choices: "new project estimate" (sets `false`) or "compare old and new rules" (sets `true`, and still asks for the filed V1.0 fNRB before any comparison). The choices' wording, what each sets and Calvin's opening line belong in the open core, as Violet's door does (ruling 2026-11-12). The Commons host only draws the buttons. | V16; the maintainer's ruling on the wording. | `packages/calvin/src/doors.ts` and Calvin's prompt hold both choices, and a test shows each choice sets the right value. |
 | V18 | [x] (Released: tag `calvin-v0.4.0` on commit `09dfc8d`.) Calvin's screens after the walk of the open site (2026-11-16): sixteen items, one pull request. No sum changes. | V16. | Merged, then a release; the private side reports pass. |
-| V19 | [~] (Open pull request.) Calvin 0.4.1: monitoring values labelled by the analysis basis (ruling 2026-11-21). Ex-ante, each is assumed from its starting value. Ex-post, each comes from the operation log or monitoring; until it is entered its box is blank, with a highlight and a red dot, and no figures show. The "entered" flag is saved. No sum changes. | V18. | Merged, then Session C packs it and Session A checks the packed files; the maintainer cuts `calvin-v0.4.1`. The maintainer confirms which values the rule covers. The paid site installs it. |
+| V19 | [x] (Released: tag `calvin-v0.4.1` on commit `8cd7971`.) Calvin 0.4.1: monitoring values labelled by the analysis basis (ruling 2026-11-21). Ex-ante, each is assumed from its starting value. Ex-post, each comes from the operation log or monitoring; until it is entered its box is blank, with a highlight and a red dot, and no figures show. The "entered" flag is saved. No sum changes. | V18. | Session C packs it, runs the release check and makes the tag. After "release it", Session C pushes the tag and publishes the release. The maintainer confirmed the values the rule covers: the operating days, M_q, U_p and X_cleanboil; Q_m is left out (2026-11-21). The paid site installs it. |
 
-**Where things stand (2026-11-21):** Calvin 0.4.0 is the latest release (`calvin-v0.4.0`), and V16 and V18 are released. V19 (Calvin 0.4.1) is an open pull request. V17 waits on the maintainer's ruling on its wording.
+**Where things stand (2026-11-21):** Calvin 0.4.1 is the latest release (`calvin-v0.4.1`), and V16, V18 and V19 are released. V17 waits on the maintainer's ruling on its wording.
 
 **Sources still to find** (from V3): moved to the source sweep, M10.4 (ruling 2026-11-05).
 
@@ -70,8 +72,6 @@ smaller tables, such as the six-row table of fallback factors, are fine as they 
 
 - npm publishing (M2.2's publish, and the npm scope and token in M1.4). This is v2.
 - Benchmarks and pass rates. This is v2.
-- M1.2 the real number gate, and M1.5 lane 1 auto-merge. Lane 3 review covers figures and names meanwhile. The maintainer may
-  pull the number gate forward.
 - M2.3 linting.
 - M4 openings and labels.
 - M5 the friendly view, beyond the sliders and simple view in V3 and V4 and its items marked **(V1)**.
@@ -86,8 +86,7 @@ smaller tables, such as the six-row table of fallback factors, are fine as they 
 
 ## M1 — Skeleton and guards, before any code
 
-*Stop for the maintainer:* read the CI run. *Waits on:* the npm scope (N13) — for publishing only. The maintainer may revisit the number
-gate's design before the real gate is built.
+*Stop for the maintainer:* read the CI run. *Waits on:* the npm scope (N13) — for publishing only.
 
 - [x] **M1.1 Guards and rules**
   - [x] `CLAUDE.md`: who does what, hard rules, merge lanes, the grant line, plain-English copy
@@ -95,11 +94,12 @@ gate's design before the real gate is built.
   - [x] Lane labelling job (`lanes.yml`) and the lane rule with tests. It labels only; it never merges.
   - [x] Typecheck, test and build jobs (`ci.yml`) (they now run for real: see M1.3)
   - [x] Gitleaks and a second secrets scan (`secrets.yml`)
-  - [x] Number gate placeholder (`number-gate.yml`)
+  - [x] Number gate placeholder (`number-gate.yml`). Taken out when the gate was retired (M1.2).
   - [x] Publish with provenance on a tag (`publish.yml`), refusing until the scope is real
   - [x] This plan and the build log
-- [ ] **M1.2 Real number gate:** keyed fingerprints (HMAC-SHA256); key and list as Actions secrets; a missing key
-      fails the run. *Waits on:* go on the design (N2), then the private side's first fingerprint list.
+- [~] **M1.2 Number gate: retired** (open pull request; ruling 2026-11-21). The name scan, reading the maintainer's
+      names-to-block list (names and project IDs), is the one check for public material. There is no rule or check on
+      calculation figures. The keyed-fingerprint design is not built.
 - [~] **M1.3 Package skeleton** (open pull request): the empty boxes. No calculator code, no data.
   - [~] Workspace root with TypeScript, vitest and a build; versions pinned, lockfile committed; Node pinned to one
         exact version (24.20.0) in the workflows and `engines`
@@ -115,14 +115,15 @@ gate's design before the real gate is built.
   - [!] The npm scope: create the npm organisation or confirm the maintainer owns it (N13)
   - [!] The `NPM_TOKEN` Actions secret
   - [!] The maintainer as required reviewer on the `npm-publish` environment, so every release needs their approval
-  - [!] **(V1)** The release tag rule: only the maintainer and the engineer may create release tags (`v*`, and each module's own,
+  - [!] **(V1)** The release tag rule: only the maintainer, the engineer and Session C (after "release it", ruling 2026-11-21) may create release tags (`v*`, and each module's own,
         such as `calvin-v*`). Set it once the GitHub organisation exists.
   - [!] **(V1)** Move this repo to the WaterBots GitHub organisation (ruling 2026-11-02). Then Session C points the
         repository link in each `package.json` at the new home, and the name scan's allowance for the owner's
         account in that link can go.
-- [ ] **M1.5 Lane 1 auto-merge** — not built; the earlier dormant job was removed. Rebuild only when the real
-      number gate (M1.2) exists and the maintainer says to switch it on. Design: lane 1 and not a draft → arm GitHub's
-      auto-merge; any other lane → disarm it. Needs the branch protection above, or it would merge at once.
+- [~] **M1.5 Lane 1 auto-merge** (open pull request; ruling 2026-11-21). The lane label job arms GitHub's
+      auto-merge on a lane 1 pull request that is not a draft, and disarms it on any other. GitHub merges once every
+      required check is green. *Waits on the maintainer:* the repo setting "Allow auto-merge" on, and "name scan" on the
+      `main` ruleset's required checks in place of "number gate".
 - [x] Secret scanning with push protection — already on in the repo settings.
 
 ## M2 — The seed lands
@@ -273,7 +274,7 @@ The maintainer's safety passes cover all three repos. This repo's own parts are 
 
 ## Open questions
 
-- **N2:** The maintainer may revisit the number gate's design before M1.2.
+- **N2:** closed. The number gate is retired (ruling 2026-11-21).
 - **N4:** how the transition splits (not ruled). The recommendation: build the maths, not the checklist.
 - **N5:** whether a higher litres cap applies with true meters — affects the cap only.
 - **N6:** whether further gates stand on D-3.

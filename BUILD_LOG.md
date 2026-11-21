@@ -4,6 +4,47 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-11-21 — Calvin 0.4.1 released
+
+**Done (branch `rules-name-scan-releases`):**
+- Session C packed both packages from `main` at `8cd7971` (pull request #29) into the handoff folder, in
+  `calvin-v0.4.1`, with `SHA256SUMS.txt` and a packing list. This is the carry for this release.
+- The release check, Session C's own (Session A no longer re-checks releases, ruling 2026-11-21): a clean install,
+  typecheck, build and the full test suite pass; two packs gave the same fingerprints; the name scan of every file inside
+  both packed files, `.map` files included, found nothing (175 files); GitHub's checks passed on `8cd7971`. Core 0.1.1 is
+  the same file, byte for byte, as in `calvin-v0.4.0`.
+- Session C made the annotated tag `calvin-v0.4.1` on `8cd7971`. The maintainer pushed it and published the GitHub release
+  "Calvin 0.4.1: monitoring values labelled by the analysis basis".
+- Checked after publishing: the release is not a draft. It holds `waterbots-calvin-0.4.1.tgz`, `waterbots-core-0.1.1.tgz`
+  and `SHA256SUMS.txt`, and each file's fingerprint matches the packed files in the handoff folder. The tag on GitHub is
+  the annotated tag Session C made, and points at `8cd7971`.
+- `BUILD_PLAN.md`: V19 marked released, and the line on where things stand.
+
+**Open:** the paid site installs 0.4.1, and the private side's report on it.
+
+---
+
+## 2026-11-21 — Rules: the name scan as the one check, carries, lane 1 auto-merge, releases
+
+**Done (branch `rules-name-scan-releases`), from the rulings of 2026-11-21:**
+- `CLAUDE.md`: the name scan, reading the maintainer's names-to-block list (names and project IDs), is the one check for
+  public material. There is no number gate, and no rule or check on calculation figures. New sections on carries
+  (through the handoff folder, started only when the maintainer names one; fingerprints, name scan, logged at the
+  session's close) and on releases (Session C's release check; Session A no longer re-checks releases). Session C pushes a
+  release tag and publishes the release only after the maintainer says "release it" (new hard rule 8). A blocked
+  force-push becomes a new branch and a replacement pull request, without asking. Lane 1 auto-merges.
+- `.github/workflows/lanes.yml`: after labelling, the job arms GitHub's auto-merge on a lane 1 pull request that is not a
+  draft, and disarms it on every other. While "Allow auto-merge" is off, arming only warns.
+- `.github/workflows/number-gate.yml` is taken out.
+- `BUILD_PLAN.md`: M1.2 retired, M1.5 built, N2 closed, the release line in Road to v1 and the tag rule in M1.4 updated.
+  V19 shows Calvin 0.4.1 merged, packed and tagged, waiting for "release it".
+
+**Open (the maintainer's settings, in this order):** put "name scan" on the `main` ruleset's required checks and take
+"number gate" off, then merge; turn on "Allow auto-merge". Session C's local deny rules still block pushing release tags
+and `gh release create`; the maintainer loosens those lines for "release it" to work.
+
+---
+
 ## 2026-11-21 — Calvin 0.4.1: monitoring values labelled by the analysis basis
 
 **Done (branch `calvin-0-4-1-monitoring-labels`), from Session A's note of 2026-11-21 in the handoff folder, read-only:**
