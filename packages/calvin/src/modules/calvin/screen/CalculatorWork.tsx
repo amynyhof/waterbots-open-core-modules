@@ -12,6 +12,7 @@ import BetaTag from "./BetaTag";
 import { fmt, fmtExp } from "./format";
 import { fnrbSourceLine } from "./citations";
 import { missingFactsPrompt, type CalvinProject } from "./state";
+import { enterMonitoring, isEntered, monitoringSource, monitoringValues, MONITORING_FIELD, type MonitoringValue } from "./monitoring";
 import type { CalculatorState } from "./useCalculatorState";
 
 /**
@@ -62,6 +63,40 @@ function Metric({ label, value, sub, tip }: { label: string; value: string; sub?
       </div>
       <div className="text-fg-4" style={{ fontSize: 10, marginTop: 4, lineHeight: 1.25 }}><WithEqNums text={label} /></div>
       {sub ? <div className="t-mono text-fg-4" style={{ fontSize: 9.5, marginTop: 1 }}>{sub}</div> : null}
+    </div>
+  );
+}
+
+/**
+ * ONE EX-POST MONITORING VALUE IN THE ASK (ruling 2026-11-21). Not entered: the box is blank, with a light highlight
+ * and a small red dot, because the calculation needs it. Entered: the box holds the figure. The line under it says
+ * where the figure comes from. Out-of-range entries are held to the ends, as on every other row.
+ */
+function MonitoringAskRow({ m, needed, value, onEnter, source }: {
+  m: MonitoringValue; needed: boolean; value: number | null; onEnter: (v: number) => void; source: string;
+}) {
+  return (
+    <div data-monitoring={m.key} data-needed={needed ? "" : undefined}>
+      <div className="flex items-baseline gap-2">
+        <span className="t-caption min-w-0 flex-1 text-fg-2" style={{ overflowWrap: "anywhere" }}><WithEqNums text={m.label} /></span>
+        <span
+          className="relative inline-flex shrink-0 rounded-sm"
+          style={needed ? { padding: 2, background: "color-mix(in oklab, var(--coral) 10%, transparent)" } : { padding: 2 }}
+        >
+          <InRowNum value={value} onChange={(v) => onEnter(Math.min(m.max, Math.max(m.min, v)))} step={m.step} min={m.min} width={72} />
+          {needed ? (
+            <span
+              role="img"
+              aria-label="Needed for the calculation"
+              title="Needed for the calculation"
+              data-needed-dot=""
+              style={{ position: "absolute", top: -3, right: -3, width: 7, height: 7, borderRadius: "50%", background: "var(--coral)" }}
+            />
+          ) : null}
+        </span>
+        <span className="t-mono shrink-0 text-fg-4" style={{ fontSize: 10, minWidth: 18 }}>{m.unit}</span>
+      </div>
+      <p className="t-caption text-fg-4" style={{ fontSize: 10 }}>{source}</p>
     </div>
   );
 }
@@ -159,6 +194,46 @@ export default function CalculatorWork({
             <span className="t-mono text-fg-4" style={{ fontSize: 10 }}>tCO₂e</span>
           </div>
         </section>
+      </ReadOnlySeat>
+    );
+  }
+
+  /**
+   * AN EX-POST RUN NEEDS ITS MONITORING VALUES (ruling 2026-11-21). After the project runs, the operating days and
+   * the other monitoring values come from the operation log or monitoring. Until each is entered its box is blank:
+   * no starting value, no fallback. Every figure depends on them, so none is shown until all are entered.
+   */
+  if (calc.missingMonitoring.length > 0) {
+    const missing = new Set(calc.missingMonitoring.map((m) => m.key));
+    return (
+      <ReadOnlySeat readOnly={readOnly}>
+        <section
+          className="rounded-lg p-4"
+          style={{ border: "1px solid var(--amber)", background: "color-mix(in oklab, var(--amber) 8%, transparent)" }}
+          role="status"
+          data-monitoring-ask=""
+        >
+          <span className="eyebrow warn">Monitoring values needed</span>
+          <p className="t-body mt-2 text-fg-1" style={{ fontSize: 13 }}>
+            This is an ex-post run, so these values come from your project&rsquo;s operation log and monitoring. Enter each
+            one marked with a red dot. No figures are shown until every one is entered.
+          </p>
+          <div className="mt-3 flex flex-col gap-2 border-t border-line pt-3">
+            {monitoringValues(state).map((m) => (
+              <MonitoringAskRow
+                key={m.key}
+                m={m}
+                needed={missing.has(m.key)}
+                value={isEntered(state, m.key) ? state[MONITORING_FIELD[m.key].value] : null}
+                onEnter={(v) => patch(enterMonitoring(m.key, v))}
+                source={monitoringSource(state, m.key)}
+              />
+            ))}
+          </div>
+        </section>
+        <div className="border-t border-line pt-2">
+          <BetaTag caseCount={referenceCaseCount} />
+        </div>
       </ReadOnlySeat>
     );
   }

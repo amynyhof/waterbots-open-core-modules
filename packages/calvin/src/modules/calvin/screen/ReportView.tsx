@@ -16,6 +16,7 @@ import { peopleServed, type CalcState, type CalvinProject } from "./state";
 import { fmt, fmtExp } from "./format";
 import { citeLong, sym, sdwsRef, RULEBOOK, type Basis } from "./citations";
 import { buildCheckSentence } from "./buildCheck";
+import { monitoringSource } from "./monitoring";
 
 /**
  * Print-only client deliverable — the "PAA Transition Analysis" (Slice 6, revision 3). Hidden on
@@ -110,7 +111,8 @@ export function tagForSource(source: string): ValueTag | undefined {
   // decides — and it is checked BEFORE "entered", because "Baseline survey … not yet entered,
   // 0 assumed" names the survey it is waiting for and is still a placeholder today.
   if (/^Assum(ption|ed)\b/i.test(s) || /^Screening preset\b/i.test(s) || /\bassumed\b/i.test(s)) return "assumed";
-  if (/^Entered\b/i.test(s) || /^Project record\b/i.test(s) || /^Flow meter\b/i.test(s) || /^Water-quality test\b/i.test(s) || /^Baseline survey\b/i.test(s)) return "entered";
+  // "From the operation log or sensor (…)": an ex-post monitoring value, entered from the records (ruling 2026-11-21).
+  if (/^Entered\b/i.test(s) || /^From\b/.test(s) || /^Project record\b/i.test(s) || /^Flow meter\b/i.test(s) || /^Water-quality test\b/i.test(s) || /^Baseline survey\b/i.test(s)) return "entered";
   // "Not applicable — Method 1 (CWT/CWS), U_p = 1 by Eq. 8": the rulebook fixes the value, which
   // is what DEFAULT means here — the methodology's own number, cited.
   if (/^Not applicable\b/i.test(s)) return "default";
@@ -316,18 +318,21 @@ export default function ReportView({
       ? `Zero — the project record says the system runs on ${powerWords[state.pumpPower]}, which burns nothing (${cite})`
       : `Zero — assumed: right for a hand pump, gravity or solar supply (${cite})`;
   const srcEta = state.etaOverride !== undefined ? `Entered — Water Boiling Test or filed value (${sdwsRef(basis, "eta")})` : `Methodology ${RULEBOOK[basis].version} default — ${sdwsRef(basis, "eta")}, weighted over the stove types (SDWS 6)`;
-  const srcMq = state.waterQualityFactor !== 1 ? `Water-quality test results at the point of use (${sdwsRef(basis, "Mq")})` : `Water-quality test results (${sdwsRef(basis, "Mq")}) — no test yet, 1.00 assumed ex-ante`;
+  // MONITORING VALUES ARE LABELLED BY THE ANALYSIS BASIS (ruling 2026-11-21; `monitoring.ts`): ex-ante they are
+  // assumed; ex-post they come from the log or monitoring. The "entered" flag decides, never the number itself.
+  const srcMq = monitoringSource(state, "testsPass");
+  const srcDays = monitoringSource(state, "days");
   // C_b IS AN ACTIVITY VALUE, NOT A DEFAULT (external review, 2026-09-03; V2.0 SDWS 12, p.53: "To be
   // determined at activity level … Baseline survey"). A zero is the seat's starting value, not the
   // methodology's, and the label says so rather than dressing it as a default.
   const srcCb = state.cBaseline !== 0 ? "Baseline survey (V2.0 SDWS 12) — activity value" : "Assumed 0% — your baseline survey (V2.0 SDWS 12) replaces this";
   // X_cleanboil IS SURVEYED, NOT DEFAULTED (V2.0 SDWS 26, p.62: annual activity survey). The SDWS
   // number chip is left as it stands — the chips wait on the methodology reviewer.
-  const srcX = state.xCleanboil !== 0 ? `Usage survey (${sdwsRef(basis, "X")}) — activity value` : `Usage survey (${sdwsRef(basis, "X")}) — not yet surveyed, 0 assumed ex-ante`;
+  const srcX = monitoringSource(state, "cleanBoil");
   // U_p HAS NO DEFAULT (V2.0 SDWS 34, p.69; V1.0 SDWS 29, p.37): it is a usage-survey fraction. Ex-ante
   // the seat assumes 1.00 until the survey exists, and says so (reviewer comments 1.8 / 3.13).
   const srcUp = state.method === 2
-    ? (state.usageRate !== 1 ? `Usage survey (${sdwsRef(basis, "Up")}) — activity value` : `Usage survey (${sdwsRef(basis, "Up")}) — not yet surveyed, 1.00 assumed ex-ante`)
+    ? monitoringSource(state, "usage")
     : "Not applicable — Method 1 (CWT/CWS), U_p = 1 by Eq. 8";
   const srcPop = popOverridden ? "Baseline survey — surveyed count, entered for this analysis" : "Project record";
   // The household size ties the two counts together in whichever direction they were entered
@@ -605,7 +610,7 @@ export default function ReportView({
             ...(basis === "legacy"
               ? [{ sym: <S basis={basis} k="Up" />, value: fmt(state.usageRate, 2), source: srcUp, desc: "Usage rate — folded into Eq. 6 under V1.0 (applied in Eq. 8 under V2.0)" }]
               : []),
-            { sym: <S basis={basis} k="DP" />, value: fmt(state.operationalDays, 0), source: `Project record — days the device was present (${sdwsRef(basis, "DP")}: sales / distribution records and technical life)`, desc: "Days in the year the device was present in the household" },
+            { sym: <S basis={basis} k="DP" />, value: fmt(state.operationalDays, 0), source: srcDays, desc: "Days in the year the device was present in the household" },
           ]}
         />
       ) : (
@@ -615,7 +620,7 @@ export default function ReportView({
           rows={[
             { sym: <span className="t-mono" style={{ fontSize: 11 }}>HH<sub style={{ fontSize: 8 }}>p,y</sub> × HN<sub style={{ fontSize: 8 }}>p,y</sub></span>, value: fmt(result.people, 0), source: srcPop, desc: "People served — households × people per household", field: "population" },
             { sym: <S basis={basis} k="QPW" />, value: fmt(result.qpwEffective, 2), source: srcQpw, desc: qpwDesc, field: "qpw" },
-            { sym: <S basis={basis} k="DO" />, value: fmt(state.operationalDays, 0), source: `Project record — operation log or sensor (${sdwsRef(basis, "DO")})`, desc: "Days the system was operational for end-users" },
+            { sym: <S basis={basis} k="DO" />, value: fmt(state.operationalDays, 0), source: srcDays, desc: "Days the system was operational for end-users" },
             { sym: <S basis={basis} k="Qm" />, value: result.Q_m === null ? "— (none)" : ML(result.Q_m), source: `Flow meter or operation sensor (${sdwsRef(basis, "Qm")})`, desc: "Metered / planned supplied volume — the credited volume can't exceed what's delivered" },
           ]}
         />
@@ -760,8 +765,8 @@ export default function ReportView({
           {m2 ? <AppxRow p={<S basis={basis} k="QPWhh" />} d="Per-household volume — Eq.7" u="L/hh·d" v={result.qpwPerPremises != null ? fmt(result.qpwPerPremises, 1) : "—"} s={srcQpwHh} /> : null}
           <AppxRow p={<S basis={basis} k="QPW" />} d={v2 && t9 ? "Litres per person per day — Table 9 age-weighted" : "Litres per person per day (cap 5.5)"} u="L/p/d" v={fmt(result.qpwEffective, 2)} s={srcQpw} />
           {m2
-            ? <AppxRow p={<S basis={basis} k="DP" />} d="Days the device was present in the household" u="d" v={fmt(state.operationalDays, 0)} s={`Project record — sales / distribution records (${sdwsRef(basis, "DP")})`} />
-            : <AppxRow p={<S basis={basis} k="DO" />} d="Days the system was operational" u="d" v={fmt(state.operationalDays, 0)} s={`Project record — operation log or sensor (${sdwsRef(basis, "DO")})`} />}
+            ? <AppxRow p={<S basis={basis} k="DP" />} d="Days the device was present in the household" u="d" v={fmt(state.operationalDays, 0)} s={srcDays} />
+            : <AppxRow p={<S basis={basis} k="DO" />} d="Days the system was operational" u="d" v={fmt(state.operationalDays, 0)} s={srcDays} />}
           {m2 ? null : <AppxRow p={<S basis={basis} k="Qm" />} d="Metered / planned volume" u="L/yr" v={result.Q_m === null ? "none" : ML(result.Q_m)} s={`Flow meter or operation sensor (${sdwsRef(basis, "Qm")})`} />}
           {/* THE ROW NAMES THE MIX IT ASSUMED, AND SAYS *"screening preset, no source"*
               (ruling (4), 2026-09-24). "ASSUMED, not surveyed" reads as *not confirmed yet*, which is

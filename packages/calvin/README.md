@@ -69,6 +69,33 @@ const project = { name: "Invented project", standards: [], technology: "CWS", co
 
 The build bundles the entry into one file, `dist/screen.js`. React and `@waterbots/core` stay outside it, so a site has one copy of each. `scripts/check-screen-entry.mjs`, at the repo root, packs both packages, installs them alone with React, and renders the ex-ante view, the ex-post view and its report, a new project's V2.0-only view and report, and a transitioning project's view and report from the packed files.
 
+## Changes in 0.4.1
+
+Monitoring values are labelled by the analysis basis (ruling 2026-11-21). No sum changed, and every reference case gives the same answer. Only what the screens say, and when they show figures, changed.
+
+**Which values the rule covers.** The maintainer is asked to confirm this list.
+
+- The operating days: DO for a community system, DP (days the device is in the home) for a household device.
+- The share of water tests that pass, M_q.
+- The usage rate, U_p. Household devices only.
+- The share still boiling the safe water, X_cleanboil.
+
+**Not covered:** the metered volume, Q_m. It is a cap, and it stays optional. Left blank, no cap applies, as before. The baseline values (C_b and the stove and fuel mix) are not monitoring data, so they keep their own labels.
+
+**Ex-ante (before the project runs).** Each value starts at its starting value and is labelled "Assumed", on the screen and in the report. The operating days start at a full year on the typed boxes, and at 347 days on the sliders. A value the person changes is their planned figure. It is still labelled assumed, and the label says where the figure will come from after the project runs.
+
+**Ex-post (after it runs).** Each value comes from the operation log or monitoring, and is labelled so: for example, "From the operation log or sensor (V2.0 SDWS 32)". Until it is entered, its box is blank. There is no starting value and no fallback. The box has a light highlight and a small red dot. No figures are shown until every value is entered.
+
+**Moving from ex-ante to ex-post asks again.** A figure entered ex-ante is a planned figure, not a monitored one. So a change of the run to ex-post clears the "entered" marks, and the screen asks for each value. Moving back to ex-ante keeps them.
+
+**The "entered" flags are saved.** The analysis now saves four flags: `operationalDaysEntered`, `mQualityEntered`, `usageRateEntered` and `xCleanboilEntered`. A save never turns an entered value back into an assumed one, or the reverse.
+
+- A saved flag is read as it stands.
+- A save made before 0.4.1 has no flags. A value other than a starting value reads as entered. A starting value reads as assumed, so an older ex-post analysis may ask again for a value it holds.
+- `slidersEntered` is still read from older saves, and is no longer written. The four flags replace it.
+
+**For a site.** `CalculatorState` has a new field, `missingMonitoring`: the values an ex-post run still needs. It is empty on an ex-ante run. The agent's page context tells Calvin there are no figures, and not to offer a stand-in.
+
 ## Changes in 0.4.0
 
 From the maintainer's walk of the open site (2026-11-16). No sum changed, and every reference case gives the same answer.

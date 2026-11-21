@@ -1,5 +1,6 @@
 import type { FiledFnrbRefusal, FnrbRefusal, ScenarioResult, TransitionWaterfall } from "../engine";
 import type { CalcState, ProjectFact } from "../screen/state";
+import type { MonitoringValue } from "../screen/monitoring";
 
 /**
  * WHAT CALVIN CAN SEE OF THE SCREEN — the same figures the user is looking at, so he answers
@@ -17,6 +18,8 @@ export interface PageContextInput {
   missingFacts?: ProjectFact[];
   /** Set when the pump runs on diesel or grid power and its emissions are not entered: no figures. */
   activityAsk?: { power: "diesel" | "grid" } | null;
+  /** Ex-post monitoring values not entered yet: the screen asks for them and shows no figures (ruling 2026-11-21). */
+  missingMonitoring?: MonitoringValue[];
   fnrbRefusal: FnrbRefusal | null;
   /** Set when a transitioning project's filed V1.0 fNRB is not on the record: the screen asks for it. */
   filedFnrbRefusal?: FiledFnrbRefusal | null;
@@ -33,6 +36,7 @@ export function calculatorPageContext({
   state,
   missingFacts,
   activityAsk = null,
+  missingMonitoring = [],
   fnrbRefusal,
   filedFnrbRefusal = null,
   transition = true,
@@ -56,6 +60,13 @@ export function calculatorPageContext({
       `The user is on the GS Safe Water calculator for project "${projectName}", and it is asking for the pump's activity emissions rather than showing a result. ` +
       `The project record says the pump runs on ${activityAsk.power === "diesel" ? "diesel" : "grid power"}, so running it gives off greenhouse gas. There are NO figures on this screen. ` +
       "Ask the user for the pump's emissions for a year, in tCO2e. Do not estimate them, and do not assume zero."
+    );
+  }
+  if (missingMonitoring.length > 0) {
+    return (
+      `The user is on the GS Safe Water calculator for project "${projectName}", in an ex-post run, and it is asking for monitoring values rather than showing a result. ` +
+      `Not entered yet: ${missingMonitoring.map((m) => `${m.label} (from ${m.record}, ${m.sdws})`).join("; ")}. There are NO figures on this screen. ` +
+      "Ask the user for each value from their monitoring records. Do not estimate one, and do not offer a starting value or a default in its place."
     );
   }
   // THE AGENT IS TOLD THERE IS NOTHING ON THE SCREEN, AND TOLD NOT TO FILL THE GAP. A refusal
