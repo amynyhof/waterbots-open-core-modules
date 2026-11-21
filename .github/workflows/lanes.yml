@@ -5,7 +5,11 @@
 # so a pull request cannot change the rule and relabel itself. It never checks out or runs the
 # pull request's code; it only asks GitHub for the list of changed file names.
 #
-# This workflow only labels. It never merges: the maintainer merges every pull request.
+# It also arms GitHub's auto-merge on a lane 1 pull request that is not a draft, and disarms it on every other
+# pull request (ruling 2026-11-21). It never merges by itself: GitHub merges an armed pull request once every
+# required check on the main ruleset is green. Arming needs the repo setting "Allow auto-merge"; while that is
+# off, the arm step only warns. The disarm step runs inside this job, and "lane label" is a required check, so a
+# pull request that leaves lane 1 is disarmed before it can merge.
 
 name: lanes
 
@@ -24,7 +28,8 @@ jobs:
     name: lane label
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      # contents: write is what GitHub's auto-merge needs. This job still never checks out the pull request's code.
+      contents: write
       issues: write
       pull-requests: write
     steps:
@@ -77,4 +82,24 @@ jobs:
           done
           if ! grep -qx "lane $LANE" <<<"$current"; then
             gh api -X POST "repos/$REPO/issues/$PR/labels" -f "labels[]=lane $LANE" --silent
+          fi
+
+      # LANE 1 AUTO-MERGE (ruling 2026-11-21). Lane 1 and not a draft: arm it. Anything else: disarm it.
+      - name: Arm or disarm auto-merge
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          LANE: ${{ steps.lane.outputs.lane }}
+          DRAFT: ${{ github.event.pull_request.draft }}
+        run: |
+          if [ "$LANE" = "1" ] && [ "$DRAFT" != "true" ]; then
+            if gh pr merge "$PR" --repo "$REPO" --auto --squash; then
+              echo "Lane 1: auto-merge is armed. GitHub merges once every required check is green." >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo "::warning title=Auto-merge not armed::Lane 1, but GitHub refused to arm auto-merge. Is the repo setting 'Allow auto-merge' on?"
+            fi
+          else
+            gh pr merge "$PR" --repo "$REPO" --disable-auto 2>/dev/null || true
+            echo "Lane $LANE$([ "$DRAFT" = "true" ] && echo ', draft'): auto-merge is off." >> "$GITHUB_STEP_SUMMARY"
           fi

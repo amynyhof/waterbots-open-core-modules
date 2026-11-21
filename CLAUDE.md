@@ -7,32 +7,38 @@ Write as if a stranger is reading — because one will.
 
 | Who | Does | Never does |
 |---|---|---|
-| **The maintainer** | Decides. Merges every pull request (lane 1 may auto-merge only after the maintainer switches it on). Owns the repo settings, the GitHub secrets and the npm scope. | — |
-| **Session C** (the Claude session that owns this repo) | Builds here: code, tests, CI, docs. Works on a branch and opens a pull request. | Merges. Pushes to `main`. Changes repo settings. Works in any other repo. |
+| **The maintainer** | Decides. Merges every pull request in lanes 2 and 3. Says "release it" for each release. Owns the repo settings, the GitHub secrets and the npm scope. | — |
+| **Session C** (the Claude session that owns this repo) | Builds here: code, tests, CI, docs. Works on a branch and opens a pull request. Packs and checks each release. After the maintainer says "release it", pushes that release's tag and publishes it. | Merges. Pushes to `main`. Changes repo settings. Works in any other repo. |
 | **The private session** | Installs the **published** packages and runs its own real-filing tests against them. | Reads or works in this repo. |
 | **Outside AI review** | Reviews lane 3 pull requests (see below). | Merges. |
 
-Nothing crosses between this repo and the private side except by the maintainer's hand: the seed once, then version numbers and
-pass-or-fail results with a reference line — **never a figure.**
+Nothing crosses between this repo and the private side except by the maintainer's hand. It crosses as a carry, through the
+handoff folder (`%USERPROFILE%\GitHub\handoff\`), and a carry starts only when the maintainer names it (see "Carries" below).
 
 ## Hard rules
 
 1. **Rule Zero — stay in this repo.** Never open, read or search the private WaterBots repos, the harness repo or the
-   carry folder on this machine. The only outside file Session C may read is the brief the maintainer hands over, read-only.
-   The one other exception: the name scan may read the private name list in place, through the `WB_NAMES_LIST`
-   variable, and nothing else in that place.
-2. **Nothing private goes in.** No real project figures, no real project names, no reviewer or partner names or
-   organisations, no secrets or keys. Not in code, tests, fixtures, comments, presets, commit messages or PR text.
-   Fixtures are **invented** projects only.
+   carry folder on this machine. Outside this repo, Session C uses only the handoff folder, and there only what a carry
+   or a release needs: it reads a file the maintainer names, read-only, and writes release packs. The one other
+   exception: the name scan may read the private name list in place, through the `WB_NAMES_LIST` variable, and
+   nothing else in that place.
+2. **Nothing private goes in.** No real project names or project IDs, no reviewer or partner names or organisations,
+   no secrets or keys. Not in code, tests, fixtures, comments, presets, commit messages or PR text. Fixtures are
+   **invented** projects only. The name scan checks names and project IDs (see "The one check for public material").
+   There is no rule or check on calculation figures (ruling 2026-11-21).
 3. **No standards text.** No standards PDFs, no copied passages, no context packs or retrieval indexes. Cite and link
    instead. Rule cards are **our own wording**, each with its citation and link.
 4. **Never merge, never push to `main`, never force-push, never change repo settings.** These are also denied in
-   Session C's local settings (`.claude/settings.local.json`, not committed).
+   Session C's local settings (`.claude/settings.local.json`, not committed). Lane 1's auto-merge is GitHub's, not
+   Session C's. When a force-push would be needed, push to a new branch and open a replacement pull request instead,
+   without asking; say which pull request it replaces.
 5. **Archive, never delete** the reviewed calculator. When the seed arrives with its reviewed-version ledger, keep the
    ledger exactly as it arrives and only add rows. Never rewrite a row. The ledger, tag names and tag messages never
    name a reviewer or their organisation.
 6. **The engine does every sum; the screen computes nothing.**
 7. **Do not seed calculator code by hand.** It arrives once, by the maintainer's carry (step M2).
+8. **Push a release tag and publish a release only after the maintainer says "release it"** for that release. One tag
+   at a time, by name. Never push all tags at once.
 
 ## Merge lanes
 
@@ -41,16 +47,41 @@ in `.github/lanes/lane-rule.mjs`.
 
 | Lane | Files | How it merges |
 |---|---|---|
-| **1** | Only `BUILD_PLAN.md`, `BUILD_LOG.md`, `docs/**/*.md` | All checks green, then the maintainer merges with one click. There is no auto-merge. It may be built only after the keyed-fingerprint number gate exists, and runs only after the maintainer switches it on. |
+| **1** | Only `BUILD_PLAN.md`, `BUILD_LOG.md`, `docs/**/*.md` | GitHub merges it on its own once every required check is green (auto-merge). Nobody clicks. A draft never auto-merges. |
 | **2** | What visitors see or read: `README.md` for now; screens and copy when they exist | The maintainer merges, then checks the live site. |
-| **3** | Everything else: calculator, engine, data, tests, packages, CI, rules files, the lane rule itself, and anything that could leak a real figure | Outside AI review, then the maintainer reviews and merges. |
+| **3** | Everything else: calculator, engine, data, tests, packages, CI, rules files, the lane rule itself, and anything that could leak a real name | Outside AI review, then the maintainer reviews and merges. |
 
 - A file on no list → lane 3.
 - A pull request touching more than one lane takes the highest.
 - A pull request that changes the lane rule, CI or a rules file (`CLAUDE.md`, `.claude/**`) → lane 3.
 
-**The number gate is a placeholder for now.** It passes with a warning and checks nothing. Until the real
-keyed-fingerprint gate exists, lane 3 — the maintainer's review plus outside AI review — is what catches real figures and names.
+**How lane 1 auto-merges.** The lane label job arms GitHub's auto-merge on a lane 1 pull request that is not a draft, and
+disarms it on every other pull request. GitHub then merges once every required check is green. It needs two repo settings,
+both the maintainer's: "Allow auto-merge" on, and every check that matters on the `main` ruleset's required list.
+
+## The one check for public material
+
+The name scan is the one check for public material (ruling 2026-11-21). It reads the maintainer's names-to-block list:
+names and project IDs. It runs on every pull request, on `main`, and on every file inside each packed release. There is no
+number gate, and no rule or check on calculation figures.
+
+## Carries
+
+A carry is anything that crosses between this repo and the private side. It goes through the handoff folder
+(`%USERPROFILE%\GitHub\handoff\`). A carry starts only when the maintainer names it. For each carry, Session C checks its fingerprints (each
+file's SHA-256), runs the name scan on what it carries, and logs it in `BUILD_LOG.md` at the session's close.
+
+## Releases
+
+Session C packs each release from `main` into the handoff folder, with `SHA256SUMS.txt`. Session A no longer re-checks
+releases (ruling 2026-11-21). The release check is:
+
+1. Pack twice; both packs give the same fingerprints.
+2. Unpack each packed file into an empty folder and run the name scan on every file inside, `.map` files included.
+3. GitHub's checks pass on the commit being released.
+
+Then Session C makes the annotated tag and tells the maintainer the title, the notes and the files. After the maintainer
+says "release it", Session C pushes that one tag and publishes the GitHub release with the packed files and `SHA256SUMS.txt`.
 
 ## The grant line
 
@@ -108,7 +139,7 @@ Stove and fuel presets: do not raise their sources with the maintainer until the
 
 ### Never write
 
-- A real project's name or figure, or a reviewer's or partner's name or organisation.
+- A real project's name or project ID, or a reviewer's or partner's name or organisation.
 - Standards text, quoted or paraphrased closely. Cite it instead.
 - A credit price. It was removed from the module and appears nowhere.
 - Any key, token or password.
