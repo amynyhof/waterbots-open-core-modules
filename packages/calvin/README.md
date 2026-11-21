@@ -69,6 +69,44 @@ const project = { name: "Invented project", standards: [], technology: "CWS", co
 
 The build bundles the entry into one file, `dist/screen.js`. React and `@waterbots/core` stay outside it, so a site has one copy of each. `scripts/check-screen-entry.mjs`, at the repo root, packs both packages, installs them alone with React, and renders the ex-ante view, the ex-post view and its report, a new project's V2.0-only view and report, and a transitioning project's view and report from the packed files.
 
+## Changes in 0.5.0
+
+Released with Violet 0.5.0, for both sites. No sum changed, and every reference case gives the same answer.
+
+**A pinned header.** The main credit figures stay at the top while the reader scrolls: the PAA v2.0 tile in tCO₂e a
+year, and for a project credited under V1.0 the Legacy V1.0 tile and the transition delta too. The smaller figures
+sit right under them. Everything below can collapse: the sliders and the calculation each have a title that opens
+and closes them. Both start open.
+
+- `unpinFigureBlock` still works. Left out, the smaller figures stay pinned with the tiles. Set to `true`, the tiles
+  stay pinned and the smaller figures scroll away with the page.
+- On a phone (narrower than 640 pixels), only the tiles stay pinned, so the header never fills the screen.
+- The pin lives in Calvin's stylesheet, `@waterbots/calvin/styles.css`, which every site already imports.
+
+**What a site should change.**
+
+- Keep importing `@waterbots/calvin/styles.css`. The pinned header, the phone layout and the parts that collapse are
+  in it.
+- The header pins to the top of the area that scrolls. A site with a fixed bar of its own at the top sets
+  `--calvin-pin-top` to that bar's height, for example `--calvin-pin-top: 56px`. A site whose page colour is not
+  `--card` can set `--calvin-pin-bg`.
+- Nothing between the work surface and the area that scrolls may clip its overflow (`overflow: hidden` or `auto`).
+  If something does, the header cannot pin.
+- A site that set `unpinFigureBlock: true` can keep it: the tiles stay pinned either way. A site that wants the
+  smaller figures pinned too leaves it out.
+- The controls panel now holds only what the site passes in `header`, and Calvin's buttons. A site that puts an
+  introduction of its own in `header` and no longer wants it there takes it out.
+- `referenceCaseCount` is no longer shown. It is still accepted, so a site that passes it keeps working.
+- `VersionTabs` takes `showNote`. Left out, it shows the sentence under its tiles, as before.
+
+**What a visitor sees.**
+
+- The controls panel holds only the site's own top and Calvin's buttons.
+- The work surface ends with the calculation.
+- The report's paragraph "How these figures were produced" is one sentence shorter.
+- On a phone, nothing is squeezed: when a value's label would get too narrow, its tags and box move to a line of
+  their own. The line about the pencil wraps as plain text.
+
 ## Changes in 0.4.1
 
 Monitoring values are labelled by the analysis basis (ruling 2026-11-21). No sum changed, and every reference case gives the same answer. Only what the screens say, and when they show figures, changed.
@@ -137,6 +175,6 @@ No sum changed. The engine version and every reference case stay as they are.
 
 Since the seed landed, this repo is Calvin's home. Changes are made here, by pull request. `scripts/check-seed.mjs` proves what arrived against the commit where the seed landed, so later changes are allowed.
 
-- Version 0.4.0. Not published. Nothing in this repo goes to npm yet; the package is marked `private`.
+- Version 0.5.0. Not published. Nothing in this repo goes to npm yet; the package is marked `private`.
 - The build writes plain files for a bundler to pick up. Apart from `dist/engine.js` and `dist/screen.js`, they do not run on their own in Node.
 - Apache License 2.0. See `LICENSE` and `NOTICE` in this folder.

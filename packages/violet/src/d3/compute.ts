@@ -29,6 +29,7 @@ import {
 import { D3_CITES, formatCitation } from "./sources.js";
 import {
   AWAITING,
+  D3_STATUS,
   type D3Input,
   type D3Result,
   type D3Slider,
@@ -560,6 +561,7 @@ export function computeD3(input: D3Input): D3Result {
   return {
     method: "VWBA 2.0 D-3 Volume Provided",
     engineVersion: D3_ENGINE_VERSION,
+    status: D3_STATUS,
     view,
     option,
     values,

@@ -354,13 +354,16 @@ function VarRow({ label, value, unit, state, tip, baselineSdws, monitor }: { lab
   const mark = rowMark(baselineSdws, monitor);
   return (
     <div className="py-1">
-      <div className="flex items-baseline gap-2">
+      <div className="calvin-row flex items-baseline gap-2">
         <span className="t-caption min-w-0 flex-1 text-fg-3" style={{ overflowWrap: "anywhere" }}><WithEqNums text={label} /></span>
-        <span className="t-mono shrink-0 text-fg-1" style={{ fontSize: 11 }}>
-          {value}
-          {unit ? <span className="text-fg-4"> {unit}</span> : null}
+        {/* The value and its tag move together when the row wraps on a narrow screen. */}
+        <span className="inline-flex min-w-0 flex-wrap items-baseline gap-2">
+          <span className="t-mono shrink-0 text-fg-1" style={{ fontSize: 11 }}>
+            {value}
+            {unit ? <span className="text-fg-4"> {unit}</span> : null}
+          </span>
+          <StateBadge state={state} tip={tip} mark={mark} />
         </span>
-        <StateBadge state={state} tip={tip} mark={mark} />
       </div>
       <ProveLater entered={state === "entered"} mark={mark} />
     </div>
@@ -405,20 +408,23 @@ function Param({ label, sdwsRef, value, onChange, min, max, step, unit, baseline
 }) {
   return (
     <div className="py-1">
-      <div className="flex items-baseline gap-2">
+      <div className="calvin-row flex items-baseline gap-2">
         <span className="t-caption min-w-0 flex-1 text-fg-2" style={{ overflowWrap: "anywhere" }}><WithEqNums text={label} /></span>
-        <span className="t-mono shrink-0 rounded-sm px-1" style={{ fontSize: 8, letterSpacing: "0.06em", color: "var(--fg-1)", background: "color-mix(in oklab, var(--tide) 12%, transparent)", boxShadow: "inset 0 0 0 1px color-mix(in oklab, var(--tide) 40%, transparent)" }}>{sdwsRef}</span>
-        <StateBadge state={changed ? "entered" : resting} tip={tip} mark={rowMark(baselineSdws, monitor)} />
-        {/* The pencil removes itself on a read-only seat — see `EditGlyph` ([#97]). */}
-        <EditGlyph title={`Type a value between ${min} and ${max}`} />
-        <InRowNum
-          value={Number.isFinite(value) ? value : undefined}
-          onChange={(v) => onChange(Math.min(max, Math.max(min, v)))}
-          step={step}
-          min={min}
-          width={72}
-        />
-        {unit ? <span className="t-mono shrink-0 text-fg-4" style={{ fontSize: 10, minWidth: 18 }}>{unit}</span> : null}
+        {/* The tags, pencil, box and unit move together when the row wraps on a narrow screen. */}
+        <span className="inline-flex min-w-0 flex-wrap items-baseline gap-2">
+          <span className="t-mono shrink-0 rounded-sm px-1" style={{ fontSize: 8, letterSpacing: "0.06em", color: "var(--fg-1)", background: "color-mix(in oklab, var(--tide) 12%, transparent)", boxShadow: "inset 0 0 0 1px color-mix(in oklab, var(--tide) 40%, transparent)" }}>{sdwsRef}</span>
+          <StateBadge state={changed ? "entered" : resting} tip={tip} mark={rowMark(baselineSdws, monitor)} />
+          {/* The pencil removes itself on a read-only seat — see `EditGlyph` ([#97]). */}
+          <EditGlyph title={`Type a value between ${min} and ${max}`} />
+          <InRowNum
+            value={Number.isFinite(value) ? value : undefined}
+            onChange={(v) => onChange(Math.min(max, Math.max(min, v)))}
+            step={step}
+            min={min}
+            width={72}
+          />
+          {unit ? <span className="t-mono shrink-0 text-fg-4" style={{ fontSize: 10, minWidth: 18 }}>{unit}</span> : null}
+        </span>
       </div>
       <div className="t-caption text-fg-4" style={{ fontSize: 10 }} data-source-note={note ? "" : undefined}>{note ?? `${resting === "assumed" ? "assumed" : "default"} ${baseline}`}</div>
       <ProveLater entered={changed} mark={rowMark(baselineSdws, monitor)} />
@@ -680,13 +686,16 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
       {/* THE LABEL SAYS WHAT THE NUMBER IS — "People served" or "Households served", following the
           record's toggle (glossary, 2026-09-24). A box labelled "population" holding a
           household count was the first of the two faults that sent this back at the eyeball. */}
-      <div className="flex items-baseline gap-2">
+      <div className="calvin-row flex items-baseline gap-2">
         {/* The count box carries the plain name; the "(N_p)" marker belongs to the Eq.7 parameter
             row below, so the two are not two identical labels one above the other. */}
         <span className="t-caption flex-1 text-fg-2">{enteredAsHouseholds ? "Households served" : "People served"}</span>
+        {/* The controls move together when the row wraps on a narrow screen. */}
+        <span className="inline-flex min-w-0 flex-wrap items-baseline gap-2">
         <StateBadge state="entered" tip="The figure on the project record. Change it here only to record a surveyed figure for this analysis — an override; the record stays untouched." mark={peopleMark} />
         <EditGlyph title="Enter a surveyed figure to override the record" />
         <InRowNum value={state.populationCount} onChange={(v) => patch({ populationCount: v })} width={92} />
+        </span>
       </div>
       <div className="t-caption text-fg-4" style={{ fontSize: 10 }}>
         {canonPopulation === undefined
@@ -701,10 +710,13 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
           the three numbers can be checked against each other without doing sums in one's head. */}
       {counterpart ? (
         <div className="pt-1">
-          <div className="flex items-baseline gap-2">
+          <div className="calvin-row flex items-baseline gap-2">
             <span className="t-caption flex-1 text-fg-2">{counterpart.label}</span>
+            {/* The controls move together when the row wraps on a narrow screen. */}
+            <span className="inline-flex min-w-0 flex-wrap items-baseline gap-2">
             <StateBadge state="calculated" tip="Worked out from the figure above and the household size below — this is what the equations are computed on." />
             <span className="t-mono text-fg-1" style={{ fontSize: 11 }}>{counterpart.value}</span>
+            </span>
           </div>
           <div className="t-caption text-fg-4" style={{ fontSize: 10 }}>{counterpart.working}</div>
         </div>
@@ -713,11 +725,14 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
           ties the two counts together, so it sits with them rather than in a dial somewhere else. */}
       {result.householdSizeUsed != null && state.method === 2 ? (
         <div className="py-1">
-          <div className="flex items-baseline gap-2">
+          <div className="calvin-row flex items-baseline gap-2">
             <span className="t-caption flex-1 text-fg-2">Household size</span>
+            {/* The controls move together when the row wraps on a narrow screen. */}
+            <span className="inline-flex min-w-0 flex-wrap items-baseline gap-2">
             <StateBadge mark={{ kind: "baseline", sdws: "V2.0 SDWS 30" }} state={state.householdSizeOverride != null ? "entered" : "default"} tip="The cited country average until this project's own surveyed figure is entered here." />
             <EditGlyph title="Enter a surveyed household size to override the country average" />
             <InRowNum value={state.householdSizeOverride ?? result.householdSizeUsed} onChange={(v) => patch({ householdSizeOverride: v })} onClear={() => patch({ householdSizeOverride: undefined })} optional step={0.01} width={92} />
+            </span>
           </div>
           <ProveLater entered={state.householdSizeOverride != null} mark={{ kind: "baseline", sdws: "V2.0 SDWS 30" }} />
           <div className="t-caption text-fg-4" style={{ fontSize: 10 }}>
@@ -778,8 +793,10 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
     );
     return (
       <div className="py-1">
-        <div className="flex items-baseline gap-2">
+        <div className="calvin-row flex items-baseline gap-2">
           <span className="t-caption flex-1 text-fg-2">age split — share of people, %</span>
+          {/* The controls move together when the row wraps on a narrow screen. */}
+          <span className="inline-flex min-w-0 flex-wrap items-baseline gap-2">
           <span className="t-mono shrink-0 rounded-sm px-1" style={{ fontSize: 8, letterSpacing: "0.06em", color: "var(--fg-1)", background: "color-mix(in oklab, var(--tide) 12%, transparent)", boxShadow: "inset 0 0 0 1px color-mix(in oklab, var(--tide) 40%, transparent)" }}>V2.0 SDWS 30</span>
           <StateBadge mark={{ kind: "baseline", sdws: "V2.0 SDWS 30" }}
             state={entered ? "entered" : "default"}
@@ -788,6 +805,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
               : "UN WPP 2024 national shares — a census estimate for the whole country, not this project's survey."}
           />
           <EditGlyph title="Enter the baseline survey's age split (V2.0 SDWS 30)" />
+          </span>
         </div>
         <ProveLater entered={Boolean(entered)} mark={{ kind: "baseline", sdws: "V2.0 SDWS 30" }} />
         <div className="mt-1 flex flex-wrap items-baseline gap-3">
@@ -872,8 +890,10 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
     return (
       <>
         <div className="py-1">
-          <div className="flex items-baseline gap-2">
+          <div className="calvin-row flex items-baseline gap-2">
             <span className="t-caption flex-1 text-fg-2">stove shares — share of premises, %</span>
+            {/* The controls move together when the row wraps on a narrow screen. */}
+            <span className="inline-flex min-w-0 flex-wrap items-baseline gap-2">
             <StateBadge mark={{ kind: "baseline", sdws: "V2.0 SDWS 6" }}
               state={tagFor(result.baselineMix.stove)}
               tip={result.baselineMix.stove === "entered"
@@ -883,6 +903,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
                   : "The screening preset's stoves — no source yet; replaced by country data or your baseline survey. Type the survey's shares here (V2.0 SDWS 6)."}
             />
             <EditGlyph title="Type the baseline survey's stove shares (V2.0 SDWS 6)" />
+            </span>
           </div>
           <ProveLater entered={tagFor(result.baselineMix.stove) === "entered"} mark={{ kind: "baseline", sdws: "V2.0 SDWS 6" }} />
           <div className="mt-1 flex flex-wrap items-baseline gap-3">
@@ -912,8 +933,10 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
           {state.stoveSharesEntered ? clearButton("stoves", () => patch({ stoveSharesEntered: undefined, fossilStoveEta: undefined })) : null}
         </div>
         <div className="py-1">
-          <div className="flex items-baseline gap-2">
+          <div className="calvin-row flex items-baseline gap-2">
             <span className="t-caption flex-1 text-fg-2">fuel shares — share of boiling fuel, %</span>
+            {/* The controls move together when the row wraps on a narrow screen. */}
+            <span className="inline-flex min-w-0 flex-wrap items-baseline gap-2">
             <StateBadge mark={{ kind: "baseline", sdws: "V2.0 SDWS 8" }}
               state={tagFor(result.baselineMix.fuel)}
               tip={result.baselineMix.fuel === "entered"
@@ -923,6 +946,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
                   : "The screening preset's fuels — no source yet; replaced by country data or your baseline survey. Type the survey's shares here (V2.0 SDWS 8)."}
             />
             <EditGlyph title="Type the baseline survey's fuel shares (V2.0 SDWS 8)" />
+            </span>
           </div>
           <ProveLater entered={tagFor(result.baselineMix.fuel) === "entered"} mark={{ kind: "baseline", sdws: "V2.0 SDWS 8" }} />
           <div className="mt-1 flex flex-wrap items-baseline gap-3">
@@ -1008,11 +1032,14 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
   // units fact, overridable for this analysis. Decomposes people into premises × per-premises.
   const npInput = (
     <div className="py-1">
-      <div className="flex items-baseline gap-2">
+      <div className="calvin-row flex items-baseline gap-2">
         <span className="t-caption flex-1 text-fg-2">Households served (N_p)</span>
+        {/* The controls move together when the row wraps on a narrow screen. */}
+        <span className="inline-flex min-w-0 flex-wrap items-baseline gap-2">
         <StateBadge mark={{ kind: "monitoring", sdws: sdwsRef(basis, "Np"), instrument: "sales or distribution records" }} state={state.premises != null || npFromRecord ? "entered" : "calculated"} tip="The households with a treatment device. It comes from the project record — the household count itself, or the people count divided by the household size. Type a figure to record a different count for this analysis." />
         <EditGlyph title="Enter the households served (N_p)" />
         <InRowNum value={state.premises ?? result.premises} onChange={(v) => patch({ premises: v })} onClear={() => patch({ premises: undefined })} optional width={92} />
+        </span>
       </div>
       <ProveLater entered={state.premises != null || npFromRecord} mark={{ kind: "monitoring", sdws: sdwsRef(basis, "Np"), instrument: "sales or distribution records" }} />
       {/* HN_p IS PRINTED TO THE SAME PRECISION AS THE HOUSEHOLD SIZE ABOVE, and says outright when
@@ -1037,8 +1064,10 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
   // (reviewer comment 1.2: the v0.1.0 report claimed Eq.7 on a value it never produced).
   const deviceInputs = (
     <div className="py-1">
-      <div className="flex items-baseline gap-2">
+      <div className="calvin-row flex items-baseline gap-2">
         <span className="t-caption flex-1 text-fg-2">q_i — device capacity (L/h)</span>
+        {/* The controls move together when the row wraps on a narrow screen. */}
+        <span className="inline-flex min-w-0 flex-wrap items-baseline gap-2">
         <StateBadge
           state={state.deviceCapacityLPerHour != null ? "entered" : "assumed"}
           tip={state.deviceCapacityLPerHour != null
@@ -1047,12 +1076,16 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
         />
         <EditGlyph title="Enter the device capacity (q_i)" />
         <InRowNum value={state.deviceCapacityLPerHour} onChange={(v) => patch({ deviceCapacityLPerHour: v })} onClear={() => patch({ deviceCapacityLPerHour: undefined })} optional width={92} />
+        </span>
       </div>
-      <div className="flex items-baseline gap-2">
+      <div className="calvin-row flex items-baseline gap-2">
         <span className="t-caption flex-1 text-fg-2">t_p — hours used / day</span>
+        {/* The controls move together when the row wraps on a narrow screen. */}
+        <span className="inline-flex min-w-0 flex-wrap items-baseline gap-2">
         <StateBadge mark={{ kind: "monitoring", sdws: sdwsRef(basis, "tp"), instrument: "usage survey" }} state={state.usageHoursPerDay != null ? "entered" : "default"} tip={`Hours a day the device is used (${sdwsRef(basis, "tp")}). Default 5 h (Option 1).`} />
         <EditGlyph title="Enter usage hours (t_p)" />
         <InRowNum value={state.usageHoursPerDay ?? 5} onChange={(v) => patch({ usageHoursPerDay: v })} onClear={() => patch({ usageHoursPerDay: undefined })} optional width={92} />
+        </span>
       </div>
       <ProveLater entered={state.usageHoursPerDay != null} mark={{ kind: "monitoring", sdws: sdwsRef(basis, "tp"), instrument: "usage survey" }} />
       {/* DN_p, DEVICES PER HOUSEHOLD — A PROJECT FACT, SHOWN ONLY WITH A FLOW RATE (ruling 2026-10-23).
@@ -1062,8 +1095,10 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
           is refused here, in words, before the engine sees it. */}
       {state.deviceCapacityLPerHour != null && state.deviceCapacityLPerHour > 0 ? (
         <div>
-          <div className="flex items-baseline gap-2">
+          <div className="calvin-row flex items-baseline gap-2">
             <span className="t-caption flex-1 text-fg-2">DN_p — devices per household</span>
+            {/* The controls move together when the row wraps on a narrow screen. */}
+            <span className="inline-flex min-w-0 flex-wrap items-baseline gap-2">
             <StateBadge mark={{ kind: "monitoring", sdws: sdwsRef(basis, "DN"), instrument: "sales or distribution records" }} state={state.devicesPerPremises != null ? "entered" : "assumed"} tip={`Average devices per household, from sales or distribution records (${sdwsRef(basis, "DN")}). A whole number, 1 or more.`} />
             <EditGlyph title="Enter devices per household (DN_p)" />
             <InRowNum
@@ -1079,6 +1114,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
               min={1}
               width={92}
             />
+            </span>
           </div>
           <ProveLater entered={state.devicesPerPremises != null} mark={{ kind: "monitoring", sdws: sdwsRef(basis, "DN"), instrument: "sales or distribution records" }} />
           <div className="t-caption text-fg-4" style={{ fontSize: 10 }}>
@@ -1160,8 +1196,9 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
           and equation, and none of them can be changed here.
         </p>
       ) : (
-        <p className="t-caption mt-1 flex items-center gap-1 text-fg-3" style={{ fontSize: 10 }}>
-          Values marked <EditGlyph title="edit affordance" /> can be typed over — doing so tags them ENTERED. CALCULATED values are worked out here and cannot be typed over.
+        // One line of text that wraps as text: as a row of flex items it split into three narrow columns on a phone.
+        <p className="t-caption mt-1 text-fg-3" style={{ fontSize: 10 }}>
+          Values marked <span className="inline-flex" style={{ verticalAlign: "-1px" }}><EditGlyph title="edit affordance" /></span> can be typed over — doing so tags them ENTERED. CALCULATED values are worked out here and cannot be typed over.
         </p>
       )}
 
@@ -1224,8 +1261,10 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
             Clearing it on the Legacy path does not fall back to anything: the transition stops and
             the seat asks for the value again. Source labeled per version. */}
         <div className="py-1">
-          <div className="flex items-baseline gap-2">
+          <div className="calvin-row flex items-baseline gap-2">
             <span className="t-caption flex-1 text-fg-2">fNRB — non-renewable biomass</span>
+            {/* The controls move together when the row wraps on a narrow screen. */}
+            <span className="inline-flex min-w-0 flex-wrap items-baseline gap-2">
             <StateBadge
               state={fnrbSet ? "entered" : "default"}
               tip={isLegacyV
@@ -1241,6 +1280,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
               onClear={() => patch(isLegacyV ? { fnrbFiledV1: null } : { fnrbOverride: null })}
               optional step={0.001} width={80}
             />
+            </span>
           </div>
           {/* THE PROVENANCE STAYS; THE INSTRUCTION GOES ([#97]). Where this value CAME FROM is a
               fact a reader needs — "country lookup", "override, filed" — but *"Overtype to file
@@ -1293,18 +1333,21 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
         open={open.has("q_y")} onToggle={() => toggle("q_y")} editable cite={citeShort(basis, "qy")}>
         <VarRow label={`Q_pop (Eq.${m2 ? "6" : "5"})`} value={ML(result.Q_pop)} unit="/yr" state="calculated" tip={`Quantity of safe water from Eq.${m2 ? "6" : "5"}.`} />
         <div className="py-1">
-          <div className="flex items-baseline gap-2">
+          <div className="calvin-row flex items-baseline gap-2">
             {/* PLANNED PRODUCTION STAYS BLANK UNTIL GIVEN (the maintainer's walk, 2026-11-16, item 11). Blank is no
                 value at all, so it carries no tag: nothing is assumed in its place. */}
             <span className="t-caption flex-1 text-fg-2" data-production-question="">
               {state.mode === "ex-post" ? "Q_m — metered volume / yr" : "How much water will the system produce in a year?"}
             </span>
+            {/* The controls move together when the row wraps on a narrow screen. */}
+            <span className="inline-flex min-w-0 flex-wrap items-baseline gap-2">
             {state.meteredVolumeL != null ? (
               <StateBadge state="entered" tip={state.mode === "ex-post" ? "Metered volume, entered for this project." : "Planned production, entered for this project."} />
             ) : null}
             <EditGlyph title={state.mode === "ex-post" ? "Enter the metered volume" : "Enter the planned production"} />
             <InRowNum value={state.meteredVolumeL} onChange={(v) => patch({ meteredVolumeL: v })} onClear={() => patch({ meteredVolumeL: null })} optional width={108} />
             <span className="t-mono shrink-0 text-fg-4" style={{ fontSize: 10 }}>L/yr</span>
+            </span>
           </div>
           <div className="t-caption text-fg-4" style={{ fontSize: 10 }}>
             Leave blank if you don&rsquo;t know yet. If it {state.mode === "ex-post" ? "supplied" : "produces"} less than people need, credits follow what it {state.mode === "ex-post" ? "supplied" : "produces"}.
@@ -1345,8 +1388,10 @@ function ActivityRow({ result, state, patch }: { result: ScenarioResult; state: 
   const powerWords = { hand: "a hand pump", gravity: "gravity", solar: "solar power", diesel: "diesel", grid: "grid power" } as const;
   return (
     <div className="py-1" data-activity-row="">
-      <div className="flex items-baseline gap-2">
+      <div className="calvin-row flex items-baseline gap-2">
         <span className="t-caption min-w-0 flex-1 text-fg-2">Pump and fuel emissions a year</span>
+        {/* The controls move together when the row wraps on a narrow screen. */}
+        <span className="inline-flex min-w-0 flex-wrap items-baseline gap-2">
         <StateBadge
           state={entered ? "entered" : burnsNothing ? "default" : "assumed"}
           tip={entered ? "Entered for this project: the pump's yearly emissions." : "Zero: nothing is burned to run the system."}
@@ -1355,6 +1400,7 @@ function ActivityRow({ result, state, patch }: { result: ScenarioResult; state: 
         <InRowNum value={entered ? state.activityEmissions : result.result.PE} onChange={(v) => patch({ activityEmissions: v })}
           onClear={() => patch({ activityEmissions: null })} optional step={0.1} width={80} />
         <span className="t-mono shrink-0 text-fg-4" style={{ fontSize: 10 }}>tCO₂e</span>
+        </span>
       </div>
       <div className="t-caption text-fg-4" style={{ fontSize: 10 }}>
         {entered

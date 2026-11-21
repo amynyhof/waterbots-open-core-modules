@@ -18,13 +18,16 @@ export default function ExAntePanel({ state, result, patch }: {
   patch: (p: Partial<CalcState>) => void;
 }) {
   return (
-    <section className="rounded-lg border border-line bg-card" style={{ padding: "12px 20px" }} aria-label="Anticipated performance">
-      <div className="flex items-baseline gap-3">
+    // IT CAN COLLAPSE (0.5.0). The title row is the toggle, and it keeps the headline in view when closed. It starts open.
+    <details open className="calvin-fold rounded-lg border border-line bg-card" style={{ padding: "12px 20px" }} aria-label="Anticipated performance" data-fold="sliders">
+      <summary className="calvin-fold-title flex flex-wrap items-baseline gap-x-3 gap-y-1">
         <span className="eyebrow" style={{ fontSize: 11 }}>Anticipated performance</span>
-        <span className="ml-auto t-caption text-fg-3" style={{ fontSize: 11 }}>Credits a year</span>
-        <span className="t-mono text-fg-1" data-headline="" style={{ fontSize: 17, fontWeight: 600 }}>{fmt(result.result.ER, 0)}</span>
-        <span className="t-mono text-fg-4" style={{ fontSize: 10 }}>tCO₂e</span>
-      </div>
+        <span className="ml-auto inline-flex items-baseline gap-2">
+          <span className="t-caption text-fg-3" style={{ fontSize: 11 }}>Credits a year</span>
+          <span className="t-mono text-fg-1" data-headline="" style={{ fontSize: 17, fontWeight: 600 }}>{fmt(result.result.ER, 0)}</span>
+          <span className="t-mono text-fg-4" style={{ fontSize: 10 }}>tCO₂e</span>
+        </span>
+      </summary>
       <p className="t-caption mt-1 text-fg-3" style={{ fontSize: 11 }}>
         For a planned project, move the sliders to match its expected performance. To type an exact number, tap the
         pencil.
@@ -34,6 +37,6 @@ export default function ExAntePanel({ state, result, patch }: {
           <SliderRow key={spec.key} spec={spec} state={state} result={result} patch={patch} />
         ))}
       </div>
-    </section>
+    </details>
   );
 }

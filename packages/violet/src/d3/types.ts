@@ -32,6 +32,12 @@ export type ValueKind = "project fact" | "method default" | "anticipated perform
 /** What a field shows while a project fact is missing. Never guessed. */
 export const AWAITING = "awaiting user project input" as const;
 
+/**
+ * D-3's standing, on every result (0.5.0). The module is a draft until an outside VWBA expert has checked it, so
+ * the screen shows this label, and so does any report or answer built from a result.
+ */
+export const D3_STATUS = "Draft — pending expert review" as const;
+
 export interface D3Input {
   view: D3View;
   option: D3Option;
@@ -123,6 +129,8 @@ export interface D3Step {
 export interface D3Result {
   method: "VWBA 2.0 D-3 Volume Provided";
   engineVersion: string;
+  /** The module's standing. A report or answer built from this result shows it. */
+  status: typeof D3_STATUS;
   view: D3View;
   option: D3Option;
   values: D3Value[];

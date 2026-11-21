@@ -51,8 +51,10 @@ export default function SliderRow({ spec, state, result, patch }: {
 
   return (
     <div className="py-2" data-slider={spec.key}>
-      <div className="flex items-baseline gap-2">
+      <div className="calvin-row flex items-baseline gap-2">
         <span className="t-caption flex-1 text-fg-2">{spec.label}</span>
+        {/* The controls move together when the row wraps on a narrow screen. */}
+        <span className="inline-flex min-w-0 flex-wrap items-baseline gap-2">
         <HelpTip text={sliderSources(spec)} label={`Where the ${spec.label.toLowerCase()} values come from`}>
           <span className="inline-flex text-fg-3" data-sources="">
             <InfoIcon />
@@ -62,6 +64,7 @@ export default function SliderRow({ spec, state, result, patch }: {
         <EditGlyph title={`Type an exact value, from ${shownValue(spec, spec.floor.value)} to ${shownValue(spec, spec.ceiling.value)}.`} />
         <InRowNum value={value} onChange={change} step={spec.step} min={0} width={64} />
         <span className="t-mono shrink-0 text-fg-4" style={{ fontSize: 10, minWidth: 18 }}>{spec.unit}</span>
+        </span>
       </div>
       <input
         type="range"
