@@ -1,5 +1,9 @@
 # Working rules for this repo
 
+REFERENCE PROJECTS — SETTLED, DO NOT ASK AGAIN (ruled 21 Nov 2026)
+
+Never put a reference project's name, ID or documents into code, comments, tests or anything public. The name scan on the private names-to-block list (names and project IDs) is the only check. There is no rule or check on calculation figures. Every older rule about project numbers, figures or a number gate is retired. Do not raise this topic again; if anything seems to conflict, this rule wins. When a new reference project is used, stop and tell the maintainer to add its name and ID to names-to-block and update the three secrets.
+
 This repo is public and licensed Apache 2.0. Anyone can read every file, every commit message and every pull request.
 Write as if a stranger is reading — because one will.
 
@@ -22,10 +26,9 @@ handoff folder (`%USERPROFILE%\GitHub\handoff\`), and a carry starts only when t
    or a release needs: it reads a file the maintainer names, read-only, and writes release packs. The one other
    exception: the name scan may read the private name list in place, through the `WB_NAMES_LIST` variable, and
    nothing else in that place.
-2. **Nothing private goes in.** No real project names or project IDs, no reviewer or partner names or organisations,
-   no secrets or keys. Not in code, tests, fixtures, comments, presets, commit messages or PR text. Fixtures are
-   **invented** projects only. The name scan checks names and project IDs (see "The one check for public material").
-   There is no rule or check on calculation figures (ruling 2026-11-21).
+2. **Nothing private goes in.** No reviewer or partner names or organisations, no secrets or keys. Not in code, tests,
+   fixtures, comments, presets, commit messages or PR text. Fixtures are **invented** projects only. Reference projects:
+   the rule at the top. The name scan runs on every pull request, on `main`, and on every file inside each packed release.
 3. **No standards text.** No standards PDFs, no copied passages, no context packs or retrieval indexes. Cite and link
    instead. Rule cards are **our own wording**, each with its citation and link.
 4. **Never merge, never push to `main`, never force-push, never change repo settings.** These are also denied in
@@ -58,12 +61,6 @@ in `.github/lanes/lane-rule.mjs`.
 **How lane 1 auto-merges.** The lane label job arms GitHub's auto-merge on a lane 1 pull request that is not a draft, and
 disarms it on every other pull request. GitHub then merges once every required check is green. It needs two repo settings,
 both the maintainer's: "Allow auto-merge" on, and every check that matters on the `main` ruleset's required list.
-
-## The one check for public material
-
-The name scan is the one check for public material (ruling 2026-11-21). It reads the maintainer's names-to-block list:
-names and project IDs. It runs on every pull request, on `main`, and on every file inside each packed release. There is no
-number gate, and no rule or check on calculation figures.
 
 ## Carries
 
@@ -139,7 +136,7 @@ Stove and fuel presets: do not raise their sources with the maintainer until the
 
 ### Never write
 
-- A real project's name or project ID, or a reviewer's or partner's name or organisation.
+- A reviewer's or partner's name or organisation. (Reference projects: the rule at the top.)
 - Standards text, quoted or paraphrased closely. Cite it instead.
 - A credit price. It was removed from the module and appears nowhere.
 - Any key, token or password.
