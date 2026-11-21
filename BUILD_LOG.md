@@ -4,6 +4,30 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-11-21 — Calvin 0.4.1: monitoring values labelled by the analysis basis
+
+**Done (branch `calvin-0-4-1-monitoring-labels`), from Session A's note of 2026-11-21 in the handoff folder, read-only:**
+- `packages/calvin/src/modules/calvin/screen/monitoring.ts` (new): the four monitoring values the rule covers (the
+  operating days, the share of water tests that pass, the usage rate and the share still boiling the safe water),
+  their "entered" flags, the words each one carries, and what an ex-post run is missing. It does no arithmetic.
+- Ex-ante: each value is labelled assumed, on the rows and in the report. Ex-post: each is labelled from the
+  operation log or monitoring. Until it is entered its box is blank, with a light highlight and a small red dot, and
+  the seat computes nothing (`missingMonitoring` on the state hook).
+- The four flags are saved with the analysis and read back. A save from before 0.4.1 is read by its value, and its
+  moved sliders still count. A change of the run into ex-post clears the flags, so a planned figure never reads as
+  monitored.
+- The ex-ante sliders set the same flags. `slidersEntered` is read from older saves and no longer written.
+- The agent's page context tells Calvin there are no figures while a value is missing.
+- `scripts/check-screen-entry.mjs`: the ex-post views from the packed files now enter invented monitoring values,
+  and a new view checks the ask.
+- Calvin's version is 0.4.1. The engine version stays 0.19.0: no arithmetic changed. `core` stays 0.1.1.
+- The README's "Changes in 0.4.1" lists which values the rule covers, for the maintainer to confirm.
+
+**Open:** the maintainer confirms the list of values. After this merges, Session C packs both from `main` into the
+handoff folder with `SHA256SUMS.txt`. The tag `calvin-v0.4.1` waits until Session A sends a pass on the packed files.
+
+---
+
 ## 2026-11-18 — Calvin 0.4.0 released
 
 **Done (branch `calvin-release-close`):**
