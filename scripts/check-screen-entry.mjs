@@ -38,6 +38,7 @@ export const V2_ONLY = 'data-view="v2-only"';
 export const TRANSITION = ["Transition delta (PAA − Legacy)", "PAA Transition Analysis", "Legacy V1.0 ER", "What changed — methodology transition"];
 /** The ask for a filed V1.0 fNRB. */
 export const FILED_ASK = "Filed V1.0 fNRB needed";
+export const MONITORING_ASK = "Monitoring values needed";
 const SITE_TABLES = { daf: { source: SITE_SOURCE, countries: { LSO: { name: "Lesotho", daf_2026_2030: Number(SITE_DAF), basis: "invented basis" } } } };
 
 // What a site writes to mount a seat: the state hook, the controls panel and the work surface.
@@ -55,6 +56,8 @@ function Seat({ project, options, tab }) {
   return h("div", null, h(S.CalculatorLens, { calc }), h(S.CalculatorWork, { calc, project, appVersion: "0.0.0", tab }));
 }
 const render = (p, options, tab = "calculator") => renderToStaticMarkup(h(Seat, { project: p, options, tab }));
+// An ex-post run shows figures only once its monitoring values are entered (ruling 2026-11-21). Invented values.
+const monitored = { mode: "ex-post", operationalDays: 300, operationalDaysEntered: true, mQuality: 0.95, mQualityEntered: true, xCleanboil: 0.1, xCleanboilEntered: true };
 const tables = ${JSON.stringify(SITE_TABLES)};
 const found = (name) => existsSync(fileURLToPath(import.meta.resolve(name)));
 process.stdout.write(JSON.stringify({
@@ -62,14 +65,15 @@ process.stdout.write(JSON.stringify({
   views: {
     exAnte: render(project({}), { exAnteOnly: true }),
     exAnteFromSavedExPost: render(project({ mode: "ex-post" }), { exAnteOnly: true }),
-    exPost: render(project({ mode: "ex-post" }), {}),
-    exPostReport: render(project({ mode: "ex-post" }), {}, "report"),
-    siteTable: render(project({ mode: "ex-post" }), { tables }),
-    siteTableReport: render(project({ mode: "ex-post" }), { tables }, "report"),
+    exPostNeedsMonitoring: render(project({ mode: "ex-post" }), {}),
+    exPost: render(project(monitored), {}),
+    exPostReport: render(project(monitored), {}, "report"),
+    siteTable: render(project(monitored), { tables }),
+    siteTableReport: render(project(monitored), { tables }, "report"),
     newProject: render({ ...project({}), analysis: {} }, {}),
     newProjectReport: render({ ...project({}), analysis: {} }, {}, "report"),
-    transition: render({ ...project({ mode: "ex-post" }), creditedUnderV1: true }, {}),
-    transitionReport: render({ ...project({ mode: "ex-post" }), creditedUnderV1: true }, {}, "report"),
+    transition: render({ ...project(monitored), creditedUnderV1: true }, {}),
+    transitionReport: render({ ...project(monitored), creditedUnderV1: true }, {}, "report"),
     transitionNeedsFiling: render({ ...project({}), analysis: {}, creditedUnderV1: true }, {}),
   },
   stylesheets: { "@waterbots/calvin/styles.css": found("@waterbots/calvin/styles.css"), "@waterbots/core/base.css": found("@waterbots/core/base.css") },
@@ -94,7 +98,8 @@ const TSCONFIG = {
 export const EXPECT = {
   exAnte: { has: ['aria-label="Anticipated performance"', "How much water will the system produce in a year?"], lacks: ["Q_m — metered volume"] },
   exAnteFromSavedExPost: { has: ['aria-label="Anticipated performance"', "How much water will the system produce in a year?"], lacks: ["Q_m — metered volume"] },
-  exPost: { has: ["Q_m — metered volume", PACKAGE_DAF], lacks: ['aria-label="Anticipated performance"', SITE_SOURCE] },
+  exPostNeedsMonitoring: { has: [MONITORING_ASK, "data-needed-dot"], lacks: ["Q_m — metered volume", PACKAGE_DAF] },
+  exPost: { has: ["Q_m — metered volume", PACKAGE_DAF, "From the operation log or sensor"], lacks: [MONITORING_ASK, 'aria-label="Anticipated performance"', SITE_SOURCE] },
   exPostReport: { has: ["print-report", "Ex-post"], lacks: ['aria-label="Anticipated performance"', SITE_SOURCE] },
   siteTable: { has: ["Q_m — metered volume", SITE_DAF, SITE_SOURCE], lacks: [PACKAGE_DAF] },
   siteTableReport: { has: ["print-report", SITE_DAF, SITE_SOURCE], lacks: [PACKAGE_DAF] },

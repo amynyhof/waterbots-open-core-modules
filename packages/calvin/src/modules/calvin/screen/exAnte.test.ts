@@ -6,7 +6,7 @@ import {
   applySlider, capNote, creditedIfDifferent, creditedValue, endLabel, exAnteOnlyPatch, exAnteOnlySeed, showSliders, sliderLabel, sliderNotes,
   sliderSpecs, startsWithoutSource, withSliderStarts, type SliderKey, type SliderSpec,
 } from "./exAnte";
-import { seedCalcState, toScenarioInput, type CalcState, type CalvinProject } from "./state";
+import { seedCalcState, toSavedAnalysis, toScenarioInput, type CalcState, type CalvinProject } from "./state";
 
 const COUNTRY = "LSO"; // a country with an official fNRB; the project itself is invented
 const invented = (technology: "CWS" | "HWT", analysis: CalvinProject["analysis"] = {}): CalvinProject => ({
@@ -110,7 +110,9 @@ describe("starting values", () => {
   });
   it("a saved analysis keeps entered and typed values", () => {
     const s = move(hwt(), "days", 400);
-    const again = seedCalcState(invented("HWT", { slidersEntered: s.slidersEntered, slidersTyped: s.slidersTyped, operationalDays: s.operationalDays }));
+    const again = seedCalcState(invented("HWT", toSavedAnalysis(s)));
+    // Held at 365, a starting value: only the saved flag says it was entered.
+    expect(again.operationalDays).toBe(365);
     expect(sliderLabel(again, "days")).toBe("entered");
     expect(capNote(again, spec(again, "days"))).not.toBeNull();
   });

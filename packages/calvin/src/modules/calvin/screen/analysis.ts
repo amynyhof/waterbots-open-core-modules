@@ -66,7 +66,19 @@ export interface SavedAnalysis {
   cBaseline?: number; // C_b
   xCleanboil?: number; // X_cleanboil
   mQuality?: number; // M_qy
-  /** Ex-ante sliders: which were moved, and any value typed past a cited end (see `exAnte.ts`). */
+  /**
+   * WHETHER EACH MONITORING VALUE WAS ENTERED (ruling 2026-11-21; see `monitoring.ts`). Unset or false: the
+   * value is still its starting value, labelled assumed ex-ante and asked for ex-post. A save keeps them.
+   */
+  operationalDaysEntered?: boolean;
+  mQualityEntered?: boolean;
+  usageRateEntered?: boolean;
+  xCleanboilEntered?: boolean;
+  /**
+   * Ex-ante sliders moved, from a save made before 0.4.1. Read, never written: the four flags above replace it.
+   * @deprecated
+   */
   slidersEntered?: Partial<Record<"days" | "testsPass" | "usage", true>>;
+  /** Ex-ante sliders: any value typed past a cited end (see `exAnte.ts`). */
   slidersTyped?: Partial<Record<"litres" | "days" | "testsPass" | "usage", number>>;
 }

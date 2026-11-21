@@ -10,6 +10,7 @@ import {
 } from "../engine";
 import type { SavedAnalysis } from "./analysis";
 import { technologyToMethod } from "./method";
+import { readMonitoringFlags } from "./monitoring";
 
 /** The project as Calvin receives it: the host's facts, plus Calvin's own saved analysis. */
 export type CalvinProject = ModuleProject<SavedAnalysis> & {
@@ -140,11 +141,16 @@ export interface CalcState {
   /** A project's own surveyed household size (people/household), overriding the UN 2022 country average — [#225](b). */
   householdSizeOverride?: number | null;
   /**
-   * EX-ANTE SLIDERS (`exAnte.ts`). Which of days, tests passing and usage somebody has moved, so the
-   * row says "entered" rather than "assumed" (litres uses `qpwEntered`). And a value typed past a
-   * cited end, kept beside the held value so the row can say the credit is capped.
+   * WHETHER EACH MONITORING VALUE WAS ENTERED (ruling 2026-11-21; `monitoring.ts`). False while the value is
+   * still its starting value. Ex-ante, an unentered value is labelled assumed. Ex-post, an unentered value is
+   * blank and the seat computes nothing until it is entered. Saved with the analysis, so a save keeps them.
+   * The ex-ante sliders set the first three too.
    */
-  slidersEntered?: Partial<Record<"days" | "testsPass" | "usage", true>>;
+  operationalDaysEntered: boolean;
+  waterQualityEntered: boolean;
+  usageRateEntered: boolean;
+  xCleanboilEntered: boolean;
+  /** EX-ANTE SLIDERS (`exAnte.ts`): a value typed past a cited end, kept beside the held value so the row can say the credit is capped. */
   slidersTyped?: Partial<Record<"litres" | "days" | "testsPass" | "usage", number>>;
 }
 
@@ -319,7 +325,7 @@ export function seedCalcState(project: CalvinProject): CalcState {
     // Household size: a saved analysis figure wins, else the RECORD's own (glossary,
     // 2026-09-24 — it is a project fact), else undefined and the cited UN average is used.
     householdSizeOverride: g.householdSizeOverride ?? project.population?.householdSize,
-    slidersEntered: g.slidersEntered,
+    ...readMonitoringFlags(g),
     slidersTyped: g.slidersTyped,
   };
 }
@@ -354,7 +360,10 @@ export function toSavedAnalysis(s: CalcState): SavedAnalysis {
     fnrbOverride: s.fnrbOverride,
     fnrbFiledV1: s.fnrbFiledV1,
     householdSizeOverride: s.householdSizeOverride,
-    slidersEntered: s.slidersEntered,
+    operationalDaysEntered: s.operationalDaysEntered,
+    mQualityEntered: s.waterQualityEntered,
+    usageRateEntered: s.usageRateEntered,
+    xCleanboilEntered: s.xCleanboilEntered,
     slidersTyped: s.slidersTyped,
   };
 }

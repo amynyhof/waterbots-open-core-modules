@@ -1,6 +1,9 @@
 import type { ScenarioResult } from "../engine";
 import { sdwsRef, type Basis } from "./citations";
 import { anticipatedInput, type CalcState } from "./state";
+import { MONITORING_FIELD, SENSOR_DAYS, SENSOR_SOURCE } from "./monitoring";
+
+export { SENSOR_DAYS } from "./monitoring";
 
 /**
  * THE EX-ANTE SLIDERS (Road to v1, step V3; rulings 2026-10-30).
@@ -55,9 +58,6 @@ export interface SliderSpec {
 }
 
 const YEAR = "natural limit: the days in a year";
-/** Days of operation above which a community system needs an operation sensor, and where that is stated. */
-export const SENSOR_DAYS = 347;
-const SENSOR_SOURCE = "V2.0 SDWS 32; V1.0 SDWS 27";
 /** Where a household device's starting days come from: a starting point, not a cited value (ruling 2026-11-16). */
 const HOUSEHOLD_DAYS_SOURCE = "starting point (ruling 2026-11-16)";
 const SHARE = "natural limit: a share";
@@ -171,10 +171,13 @@ export function storedValue(state: CalcState, key: SliderKey): number {
   return state[FIELD[key]];
 }
 
-/** "assumed" until somebody moves or types the slider, then "entered". */
+/**
+ * "assumed" until somebody moves or types the slider, then "entered". Days, tests passing and usage keep their
+ * flag with the monitoring values ("monitoring.ts"), so the slider and the report read the same one.
+ */
 export function sliderLabel(state: CalcState, key: SliderKey): "assumed" | "entered" {
   if (key === "litres") return state.qpwEntered ? "entered" : "assumed";
-  return state.slidersEntered?.[key] ? "entered" : "assumed";
+  return state[MONITORING_FIELD[key].entered] ? "entered" : "assumed";
 }
 
 export type SliderChange =
@@ -201,7 +204,7 @@ export function applySlider(state: CalcState, spec: SliderSpec, display: number)
   else delete slidersTyped[spec.key];
   const patch: Partial<CalcState> = { [FIELD[spec.key]]: held, slidersTyped };
   if (spec.key === "litres") patch.qpwEntered = true;
-  else patch.slidersEntered = { ...state.slidersEntered, [spec.key]: true };
+  else patch[MONITORING_FIELD[spec.key].entered] = true;
   return { ok: true, patch };
 }
 

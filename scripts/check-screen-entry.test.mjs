@@ -1,7 +1,7 @@
 // Tests for the screen-entry check: how it judges what was rendered, on invented markup only.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { compare, EXPECT, FILED_ASK, NAMES, PACKAGE_DAF, SITE_DAF, SITE_SOURCE, V2_ONLY } from "./check-screen-entry.mjs";
+import { compare, EXPECT, FILED_ASK, MONITORING_ASK, NAMES, PACKAGE_DAF, SITE_DAF, SITE_SOURCE, V2_ONLY } from "./check-screen-entry.mjs";
 
 const SLIDERS = 'aria-label="Anticipated performance"';
 const goodRun = () => ({
@@ -9,7 +9,8 @@ const goodRun = () => ({
   views: {
     exAnte: `<section ${SLIDERS}></section><span>How much water will the system produce in a year?</span>`,
     exAnteFromSavedExPost: `<section ${SLIDERS}></section><span>How much water will the system produce in a year?</span>`,
-    exPost: `<span>Q_m — metered volume / yr</span><span>${PACKAGE_DAF}</span>`,
+    exPostNeedsMonitoring: `<section>${MONITORING_ASK}<span data-needed-dot=""></span></section>`,
+    exPost: `<span>Q_m — metered volume / yr</span><span>${PACKAGE_DAF}</span><p>From the operation log or sensor (V2.0 SDWS 32)</p>`,
     exPostReport: '<div class="print-report">Ex-post</div>',
     siteTable: `<span>Q_m — metered volume / yr</span><span>${SITE_DAF}</span><span>${SITE_SOURCE}</span>`,
     siteTableReport: `<div class="print-report">${SITE_DAF} ${SITE_SOURCE}</div>`,
@@ -27,10 +28,21 @@ test("every view as it should be: no problem", () => {
   assert.deepEqual(compare(goodRun()), []);
 });
 
-test("checks eleven views", () => {
+test("checks twelve views", () => {
   assert.deepEqual(Object.keys(EXPECT), [
-    "exAnte", "exAnteFromSavedExPost", "exPost", "exPostReport", "siteTable", "siteTableReport",
+    "exAnte", "exAnteFromSavedExPost", "exPostNeedsMonitoring", "exPost", "exPostReport", "siteTable", "siteTableReport",
     "newProject", "newProjectReport", "transition", "transitionReport", "transitionNeedsFiling",
+  ]);
+});
+
+test("an ex-post run with no monitoring values that shows figures, or no ask, is a problem", () => {
+  const run = goodRun();
+  run.views.exPostNeedsMonitoring = `<span>Q_m — metered volume / yr</span><span>${PACKAGE_DAF}</span>`;
+  assert.deepEqual(compare(run), [
+    `exPostNeedsMonitoring: missing ${MONITORING_ASK}`,
+    "exPostNeedsMonitoring: missing data-needed-dot",
+    "exPostNeedsMonitoring: should not show Q_m — metered volume",
+    `exPostNeedsMonitoring: should not show ${PACKAGE_DAF}`,
   ]);
 });
 

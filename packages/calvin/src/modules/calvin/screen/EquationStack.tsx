@@ -13,6 +13,7 @@ import { fmt, fmtExp, parseNumericInput } from "./format";
 import HelpTip from "./HelpTip";
 import { sdwsRef, citeShort, dafSteps, fnrbTableLabel, FNRB_ORIGIN, type Basis } from "./citations";
 import { creditedValue, shownValue, sliderLabel, sliderSpecs, type SliderKey } from "./exAnte";
+import { enterMonitoring, monitoringSource } from "./monitoring";
 
 /*
  * Derivation view — structured by the GS methodology's NATIVE sections (Baseline emissions →
@@ -390,7 +391,7 @@ function VarRow({ label, value, unit, state, tip, baselineSdws, monitor }: { lab
  * most rows and *assumed* for the ones the rulebook gives no value for (C_b is the standing
  * example: its zero is the seat's starting point, not the methodology's).
  */
-function Param({ label, sdwsRef, value, onChange, min, max, step, unit, baseline, tip, changed, baselineSdws, monitor, resting = "default" }: {
+function Param({ label, sdwsRef, value, onChange, min, max, step, unit, baseline, tip, changed, baselineSdws, monitor, resting = "default", note }: {
   label: string; sdwsRef: string; value: number; onChange: (v: number) => void;
   min: number; max: number; step: number; unit: string; baseline: string; tip?: string; changed: boolean;
   /** Set when a project's BASELINE SURVEY is the real source of this value — see `BaselineChip`. */
@@ -399,6 +400,8 @@ function Param({ label, sdwsRef, value, onChange, min, max, step, unit, baseline
   monitor?: { sdws: string; instrument: string };
   /** The tag this row carries while nobody has typed in it. */
   resting?: EditState;
+  /** Replaces the starting-value line under the box: a monitoring value says where it comes from (`monitoringSource`). */
+  note?: string;
 }) {
   return (
     <div className="py-1">
@@ -417,7 +420,7 @@ function Param({ label, sdwsRef, value, onChange, min, max, step, unit, baseline
         />
         {unit ? <span className="t-mono shrink-0 text-fg-4" style={{ fontSize: 10, minWidth: 18 }}>{unit}</span> : null}
       </div>
-      <div className="t-caption text-fg-4" style={{ fontSize: 10 }}>{resting === "assumed" ? "assumed" : "default"} {baseline}</div>
+      <div className="t-caption text-fg-4" style={{ fontSize: 10 }} data-source-note={note ? "" : undefined}>{note ?? `${resting === "assumed" ? "assumed" : "default"} ${baseline}`}</div>
       <ProveLater entered={changed} mark={rowMark(baselineSdws, monitor)} />
     </div>
   );
@@ -614,11 +617,12 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
   // "Adjusted" = moved from the methodology default (discounts) or the seeded value (QPW).
   const changed = {
     eta: state.etaOverride !== undefined,
-    mq: state.waterQualityFactor !== 1,
+    // Monitoring values: entered only when somebody entered them (ruling 2026-11-21), never by comparing numbers.
+    mq: state.waterQualityEntered,
     cb: state.cBaseline !== 0,
-    xcb: state.xCleanboil !== 0,
+    xcb: state.xCleanboilEntered,
     qpw: seed !== undefined ? state.litresPerPersonPerDay !== seed.litresPerPersonPerDay : false,
-    do: state.operationalDays !== 365,
+    do: state.operationalDaysEntered,
   };
 
   const etaParam = (
@@ -643,7 +647,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
         state={sliderLabel(state, key)} tip="Set on the anticipated-performance sliders above the equations. This is the value the engine credits." />
     );
   };
-  const mqParam = slider("testsPass") ?? <Param monitor={mon("Mq", "water-quality tests")} label="M_q,y — water-quality modifier" sdwsRef={sdwsRef(basis, "Mq")} value={state.waterQualityFactor} changed={changed.mq} onChange={(v) => patch({ waterQualityFactor: v })} min={0} max={1} step={0.01} unit="" baseline="1.0 (all samples pass at point of use)" tip="Fraction of water-quality samples that pass at the point of use. 0 = all failing → no credits." />;
+  const mqParam = slider("testsPass") ?? <Param monitor={mon("Mq", "water-quality tests")} label="M_q,y — water-quality modifier" sdwsRef={sdwsRef(basis, "Mq")} value={state.waterQualityFactor} changed={changed.mq} onChange={(v) => patch(enterMonitoring("testsPass", v))} min={0} max={1} step={0.01} unit="" resting="assumed" note={monitoringSource(state, "testsPass")} baseline="1.0 (all samples pass at point of use)" tip="Fraction of water-quality samples that pass at the point of use. 0 = all failing → no credits." />;
   // C_b ON THE SCREENING VIEW (the maintainer's walk of the open site, 2026-11-16, item 13). V2.0 sets no default for
   // it: SDWS 12 (p.53) leaves it to the activity, from a baseline survey or published sources. So the screening view
   // shows the 0% it uses, locked, and says plainly that 0% is the most generous value. The value is unchanged.
@@ -660,7 +664,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
   );
   const activityRow = <ActivityRow result={result} state={state} patch={patch} />;
   const cbParam = screening ? cbScreening : <Param resting="assumed" label="C_b — already-safe share" sdwsRef={sdwsRef(basis, "Cb")} baselineSdws="V2.0 SDWS 12" value={state.cBaseline} changed={changed.cb} onChange={(v) => patch({ cBaseline: v })} min={0} max={1} step={0.01} unit="" baseline="0% — your baseline survey replaces this" tip="Share of end-users already using a safe supply that didn't require boiling. 1 = everyone → no credits. Assumed 0% until your baseline survey (V2.0 SDWS 12) replaces it." />;
-  const xcbParam = <Param monitor={mon("X", "usage survey")} label="X_cleanboil,y — still boiling the safe water" sdwsRef={sdwsRef(basis, "X")} value={state.xCleanboil} changed={changed.xcb} onChange={(v) => patch({ xCleanboil: v })} min={0} max={1} step={0.01} unit="" baseline="0 (not yet surveyed)" tip="Share of end-users who still boil the project's safe water after it arrives — that boiling still burns fuel. 1 = everyone → no credits." />;
+  const xcbParam = <Param monitor={mon("X", "usage survey")} label="X_cleanboil,y — still boiling the safe water" sdwsRef={sdwsRef(basis, "X")} value={state.xCleanboil} changed={changed.xcb} onChange={(v) => patch(enterMonitoring("cleanBoil", v))} min={0} max={1} step={0.01} unit="" resting="assumed" note={monitoringSource(state, "cleanBoil")} baseline="0 (not yet surveyed)" tip="Share of end-users who still boil the project's safe water after it arrives — that boiling still burns fuel. 1 = everyone → no credits." />;
 
   // ── shared quantity inputs (reused by the Method-1 Eq.5 row and the Method-2 Eq.6/7 rows) ──
   // PEOPLE SERVED IS ENTERED NOW AND PROVEN LATER (item 10): monitoring shows how many people really use the
@@ -997,8 +1001,8 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
   );
   const doParam = slider("days") ?? (
     <Param label={`${m2 ? "DP" : "DO"} — operational days / yr`} sdwsRef={sdwsRef(basis, m2 ? "DP" : "DO")} value={state.operationalDays} changed={changed.do}
-      onChange={(v) => patch({ operationalDays: v })} min={0} max={365} step={1} unit="d"
-      baseline="365 (full year)" tip="Days per year the system serves water." />
+      onChange={(v) => patch(enterMonitoring("days", v))} min={0} max={365} step={1} unit="d"
+      resting="assumed" note={monitoringSource(state, "days")} baseline="365 (full year)" tip="Days per year the system serves water." />
   );
   // N_p premises input — Method 2 (HWT/IWT) only. ProjectContext-driven: seeded from the record's
   // units fact, overridable for this analysis. Decomposes people into premises × per-premises.
@@ -1131,7 +1135,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
             U_p (usage rate) is not in Eq.6 under V2.0 — it is applied in Eq.8 (Q_adj), where it is entered.
           </p>
         ) : slider("usage") ?? (
-          <Param monitor={mon("Up", "usage survey")} label="U_p,y — usage rate" sdwsRef={sdwsRef(basis, "Up")} value={state.usageRate} changed={state.usageRate !== 1} onChange={(v) => patch({ usageRate: v })} min={0} max={1} step={0.01} unit="" baseline="1.0 (full use)" tip="Under V1.0, U_p is folded into Eq.6 (Q_pop). Fraction of the time the device is actually used." />
+          <Param monitor={mon("Up", "usage survey")} label="U_p,y — usage rate" sdwsRef={sdwsRef(basis, "Up")} value={state.usageRate} changed={state.usageRateEntered} onChange={(v) => patch(enterMonitoring("usage", v))} min={0} max={1} step={0.01} unit="" resting="assumed" note={monitoringSource(state, "usage")} baseline="1.0 (full use)" tip="Under V1.0, U_p is folded into Eq.6 (Q_pop). Fraction of the time the device is actually used." />
         )}
         {doParam}
         <LiveRow><span className="text-fg-1">{result.premises != null ? fmt(result.premises, 0) : fmt(result.people, 0)}</span>{v2 ? "" : ` · U_p ${fmt(state.usageRate, 2)}`} · QPW_hh · DP_p <span className="text-fg-1">{fmt(state.operationalDays, 0)}</span> = <span style={{ color: "var(--tide)" }}>{ML(result.Q_pop)}/yr</span></LiveRow>
@@ -1439,7 +1443,7 @@ function paaTail(result: ScenarioResult, open: Set<string>, toggle: Toggle, xcbP
         {xcbParam}
         {mqParam}
         {state.method === 2 ? usageSlider ?? (
-          <Param monitor={{ sdws: sdwsRef("paa", "Up"), instrument: "usage survey" }} label="U_p,y — usage rate" sdwsRef={sdwsRef("paa", "Up")} value={state.usageRate} changed={state.usageRate !== 1} onChange={(v) => patch({ usageRate: v })} min={0} max={1} step={0.01} unit="" baseline="1.0 (full use)" tip="Fraction of the time the technology is actually used (Method 2). 0 = never → no credits." />
+          <Param monitor={{ sdws: sdwsRef("paa", "Up"), instrument: "usage survey" }} label="U_p,y — usage rate" sdwsRef={sdwsRef("paa", "Up")} value={state.usageRate} changed={state.usageRateEntered} onChange={(v) => patch(enterMonitoring("usage", v))} min={0} max={1} step={0.01} unit="" resting="assumed" note={monitoringSource(state, "usage")} baseline="1.0 (full use)" tip="Fraction of the time the technology is actually used (Method 2). 0 = never → no credits." />
         ) : (
           <VarRow label="U_p — usage rate (Method 1)" value="1.0" state="default" tip="Usage rate is fixed at 1.0 for Method 1 (CWS/CWT)." />
         )}

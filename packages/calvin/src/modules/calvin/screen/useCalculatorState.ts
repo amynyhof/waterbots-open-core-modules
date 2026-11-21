@@ -30,6 +30,7 @@ import {
 } from "./state";
 import { zeroCreditWarning } from "./warnings";
 import { exAnteOnlyPatch, exAnteOnlySeed, showSliders, withSliderStarts } from "./exAnte";
+import { missingMonitoring, withModeChange, type MonitoringValue } from "./monitoring";
 
 /**
  * The GS4GG carbon calculator's state, lifted out of the standalone calculator page
@@ -165,6 +166,11 @@ export interface CalculatorState {
    */
   activityAsk: { power: "diesel" | "grid" } | null;
   /**
+   * AN EX-POST RUN WITH A MONITORING VALUE NOT ENTERED (ruling 2026-11-21; `monitoring.ts`). Nothing is computed;
+   * the work surface shows each value with a blank box until it is entered. Empty on an ex-ante run.
+   */
+  missingMonitoring: MonitoringValue[];
+  /**
    * THE ENGINE HAS NO fNRB IT WILL STAND BEHIND FOR THIS COUNTRY (ruling (3)(b), 2026-09-21).
    * A6.4-AMT-009 publishes national values for 90 countries and multi-national values for three
    * regions; a project in neither list gets no number, so nothing below is computed and the seat
@@ -224,7 +230,8 @@ export function useCalculatorState(project: CalvinProject, options: CalculatorOp
   // transition keeps V2.0: a change of version is dropped too.
   const patch = (p: Partial<CalcState>) => {
     if (readOnly) return;
-    setState((s) => ({ ...s, ...exAnteOnlyPatch(transitionPatch(p, transition), exAnteOnly) }));
+    // A change into ex-post clears the monitoring flags, so a planned figure never reads as monitored (`withModeChange`).
+    setState((s) => ({ ...s, ...withModeChange(s, exAnteOnlyPatch(transitionPatch(p, transition), exAnteOnly)) }));
   };
 
   // "modified · unsaved" landmark: working state differs from the last SAVED analysis.
@@ -346,9 +353,11 @@ export function useCalculatorState(project: CalvinProject, options: CalculatorOp
   // Both versions computed every render — each tab shows its own version-correct total.
   // A PUMP ON DIESEL OR GRID POWER WITH NOTHING ENTERED: no figures, and the seat asks (item 15).
   const activityAsk = useMemo(() => activityEmissionsAsk(state), [state]);
+  // AN EX-POST MONITORING VALUE NOT ENTERED: no figures, and the seat asks (ruling 2026-11-21). Never a fallback.
+  const monitoringAsk = useMemo(() => missingMonitoring(state), [state]);
   const inputBase = useMemo(
-    () => (missingFacts.length > 0 || activityAsk ? null : toScenarioInput(state, tables)),
-    [state, missingFacts, activityAsk, tables],
+    () => (missingFacts.length > 0 || activityAsk || monitoringAsk.length > 0 ? null : toScenarioInput(state, tables)),
+    [state, missingFacts, activityAsk, monitoringAsk, tables],
   );
   // ASK BEFORE COMPUTING. `computeScenario` REFUSES (it throws) for a country with no official
   // fNRB and no filed value; the seat must show that refusal, not crash on it, so it checks first.
@@ -406,7 +415,7 @@ export function useCalculatorState(project: CalvinProject, options: CalculatorOp
   const erPerPerson = result && result.people > 0 ? result.result.ER / result.people : 0;
 
   const pageContext = () =>
-    calculatorPageContext({ projectName: project.name, state, missingFacts, activityAsk, fnrbRefusal, filedFnrbRefusal, transition, result, legacyResult, paaResult, waterfall });
+    calculatorPageContext({ projectName: project.name, state, missingFacts, activityAsk, missingMonitoring: monitoringAsk, fnrbRefusal, filedFnrbRefusal, transition, result, legacyResult, paaResult, waterfall });
 
   return {
     readOnly,
@@ -427,6 +436,7 @@ export function useCalculatorState(project: CalvinProject, options: CalculatorOp
     save,
     missingFacts,
     activityAsk,
+    missingMonitoring: monitoringAsk,
     fnrbRefusal,
     filedFnrbRefusal,
     result,

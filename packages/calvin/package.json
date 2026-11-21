@@ -1,6 +1,6 @@
 {
   "name": "@waterbots/calvin",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "private": true,
   "description": "WaterBots open core module: calvin (quantify: the carbon calculator). Arrived with the Calvin seed. Not published.",
   "license": "Apache-2.0",
