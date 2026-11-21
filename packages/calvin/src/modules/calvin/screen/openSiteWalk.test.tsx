@@ -3,7 +3,6 @@
 import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { computeScenario } from "../engine";
-import BetaTag from "./BetaTag";
 import CalculatorLens from "./CalculatorLens";
 import CalculatorWork from "./CalculatorWork";
 import EquationStack, { proveLaterLine, TagKey, WithEqNums } from "./EquationStack";
@@ -55,7 +54,7 @@ describe("2 and 7. a site can unpin the figures and hide the export buttons", ()
   it("pins the figures and shows the buttons by default", () => {
     const { html, lens } = mount(project());
     expect(html).toContain('data-figure-block="pinned"');
-    expect(html).toMatch(/class="sticky top-0 z-10 [^"]*"[^>]*data-figure-block/);
+    expect(html).toMatch(/class="calvin-pin"[^>]*data-figure-block="pinned"/);
     expect(lens).toContain("Export report (PDF)");
     expect(mount(project(), {}, "report").html).toContain("Export (PDF)");
   });
@@ -63,7 +62,7 @@ describe("2 and 7. a site can unpin the figures and hide the export buttons", ()
     const { html, lens } = mount(project(), { unpinFigureBlock: true, hideExportButton: true });
     expect(html).toContain('data-figure-block="scrolls"');
     expect(html).toContain("data-figure-tiles");
-    expect(html).not.toContain("sticky top-0");
+    expect(html).toContain("data-pinned-header"); // the main credit tiles stay pinned (0.5.0)
     expect(lens).not.toContain("Export report (PDF)");
     const report = mount(project(), { hideExportButton: true }, "report").html;
     expect(report).not.toContain("Export (PDF)");
@@ -91,9 +90,9 @@ describe("3. starting values follow details that arrive late", () => {
 });
 
 describe("4 and 5. the lens note and the slider intro", () => {
-  it("drops the sideways arrow", () => {
+  it("has no note of its own in the lens (0.5.0)", () => {
     const { lens } = mount(project());
-    expect(lens).toContain("are set in the calculator, each in its own formula row.");
+    expect(lens).not.toContain("formula row");
     expect(lens).not.toContain("→");
   });
   it("words the slider intro as asked", () => {
@@ -252,9 +251,7 @@ describe("15. explanation first, and the pump's emissions", () => {
 });
 
 describe("16. Beta", () => {
-  it("is just the word", () => {
-    const html = renderToStaticMarkup(<BetaTag caseCount={44} />);
-    expect(html).toContain("Beta");
-    expect(html).not.toMatch(/pending|expert|draft/i);
+  it("is gone from the screens (0.5.0)", () => {
+    expect(mount(project()).html).not.toMatch(/data-beta|>Beta</);
   });
 });

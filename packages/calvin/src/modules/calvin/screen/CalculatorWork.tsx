@@ -7,8 +7,7 @@ import EquationStack from "./EquationStack";
 import ExAntePanel from "./ExAntePanel";
 import { CalculatedTag, InRowNum, TagLegend, WithEqNums } from "./EquationStack";
 import ReportView, { type ReportSlots } from "./ReportView";
-import VersionTabs, { V2OnlyTab } from "./VersionTabs";
-import BetaTag from "./BetaTag";
+import VersionTabs, { TabsNote, V2OnlyTab } from "./VersionTabs";
 import { fmt, fmtExp } from "./format";
 import { fnrbSourceLine } from "./citations";
 import { missingFactsPrompt, type CalvinProject } from "./state";
@@ -77,8 +76,10 @@ function MonitoringAskRow({ m, needed, value, onEnter, source }: {
 }) {
   return (
     <div data-monitoring={m.key} data-needed={needed ? "" : undefined}>
-      <div className="flex items-baseline gap-2">
+      <div className="calvin-row flex items-baseline gap-2">
         <span className="t-caption min-w-0 flex-1 text-fg-2" style={{ overflowWrap: "anywhere" }}><WithEqNums text={m.label} /></span>
+        {/* The controls move together when the row wraps on a narrow screen. */}
+        <span className="inline-flex min-w-0 flex-wrap items-baseline gap-2">
         <span
           className="relative inline-flex shrink-0 rounded-sm"
           style={needed ? { padding: 2, background: "color-mix(in oklab, var(--coral) 10%, transparent)" } : { padding: 2 }}
@@ -95,6 +96,7 @@ function MonitoringAskRow({ m, needed, value, onEnter, source }: {
           ) : null}
         </span>
         <span className="t-mono shrink-0 text-fg-4" style={{ fontSize: 10, minWidth: 18 }}>{m.unit}</span>
+        </span>
       </div>
       <p className="t-caption text-fg-4" style={{ fontSize: 10 }}>{source}</p>
     </div>
@@ -105,7 +107,6 @@ export default function CalculatorWork({
   calc,
   project,
   appVersion,
-  referenceCaseCount,
   tab,
   otherTab,
   report,
@@ -113,7 +114,7 @@ export default function CalculatorWork({
   calc: CalculatorState;
   project: CalvinProject;
   appVersion: string;
-  /** Read by the host from its reference dataset; the Beta footer states it. */
+  /** No longer shown (0.5.0: the footer that used it is gone). Still accepted, so a site that passes it keeps working. */
   referenceCaseCount?: number;
   /** "calculator" and "report" are the module's; any other tab shows `otherTab`. */
   tab: string;
@@ -163,9 +164,6 @@ export default function CalculatorWork({
           <span className="eyebrow warn">Project facts needed</span>
           <p className="t-body mt-2 text-fg-1" style={{ fontSize: 13 }}>{factsPrompt}</p>
         </section>
-        <div className="border-t border-line pt-2">
-          <BetaTag caseCount={referenceCaseCount} />
-        </div>
       </ReadOnlySeat>
     );
   }
@@ -188,10 +186,13 @@ export default function CalculatorWork({
             The project record says the pump runs on {calc.activityAsk.power === "diesel" ? "diesel" : "grid power"}, so running it
             gives off greenhouse gas. How much, in a year? Enter it in tonnes of CO₂e. No figures are shown until it is entered.
           </p>
-          <div className="mt-2 flex items-baseline gap-2">
+          <div className="calvin-row mt-2 flex items-baseline gap-2">
             <span className="t-caption text-fg-2">Pump emissions a year</span>
+            {/* The controls move together when the row wraps on a narrow screen. */}
+            <span className="inline-flex min-w-0 flex-wrap items-baseline gap-2">
             <InRowNum value={null} onChange={(v) => patch({ activityEmissions: v })} step={0.1} width={92} />
             <span className="t-mono text-fg-4" style={{ fontSize: 10 }}>tCO₂e</span>
+            </span>
           </div>
         </section>
       </ReadOnlySeat>
@@ -231,9 +232,6 @@ export default function CalculatorWork({
             ))}
           </div>
         </section>
-        <div className="border-t border-line pt-2">
-          <BetaTag caseCount={referenceCaseCount} />
-        </div>
       </ReadOnlySeat>
     );
   }
@@ -292,9 +290,6 @@ export default function CalculatorWork({
             </span>
           </div>
         </section>
-        <div className="border-t border-line pt-2">
-          <BetaTag caseCount={referenceCaseCount} />
-        </div>
       </ReadOnlySeat>
     );
   }
@@ -317,28 +312,72 @@ export default function CalculatorWork({
           </p>
           <p className="t-caption mt-2 text-fg-4" style={{ fontSize: 10 }}>{fnrbRefusal?.cite}</p>
         </section>
-        <div className="border-t border-line pt-2">
-          <BetaTag caseCount={referenceCaseCount} />
-        </div>
       </ReadOnlySeat>
     );
   }
+
+  /** The smaller figures, right under the main credit tiles. */
+  const figureBlock = (
+    <section className="rounded-lg border border-line bg-card shadow-sm" style={{ padding: "14px 20px" }} data-figure-numbers="">
+      {/* THE COLUMNS FOLLOW THE PANEL, NOT THE WINDOW. A count picked from the window's width gave
+          four narrow columns in a panel beside a side rail and chat, and the figures ran into each
+          other at laptop width. Each tile now gets at least TILE_MIN_WIDTH; tiles that do not fit
+          move to the next row, and three tiles never leave an empty fourth column. */}
+      <div className="grid gap-x-6 gap-y-4" style={{ gridTemplateColumns: TILE_COLUMNS }} data-figure-tiles>
+        <Metric label="ER / person / yr" value={`${fmt(erPerPerson, 4)}`} sub="tCO₂e" tip="Worked out from the credits (ER_y) and the people served — change either and this follows." />
+        <Metric label="Baseline EF_b (Eq.1)" value={fmtExp(result.result.EF_b, 3)} sub="tCO₂e / L" tip="Worked out by Eq.1 from the stoves, fuels and fNRB below." />
+        <Metric label="Water volume Q_y" value={`${fmt(result.result.Q_y / 1e6, 2)}`} sub="ML / yr" tip="Worked out by Eq.4 — the smaller of the water people use and the water supplied." />
+        {creditingPeriodYears != null ? (
+          <Metric
+            label={`Total · 1st CP (${creditingPeriodYears} yr)`}
+            value={fmt(result.result.ER * creditingPeriodYears, 0)}
+            sub="tCO₂e"
+            tip="Worked out from the yearly credits (ER_y) over the first crediting period."
+          />
+        ) : null}
+      </div>
+      <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-line pt-2 text-fg-3" style={{ fontSize: 11 }}>
+        {/* Provenance line. */}
+        <span data-fnrb-source="">fNRB · {fnrbSourceLine(result, state)}</span>
+        <span aria-hidden>·</span>
+        <span className="t-mono">{defaultCount} default{defaultCount === 1 ? "" : "s"}</span>
+        {fallbackCount > 0 ? (
+          <span className="inline-flex items-center gap-1 t-mono" style={{ color: "var(--amber)" }}>
+            <span className="inline-block h-2 w-2 rounded-pill" style={{ background: "var(--amber)" }} aria-hidden />
+            {fallbackCount} fallback dial{fallbackCount === 1 ? "" : "s"} fired
+          </span>
+        ) : null}
+      </div>
+    </section>
+  );
 
   return (
     <ReadOnlySeat readOnly={readOnly}>
       {/* ── Calculator tab ── */}
       {tab === "calculator" ? (
         <>
-          {comparison ? (
-            <VersionTabs
-              legacyER={comparison.legacyER}
-              paaER={paaResult.result.ER}
-              selected={state.version}
-              onSelect={(v) => patch({ version: v })}
-            />
-          ) : (
-            <V2OnlyTab paaER={paaResult.result.ER} />
-          )}
+          {/* THE PINNED HEADER (0.5.0). The main credit figures, the V1.0 and V2.0 tiles in tCO₂e a year, stay at the
+              top while the reader scrolls, whatever the site sets. The smaller figures sit right under them: pinned
+              with them by default, scrolling with the page when the site sets `unpinFigureBlock`. On a phone only the
+              tiles stay pinned (`styles.css`), so the header never fills the screen. Everything below can collapse. */}
+          <div className="calvin-pin" data-pinned-header="" data-figure-block={calc.figureBlockPinned ? "pinned" : "scrolls"}>
+            <div className="calvin-pin-main" data-pinned-main="">
+              {comparison ? (
+                <VersionTabs
+                  legacyER={comparison.legacyER}
+                  paaER={paaResult.result.ER}
+                  selected={state.version}
+                  onSelect={(v) => patch({ version: v })}
+                  showNote={false}
+                />
+              ) : (
+                <V2OnlyTab paaER={paaResult.result.ER} showNote={false} />
+              )}
+            </div>
+            {calc.figureBlockPinned ? figureBlock : null}
+          </div>
+          <TabsNote transition={comparison !== null} />
+          {calc.figureBlockPinned ? null : figureBlock}
 
           {warning ? (
             <div
@@ -351,56 +390,19 @@ export default function CalculatorWork({
             </div>
           ) : null}
 
-          {/* Summary row is sticky so the changed values stay visible while scrolling the derivation.
-              A site can unpin it, so it scrolls with the page (`unpinFigureBlock`). */}
-          <section
-            className={`${calc.figureBlockPinned ? "sticky top-0 z-10 " : ""}rounded-lg border border-line bg-card shadow-sm`}
-            style={{ padding: "14px 20px" }}
-            data-figure-block={calc.figureBlockPinned ? "pinned" : "scrolls"}
-          >
-            {/* THE COLUMNS FOLLOW THE PANEL, NOT THE WINDOW. A count picked from the window's width gave
-                four narrow columns in a panel beside a side rail and chat, and the figures ran into each
-                other at laptop width. Each tile now gets at least TILE_MIN_WIDTH; tiles that do not fit
-                move to the next row, and three tiles never leave an empty fourth column. */}
-            <div className="grid gap-x-6 gap-y-4" style={{ gridTemplateColumns: TILE_COLUMNS }} data-figure-tiles>
-              <Metric label="ER / person / yr" value={`${fmt(erPerPerson, 4)}`} sub="tCO₂e" tip="Worked out from the credits (ER_y) and the people served — change either and this follows." />
-              <Metric label="Baseline EF_b (Eq.1)" value={fmtExp(result.result.EF_b, 3)} sub="tCO₂e / L" tip="Worked out by Eq.1 from the stoves, fuels and fNRB below." />
-              <Metric label="Water volume Q_y" value={`${fmt(result.result.Q_y / 1e6, 2)}`} sub="ML / yr" tip="Worked out by Eq.4 — the smaller of the water people use and the water supplied." />
-              {creditingPeriodYears != null ? (
-                <Metric
-                  label={`Total · 1st CP (${creditingPeriodYears} yr)`}
-                  value={fmt(result.result.ER * creditingPeriodYears, 0)}
-                  sub="tCO₂e"
-                  tip="Worked out from the yearly credits (ER_y) over the first crediting period."
-                />
-              ) : null}
-            </div>
-            <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-line pt-2 text-fg-3" style={{ fontSize: 11 }}>
-              {/* Provenance line. The single Beta marker (surface hedge) is the footer line below the equations. */}
-              <span data-fnrb-source="">fNRB · {fnrbSourceLine(result, state)}</span>
-              <span aria-hidden>·</span>
-              <span className="t-mono">{defaultCount} default{defaultCount === 1 ? "" : "s"}</span>
-              {fallbackCount > 0 ? (
-                <span className="inline-flex items-center gap-1 t-mono" style={{ color: "var(--amber)" }}>
-                  <span className="inline-block h-2 w-2 rounded-pill" style={{ background: "var(--amber)" }} aria-hidden />
-                  {fallbackCount} fallback dial{fallbackCount === 1 ? "" : "s"} fired
-                </span>
-              ) : null}
-            </div>
-          </section>
-
-          {/* THE KEY, WHERE THE TAGS ARE READ (ruling (2), 2026-09-24). One line above the
-              derivation, so a reader never has to remember what four small words mean. */}
+          {/* EVERYTHING BELOW THE HEADER CAN COLLAPSE (0.5.0): the sliders and the equations, each behind its own
+              title. Both start open. The key to the tags sits with the equations, where the tags are read. */}
           {calc.sliders ? <ExAntePanel state={state} result={result} patch={patch} /> : null}
 
-          <TagLegend />
-
-          <EquationStack result={result} state={state} patch={patch} canonPopulation={project.population?.served} seed={seed} sliders={calc.sliders} tables={calc.tables} screening={calc.exAnteOnly} />
-
-          {/* ── Beta footer — one line, honest state, shown to visitors (ruling 2026-09-07) ── */}
-          <div className="border-t border-line pt-2">
-            <BetaTag caseCount={referenceCaseCount} />
-          </div>
+          <details open className="calvin-fold" data-fold="equations">
+            <summary className="calvin-fold-title">
+              <span className="eyebrow">The calculation, step by step</span>
+            </summary>
+            <div className="flex flex-col gap-3">
+              <TagLegend />
+              <EquationStack result={result} state={state} patch={patch} canonPopulation={project.population?.served} seed={seed} sliders={calc.sliders} tables={calc.tables} screening={calc.exAnteOnly} />
+            </div>
+          </details>
         </>
       ) : null}
 
@@ -430,7 +432,7 @@ export default function CalculatorWork({
       ) : null}
 
       {/* Report export/preview — ONE ReportView, always mounted so Export works from any tab;
-          revealed on-screen only under .report-preview (Report tab). No Beta/status sticker lives
+          revealed on-screen only under .report-preview (Report tab). No status sticker lives
           inside it — the client deliverable stays clean (canon). */}
       <div className={tab === "report" ? "report-preview" : undefined}>
         <ReportView

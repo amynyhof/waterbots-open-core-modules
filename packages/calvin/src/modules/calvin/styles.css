@@ -32,3 +32,56 @@
     @bottom-center { content: "Page " counter(page) " of " counter(pages); font-size: 9px; }
   }
 }
+
+/* The pinned header (0.5.0). The main credit figures stay at the top of the scrolling area while the reader
+   scrolls. A site with a fixed bar of its own at the top sets --calvin-pin-top to that bar's height, and can set
+   --calvin-pin-bg to its own page colour. Sticky needs every element between the header and the scrolling area to
+   leave overflow visible. */
+.calvin-pin {
+  position: sticky;
+  top: var(--calvin-pin-top, 0px);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 8px;
+  background: var(--calvin-pin-bg, var(--card, #fff));
+  box-shadow: 0 1px 0 var(--line, #d9e0e3);
+}
+.calvin-pin-main { background: var(--calvin-pin-bg, var(--card, #fff)); }
+/* On a phone only the tiles stay pinned, so the header never fills the screen. The smaller figures scroll. */
+@media (max-width: 639px) {
+  .calvin-pin { display: contents; }
+  .calvin-pin-main {
+    position: sticky;
+    top: var(--calvin-pin-top, 0px);
+    z-index: 10;
+    padding-bottom: 6px;
+    box-shadow: 0 1px 0 var(--line, #d9e0e3);
+  }
+}
+
+/* A part that can collapse (0.5.0): its title is the toggle, with a small arrow that turns when it opens. */
+.calvin-fold > .calvin-fold-title { cursor: pointer; list-style: none; padding: 2px 0; }
+.calvin-fold > .calvin-fold-title::-webkit-details-marker { display: none; }
+.calvin-fold > .calvin-fold-title::before {
+  content: "";
+  display: inline-block;
+  width: 0.45em;
+  height: 0.45em;
+  margin-right: 0.5em;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 160ms ease-out;
+  color: var(--fg-4, #7d8a93);
+  vertical-align: 0.1em;
+}
+.calvin-fold[open] > .calvin-fold-title::before { transform: rotate(45deg); }
+.calvin-fold[open] > .calvin-fold-title { margin-bottom: 8px; }
+.calvin-fold > .calvin-fold-title:focus-visible { outline: 2px solid var(--tide, #0e7c86); outline-offset: 2px; border-radius: 4px; }
+
+/* A value row: its label, then its tags, box and unit (0.5.0). When the label would get narrower than 9rem, the
+   tags and box move to a line of their own, on the right, instead of squeezing the label. */
+.calvin-row { flex-wrap: wrap; justify-content: flex-end; }
+.calvin-row > :first-child { flex: 1 1 9rem; min-width: 0; }

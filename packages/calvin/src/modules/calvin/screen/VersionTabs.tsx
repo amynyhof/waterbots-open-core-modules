@@ -54,16 +54,30 @@ function VerTab({
  * gets one card: V2.0 and its own total, with no V1.0 tab and no transition line. Nothing is offered that
  * would need a V1.0 filing the project does not have.
  */
-export function V2OnlyTab({ paaER }: { paaER: number }) {
+export function V2OnlyTab({ paaER, showNote = true }: { paaER: number; showNote?: boolean }) {
   return (
     <div data-view="v2-only">
       <div className="flex items-end gap-1 border-b border-line">
         <VerTab name="PAA v2.0" total={`${fmt(paaER, 0)} tCO₂e/yr`} active onClick={() => {}} disabled />
       </div>
-      <p className="t-caption mt-2 text-fg-3" style={{ fontSize: 11 }}>
-        A new project: its credits are worked out under V2.0, the methodology in force.
-      </p>
+      {showNote ? <div className="mt-2"><TabsNote transition={false} /></div> : null}
     </div>
+  );
+}
+
+/**
+ * THE SENTENCE UNDER THE TILES (0.5.0). The calculator pins the tiles at the top while the page scrolls. It shows
+ * this sentence just below the pinned header, where it scrolls away, so the header stays short.
+ */
+export function TabsNote({ transition }: { transition: boolean }) {
+  return transition ? (
+    <p className="t-caption text-fg-4" style={{ fontSize: 10 }} data-tabs-note="">
+      Difference attributable to the methodology transition, computed on identical project data.
+    </p>
+  ) : (
+    <p className="t-caption text-fg-3" style={{ fontSize: 11 }} data-tabs-note="">
+      A new project: its credits are worked out under V2.0, the methodology in force.
+    </p>
   );
 }
 
@@ -72,11 +86,14 @@ export default function VersionTabs({
   paaER,
   selected,
   onSelect,
+  showNote = true,
 }: {
   legacyER: number;
   paaER: number;
   selected: "legacy" | "paa";
   onSelect: (v: "legacy" | "paa") => void;
+  /** False when the host shows the sentence under the tiles itself (`TabsNote`), as the calculator does. */
+  showNote?: boolean;
 }) {
   /*
    * WHY THIS IS DISABLED ON A READ-ONLY SEAT, and it is the one control where the call was
@@ -113,9 +130,7 @@ export default function VersionTabs({
           {deltaPct !== undefined ? ` (${deltaPct >= 0 ? "+" : ""}${fmt(deltaPct, 1)}%)` : ""}
         </span>
       </p>
-      <p className="t-caption text-fg-4" style={{ fontSize: 10 }}>
-        Difference attributable to the methodology transition, computed on identical project data.
-      </p>
+      {showNote ? <TabsNote transition /> : null}
     </div>
   );
 }

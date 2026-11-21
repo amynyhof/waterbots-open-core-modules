@@ -4,6 +4,36 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-11-21 — Calvin and Violet 0.5.0
+
+**Done (branch `calvin-violet-0.5.0`):** one pull request for both sites. No sum changed, and every reference case gives
+the same answer.
+- Calvin, 1: the controls panel holds only what the site passes in `header`, and Calvin's buttons.
+- Calvin, 2: the main credit tiles (PAA v2.0, and Legacy V1.0 with the transition delta for a project credited under
+  V1.0) are a pinned header. The smaller figures sit right under them: pinned with them by default, scrolling with the
+  page when a site sets `unpinFigureBlock`. On a phone only the tiles stay pinned. The sliders and the calculation each
+  collapse behind a title, and both start open. The pin is in `styles.css`, with `--calvin-pin-top` for a site with a
+  fixed bar of its own and `--calvin-pin-bg` for its page colour. The README says what sites should change.
+- Calvin, 3: the work surface ends with the calculation, in every view. `referenceCaseCount` is still accepted.
+- Calvin, 4: a phone pass. A value row's tags and box move together to a line of their own when the label would get
+  narrower than 9rem. The line about the pencil wraps as text. Checked at 1280 and 390 pixels wide: nothing runs off
+  the side.
+- Calvin, 5: the report's paragraph "How these figures were produced" is one sentence shorter.
+- Violet, 6: people served come from the project record, the way Calvin takes them: a count above zero, with what it
+  counts. The screen follows the record when the count arrives or changes. When it is missing, the screen says to
+  fill it in on the project record.
+- Violet, 7: "Draft — pending expert review" shows under the screen's title, and every D-3 result carries it as
+  `status`. Violet's prompt tells her to say so.
+- Both packages are version 0.5.0. Violet's first release.
+
+**Checked:** typecheck, build and the full test suite pass (Calvin 348 of 348, Violet 46 of 46). The engine checks
+(48 of 48), the screen mount test (12 views), and the seed, package, paid-code and name checks pass.
+
+**Open:** after this merges, Session C packs Calvin, Violet and Core from `main`, runs the release check and makes the
+tags. Each tag waits for "release it".
+
+---
+
 ## 2026-11-21 — Calvin 0.4.1 released
 
 **Done (branch `rules-name-scan-releases`):**

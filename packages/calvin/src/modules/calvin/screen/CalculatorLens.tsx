@@ -48,19 +48,13 @@ export default function CalculatorLens({
 
   return (
     <ReadOnlySeat readOnly={readOnly}>
-      <div className="min-h-0 flex-1 overflow-y-auto p-3">
-        <div className="flex flex-col gap-3">
-          {header}
-          {/* THE SIGNPOST POINTS AT SOMETHING THIS READER CANNOT DO ([#97]) — it said values "are
-              adjusted" in the rows, which is false for a contributor. It became a description of
-              where the values LIVE, which is the useful half and stays true either way. */}
-          <p className="t-caption text-fg-4" style={{ fontSize: 10 }}>
-            All values — population, metered volume, and every methodology parameter (η, M_q, C_b,
-            X_cleanboil, QPW, DO, U_p) — {readOnly ? "are shown in the calculator, each in its own formula row." : "are set in the calculator, each in its own formula row."}
-          </p>
+      {/* Only the host's own top of the lens sits here (0.5.0: the lens adds no note of its own). */}
+      {header ? (
+        <div className="min-h-0 flex-1 overflow-y-auto p-3">
+          <div className="flex flex-col gap-3">{header}</div>
         </div>
-      </div>
-      <div className="flex shrink-0 flex-col gap-2 border-t border-line p-3">
+      ) : null}
+      <div className={`flex shrink-0 flex-col gap-2 ${header ? "border-t border-line " : ""}p-3`}>
         {/* Analysis-state tag lives HERE, with the Save affordance — never on the canon card.
             With nowhere to save (no `onSave`), "unsaved" would describe nothing, so it is not shown. */}
         {dirty && canSave ? (

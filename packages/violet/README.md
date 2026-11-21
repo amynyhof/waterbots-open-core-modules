@@ -27,6 +27,18 @@ VWBA is a way to count the water a project gives back.
 The water and carbon calculators sit side by side. They are never added together. Whether one project may claim
 both is an open question (N14 in `BUILD_PLAN.md`).
 
+## Changes in 0.5.0
+
+Violet's first release, with Calvin 0.5.0, for both sites. No sum changed.
+
+- **People served come from the project record, the way Calvin takes them.** Only a count above zero counts, with
+  whether it counts people or households, and people per household when the record has them. When the record's
+  count arrives or changes after the screen opens, the screen follows it. When it is missing, the screen names
+  what is missing and says to fill it in on the project record. The screen has no box of its own for it.
+- **"Draft — pending expert review".** The screen shows this label under its title. Every D-3 result carries it as
+  `status`, so a report or answer built from a result shows it too. Violet's prompt tells her to say so.
+- New on the screen entry: `recordPopulation`, `followRecord` and `missingPopulationFacts`.
+
 ## Checks
 
 D-3 is tested on invented projects worked out by hand, each step cited. An outside expert checks the module once

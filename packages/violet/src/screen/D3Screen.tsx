@@ -6,24 +6,65 @@
 //
 // Water only. This screen never shows a carbon figure, and never a total of water and carbon (open item N14).
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useReadOnlySeat } from "@waterbots/core/readOnly";
 import type { ModuleProject } from "@waterbots/core/project";
 import { computeD3 } from "../d3/compute.js";
-import { AWAITING, type D3Input, type D3Option, type D3Result, type D3Slider, type D3Value, type D3View } from "../d3/types.js";
+import { AWAITING, D3_STATUS, type D3Input, type D3Option, type D3Result, type D3Slider, type D3Value, type D3View } from "../d3/types.js";
+
+/** A count the record holds, or nothing. Zero is an empty field written as a number, not a fact (as in Calvin). */
+function positive(n: number | undefined): number | undefined {
+  return typeof n === "number" && n > 0 ? n : undefined;
+}
+
+/**
+ * People served, from the project record, the way Calvin takes it (0.5.0): only a count above zero counts, with
+ * whether it counts people or households, and people per household when the record has them. Nothing is guessed.
+ */
+export function recordPopulation(project: ModuleProject | undefined): D3Input["population"] {
+  const pop = project?.population;
+  if (pop === undefined) return undefined;
+  const served = positive(pop.served);
+  const householdSize = positive(pop.householdSize);
+  const out = {
+    ...(pop.mode !== undefined ? { mode: pop.mode } : {}),
+    ...(served !== undefined ? { served } : {}),
+    ...(householdSize !== undefined ? { householdSize } : {}),
+  };
+  return Object.keys(out).length > 0 ? out : undefined;
+}
 
 /** The record's facts, as the screen's starting input. Facts the record does not hold stay unset: awaited. */
 export function seedD3Input(project: ModuleProject | undefined, view: D3View): D3Input {
   const input: D3Input = { view, option: view === "ex-post" ? "metered" : "beneficiaries" };
-  const pop = project?.population;
-  if (pop !== undefined) {
-    input.population = {
-      ...(pop.mode !== undefined ? { mode: pop.mode } : {}),
-      ...(pop.served !== undefined ? { served: pop.served } : {}),
-      ...(pop.householdSize !== undefined ? { householdSize: pop.householdSize } : {}),
-    };
-  }
+  const population = recordPopulation(project);
+  if (population !== undefined) input.population = population;
   return input;
+}
+
+/**
+ * The input with people served as the record now gives them (0.5.0). Every other value stays as it is. The record
+ * is the one place people served are kept, so a count that leaves the record leaves the input too.
+ */
+export function followRecord(input: D3Input, project: ModuleProject | undefined): D3Input {
+  const next = { ...input };
+  const population = recordPopulation(project);
+  if (population === undefined) delete next.population;
+  else next.population = population;
+  return next;
+}
+
+/**
+ * What the record still lacks for a count by people served, in the words Calvin's record check uses. Empty when
+ * nothing is missing.
+ */
+export function missingPopulationFacts(input: D3Input): string[] {
+  const pop = input.population ?? {};
+  const out: string[] = [];
+  if (pop.served === undefined) out.push("people served");
+  else if (pop.mode === undefined) out.push("whether people served were counted as people or households");
+  else if (pop.mode === "households" && pop.householdSize === undefined) out.push("people per household");
+  return out;
 }
 
 const OPTION_LABEL: Record<D3Option, string> = {
@@ -103,6 +144,29 @@ function NumberBox({ label, value, disabled, set }: { label: string; value: numb
   );
 }
 
+/**
+ * People served, as the record gives them. Missing: the screen names what is missing and where it is filled in,
+ * in Calvin's words, since the record is the one place it is kept.
+ */
+function PeopleFromRecord({ input }: { input: D3Input }) {
+  const missing = missingPopulationFacts(input);
+  if (missing.length > 0) {
+    return (
+      <p role="status" data-record-ask="">
+        The water can&rsquo;t be worked out from the people served yet: this project&rsquo;s record is missing {missing.join(" and ")}.
+        Fill it in on the project record and the figures follow.
+      </p>
+    );
+  }
+  const pop = input.population!;
+  const n = pop.served!.toLocaleString("en");
+  return (
+    <p data-record-people="">
+      People served: {n} {pop.mode === "households" ? `households of ${pop.householdSize!.toLocaleString("en")} people` : "people"}, from the project record.
+    </p>
+  );
+}
+
 /** Drops a key when its value is cleared, so the engine sees it as awaited. */
 function patchNumber<K extends keyof D3Input>(input: D3Input, key: K, n: number | undefined): D3Input {
   const next = { ...input };
@@ -125,6 +189,17 @@ export default function D3Screen({ project, view = "ex-ante", lockView, onChange
   const readOnly = useReadOnlySeat();
   const [input, setInput] = useState<D3Input>(() => seedD3Input(project, lockView ?? view));
   const [error, setError] = useState<string | null>(null);
+
+  // PEOPLE SERVED FOLLOW THE RECORD (0.5.0), as in Calvin. When the record's count arrives or changes after the
+  // screen opens, the screen takes it. The record is the one place it is kept: this screen has no box for it.
+  const recordKey = JSON.stringify(recordPopulation(project) ?? null);
+  const lastRecordKey = useRef(recordKey);
+  useEffect(() => {
+    if (lastRecordKey.current === recordKey) return;
+    lastRecordKey.current = recordKey;
+    update(followRecord(input, project));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [recordKey]);
 
   // `update` only keeps an input the engine accepts, so this always succeeds.
   const result: D3Result = computeD3(input);
@@ -155,6 +230,7 @@ export default function D3Screen({ project, view = "ex-ante", lockView, onChange
   return (
     <section className="violet-d3" data-view={input.view} aria-label="Water benefit, VWBA 2.0 D-3">
       <h2>Water provided (VWBA 2.0, D-3)</h2>
+      <p data-status="">{D3_STATUS}</p>
 
       {lockView === undefined ? (
         <div role="group" aria-label="View">
@@ -189,6 +265,7 @@ export default function D3Screen({ project, view = "ex-ante", lockView, onChange
             ))}
           </div>
         ) : null}
+        {input.option === "beneficiaries" ? <PeopleFromRecord input={input} /> : null}
       </fieldset>
 
       {input.view === "ex-ante" ? (
