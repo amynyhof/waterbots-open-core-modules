@@ -20,7 +20,7 @@ main family. An item inside it that belongs to another family carries its own la
 
 | Family | What belongs here |
 |---|---|
-| 1. Agent orchestration | how agents plug into both sites; the one shared project record; what each agent reads and writes; which pathway and method a project is on and which are ruled out; hand-offs between agents; installing core releases. |
+| 1. Agent orchestration | how agents plug into both sites; the one shared project record; what each agent reads and writes; which pathway and method a project is on and which are unlikely; hand-offs between agents; installing core releases. |
 | 2. Calculators and methods | the maths, method values, defaults, labels and where each value comes from. |
 | 3. Knowledge | what the agents are allowed to know: cards, packs, hosted copies. |
 | 4. Console and surfaces | what a visitor sees and clicks, the same on both sites: layout, navigation, header, Save, words, phone, design, report. |
@@ -73,7 +73,7 @@ smaller tables, such as the six-row table of fallback factors, are fine as they 
 | V6 | Agent orchestration | The method registry (M3): one entry per carbon method, so both sites pick a method the same way. | V5; V13 goes first (ruling 2026-11-14). | A trial release is out; the private side reports pass on both carbon filings. |
 | V7 | — | [x] (Merged, pull request #18.) Violet, the water-benefit agent, as her own module: `@waterbots/violet`. She hosts the D-n modules, starting with D-3. Her color is Orchid (`#A457D4`) (ruling 2026-10-31). | V1; rulings on Violet. | The package builds, passes the package checks, and has a place for each D-n module. |
 | V8 | Experts and partners | [x] (Merged, pull request #18. Still to come: the outside expert's check, and N14 and N15 for the outside expert group.) D-3, the water-supply module, inside Violet (M8.1). | V7. It does not wait for the activity-type signature or N6: D-3 is a prototype the outside expert checks later (ruling 2026-11-12). | Violet's D-3 tests are hand-worked cases, with every step cited to the guidebook (cited, not copied). The VWBA spec is written alongside the build, in `docs/`, and the maintainer reviews it then. An outside expert checks the module once the prototype is up. |
-| V9 | Agent orchestration | (Proposal: `docs/proposals/shared-project-record.md`, pull request #34.) The screening hand-off: one project record in `core` that every module fills in and the paid site reads. Each module writes how many questions it asked on that walk. | V5; the paid site's save format (paid repo); Wellington's fields (free-site repo). | A test takes an invented project through all four modules' parts, saves it, reads it back unchanged, and gives each module's question count. |
+| V9 | Agent orchestration | (Proposal: `docs/proposals/shared-project-record.md`, pull requests #34 and #35.) The screening hand-off: one project record in `core` that every module fills in and the paid site reads. Each module writes how many questions it asked on that walk. | V5; the paid site's save format (paid repo); Wellington's fields (free-site repo). | A test takes an invented project through all four modules' parts, saves it, reads it back unchanged, and gives each module's question count. |
 | V10 | Agent orchestration | Phoebe (eligibility) to its first release (M9.1). | V9; Phoebe's rulings. | Released; Phoebe fills its part of the record and counts its questions. |
 | V11 | Agent orchestration | Bridget (the map) to its first release (M9.2). | V9; Bridget's rulings; a rights read on every data file; a ruling on the shared map key. | Released; Bridget fills its part of the record and counts its questions. |
 | V12 | Agent orchestration | Calvin's screening part: Calvin fills its part of the record and counts its questions. | V9. | A test shows Calvin's part saved and its count written. |
@@ -320,10 +320,10 @@ Three findings from a walk of the open site on 2026-11-21. Each goes in the next
       like Calvin's, reads a count of zero or below on the record as an empty field, so it says the record is missing
       people served, which is not quite true. Done when the shared project record refuses a count below zero where it
       is entered, and Calvin and Violet each say the record's count is below zero.
-- [ ] **W2** *Family: Agent orchestration.* A pathway the eligibility agent had ruled out still got a water figure. Nothing told the
-      calculator: the shared project record has no place to say which pathways are ruled out. Done when the record says
-      which pathways are ruled out, and a calculator on a ruled-out pathway shows no figure, only a sentence that says
-      why.
+- [ ] **W2** *Family: Agent orchestration.* A pathway the eligibility agent had read as unlikely still got a water figure. Nothing told
+      the calculator: the shared project record has no place for each pathway's reading. Done when the record gives each
+      pathway's reading (likely, more to learn or unlikely), with its reason and what would change it, and inside a
+      site's screening the host agent does not call the calculator agent of an unlikely pathway (ruling 2026-11-21).
 - [ ] **W3** *Family: Agent orchestration.* The site's record said "Community level water treatment technologies", and Calvin read the
       technology as "other" and would not run. The record hands Calvin one of three codes: community water supply
       (`CWS`), household water treatment (`HWT`) or `other`. The site turns its own label into a code, and this

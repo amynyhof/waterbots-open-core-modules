@@ -30,8 +30,14 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 - Session C wrote a proposal for V9, the shared project record, in `docs/proposals/shared-project-record.md`, as lane 1
   pull request #34. It is a proposal only. Its log line is here, so the two pull requests do not clash in this file.
 
-**Open:** both sites install it (C5.5). The maintainer's three calls in the V9 proposal, and the questions it asks the
-paid site and the open site.
+- Rulings 2026-11-21 on the V9 proposal's three calls: the readings are "likely", "more to learn" and "unlikely",
+  never "ruled out"; a pathway's reading decides which calculator agents the host agent calls inside a site's
+  screening, in place of the ruling of 2026-10-01 that the water calculator always shows; and the record lives only in
+  `core`. Pull request #34 had merged on its own, so Session C carried the rulings in lane 1 pull request #35.
+- `BUILD_PLAN.md`: "unlikely" in place of "ruled out" in Agent orchestration's "What belongs here" line, and in W2.
+
+**Open:** both sites install it (C5.5). The questions the V9 proposal asks the paid site and the open site, and its one
+question for the maintainer: whether a pathway with no reading yet is called with the "more to learn" flag.
 
 ---
 
