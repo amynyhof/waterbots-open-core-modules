@@ -7,18 +7,18 @@ import { fileURLToPath } from "node:url";
 const read = (rel: string) => readFileSync(fileURLToPath(new URL(rel, import.meta.url)), "utf8").replace(/\r\n/g, "\n");
 
 describe("Violet's agent files", () => {
-  it("name her tool, her colour and both doors", () => {
+  it("name her tool and her colour", () => {
     const config = read("./agents/violet/config.yaml");
     expect(config).toMatch(/calc\/vwba-d3\.computeD3/);
     expect(config).toMatch(/#A457D4/);
-    expect(config).toMatch(/agent-commons:/);
-    expect(config).toMatch(/hands back to Wellington/);
   });
 
-  it("tell her to ask for every value in the Commons and never add water to carbon", () => {
+  it("keep only what is hers: her tool, the facts it needs and her method's limits", () => {
     const prompt = read("./agents/violet/prompt.md");
-    expect(prompt).toMatch(/In the Agent Commons, you work alone/);
-    expect(prompt).toMatch(/ask the person for every value/);
-    expect(prompt).toMatch(/Never add a water benefit to a carbon figure/);
+    expect(prompt).toMatch(/computeD3/);
+    expect(prompt).toMatch(/people or households/);
+    expect(prompt).toMatch(/Draft — pending\s+expert review/);
+    // Who the rest of the crew are belongs to Wellington, not to her file.
+    expect(prompt).not.toMatch(/Wellington|Calvin|Phoebe|Bridget/);
   });
 });
