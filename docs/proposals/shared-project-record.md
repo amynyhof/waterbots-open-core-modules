@@ -46,6 +46,9 @@ door for good.
    "more to learn" flag until it has one. The answer is worked out again whenever the record changes, so a pathway
    can come into play or drop out during a visit. "Unlikely" drops a pathway from the screening; it stays open in the
    Agent Commons.
+5. **When a fact changes in the open screening,** the old answer is treated as if it never existed. Every reading is
+   worked out again from the record as it stands. A reading that can no longer be worked out from the current facts
+   is "more to learn".
 
 ## What `core` holds today
 
@@ -191,9 +194,10 @@ For each pathway, the function looks at its reading first, then at the project f
   learn" flag until it has a reading. The rules for which facts point to which pathway are in the next section.
 - **No reading yet, and no project fact points to it:** not in play yet.
 
-A reading names the facts it rested on. When one of those facts changes, this proposal suggests the reading falls back
-to "more to learn" until the eligibility agent reads the project again. That way an old "unlikely" never outlives the
-facts behind it.
+**When a fact changes in the open screening** (ruling 2026-11-21), the old answer is treated as if it never existed.
+Every reading is worked out again from the record as it stands. No reading is kept from before the change, and there
+is no separate step for falling back. A reading that can no longer be worked out from the current facts is simply
+"more to learn".
 
 In the Agent Commons door, every agent still opens alone, whatever a reading says. "Unlikely" drops a pathway from the
 screening only (see "The two doors").
@@ -303,6 +307,7 @@ through a normal pull request, as for Calvin's seeded files.
 
 ## Still for the maintainer
 
-1. The four rules this repo cannot cite yet, under "Which project facts point to which pathway".
-2. Whether a reading falls back to "more to learn" when a fact it rested on changes, as proposed under "Agents in
-   play".
+1. The four rules this repo cannot cite yet, under "Which project facts point to which pathway". They stay open
+   questions until the maintainer answers them. Nothing is built on a guess for any of them.
+2. Open, and not for now: what happens on the paid site when a fact changes on a saved project, given that the
+   evidence log is locked and nothing deletes on its own. This proposal offers no answer.
