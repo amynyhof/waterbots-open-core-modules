@@ -221,9 +221,9 @@ export function creditedValue(state: CalcState, result: ScenarioResult, key: Sli
   return input.usageRate ?? null;
 }
 
-/** A stored value as the row shows it, with its unit. Display only. */
+/** A stored value as the row shows it, with its unit. Display only. A missing value shows blank, with no label (0.5.1). */
 export function shownValue(spec: SliderSpec, v: number | null): string {
-  if (v === null || !Number.isFinite(v)) return "—";
+  if (v === null || !Number.isFinite(v)) return "";
   const n = (v * spec.scale).toLocaleString(undefined, { minimumFractionDigits: spec.dp, maximumFractionDigits: spec.dp });
   return spec.unit === "%" ? `${n}%` : `${n} ${spec.unit}`;
 }

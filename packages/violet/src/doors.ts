@@ -5,19 +5,19 @@
 // - The sites: Violet reads the project record, does not ask again for a fact it holds, and hands back to
 //   Wellington when she is done.
 // - The screening: the water calculator always shows. Carbon shows beside it only when Phoebe reads carbon as
-//   "likely" or "not enough known" (ruling 2026-10-01).
+//   "likely" or "more to learn" (ruling 2026-10-01; the words since 0.5.1, ruling 2026-11-21).
 //
 // Water and carbon sit side by side and are never added together, until open item N14 is ruled
 // (ruling 2026-11-12). Nothing in this package adds a water benefit to a carbon figure.
 
 export type Door = "agent-commons" | "site";
 
-/** Phoebe's reading of whether a carbon claim fits the project. */
-export type CarbonReading = "likely" | "not enough known" | "unlikely";
+/** Phoebe's reading of whether a carbon claim fits the project: one set of words everywhere (ruling 2026-11-21). */
+export type CarbonReading = "likely" | "more to learn" | "unlikely";
 
 /** Whether the screening shows the carbon calculator beside the water calculator (ruling 2026-10-01). */
 export function carbonShowsBeside(reading: CarbonReading | undefined): boolean {
-  return reading === "likely" || reading === "not enough known";
+  return reading === "likely" || reading === "more to learn";
 }
 
 /** The water calculator always shows on the screening. */

@@ -69,6 +69,19 @@ const project = { name: "Invented project", standards: [], technology: "CWS", co
 
 The build bundles the entry into one file, `dist/screen.js`. React and `@waterbots/core` stay outside it, so a site has one copy of each. `scripts/check-screen-entry.mjs`, at the repo root, packs both packages, installs them alone with React, and renders the ex-ante view, the ex-post view and its report, a new project's V2.0-only view and report, and a transitioning project's view and report from the packed files.
 
+## Changes in 0.5.1
+
+With Violet 0.5.1, for both sites. No sum changed, and every reference case gives the same answer.
+
+- **A missing value is a blank box, with no label.** In the ex-post ask, a monitoring value not yet entered has a
+  blank box, its highlight and red dot, and nothing written under it. In the report's tables and on the equations, a
+  value that is not there shows blank, in its value and its source cells, where it used to show "—" or
+  "Not entered". A blank never counts as zero: with a monitoring value missing, no figures show.
+- Where a sentence says what the sum did without a value, it stays, without the "Not entered" label. For example:
+  "Eq.6 could not run; people-basis aggregate used".
+
+**What a site should change.** Nothing. No exported name changed.
+
 ## Changes in 0.5.0
 
 Released with Violet 0.5.0, for both sites. No sum changed, and every reference case gives the same answer.

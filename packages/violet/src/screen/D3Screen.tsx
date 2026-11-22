@@ -73,9 +73,9 @@ const OPTION_LABEL: Record<D3Option, string> = {
   beneficiaries: "From the people served (handpumps, household systems)",
 };
 
-/** Shows a number the engine returned. Display only. */
+/** Shows a number the engine returned. Display only. A missing value is blank, with no label (0.5.1). */
 function shown(v: number | string | null): string {
-  if (v === null) return AWAITING;
+  if (v === null) return "";
   if (typeof v === "string") return v === "full" ? "full access" : v === "limited" ? "limited access" : v;
   return v.toLocaleString("en", { maximumFractionDigits: 2 });
 }
@@ -89,9 +89,9 @@ function ValueRow({ v }: { v: D3Value }) {
         {shown(v.value)} {v.value !== null ? v.unit : ""}
         {capped ? <span data-used> (the sum uses {shown(v.used)})</span> : null}
       </td>
-      <td data-origin>{v.origin ?? AWAITING}</td>
+      <td data-origin>{v.origin ?? ""}</td>
       <td data-source>{v.source}</td>
-      <td data-note>{v.note ?? ""}</td>
+      <td data-note>{v.value === null ? "" : (v.note ?? "")}</td>
     </tr>
   );
 }
@@ -100,7 +100,7 @@ function SliderRow({ s, disabled, set }: { s: D3Slider; disabled: boolean; set: 
   return (
     <div data-slider={s.key}>
       <label>
-        {s.label} <span data-label>{s.startLabel}</span>
+        {s.label} <span data-label>{s.startLabel === AWAITING ? "" : s.startLabel}</span>
         <input
           type="range"
           aria-label={s.label}

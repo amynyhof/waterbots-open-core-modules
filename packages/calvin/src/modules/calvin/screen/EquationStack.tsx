@@ -1157,12 +1157,12 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
         {npInput}
         {qpwParam}
         {deviceInputs}
-        <LiveRow>HN_p = <span className="text-fg-1">{result.individualsPerPremises != null ? fmt(result.individualsPerPremises, 1) : "—"}</span> · QPW_p <span className="text-fg-1">{fmt(result.qpwEffective, 1)}</span>{result.deviceLimitEvaluated ? <> vs device <span className="text-fg-1">{fmt(result.deviceCapacityLPerDay ?? 0, 1)}</span></> : null} = <span style={{ color: "var(--tide)" }}>{qpwHhStr}</span></LiveRow>
+        <LiveRow>HN_p = <span className="text-fg-1">{result.individualsPerPremises != null ? fmt(result.individualsPerPremises, 1) : ""}</span> · QPW_p <span className="text-fg-1">{fmt(result.qpwEffective, 1)}</span>{result.deviceLimitEvaluated ? <> vs device <span className="text-fg-1">{fmt(result.deviceCapacityLPerDay ?? 0, 1)}</span></> : null} = <span style={{ color: "var(--tide)" }}>{qpwHhStr}</span></LiveRow>
       </EqRow>
       <EqRow eqNum="6" symbol="Q_pop" title="Clean water all premises use / yr" formula={v2 ? "N_p · QPW_hh · DP_p" : "N_p · U_p · QPW_hh · DP_p"} value={ML(result.Q_pop) + "/yr"}
         oneLiner="The clean water all served premises use in a year — premises times per-premises volume times operating days. Serving more water avoids more boiling."
         open={open.has("q_pop")} onToggle={() => toggle("q_pop")} editable cite={citeShort(basis, "qMethod2")}>
-        <VarRow label="N_p — premises (Eq.7)" value={result.premises != null ? fmt(result.premises, 0) : "—"} state="calculated" tip="Premises count, entered in the QPW_hh row above." />
+        <VarRow label="N_p — premises (Eq.7)" value={result.premises != null ? fmt(result.premises, 0) : ""} state="calculated" tip="Premises count, entered in the QPW_hh row above." />
         <VarRow label="QPW_hh — per-premises volume (Eq.7)" value={qpwHhStr} state="calculated" tip="Per-premises daily volume from Eq.7." />
         {/* U_p SHOWS ONCE, IN ITS ENTRY BOX (ruling (3), 2026-09-26). Under V2.0 that box is in
             Eq.8, where U_p is applied; here it is only referenced, never printed as a second value. */}
@@ -1433,7 +1433,7 @@ function peLeRows(result: ScenarioResult, open: Set<string>, toggle: Toggle, bas
         {basis === "paa" ? (
           <VarRow label="LE_emb — embodied emissions of the devices" value={fmt((result.result as PaaErOutput).LE_embodied, 1)} unit="tCO₂e" state="calculated"
             tip={(result.result as PaaErOutput).warnings.some((w) => /embodied emissions not entered/.test(w))
-              ? "Not entered. V2.0 §9.2 deducts a default per new device (Table 10) once — upfront (Eq. 18) or over five years (Eq. 19). Nothing is deducted until the device class and unit count are entered."
+              ? "V2.0 §9.2 deducts a default per new device (Table 10) once — upfront (Eq. 18) or over five years (Eq. 19). Nothing is deducted until the device class and unit count are entered."
               : "Embodied emissions per new device (V2.0 §9.2, Table 10), once per unit — upfront (Eq. 18) or amortised over five years (Eq. 19)."} />
         ) : null}
         <VarRow label={basis === "paa" ? "LE_Market — market leakage" : "non-renewable biomass leakage"} value={fmt(basis === "paa" ? (result.result as PaaErOutput).LE_market : result.result.LE, 1)} unit="tCO₂e" state="calculated" tip={basis === "paa"

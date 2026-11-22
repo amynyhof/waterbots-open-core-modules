@@ -21,11 +21,32 @@ VWBA is a way to count the water a project gives back.
 - `@waterbots/violet/engine`: the maths alone. No React.
 - `@waterbots/violet/screen`: the screen. Needs React.
 - `@waterbots/violet`: everything.
+- `@waterbots/violet/styles.css`: her screen's styles (0.5.1). A site imports it, with `@waterbots/core/base.css` when
+  the site has no WaterBots design system of its own.
 
 ## Water and carbon
 
 The water and carbon calculators sit side by side. They are never added together. Whether one project may claim
 both is an open question (N14 in `BUILD_PLAN.md`).
+
+## Changes in 0.5.1
+
+With Calvin 0.5.1, for both sites. No sum changed.
+
+- **"Calculated".** A value worked out from other values is tagged `calculated`, as in Calvin. The four tags are
+  `entered`, `default`, `calculated` and `assumed`. `Origin` changes from `"derived"` to `"calculated"`, and
+  D-3's engine version is 0.1.1.
+- **A missing value is a blank box, with no label.** On the screen, a value still awaited shows blank in its box, in
+  the table and in its tag and note cells. A blank never counts as zero: the benefit shows only when every value it
+  needs is given. The engine still marks an awaited value with `AWAITING` in its notes, for the agent; the screen
+  never shows it.
+- **"More to learn".** `CarbonReading` is `"likely"`, `"more to learn"` or `"unlikely"`. `"not enough known"` is
+  gone.
+- **A stylesheet.** `@waterbots/violet/styles.css` styles her screen with the same tokens, spacing and table style as
+  Calvin's, and Orchid as her accent (`--orchid`, which a site may set). Every rule sits under `.violet-d3`.
+
+**What a site should change.** Import `@waterbots/violet/styles.css`. Read `"calculated"` where it read
+`"derived"`, and pass `"more to learn"` where it passed `"not enough known"`. No exported name changed.
 
 ## Changes in 0.5.0
 

@@ -36,4 +36,4 @@ export const SLIDER_FLOOR = 0;
 export const SLIDER_FLOOR_SOURCE = "starting point";
 
 /** The engine's version. It changes when a sum or a default changes. */
-export const D3_ENGINE_VERSION = "0.1.0";
+export const D3_ENGINE_VERSION = "0.1.1";

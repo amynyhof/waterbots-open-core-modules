@@ -22,14 +22,17 @@ export type Origin =
   /** Filled in from a published source. The user's own local value replaces it. */
   | "default"
   /** Worked out from other values. */
-  | "derived"
+  | "calculated"
   /** Expected project performance. The user should set it to their planned project. */
   | "assumed";
 
 /** The three kinds of value, plus the engine's own results. */
 export type ValueKind = "project fact" | "method default" | "anticipated performance" | "result";
 
-/** What a field shows while a project fact is missing. Never guessed. */
+/**
+ * The engine's word for a value it is still waiting for, in a result's notes and slider labels, for the agent. A
+ * screen never shows it: there a missing value is a blank box with no label (0.5.1). Never guessed.
+ */
 export const AWAITING = "awaiting user project input" as const;
 
 /**
@@ -87,7 +90,7 @@ export interface D3Value {
   label: string;
   unit: string;
   kind: ValueKind;
-  /** What the user typed, or the default, or the derived value. Null while it is awaited. */
+  /** What the user typed, or the default, or the calculated value. Null while it is awaited. */
   value: number | string | null;
   /** What the sum uses. Differs from `value` only when a cap was applied. Null while awaited. */
   used: number | string | null;

@@ -213,7 +213,7 @@ export function computeD3(input: D3Input): D3Result {
         kind: "result",
         value: capacityM3,
         used: capacityM3,
-        origin: "derived",
+        origin: "calculated",
         source: formatCitation(D3_CITES.capacity),
       });
       steps.push({
@@ -324,7 +324,7 @@ export function computeD3(input: D3Input): D3Result {
         kind: "project fact",
         value: people,
         used: people,
-        origin: pop.mode === "households" ? "derived" : "entered",
+        origin: pop.mode === "households" ? "calculated" : "entered",
         source: peopleSource,
       });
     }
@@ -466,7 +466,7 @@ export function computeD3(input: D3Input): D3Result {
         kind: "result",
         value: beneficiaryM3,
         used: beneficiaryM3,
-        origin: "derived",
+        origin: "calculated",
         source: formatCitation(D3_CITES.beneficiaries),
       });
       steps.push({
@@ -502,7 +502,7 @@ export function computeD3(input: D3Input): D3Result {
     kind: "result",
     value: withProject,
     used: withProject,
-    origin: withProject === null ? null : "derived",
+    origin: withProject === null ? null : "calculated",
     source: formatCitation(D3_CITES.options),
   });
 
@@ -554,7 +554,7 @@ export function computeD3(input: D3Input): D3Result {
     kind: "result",
     value: vwb,
     used: vwb,
-    origin: vwb === null ? null : "derived",
+    origin: vwb === null ? null : "calculated",
     source: formatCitation(D3_CITES.formula),
   });
 

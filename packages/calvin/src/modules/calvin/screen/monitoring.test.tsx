@@ -84,14 +84,17 @@ describe("ex-post: a value not entered is blank, and no figures are shown", () =
     const daysRow = html.slice(html.indexOf('data-monitoring="days"'), html.indexOf('data-monitoring="testsPass"'));
     expect(daysRow).toContain('value=""');
     expect(daysRow).not.toContain('value="365"');
-    expect(daysRow).toContain("Not entered — needed from the operation log or sensor (V2.0 SDWS 32)");
+    // A blank box with no label under it (0.5.1).
+    expect(daysRow).not.toMatch(/Not entered|needed from|awaiting/i);
+    expect(monitoringSource(calc.state, "days")).toBe("");
     // No figure tiles and no equations.
     expect(html).not.toContain("data-figure-block");
   });
   it("a household device also asks for its usage rate, and its days come from sales or distribution records", () => {
     const { calc, html } = mount(project("HWT", { mode: "ex-post" }));
     expect(calc.missingMonitoring.map((m) => m.key)).toEqual(["days", "testsPass", "usage", "cleanBoil"]);
-    expect(html).toContain("needed from sales or distribution records (V2.0 SDWS 36)");
+    expect(calc.missingMonitoring.find((m) => m.key === "days")?.record).toBe("sales or distribution records");
+    expect(html).not.toContain("Not entered");
   });
   it("one value left out still holds back every figure, and only that box carries the dot", () => {
     const { calc, html } = mount(project("CWS", { ...CWS_MONITORED, xCleanboilEntered: false }));

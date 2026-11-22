@@ -122,11 +122,11 @@ Everything here is public: README, docs, cards, screen text, commit messages, PR
 Every value shown to a user says where it came from. It never credits a ruling or a person.
 - Entered: the user typed it. The source is the user.
 - Default: the site filled it in from a published source (document, section, page). The user's own local value replaces it.
-- Calculated: worked out from other values. It shows the source of its formula. (Called "derived" until ruling 2026-11-16.)
+- Calculated: worked out from other values. It shows the source of its formula. Calvin and Violet both use this word.
 - Assumed: expected project performance, labelled 'assumed'. Calvin encourages the user to adjust it to their planned project.
 
 Three kinds of value (Calvin carbon modules):
-- Project facts (the project record): the user gives them at intake, and Wellington collects them. Until then, the field shows 'awaiting user project input'. Never guessed.
+- Project facts (the project record): the user gives them at intake, and Wellington collects them. Until then, its box is blank, with no label. A blank never counts as zero. Never guessed.
 - Method defaults: at screening, the site fills them in from cited sources, chosen by the user's project facts.
 - Anticipated performance (screening and ex-ante): starts at a labelled 'assumed' value. Calvin encourages the user to adjust it to their planned project.
 
