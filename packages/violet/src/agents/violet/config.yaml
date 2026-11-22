@@ -6,7 +6,7 @@ version: 0.1.0
 persona: violet
 colour: "#A457D4"
 role_prompt: prompt.md
-base_rules: "@waterbots/core/agent-rules.md" # the foundational agent rules, rules 1 to 19 of AGENT_RULES.md
+base_rules: "@waterbots/core/agent-rules.md" # the foundational agent rules, rules 1 to 21 of AGENT_RULES.md
 knowledge: knowledge.md
 context_packs: [] # none in the shared Violet; a host that adds a search tool adds the packs it searches
 tools:

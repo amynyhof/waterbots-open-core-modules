@@ -36,17 +36,17 @@ const SCENARIO_INPUT_SCHEMA: Record<string, unknown> = {
   required: ["version", "method", "countryIso", "populationMode", "populationCount", "litresPerPersonPerDay", "operationalDays"],
   properties: {
     version: { type: "string", enum: ["legacy", "paa"], description: "Methodology: legacy = SDWS V1.0; paa = PAA v2.0." },
-    method: { type: "number", enum: [1, 2], description: "A PROJECT FACT, from the project's technology: 1 = CWS/CWT (community supply); 2 = HWT/IWT (household treatment). Never assume it; if you do not know the technology, ask." },
+    method: { type: "number", enum: [1, 2], description: "A PROJECT FACT, from the project's technology: 1 = CWS/CWT (community supply); 2 = HWT/IWT (household treatment)." },
     mode: { type: "string", enum: ["ex-ante", "ex-post"], description: "Defaults to ex-ante." },
-    countryIso: { type: "string", description: "A PROJECT FACT: the project's country, as an ISO code (alpha-2 or alpha-3); drives the fNRB/DAF lookups. Never assume it; if you do not know it, ask." },
-    populationMode: { type: "string", enum: ["people", "households"], description: "A PROJECT FACT: whether populationCount counts people or households. Never assume it; if you do not know, ask." },
-    populationCount: { type: "number", description: "A PROJECT FACT: people served, or households served (per populationMode). Never assume it; if you do not know it, ask." },
+    countryIso: { type: "string", description: "A PROJECT FACT: the project's country, as an ISO code (alpha-2 or alpha-3); drives the fNRB/DAF lookups." },
+    populationMode: { type: "string", enum: ["people", "households"], description: "A PROJECT FACT: whether populationCount counts people or households." },
+    populationCount: { type: "number", description: "A PROJECT FACT: people served, or households served (per populationMode)." },
     litresPerPersonPerDay: { type: "number", description: "Design or measured L/person/day (the engine caps at 5.5)." },
     operationalDays: { type: "number", description: "Operational days in the year." },
     meteredVolumeL: { type: ["number", "null"], description: "Metered annual volume (L), if available." },
     deviceCapacityLPerHour: { type: "number", description: "Method 2 only: a device's flow rate in litres per hour, from the manufacturer's specification. Pass it only if the person gives it." },
-    devicesPerPremises: { type: "integer", minimum: 1, description: "A PROJECT FACT that matters only when a device flow rate is given: devices per household, a whole number, 1 or more. When the person gives a flow rate, ask how many devices a household has. If they do not know, leave it out: the calculator assumes 1, the lowest and safest." },
-    preset: { type: "string", enum: Object.keys(PRESETS), description: "Methodology-default baseline preset id (optional). A project's own baseline is never guessed: ask for it." },
+    devicesPerPremises: { type: "integer", minimum: 1, description: "A PROJECT FACT that matters only when a device flow rate is given: devices per household, a whole number, 1 or more. Left out, the calculator uses 1, the lowest." },
+    preset: { type: "string", enum: Object.keys(PRESETS), description: "Methodology-default baseline preset id (optional)." },
     fnrbOverride: { type: ["number", "null"], description: "PAA fNRB override (fraction 0–1)." },
     fnrbFiledV1: { type: ["number", "null"], description: "Legacy path: the project's filed V1-era fNRB (fraction 0–1)." },
     etaOverride: { type: "number", description: "Override stove efficiency η (fraction)." },
@@ -74,8 +74,8 @@ function parseScenarioInput(raw: unknown): ScenarioInput {
   // PROJECT FACTS ARE REQUIRED, NEVER DEFAULTED (CALCULATOR_SPEC §0.2): the method (from the
   // technology) and whether the count is people or households join the country and the count. A
   // missing one is refused in words that tell the model to ask, not to guess.
-  if (o.method !== 1 && o.method !== 2) throw new Error("method is a project fact (1 = CWS/CWT, 2 = HWT/IWT, from the technology). Ask the person for the project's technology; do not assume it.");
-  if (o.populationMode !== "people" && o.populationMode !== "households") throw new Error('populationMode is a project fact ("people" or "households"). Ask the person how people served were counted; do not assume it.');
+  if (o.method !== 1 && o.method !== 2) throw new Error("method is a project fact (1 = CWS/CWT, 2 = HWT/IWT, from the project's technology), and it is missing.");
+  if (o.populationMode !== "people" && o.populationMode !== "households") throw new Error('populationMode is a project fact ("people" or "households": how people served were counted), and it is missing.');
 
   const input: ScenarioInput = {
     version,
@@ -126,8 +126,7 @@ export const computeScenarioTool: AgentTool = makeCalculatorTool<ScenarioInput, 
   version: GS4GG_CALCULATOR_VERSION,
   description:
     "Compute GS4GG Safe Water emission reductions (tCO2e) for a project scenario, legacy (SDWS V1.0) " +
-    "or PAA v2.0. Deterministic — returns the ER plus a full provenance trail. Use this for every " +
-    "ER/EF_b/Q_y number; never compute one yourself.",
+    "or PAA v2.0. Deterministic — returns the ER plus a full provenance trail.",
   inputSchema: SCENARIO_INPUT_SCHEMA,
   compute: computeScenario,
   parseInput: parseScenarioInput,
@@ -149,7 +148,7 @@ export const transitionWaterfallTool: AgentTool = makeCalculatorTool<ScenarioInp
     "rule update as its own line (the project's filed V1.0 fNRB vs the current standardised value; null when " +
     "no filed value is on the record), and the ordered drivers of the methodology transition itself (stove " +
     "efficiency η, discount placement, volume basis, leakage, DAF) with fNRB held equal. Deterministic. " +
-    "Use this to explain WHY the number changes between methodologies; never estimate the delta yourself.",
+    "Use this to explain why the number changes between methodologies.",
   inputSchema: SCENARIO_INPUT_SCHEMA,
   compute: computeTransitionWaterfall,
   parseInput: parseScenarioInput,

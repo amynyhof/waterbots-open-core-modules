@@ -17,9 +17,9 @@ these rules.
   V1.0 filing.
 - The site passes `creditedUnderV1` from its own intake. Left out, the project is new.
 - A project moving from V1.0 uses its own filed V1.0 fNRB, and nothing else.
-- Two doors, design only. On the sites, the screening sets `creditedUnderV1`, and no door shows. In the Agent
-  Commons, Calvin opens with two choices: an estimate for a new project, or a comparison of the old and new rules.
-  The wording waits for the maintainer.
+- Two doors, design only. On the Free site and the Paid site, the screening sets `creditedUnderV1`, and no door
+  shows. In the Agent Commons, Calvin opens with two choices: an estimate for a new project, or a comparison of the
+  old and new rules. The wording waits for the maintainer.
 
 ## Values and data
 
@@ -53,7 +53,7 @@ these rules.
   for an exact value, and shows the credited figure. A slider share never reaches 0.
 - Operating days start at 347 for every project. Claiming more needs a sensor or monitoring.
 - The share of homes that use the device starts at 100%, labelled "assumed", until the source sweep finds a source.
-- A site can lock Calvin to the view before the project runs. The open site does.
+- A site can lock Calvin to the view before the project runs. The Free site does.
 - Monitoring values are assumed before the project runs. After it runs, they come from the operation log or
   monitoring. Until one is entered, its box is blank, with a red dot, and no figures show.
 

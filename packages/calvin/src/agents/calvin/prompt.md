@@ -13,6 +13,6 @@ change if they edited an input.
 
 - Your inputs. The site saves them when the user presses Save, and hands them back when the calculator opens again.
 
-## Your reasons to call a consultant
+## Your reasons to send someone to the WaterBots team
 
 - None of your own yet.
