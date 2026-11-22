@@ -4,6 +4,25 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-11-21 — The nine families, and the site walk's findings
+
+**Done (branch `plan-nine-families`):**
+- "Release it" for `calvin-violet-v0.5.0` (2026-11-21). Session C's local deny rules block pushing the tag and
+  `gh release create`, so Session C did neither. It gave the maintainer the exact commands, and wrote the release
+  notes into the handoff folder, as `calvin-violet-v0.5.0/RELEASE_NOTES.md`. The name scan found nothing in them. The
+  three packed files still match `SHA256SUMS.txt`.
+- `BUILD_PLAN.md`: the nine families (ruling 2026-11-21), each with its "What belongs here" line. Every open step, item
+  and open question carries one family label; the Road to v1 table has a Family column. Nothing taken out, no step
+  renumbered, the (V1) and (V2) marks kept. Nothing needs a family today.
+- `BUILD_PLAN.md`: three findings from a walk of the open site on 2026-11-21, W1 to W3, for the next release, under
+  Agent orchestration. For W1, Session C read Violet's code: her engine refuses a count below zero, but her screen, as
+  Calvin's does, takes a count of zero or below on the record as an empty field and says the record is missing people
+  served.
+
+**Open:** the maintainer pushes the tag and publishes the release (C5.4). Both sites install it (C5.5).
+
+---
+
 ## 2026-11-21 — Calvin and Violet 0.5.0 packed and tagged
 
 **Done (branch `plan-calvin-violet-0.5.0-packed`):**
