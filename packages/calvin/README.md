@@ -56,7 +56,7 @@ A site that shows both (the paid site) offers its own switch between them. A sit
 
 ### New projects and transitioning projects
 
-Each project also says whether it was already credited under the V1.0 methodology. The site passes it on the project as `creditedUnderV1`, from its own intake (ruling 2026-09-21):
+Each project also says whether it was already credited under the V1.0 methodology. The site passes it on the project as `creditedUnderV1`, from its own intake:
 
 - **`creditedUnderV1: true`**: a transitioning project. The screens show both versions and the transition: how the credits move from V1.0 to V2.0. They ask for the project's filed V1.0 fNRB (the share of firewood counted as unsustainably harvested) before they show the comparison.
 - **`false`, or left out**: a new project, on paper or newly built. The screens show V2.0 only. There is no V1.0 figure, no transition, and no ask for a V1.0 filing the project does not have.
@@ -122,7 +122,7 @@ and closes them. Both start open.
 
 ## Changes in 0.4.1
 
-Monitoring values are labelled by the analysis basis (ruling 2026-11-21). No sum changed, and every reference case gives the same answer. Only what the screens say, and when they show figures, changed.
+Monitoring values are labelled by the analysis basis. No sum changed, and every reference case gives the same answer. Only what the screens say, and when they show figures, changed.
 
 **Which values the rule covers.** The maintainer is asked to confirm this list.
 

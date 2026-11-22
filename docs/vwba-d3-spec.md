@@ -24,7 +24,7 @@ We copy no text from it. Every summary below is in our own words.
    2. **Capacity.** The system's design flow, or its expected average flow, times the hours it runs (p.46). This is
       for motor-pumped and treatment-plant systems.
    3. **People served.** People with access × litres per person per day × days of access ÷ 1,000 (p.46). This is
-      for handpumps and household systems. They never show an hours slider (ruling 2026-11-12).
+      for handpumps and household systems. They never show an hours slider.
 3. **The capacity check.** With the people-served way, when a flow and hours are both given, the engine uses the
    smaller of the two. This keeps the benefit from being overstated (p.46; Table D3.3, p.46).
 
@@ -50,7 +50,7 @@ Three kinds of value. **Project facts** come from the project record or the user
 **Bounds.** Each slider runs from 0 (a starting point) to its ceiling: 365 days, or 8,760 hours (365 days × 24
 hours). The default and the cap are kept as two separate values, even where they hold the same number.
 
-**Above a cap** (ruling 2026-11-12). Ex-post, a typed value above a cap is kept as typed. The sum uses the cap.
+**Above a cap.** Ex-post, a typed value above a cap is kept as typed. The sum uses the cap.
 A plain note says so. Ex-ante, a typed value past a slider's ceiling is held to the ceiling, as in Calvin.
 
 **Conditions.** The engine lists them; the user confirms them. The water is free from contamination and meets
@@ -60,16 +60,15 @@ of water is counted once (Step 3, p.21).
 ## 4. Where Violet works
 
 - **Agent Commons.** Violet works alone. She asks the user for every value she needs. She never sends the user to
-  another agent (ruling 2026-11-12).
+  another agent.
 - **The sites.** She reads the project record, never asks again for a fact it holds, and hands back to Wellington.
-- **The screening.** The water calculator always shows. Carbon shows beside it only when Phoebe reads carbon as
-  "likely" or "more to learn" (ruling 2026-10-01; the words since ruling 2026-11-21).
+- **The screening.** Which calculators are called is worked out from the project facts, as `RULINGS.md` (section 4,
+  Agents) says.
 
 ## 5. Water and carbon: open item N14
 
 Whether one project may split its water between a carbon claim and a VWBA claim is open. A group of outside
-professionals will rule (ruling 2026-11-12). Until then the two calculators sit side by side and are never added
-together. Nothing in Violet adds a water figure to a carbon figure.
+professionals will rule. Nothing in Violet adds a water figure to a carbon figure.
 
 What each side says, in our own words, for the group to read in full:
 
@@ -89,7 +88,7 @@ What each side says, in our own words, for the group to read in full:
 
 ## 6. How D-3 is checked
 
-- No worked example for D-3 is confirmed in the guidebook (ruling 2026-11-12).
+- No worked example for D-3 is confirmed in the guidebook.
 - So the tests are **hand-worked cases on invented projects**. Each one writes its working beside it, with the
   page for each step. They are in `packages/violet/src/d3/compute.test.ts`.
 - An **outside expert** checks the cases once the prototype is up.
@@ -99,7 +98,6 @@ What each side says, in our own words, for the group to read in full:
 - **N14:** water and carbon claims on one project (section 5).
 - **N15:** a cited starting value for the hours a motor-pumped or treatment-plant system runs. The guidebook gives
   none. Until one is found, the
-  slider starts at 12 hours a day, labelled "assumed: no source yet" (ruling 2026-11-12).
+  slider starts at 12 hours a day, labelled "assumed: no source yet".
 
-D-3 is a prototype. It does not wait for the activity-type signature or for N6 (ruling 2026-11-12). The outside
-expert checks it later.
+D-3 is a prototype. It does not wait for the activity-type signature or for N6. The outside expert checks it later.
