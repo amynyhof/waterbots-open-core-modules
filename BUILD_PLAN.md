@@ -1,4 +1,4 @@
-# Build plan — the open core modules, steps M1 to M9
+# Build plan — the open core modules, steps M1 to M10
 
 ## The v1 finish line
 
@@ -28,7 +28,7 @@ comes after v1. **(V2)** marks an item planned for v2.
 runs its real-filing tests, and reports back through the maintainer: pass or fail and the reference line. Only
 then is it released.
 
-All of M1 to M9 is `Grant: open`. Edits to this plan and the build log are `Grant: neither`.
+All of M1 to M10 is `Grant: open`. Edits to this plan and the build log are `Grant: neither`.
 
 ## The nine families
 
@@ -63,31 +63,23 @@ sites pin that file by its fingerprint. The first pinned version includes the sl
 
 | # | Family | Step | Waits on | Done when |
 |---|---|---|---|---|
-| V1 | — | [x] The maintainer reviews and merges the engine-only entry (pull request #6). Merged. | The maintainer. | It is on `main`. |
-| V2 | — | [x] Make the engine's types complete for projects that use Node's own module rules. (Merged, pull request #8.) | V1. | A fresh project using Node's module rules typechecks against the built package, with no type falling back to "any". |
-| V3 | — | [x] (Merged, pull request #9.) Sliders for anticipated performance (ex-ante: before the project runs). Each slider is held between a cited floor and a cited ceiling. Each has a pencil to type an exact value, and shows the credited number. The engine works out that number; the screen computes nothing. The default and the cap stay two separate things. | V1; the maintainer's description of the sliders (from site pull request #156); a cited source for every floor and ceiling. | Tests show each slider stays inside its cited bounds, the pencil value is held to the same bounds, and the number shown is the engine's. The maintainer checks the screen. |
 | V4 | Console and surfaces | The simple view, shipped as the next release after V5: it hides the advanced material until asked, with bigger tap buttons (M5.3) and Reef (M5.4). See M5.5. | V5. | A test shows advanced parts are hidden at first and one control shows them. The maintainer checks the screen. |
-| V5 | v1 proof and grading | [~] (Released 2026-11-05: tag `calvin-v0.1.0` on commit `3020ee7`, recorded in `SEEDS.md`. Still to come: both sites pin it, and the private side reports pass or fail.) The first GitHub release: the packed packages (`calvin` and the `core` it needs) and their fingerprints, with both views: the ex-ante view with sliders, and the full ex-post view. A site mounts them through `@waterbots/calvin/screen`; the open site locks to ex-ante. Replaces the npm publish in M2.2. It does not wait for the simple view. | V2, V3; the maintainer's approval; branch protection and the tag rule (M1.4). | The release holds the files and their fingerprints. Both sites pin it. The private side reports pass or fail on both carbon filings. |
-| V6 | Agent orchestration | The method registry (M3): one entry per carbon method, so both sites pick a method the same way. | V5; V13 goes first. | A trial release is out; the private side reports pass on both carbon filings. |
-| V7 | — | [x] (Merged, pull request #18.) Violet, the water-benefit agent, as her own module: `@waterbots/violet`. She hosts the D-n modules, starting with D-3. Her color is Orchid (`#A457D4`). | V1; rulings on Violet. | The package builds, passes the package checks, and has a place for each D-n module. |
-| V8 | Experts and partners | [x] (Merged, pull request #18. Still to come: the outside expert's check, and N14 and N15 for the outside expert group.) D-3, the water-supply module, inside Violet (M8.1). | V7. It does not wait for the activity-type signature or N6: D-3 is a prototype the outside expert checks later. | Violet's D-3 tests are hand-worked cases, with every step cited to the guidebook (cited, not copied). The VWBA spec is written alongside the build, in `docs/`, and the maintainer reviews it then. An outside expert checks the module once the prototype is up. |
+| V5 | v1 proof and grading | [~] (Released 2026-11-05: tag `calvin-v0.1.0` on commit `3020ee7`, recorded in `SEEDS.md`. Still to come: both sites pin it, and the private side reports pass or fail.) The first GitHub release: the packed packages (`calvin` and the `core` it needs) and their fingerprints, with both views: the ex-ante view with sliders, and the full ex-post view. A site mounts them through `@waterbots/calvin/screen`; the open site locks to ex-ante. Replaces the npm publish in M2.2. It does not wait for the simple view. | The maintainer's approval; branch protection and the tag rule (M1.4). | The release holds the files and their fingerprints. Both sites pin it. The private side reports pass or fail on both carbon filings. |
+| V6 | Agent orchestration | The method registry (M3): one entry per carbon method, so both sites pick a method the same way. | V5. | A trial release is out; the private side reports pass on both carbon filings. |
+| V8 | Experts and partners | [x] (Merged, pull request #18. Still to come: the outside expert's check, and N14 and N15 for the outside expert group.) D-3, the water-supply module, inside Violet (M8.1). | It does not wait for the activity-type signature or N6: D-3 is a prototype the outside expert checks later. | Violet's D-3 tests are hand-worked cases, with every step cited to the guidebook (cited, not copied). The VWBA spec is written alongside the build, in `docs/`, and the maintainer reviews it then. An outside expert checks the module once the prototype is up. |
 | V9 | Agent orchestration | (Proposal: `docs/proposals/shared-project-record.md`, pull requests #34 and #35, and its follow-up.) The screening hand-off: one project record in `core` that every module fills in and the paid site reads. Each module writes how many questions it asked on that walk. | V5; the paid site's save format (paid repo); Wellington's fields (free-site repo). | A test takes an invented project through all four modules' parts, saves it, reads it back unchanged, and gives each module's question count. |
 | V10 | Agent orchestration | Phoebe (eligibility) to its first release (M9.1). | V9; Phoebe's rulings. | Released; Phoebe fills its part of the record and counts its questions. |
 | V11 | Agent orchestration | Bridget (the map) to its first release (M9.2). | V9; Bridget's rulings; a rights read on every data file; a ruling on the shared map key. | Released; Bridget fills its part of the record and counts its questions. |
 | V12 | Agent orchestration | Calvin's screening part: Calvin fills its part of the record and counts its questions. | V9. | A test shows Calvin's part saved and its count written. |
-| V13 | — | [x] (Merged, pull request #20. Released in `calvin-v0.2.0` once the maintainer cuts it.) Data on top: the engine and the screen entry take a site's own country tables over the package's, row by row, and the engine lists every value that came from the site's tables. The tables are the DAF, fNRB, household size, age shares, UN regions and the baseline fuel and stove mix. The DAF floors and the method's own values (charcoal and embodied-emission factors) stay the package's. A site's fNRB rows fill in the matching set of values. It comes before V6, in the next Calvin release. | V5. | A test with an invented table shows the answer and the list of changed values. A mount test from the packed files passes a site table and shows the screen uses it. |
-| V14 | v1 proof and grading | The same-numbers check: a project saved by the screening, read back the way the paid site reads it, gives the same numbers, or a list of what changed and why. | V6, V10, V11, V12, V13. | A test passes here on invented projects. The private side runs it on both real filings with the pinned release and reports pass. |
+| V14 | v1 proof and grading | The same-numbers check: a project saved by the screening, read back the way the paid site reads it, gives the same numbers, or a list of what changed and why. | V6, V10, V11, V12. | A test passes here on invented projects. The private side runs it on both real filings with the pinned release and reports pass. |
 | V15 | v1 proof and grading | The v1 release: a GitHub release that both sites pin. | V8, V14; the maintainer's approval. | Both sites run the same pinned file. The maintainer confirms the whole journey on the live sites, and the average question count is reported. |
-| V16 | — | [x] (Released: tag `calvin-v0.3.0` on commit `71ded5d`.) Calvin 0.3.0. The figure tiles fit a narrow panel (pull request #23). A new project, on paper or newly built, gets a V2.0-only view: no V1.0 figure and no transition. The site passes `creditedUnderV1: true` for a project credited under V1.0; left out, the project is new. The release note tells a site to pass `true` for every transitioning project before it upgrades. The `url` line comes out of both package files. | V13. | Released. The private side reports pass after passing `creditedUnderV1: true` on its transitioning projects. |
-| V17 | Agent orchestration | Calvin's two doors. **Design only: build nothing yet.** One calculator, two doors. On the sites, the screening sets `creditedUnderV1`, and no door is shown. In the Agent Commons, Calvin opens with two choices: "new project estimate" (sets `false`) or "compare old and new rules" (sets `true`, and still asks for the filed V1.0 fNRB before any comparison). The choices' wording, what each sets and Calvin's opening line belong in the open core, as Violet's door does. The Commons host only draws the buttons. | V16; the maintainer's ruling on the wording. | `packages/calvin/src/doors.ts` and Calvin's prompt hold both choices, and a test shows each choice sets the right value. |
-| V18 | — | [x] (Released: tag `calvin-v0.4.0` on commit `09dfc8d`.) Calvin's screens after the walk of the open site (2026-11-16): sixteen items, one pull request. No sum changes. | V16. | Merged, then a release; the private side reports pass. |
-| V19 | — | [x] (Released: tag `calvin-v0.4.1` on commit `8cd7971`.) Calvin 0.4.1: monitoring values labelled by the analysis basis. Ex-ante, each is assumed from its starting value. Ex-post, each comes from the operation log or monitoring; until it is entered its box is blank, with a highlight and a red dot, and no figures show. The "entered" flag is saved. No sum changes. | V18. | Session C packs it, runs the release check and makes the tag. After "release it", Session C pushes the tag and publishes the release. The maintainer confirmed the values the rule covers: the operating days, M_q, U_p and X_cleanboil; Q_m is left out (2026-11-21). The paid site installs it. |
-| V20 | Agent orchestration | [x] (Released: tag `calvin-violet-v0.5.0` on commit `1bce514`. Still to come: both sites install it. See the step "Calvin and Violet 0.5.0".) Calvin and Violet 0.5.0, one release for both sites. Calvin: the main credit tiles (tCO₂e a year) are a pinned header, whether or not a site sets `unpinFigureBlock`; the smaller figures sit right under them; the sliders and the calculation collapse. The controls panel holds only the site's own top and Calvin's buttons, the work surface ends with the calculation, and the report's note on how the figures were produced is one sentence shorter. A phone pass: rows wrap instead of squeezing. Violet: people served come from the project record, as Calvin takes them, and "Draft — pending expert review" shows on the screen and on every result. No sum changes. | V19, V8. | Session C packs all three packages, runs the release check and makes the tag. One release holds all three files. After "release it", Session C pushes the tag and publishes the release. Both sites install it. |
+| V17 | Agent orchestration | Calvin's two doors. **Design only: build nothing yet.** One calculator, two doors. On the sites, the screening sets `creditedUnderV1`, and no door is shown. In the Agent Commons, Calvin opens with two choices: "new project estimate" (sets `false`) or "compare old and new rules" (sets `true`, and still asks for the filed V1.0 fNRB before any comparison). The choices' wording, what each sets and Calvin's opening line belong in the open core, as Violet's door does. The Commons host only draws the buttons. | The maintainer's ruling on the wording. | `packages/calvin/src/doors.ts` and Calvin's prompt hold both choices, and a test shows each choice sets the right value. |
+| V20 | Agent orchestration | [x] (Released: tag `calvin-violet-v0.5.0` on commit `1bce514`. Still to come: both sites install it. See the step "Calvin and Violet 0.5.0".) Calvin and Violet 0.5.0, one release for both sites. Calvin: the main credit tiles (tCO₂e a year) are a pinned header, whether or not a site sets `unpinFigureBlock`; the smaller figures sit right under them; the sliders and the calculation collapse. The controls panel holds only the site's own top and Calvin's buttons, the work surface ends with the calculation, and the report's note on how the figures were produced is one sentence shorter. A phone pass: rows wrap instead of squeezing. Violet: people served come from the project record, as Calvin takes them, and "Draft — pending expert review" shows on the screen and on every result. No sum changes. | V8. | Session C packs all three packages, runs the release check and makes the tag. One release holds all three files. After "release it", Session C pushes the tag and publishes the release. Both sites install it. |
 | V21 | Console and surfaces | [x] (Merged, pull request #38. The release waits until the Agent orchestration family opens.) Calvin and Violet 0.5.1, four changes. Violet's "derived" tag becomes "calculated". A missing value is a blank box with no label, on both screens, in the tables and the tag cells; a blank never counts as zero. Violet's "not enough known" becomes "more to learn". Violet ships a small stylesheet in Calvin's look, with Orchid as her accent. No sum changes. See the step "Calvin and Violet 0.5.1". | V20; the Agent orchestration family opening. | Session C packs it, runs the release check and makes the tag. After "release it", the tag is pushed and the release published. Both sites install it. |
 
-**Where things stand (2026-11-22):** Calvin 0.5.0 and Violet 0.5.0, with core 0.1.1, are the latest release (`calvin-violet-v0.5.0`, V20). V16, V18, V19 and V20 are released. Both sites still install V20. V21 (Calvin and Violet 0.5.1) is merged; its release waits until the Agent orchestration family opens. V17 waits on the maintainer's ruling on its wording.
+**Where things stand (2026-11-22):** The latest release is `calvin-violet-v0.5.0` (V20): Calvin 0.5.0, Violet 0.5.0 and core 0.1.1. Both sites still install it. V21 (Calvin and Violet 0.5.1) is merged; its release waits until the Agent orchestration family opens and the maintainer says "release it". V17 waits on the maintainer's ruling on its wording. Finished steps are in the build log.
 
-**Sources still to find** (from V3): moved to the source sweep, M10.4.
+**Sources still to find:** in the source sweep, M10.4.
 
 **After v1** (not needed for the finish line):
 
@@ -95,7 +87,7 @@ sites pin that file by its fingerprint. The first pinned version includes the sl
 - *Family: v1 proof and grading.* Benchmarks and pass rates. This is v2.
 - *Family: Security and hygiene.* M2.3 linting.
 - *Family: Calculators and methods.* M4 openings and labels.
-- *Family: Console and surfaces.* M5 the friendly view, beyond the sliders and simple view in V3 and V4 and its items marked **(V1)**.
+- *Family: Console and surfaces.* M5 the friendly view, beyond the sliders (released) and the simple view in V4 and its items marked **(V1)**.
 - *Family: Agent orchestration.* M9.2 Bridget's map, beyond its item marked **(V1)**.
 - *Family: Calculators and methods.* M6 the fuel-mix floor.
 - *Family: Calculators and methods.* M7 diesel and grid factors.
@@ -105,31 +97,10 @@ sites pin that file by its fingerprint. The first pinned version includes the sl
 
 ---
 
-## M1 — Skeleton and guards, before any code
+## M1 — Skeleton and guards
 
 *Family: Security and hygiene.*
 
-*Stop for the maintainer:* read the CI run. *Waits on:* the npm scope (N13) — for publishing only.
-
-- [x] **M1.1 Guards and rules**
-  - [x] `CLAUDE.md`: who does what, hard rules, merge lanes, the grant line, plain-English copy
-  - [x] Session deny rules in `.claude/settings.local.json` (local, not committed)
-  - [x] Lane labelling job (`lanes.yml`) and the lane rule with tests. It labels only; it never merges.
-  - [x] Typecheck, test and build jobs (`ci.yml`) (they now run for real: see M1.3)
-  - [x] Gitleaks and a second secrets scan (`secrets.yml`)
-  - [x] Number gate placeholder (`number-gate.yml`). Taken out when the gate was retired (M1.2).
-  - [x] Publish with provenance on a tag (`publish.yml`), refusing until the scope is real
-  - [x] This plan and the build log
-- [x] **M1.2 Number gate: retired** (merged, pull request #30).
-- [x] **M1.3 Package skeleton** (merged, pull request #2): the empty boxes. No calculator code, no data.
-  - [x] Workspace root with TypeScript, vitest and a build; versions pinned, lockfile committed; Node pinned to one
-        exact version (24.20.0) in the workflows and `engines`
-  - [x] Four stubs: `@waterbots/core`, `calvin`, `phoebe`, `bridget`. Each builds, has one trivial test, an Apache 2.0
-        `LICENSE` and `NOTICE` (copyright line: WaterBots AI, LLC), and a README that says it is empty for now. All marked `private`: nothing goes to npm.
-  - [x] `scripts/check-packages.mjs`, run by the test job: keeps every package private, licensed and empty-for-now
-  - [x] The real plug points in `core` (`ModuleProject`, `StandardId`, `SaveOutcome`, the agent contract) and Calvin's
-        folders arrive with the seed (M2.1). Design tokens and the base stylesheet: `@waterbots/core/base.css`, for a site
-        without a design system of its own.
 - **M1.4 The maintainer's hand-steps** *Family: Security and hygiene.* — blocked until the maintainer; Session C cannot do these. **Due before the first release (M2.2).**
   - [!] *Family: Security and hygiene.* Branch protection on `main`: a pull request before merging, every check required, no force pushes or
         deletions, applied to admins too. Can be done now; steps are in pull request #1.
@@ -140,40 +111,17 @@ sites pin that file by its fingerprint. The first pinned version includes the sl
         such as `calvin-v*`). Set it once the GitHub organisation exists.
   - [!] **(V1)** *Family: Security and hygiene.* Move this repo to the WaterBots GitHub organisation. Then Session C points the
         repository link in each `package.json` at the new home.
-- [x] **M1.5 Lane 1 auto-merge** (merged, pull request #30). The lane label job arms GitHub's
-      auto-merge on a lane 1 pull request that is not a draft, and disarms it on any other. GitHub merges once every
-      required check is green. *Waits on the maintainer:* the repo setting "Allow auto-merge" on, and "name scan" on the
-      `main` ruleset's required checks in place of "number gate".
-- [x] Secret scanning with push protection — already on in the repo settings.
 
-## M2 — The seed lands
+## M2 — After the seed
 
 *Family: Security and hygiene.*
 
-*Stop for the maintainer:* the private side confirms the package matches the seed. *Waits on:* the seed (the maintainer's one-time carry).
-
-- [x] **M2.1** Seed arrives unchanged, with its reviewed-version ledger kept exactly as it arrives. Show that the
-      carried calculator builds and tests the same under this repo's tool versions (TypeScript 7.0.2, vitest 5.0.5,
-      Node 24.20.0), and say so in the pull request. (Merged. `SEEDS.md` records it. No ledger file came with the
-      seed; see its known gaps.)
 - [ ] **M2.2** *Family: Security and hygiene.* Publish `0.1.0` with no changes to what arrived. *Blocked until* the maintainer's hand-steps in M1.4 are done.
-  - [x] Get it ready (merged, pull request #6): an engine-only entry, `@waterbots/calvin/engine`, added in new files only;
-        React made an optional peer of `calvin` and `core`; both set to version 0.1.0. Still `private`.
   - [!] *Family: Security and hygiene.* Publish. The maintainer's call, after M1.4.
   - [ ] **(V1)** *Family: Security and hygiene.* Every release build runs the name scan on the packed files themselves, not only on the repo. Each packed file is unpacked into an empty folder and scanned there. A finding stops the release.
   - [ ] **(V2)** *Family: Security and hygiene.* Rebuild the release on a second machine and show it gives the same bytes: the same fingerprints.
 - [ ] **M2.3 Linting** *Family: Security and hygiene.* (was M1.6): add a linter that runs as part of CI, with the strictest settings that fit. It comes
       right after the seed lands (after M2.2), not before it.
-- [x] **M2.4 (V1)** *Family: v1 proof and grading.* Tag which of the 47 made-up test cases in `expected-outputs.json` are outputs of Gold Standard's
-      official V1.0 calculator on made-up inputs. The maintainer reports 26, from an audit on the private side (2026-10-25). The
-      file marks every case "synthetic" today, so the report's sentence about the official tools cannot be checked
-      here. Done when each case carries its source and a test checks the report's claim against the tags.
-      (Merged, pull request #11. From the note of 2026-10-31: 26 began as the calculator's output, and 5 of them are still
-      its output unchanged. The other 21 were recalculated by our engine. The report counts only the 5.)
-- [x] **M2.5 (V1)** *Family: v1 proof and grading.* Record how each of the other 21 made-up test cases was worked out, including every V2.0 case. The
-      file records only what the engine returned, not how each expected value was found. Done when each of the 21
-      says how it was worked out, or says plainly that its only source is the engine itself. (Merged, pull request #11.
-      Every case now carries a `workedOut` tag, explained in the file's `workedOutTags`.)
 - [ ] **M2.6 (V2)** *Family: v1 proof and grading.* Put the 21 recalculated test cases back through Gold Standard's official V1.0 calculator, so their
       expected results are the calculator's own again. Done when each one's tag says so and the report's count rises
       with it.
@@ -240,7 +188,6 @@ indicator.
 *Stop for the maintainer:* the hand-worked cases and the VWBA spec; then an outside expert's check (see V8). *Waits on:* nothing more. D-3 is a prototype; it does not wait for the activity-type signature or N6.
 The first release does not wait for this.
 
-- [x] **M8.1** Water-supply method entry and engine (merged, pull request #18)
 - [ ] **M8.2** *Family: Calculators and methods.* The free site's water file brought in
 - [ ] **M8.3** *Family: Calculators and methods.* D-3 for irrigation supply (VWBA 2.0, Appendix D, Table D3.2, p.45). A later pull request.
 - [ ] **M8.4** *Family: Calculators and methods.* Rainwater harvesting for direct use. The guidebook works it out with the Recharge method, D-4 (p.45). A later pull request.
@@ -293,37 +240,19 @@ and the IPCC 2006 citations.
 One release for both sites: Calvin 0.5.0, Violet 0.5.0 (her first release) and core 0.1.1, in one GitHub release
 holding all three packed files. It is V20 on the road to v1. No sum changes.
 
-*Stop for the maintainer:* "release it". *Waits on:* nothing else.
+Released 2026-11-21. What is left:
 
-- [x] **C5.1** The build: Calvin's pinned header, the parts that collapse, the phone pass and the tidied panel and
-      report; Violet's people served from the project record and her "Draft — pending expert review" label (merged,
-      pull request #31).
-- [x] **C5.2** The release check, Session C's own: a clean install, typecheck, build and the full test suite; two packs
-      with the same fingerprints; the name scan of every file inside the three packed files; GitHub's checks on
-      `1bce514`. The packs are in the handoff folder, in `calvin-violet-v0.5.0`, with `SHA256SUMS.txt`.
-- [x] **C5.3** The annotated tag `calvin-violet-v0.5.0` on `1bce514`, made locally. Not pushed.
-- [x] **C5.4** (Done 2026-11-21. Session C's deny rules blocked both steps, so the maintainer pushed the tag and published the release.) After "release it": Session C pushes that one tag and publishes the release, titled "Calvin 0.5.0 and
-      Violet 0.5.0: a pinned header, a phone pass, and Violet's first release", with the three packed files and
-      `SHA256SUMS.txt`.
 - [ ] **C5.5** *Family: Agent orchestration.* Both sites install it, and take the steps in Calvin's README, "Changes in 0.5.0".
 
 ## Calvin and Violet 0.5.1
 
 *Family: Console and surfaces.*
 
-A small release for both sites, with exactly four changes. It is V21 on the road to v1. No sum
+A small release for both sites, with exactly four changes, listed in V21 and merged (pull request #38). No sum
 changes.
 
 *Stop for the maintainer:* "release it". *Waits on:* the Agent orchestration family opening.
 
-- [x] **C51.1** *Family: Calculators and methods.* Violet's value tag "derived" becomes "calculated", so both agents
-      use entered, default, calculated and assumed (merged, pull request #38).
-- [x] **C51.2** *Family: Console and surfaces.* A missing value is a blank box, with no label, on Calvin's and
-      Violet's screens, in the results tables and the tag cells. A blank never counts as zero (merged, pull request #38).
-- [x] **C51.3** *Family: Calculators and methods.* Violet's reading "not enough known" becomes "more to learn": one
-      set of words everywhere, likely, more to learn and unlikely (merged, pull request #38).
-- [x] **C51.4** *Family: Console and surfaces.* Violet ships a small stylesheet, `@waterbots/violet/styles.css`, in
-      Calvin's look, with Orchid as her accent (merged, pull request #38).
 - [ ] **C51.5** *Family: Agent orchestration.* When the Agent orchestration family opens, Session C packs it, runs the release check and makes the tag. After
       "release it", the tag is pushed and the release published. Both sites install it.
 
@@ -376,6 +305,54 @@ The maintainer's safety passes cover all three repos. This repo's own parts are 
   - `peopleFromHouseholds` in `packages/calvin/src/calculators/gs4gg-carbon/quantity.ts`. It is on the engine entry.
   - `moduleName` in `core`, `calvin` and `violet` (`src/index.ts`), with the "empty stub" tests in
     `src/index.test.ts`. Without it, the package's `"."` entry is empty.
+
+---
+
+## Found in the Security and hygiene sprint (closed 2026-11-22)
+
+Each finding from the family 8 sprint that was written down and not chased. Each carries its family. `[!]` waits on
+the maintainer.
+
+- [ ] *Family: Security and hygiene.* **Every CI check job fetches full history.** Only the test job's seed check needs
+      it. Done when the typecheck and build jobs fetch one commit and the check names stay the same.
+- [ ] *Family: Security and hygiene.* **Old pointers in code comments.** About 150 lines in code, settings and CI still
+      credit a ruling by its date, and the rulings pages replaced those rulings. Short labels such as "seam S4",
+      "decision #4" and "[#257]" name nothing in this repo. The seed's copies of the data tests and the data files'
+      descriptions still point at the old calculator spec. A comment in Calvin's `version.ts` says the fallback dial
+      stays for household size (see N16). Wording only.
+- [ ] *Family: Security and hygiene.* **`publish.yml` says only the maintainer may create `v*` tags.** M1.4's tag rule
+      names the maintainer, the engineer and Session C.
+- [ ] *Family: Security and hygiene.* **`referenceCaseCount`**, a name in Calvin's screen code (`CalculatorWork.tsx`),
+      still says "reference case" for the made-up test cases. Left as it is: a name in code.
+- [!] *Family: Security and hygiene.* **No copied-text check.** `RULINGS.md` section 1 says every release is checked for
+      copied text. This repo's release check has none. A new check needs the maintainer's yes.
+- [!] *Family: Security and hygiene.* **Session C's local deny rules** still block pushing one release tag by name and
+      `gh release create`, though `CLAUDE.md`'s release steps have Session C do both after "release it".
+- [!] *Family: Security and hygiene.* **Merged branches stay on GitHub** (23 besides `main`). GitHub's setting to
+      delete a branch when its pull request merges would stop new ones.
+- [!] *Family: Security and hygiene.* **Three rules wait in `CLAUDE.md`** ("Waiting for the maintainer"): the Grant
+      line, the engine does every sum, and the three kinds of value. The maintainer places or drops each.
+- [!] *Family: Security and hygiene.* **The status sheet is not in this repo.** Rule 16 and close step 8 name
+      `BUILD_STATUS_SHEET.md`. The maintainer says where it lives.
+- [!] *Family: Console and surfaces.* **"Consultant" in Calvin's screen text and notes:** one line on screen in
+      `EquationStack.tsx`, a comment in `screen/state.ts`, a struck note in the fNRB data and a struck comment in
+      Calvin's settings. Rule 13 says "the WaterBots team". Site wording, so the maintainer rules.
+- [ ] *Family: Agent orchestration.* **Violet's `doors.ts`** hands back to no one in the Agent Commons, always shows
+      water, and cites an old ruling. `docs/vwba-d3-spec.md` says the same. `RULINGS.md` section 4 says the agents
+      called are worked out from the facts. Goes with V17 and W2.
+- [ ] *Family: Agent orchestration.* **No host tells an agent its door** (Free site, Paid site, Agent Commons or MCP;
+      rule 21). Calvin and Violet are not told today.
+- [!] *Family: Agent orchestration.* **The Agent Commons has no project record.** Rule 10 has an agent check the record
+      first. No rule says what an agent does where there is none.
+- [ ] *Family: Agent orchestration.* **Neither agent adds its results to the record** (rule 10). Calvin saves only his
+      inputs, and Violet saves nothing. Waits on V9.
+- [ ] *Family: Agent orchestration.* **A link to the WaterBots consulting page** (rule 13). Each door's host needs the
+      address, kept in one shared file. The address is not in this repo.
+- [ ] *Family: Agent orchestration.* **Calvin's agent tools are not exported** from his package, though his
+      `config.yaml` names them. Violet's are exported. Export them or retire them with V17.
+- [!] *Family: Calculators and methods.* **A value stands in for a missing one.** Calvin counts embodied emissions as 0
+      when they are not entered, with a warning. `RULINGS.md` section 2 says a missing fact never counts as zero.
+      Devices per household is 1 when not given, as Calvin's own rulings say. Changing either changes a sum.
 
 ---
 
