@@ -14,9 +14,5 @@ these rules.
 - A value above a cap: after the project runs, the typed value is kept, the sum uses the cap, and a note says so.
   Before the project runs, a typed value is held to the slider's top.
 - A slider's default and its cap are two separate values, even when they hold the same number.
-- In the Agent Commons, Violet works alone. She asks for every value and never sends the user to another agent.
-- On the sites, Violet reads the project record. She never asks again for a fact it holds, and she hands back to
-  Wellington.
-- People served come from the project record.
 - The screen and every result show "Draft — pending expert review".
 - Irrigation supply and rainwater harvesting come in later pull requests (plan items M8.3 and M8.4).

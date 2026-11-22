@@ -51,7 +51,6 @@ export function calculatorPageContext({
     return (
       `The user is on the GS Safe Water calculator for project "${projectName}", and it is asking for project facts rather than showing a result. ` +
       `Missing project facts: ${missingFacts.map((f) => f.label).join("; ")}. There are NO figures on this screen. ` +
-      "Ask the user for each missing fact. Do not estimate a figure, and do not assume a technology, country, population or counting unit. " +
       "Once the facts are on the project record, the calculator runs."
     );
   }
@@ -59,14 +58,14 @@ export function calculatorPageContext({
     return (
       `The user is on the GS Safe Water calculator for project "${projectName}", and it is asking for the pump's activity emissions rather than showing a result. ` +
       `The project record says the pump runs on ${activityAsk.power === "diesel" ? "diesel" : "grid power"}, so running it gives off greenhouse gas. There are NO figures on this screen. ` +
-      "Ask the user for the pump's emissions for a year, in tCO2e. Do not estimate them, and do not assume zero."
+      "The screen asks for the pump's emissions for a year, in tCO2e."
     );
   }
   if (missingMonitoring.length > 0) {
     return (
       `The user is on the GS Safe Water calculator for project "${projectName}", in an ex-post run, and it is asking for monitoring values rather than showing a result. ` +
       `Not entered yet: ${missingMonitoring.map((m) => `${m.label} (from ${m.record}, ${m.sdws})`).join("; ")}. There are NO figures on this screen. ` +
-      "Ask the user for each value from their monitoring records. Do not estimate one, and do not offer a starting value or a default in its place."
+      "Each value comes from the project's monitoring records. The screen offers no starting value or default in its place."
     );
   }
   // THE AGENT IS TOLD THERE IS NOTHING ON THE SCREEN, AND TOLD NOT TO FILL THE GAP. A refusal
@@ -76,8 +75,7 @@ export function calculatorPageContext({
     return (
       `The user is on the GS Safe Water calculator for project "${projectName}", and it is showing a refusal rather than a result. ` +
       `${fnrbRefusal.message} (${fnrbRefusal.cite}.) ` +
-      "There are NO figures on this screen. Do not estimate one, and do not offer a regional or global stand-in — " +
-      "the tools publish neither for this country. The project's own filed fNRB, entered with its source, is what unblocks the calculation."
+      "There are NO figures on this screen. The tools publish no regional or global value for this country. The project's own filed fNRB, entered with its source, is what unblocks the calculation."
     );
   }
   // A TRANSITION WAITING ON THE FILED V1.0 fNRB shows the ask and no figures, so Calvin is given none either.
@@ -86,7 +84,7 @@ export function calculatorPageContext({
     return (
       `The user is on the GS Safe Water calculator for project "${projectName}", a project credited under V1.0, and the transition screen is asking for its filed V1.0 fNRB rather than showing a result. ` +
       `${filedFnrbRefusal.message} (Where to find it: ${filedFnrbRefusal.cite}.) ` +
-      "There are NO figures on this screen. Do not estimate the filed value or a V1.0 figure; only the project's own filing unblocks the comparison."
+      "There are NO figures on this screen. Only the project's own filing unblocks the comparison."
     );
   }
   const pr = paaResult!;
@@ -114,6 +112,6 @@ export function calculatorPageContext({
       ? `fNRB has no national default for this country: A6.4-AMT-009 Table 2's multi-national value for ${r.fnrbMultiNational.region} is in force, and it carries a condition — ${r.fnrbMultiNational.condition} `
       : "") +
     `Key inputs: ${state.litresPerPersonPerDay} L/person/day, ${state.operationalDays} operational days, fNRB ${r.fNRB}. ` +
-    `If the user asks what changes when an input differs from these, call the calculator tool to recompute — do not estimate.`
+    `If the user asks what changes when an input differs from these, call the calculator tool to recompute.`
   );
 }

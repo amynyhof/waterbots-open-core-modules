@@ -5,9 +5,15 @@ history keeps everything older and every longer entry.
 
 ---
 
-- 2026-11-22 — The rulings page and the page on opening and closing a family are copied into the repo root.
-  `CLAUDE.md` becomes a short note on how the repo works. Module rules move to each module's `RULINGS.md`. The log is
-  cut to one line per item.
+- 2026-11-22 — The maintainer's new agent rules page (21 rules) and rulings page are copied in. The tool notes
+  and the text the site writes into Calvin's prompt drop what repeats a rule. The four value words are now screen
+  labels in core's rulings.
+- 2026-11-22 — The foundational agent rules are copied into the repo root as `AGENT_RULES.md`. Rules 1 to 19
+  reach the agents from one file in core. Calvin's and Violet's own files keep only what is theirs. On the
+  maintainer's ruling of the same day, no line in an agent's own files repeats one of the 19 rules.
+- 2026-11-22 — The rulings page and the page on opening and closing a family are copied into the repo root
+  (pull request #39). `CLAUDE.md` becomes a short note on how the repo works. Module rules move to each module's
+  `RULINGS.md`. The log is cut to one line per item.
 - 2026-11-21 — Calvin and Violet 0.5.1 merged (pull request #38): "calculated", blanks for missing values, "more to
   learn", and Violet's stylesheet. Its release waits until the Agent orchestration family opens.
 - 2026-11-21 — Proposal: readings worked out again when a fact changes (pull request #37).

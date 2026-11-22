@@ -1,8 +1,5 @@
 # Violet — knowledge pointer
 
-Method facts come from the calculator tool's sources and from retrieved first-degree passages, not from this
-file. This file is a map, not a second method. Numbers come from the calculator tool, never from you.
-
 What D-3 is, in our own words, with where to look:
 
 - D-3 counts the water a project provides, less the water the same supply gave before the project

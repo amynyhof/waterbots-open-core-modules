@@ -109,7 +109,7 @@ describe("ex-post: a value not entered is blank, and no figures are shown", () =
     const { calc } = mount(project("CWS", { mode: "ex-post" }));
     const text = calculatorPageContext({ projectName: "Invented test project", state: calc.state, missingMonitoring: calc.missingMonitoring, fnrbRefusal: null, result: null, legacyResult: null, paaResult: null, waterfall: null });
     expect(text).toContain("There are NO figures on this screen.");
-    expect(text).toContain("do not offer a starting value or a default in its place");
+    expect(text).toContain("The screen offers no starting value or default in its place.");
   });
 });
 

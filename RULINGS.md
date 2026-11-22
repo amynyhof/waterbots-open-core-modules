@@ -20,7 +20,7 @@ In force from 22 Nov 2026.
 - No real project's numbers are written into the calculator's code. Nothing made up is ever shown to a visitor as real.
 - Source your facts. When an agent gives a fact or a number, it must come from a source that can be found.
 - A project fact is never guessed. If it is missing, the box is blank, it never counts as zero, and no figure is shown until it is given.
-- Water and carbon sit side by side and are never added together.
+- Water and carbon are shown side by side, each on its own. WaterBots is still working out whether a developer can claim both together.
 
 ## 3. Words
 - Call real filings "reference projects" and anything made up "tests", so the maintainer always knows which is which.

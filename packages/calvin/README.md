@@ -8,7 +8,7 @@ What is in `src/`:
 - `calculators/data/`: the engine's data files, each citing its sources, and a test for each.
 - `modules/calvin/`: the screens and their state, the notes and tools the agent reads, and `engine.ts`, the one door to the engine. The screens compute nothing.
 - `modules/core/`: six small files that pass the seed's shared imports on to `@waterbots/core`. They are not part of the seed.
-- `agents/`: Calvin's prompt, tool list and notes, and the base rules every agent follows.
+- `agents/`: Calvin's prompt, tool list and notes. The rules every agent follows come from `@waterbots/core` (`agent-rules.md`).
 - `sources/public-index.yaml`: the sources the data cites: titles, publishers, links and rights words only.
 - `expected-outputs.json` and `prove-expected-outputs.test.ts`: the engine's results on made-up cases, and the test that re-runs them.
 - `engine.ts`: the engine-only entry (see below). It is not part of the seed.
