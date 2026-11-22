@@ -19,7 +19,15 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
   Calvin's does, takes a count of zero or below on the record as an empty field and says the record is missing people
   served.
 
-**Open:** the maintainer pushes the tag and publishes the release (C5.4). Both sites install it (C5.5).
+- Ruling 2026-11-21: "family" means only the nine families. `BUILD_PLAN.md` calls its M and V groups steps, and
+  `CLAUDE.md`'s close-out rule says what a family close is: the close of work on one of the nine. Changing
+  `CLAUDE.md` puts this pull request in lane 3.
+- `BUILD_PLAN.md`: M1.2 and M1.5 marked merged (pull request #30), and M1.3 merged (pull request #2).
+- The maintainer pushed the tag `calvin-violet-v0.5.0` and published the release. Session C downloaded its four files:
+  the three packed files match `SHA256SUMS.txt`, which is the same file as in the handoff folder. C5.4 and V20 are
+  marked released.
+
+**Open:** both sites install it (C5.5).
 
 ---
 

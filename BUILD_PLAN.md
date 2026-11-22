@@ -1,8 +1,9 @@
 # Build plan — the open core modules, steps M1 to M9
 
-Each step is one coherent, testable thing the maintainer can check in one sitting and undo in one motion. Each step is a family;
-its items are the pull requests or checks inside it. `[x]` done (merged), `[~]` open pull request, `[ ]` not started,
-`[!]` blocked until the maintainer acts. **(V1)** marks an item inside a family that v1 needs, even where the rest of its family
+Each step is one coherent, testable thing the maintainer can check in one sitting and undo in one motion. Each step holds items:
+the pull requests or checks inside it. Each step belongs to one of the nine families below. "Family" means only those
+nine (ruling 2026-11-21). `[x]` done (merged), `[~]` open pull request, `[ ]` not started,
+`[!]` blocked until the maintainer acts. **(V1)** marks an item inside a step that v1 needs, even where the rest of its step
 comes after v1. **(V2)** marks an item planned for v2.
 
 **Every engine change is published first as a release candidate** (a trial version). The private side installs it,
@@ -83,9 +84,9 @@ smaller tables, such as the six-row table of fallback factors, are fine as they 
 | V17 | Agent orchestration | Calvin's two doors. **Design only: build nothing yet.** One calculator, two doors. On the sites, the screening sets `creditedUnderV1`, and no door is shown. In the Agent Commons, Calvin opens with two choices: "new project estimate" (sets `false`) or "compare old and new rules" (sets `true`, and still asks for the filed V1.0 fNRB before any comparison). The choices' wording, what each sets and Calvin's opening line belong in the open core, as Violet's door does (ruling 2026-11-12). The Commons host only draws the buttons. | V16; the maintainer's ruling on the wording. | `packages/calvin/src/doors.ts` and Calvin's prompt hold both choices, and a test shows each choice sets the right value. |
 | V18 | — | [x] (Released: tag `calvin-v0.4.0` on commit `09dfc8d`.) Calvin's screens after the walk of the open site (2026-11-16): sixteen items, one pull request. No sum changes. | V16. | Merged, then a release; the private side reports pass. |
 | V19 | — | [x] (Released: tag `calvin-v0.4.1` on commit `8cd7971`.) Calvin 0.4.1: monitoring values labelled by the analysis basis (ruling 2026-11-21). Ex-ante, each is assumed from its starting value. Ex-post, each comes from the operation log or monitoring; until it is entered its box is blank, with a highlight and a red dot, and no figures show. The "entered" flag is saved. No sum changes. | V18. | Session C packs it, runs the release check and makes the tag. After "release it", Session C pushes the tag and publishes the release. The maintainer confirmed the values the rule covers: the operating days, M_q, U_p and X_cleanboil; Q_m is left out (2026-11-21). The paid site installs it. |
-| V20 | Agent orchestration | [~] (Merged, pull request #31. Packed and checked; tag `calvin-violet-v0.5.0` made on commit `1bce514`, waiting for "release it". See the family "Calvin and Violet 0.5.0".) Calvin and Violet 0.5.0, one release for both sites. Calvin: the main credit tiles (tCO₂e a year) are a pinned header, whether or not a site sets `unpinFigureBlock`; the smaller figures sit right under them; the sliders and the calculation collapse. The controls panel holds only the site's own top and Calvin's buttons, the work surface ends with the calculation, and the report's note on how the figures were produced is one sentence shorter. A phone pass: rows wrap instead of squeezing. Violet: people served come from the project record, as Calvin takes them, and "Draft — pending expert review" shows on the screen and on every result. No sum changes. | V19, V8. | Session C packs all three packages, runs the release check and makes the tag. One release holds all three files (coach decision 2026-11-21). After "release it", Session C pushes the tag and publishes the release. Both sites install it. |
+| V20 | Agent orchestration | [x] (Released: tag `calvin-violet-v0.5.0` on commit `1bce514`. Still to come: both sites install it. See the step "Calvin and Violet 0.5.0".) Calvin and Violet 0.5.0, one release for both sites. Calvin: the main credit tiles (tCO₂e a year) are a pinned header, whether or not a site sets `unpinFigureBlock`; the smaller figures sit right under them; the sliders and the calculation collapse. The controls panel holds only the site's own top and Calvin's buttons, the work surface ends with the calculation, and the report's note on how the figures were produced is one sentence shorter. A phone pass: rows wrap instead of squeezing. Violet: people served come from the project record, as Calvin takes them, and "Draft — pending expert review" shows on the screen and on every result. No sum changes. | V19, V8. | Session C packs all three packages, runs the release check and makes the tag. One release holds all three files (coach decision 2026-11-21). After "release it", Session C pushes the tag and publishes the release. Both sites install it. |
 
-**Where things stand (2026-11-21):** Calvin 0.4.1 is the latest release (`calvin-v0.4.1`), and V16, V18 and V19 are released. V20 (Calvin and Violet 0.5.0) is merged, packed and tagged, and has the word "release it" (2026-11-21). Session C's deny rules block the tag push and the release, so the maintainer runs both. V17 waits on the maintainer's ruling on its wording.
+**Where things stand (2026-11-21):** Calvin 0.5.0 and Violet 0.5.0, with core 0.1.1, are the latest release (`calvin-violet-v0.5.0`, V20). V16, V18, V19 and V20 are released. Both sites still install V20. V17 waits on the maintainer's ruling on its wording.
 
 **Sources still to find** (from V3): moved to the source sweep, M10.4 (ruling 2026-11-05).
 
@@ -120,16 +121,16 @@ smaller tables, such as the six-row table of fallback factors, are fine as they 
   - [x] Number gate placeholder (`number-gate.yml`). Taken out when the gate was retired (M1.2).
   - [x] Publish with provenance on a tag (`publish.yml`), refusing until the scope is real
   - [x] This plan and the build log
-- [~] **M1.2 Number gate: retired** *Family: Security and hygiene.* (open pull request; ruling 2026-11-21). The name scan, reading the maintainer's
+- [x] **M1.2 Number gate: retired** (merged, pull request #30; ruling 2026-11-21). The name scan, reading the maintainer's
       names-to-block list (names and project IDs), is the one check for public material. There is no rule or check on
       calculation figures. The keyed-fingerprint design is not built.
-- [~] **M1.3 Package skeleton** *Family: Security and hygiene.* (open pull request): the empty boxes. No calculator code, no data.
-  - [~] *Family: Security and hygiene.* Workspace root with TypeScript, vitest and a build; versions pinned, lockfile committed; Node pinned to one
+- [x] **M1.3 Package skeleton** (merged, pull request #2): the empty boxes. No calculator code, no data.
+  - [x] Workspace root with TypeScript, vitest and a build; versions pinned, lockfile committed; Node pinned to one
         exact version (24.20.0) in the workflows and `engines`
-  - [~] *Family: Security and hygiene.* Four stubs: `@waterbots/core`, `calvin`, `phoebe`, `bridget`. Each builds, has one trivial test, an Apache 2.0
+  - [x] Four stubs: `@waterbots/core`, `calvin`, `phoebe`, `bridget`. Each builds, has one trivial test, an Apache 2.0
         `LICENSE` and `NOTICE` (copyright line: WaterBots AI, LLC), and a README that says it is empty for now. All marked `private`: nothing goes to npm.
-  - [~] *Family: Security and hygiene.* `scripts/check-packages.mjs`, run by the test job: keeps every package private, licensed and empty-for-now
-  - [~] *Family: Security and hygiene.* The real plug points in `core` (`ModuleProject`, `StandardId`, `SaveOutcome`, the agent contract) and Calvin's
+  - [x] `scripts/check-packages.mjs`, run by the test job: keeps every package private, licensed and empty-for-now
+  - [x] The real plug points in `core` (`ModuleProject`, `StandardId`, `SaveOutcome`, the agent contract) and Calvin's
         folders arrive with the seed (M2.1). Design tokens and the base stylesheet: `@waterbots/core/base.css`, for a site
         without a design system of its own (ruling 2026-11-05).
 - **M1.4 The maintainer's hand-steps** *Family: Security and hygiene.* — blocked until the maintainer; Session C cannot do these. **Due before the first release (M2.2).**
@@ -143,7 +144,7 @@ smaller tables, such as the six-row table of fallback factors, are fine as they 
   - [!] **(V1)** *Family: Security and hygiene.* Move this repo to the WaterBots GitHub organisation (ruling 2026-11-02). Then Session C points the
         repository link in each `package.json` at the new home, and the name scan's allowance for the owner's
         account in that link can go.
-- [~] **M1.5 Lane 1 auto-merge** *Family: Security and hygiene.* (open pull request; ruling 2026-11-21). The lane label job arms GitHub's
+- [x] **M1.5 Lane 1 auto-merge** (merged, pull request #30; ruling 2026-11-21). The lane label job arms GitHub's
       auto-merge on a lane 1 pull request that is not a draft, and disarms it on any other. GitHub merges once every
       required check is green. *Waits on the maintainer:* the repo setting "Allow auto-merge" on, and "name scan" on the
       `main` ruleset's required checks in place of "number gate".
@@ -303,7 +304,7 @@ holding all three packed files (coach decision 2026-11-21). It is V20 on the roa
       with the same fingerprints; the name scan of every file inside the three packed files; GitHub's checks on
       `1bce514`. The packs are in the handoff folder, in `calvin-violet-v0.5.0`, with `SHA256SUMS.txt`.
 - [x] **C5.3** The annotated tag `calvin-violet-v0.5.0` on `1bce514`, made locally. Not pushed.
-- [ ] **C5.4** *Family: Agent orchestration.* After "release it": Session C pushes that one tag and publishes the release, titled "Calvin 0.5.0 and
+- [x] **C5.4** (Done 2026-11-21. Session C's deny rules blocked both steps, so the maintainer pushed the tag and published the release.) After "release it": Session C pushes that one tag and publishes the release, titled "Calvin 0.5.0 and
       Violet 0.5.0: a pinned header, a phone pass, and Violet's first release", with the three packed files and
       `SHA256SUMS.txt`.
 - [ ] **C5.5** *Family: Agent orchestration.* Both sites install it, and take the steps in Calvin's README, "Changes in 0.5.0".
