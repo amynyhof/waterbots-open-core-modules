@@ -1,9 +1,15 @@
 # Proposal: one shared project record (step V9)
 
-**Status:** a proposal only. Nothing here is built. The maintainer has ruled on its first three decisions (rulings
+**Status:** a proposal only. Nothing here is built. The maintainer has ruled on its decisions so far (rulings
 2026-11-21, below). The questions at the end still need answers from the paid site and the open site.
 
 **Family:** Agent orchestration.
+
+**`core` holds only the record's shape and its rules, never a project's data.** The data lives on the site:
+
+- On the open site, a project's record stays in the visit. It is gone when the visit ends, unless the visitor saves.
+- On a save, the record goes to the paid site, to that person's account.
+- In the Agent Commons, an agent builds a temporary record from what the visitor types.
 
 ## What this is for
 
@@ -13,8 +19,8 @@ problems that come from this (W1 to W3 in `BUILD_PLAN.md`).
 
 This proposal puts **one project record** in `core`. Every module reads it and fills in its own part, and both
 sites use it. A *record* here means one structured set of facts about one project, in one agreed shape (a
-*schema*: the list of fields, their names and their types). The record lives only in `core` (ruling 2026-11-21). Each
-site turns it into its own storage and back.
+*schema*: the list of fields, their names and their types). The record's shape and rules live only in `core` (ruling
+2026-11-21). Each site keeps the data, and turns the record into its own storage and back.
 
 Some rules stay as they are:
 
@@ -31,9 +37,15 @@ door for good.
 1. **One set of status words, everywhere:** "likely", "more to learn" and "unlikely". "Ruled out" is never used.
    Violet's code today calls her readings "likely", "not enough known" and "unlikely". "Not enough known" becomes
    "more to learn", and "unlikely" stays.
-2. **Agents in play.** A pathway's reading decides whether its calculator agent is called inside a site's screening.
-   See "Agents in play" below. This replaces the ruling of 2026-10-01 that the water calculator always shows.
-3. **The record lives only in `core`.**
+2. **Agents in play.** Which pathways are in play decides which calculator agents are called inside a site's
+   screening. See "Agents in play" below. This replaces the ruling of 2026-10-01 that the water calculator always shows.
+3. **The record lives only in `core`.** That is its shape and rules; the data stays on the site (see above).
+4. **Which agents are called is dynamic, worked out from the project's information.** No agent waits on the
+   eligibility agent as a gate. One function in `core` reads the whole record and says which pathways are in play.
+   A pathway the project facts point to is in play as soon as those facts exist, before any reading. It carries the
+   "more to learn" flag until it has one. The answer is worked out again whenever the record changes, so a pathway
+   can come into play or drop out during a visit. "Unlikely" drops a pathway from the screening; it stays open in the
+   Agent Commons.
 
 ## What `core` holds today
 
@@ -70,8 +82,9 @@ module), and from what source.
    - for "more to learn", the information that is missing;
    - its source: the eligibility agent and the rule or citation it read.
 
-   The record also carries **which pathways are in play**: those read "likely" or "more to learn". The site writes
-   this list from the readings, using one function in `core`, so no module has to work it out.
+   The record also carries **which pathways are in play**, each with its flag. One function in `core` writes this
+   list from the whole record, and writes it again whenever the record changes. So it is never out of date, and no
+   module has to work it out. See "Agents in play" below.
 3. **Place facts.** Country (a three-letter code) and region. Later, the project's point on the map and its river
    basin. The map agent, Bridget, writes these.
 4. **Each module's part.** For each module:
@@ -125,8 +138,8 @@ interface ProjectRecord {
     withoutProjectM3PerYear?: Fact<number>;
   };
   pathways: Partial<Record<StandardId, PathwayReading>>;
-  /** Written from the readings by core's one function: the pathways read "likely" or "more to learn". */
-  inPlay: StandardId[];
+  /** Written by core's one function from the whole record, and written again whenever the record changes. */
+  inPlay: Partial<Record<StandardId, { moreToLearn: boolean; because: "reading" | "project facts" }>>;
   place: { country?: Fact<string>; region?: Fact<string> /* later: point, basin */ };
   modules: Partial<Record<ModuleId, { inputs?: unknown; estimate?: Estimate; questionsAsked?: number }>>;
 }
@@ -158,23 +171,55 @@ Under this proposal:
 
 ## Agents in play
 
-The host agent reads the pathways in play and calls only their calculator agents: Calvin for carbon, Violet for VWBA.
-`core` holds the one function it uses, so both sites decide the same way.
+Which agents are called is dynamic. It is worked out from the project's information, and no agent waits on the
+eligibility agent as a gate (ruling 2026-11-21).
 
-- **Likely:** the host agent calls that pathway's calculator agent. The agent shows, and the calculator runs.
-- **More to learn:** the same, with a flag that some information is missing. The flag names what is missing, from the
+One function in `core` reads the whole record and says which pathways are in play. The site runs it whenever the
+record changes and stores its answer in the record. So a pathway can come into play, or drop out, during a visit.
+The host agent calls only the calculator agents of the pathways in play: Calvin for carbon, Violet for VWBA. Both
+sites use the one function, so they decide the same way.
+
+For each pathway, the function looks at its reading first, then at the project facts:
+
+- **Likely:** in play. The host agent calls that pathway's calculator agent. The agent shows, and the calculator runs.
+- **More to learn:** in play, with a flag that some information is missing. The flag names what is missing, from the
   reading.
-- **Unlikely:** inside a site's screening, that agent is not called and does not show. The record carries the reason
-  and what would change the reading. The host agent tells the visitor both, so they know whether the project can be
-  salvaged, and how.
-- **No reading yet:** this is a question for the maintainer (see the end). The screening runs Phoebe before the
-  calculators, so on a site this should be rare.
+- **Unlikely:** not in play inside a site's screening. That agent is not called and does not show. The record
+  carries the reason and what would change the reading. The host agent tells the visitor both, so they know whether
+  the project can be salvaged, and how.
+- **No reading yet, and the project facts point to it:** in play as soon as those facts exist, with the "more to
+  learn" flag until it has a reading. The rules for which facts point to which pathway are in the next section.
+- **No reading yet, and no project fact points to it:** not in play yet.
 
-In the Agent Commons door, every agent still opens alone, whatever a reading says (see "The two doors").
+A reading names the facts it rested on. When one of those facts changes, this proposal suggests the reading falls back
+to "more to learn" until the eligibility agent reads the project again. That way an old "unlikely" never outlives the
+facts behind it.
 
-This replaces the ruling of 2026-10-01 that the water calculator always shows. When the code moves to the record,
-Violet's `WATER_ALWAYS_SHOWS` and `carbonShowsBeside` give way to `core`'s function, and her `CarbonReading` takes the
-three words.
+In the Agent Commons door, every agent still opens alone, whatever a reading says. "Unlikely" drops a pathway from the
+screening only (see "The two doors").
+
+### Which project facts point to which pathway
+
+Each rule needs a source. This table holds only the rules this repo can cite. The others are questions, listed below
+it; none of them is guessed.
+
+| Project fact | Points to | Source |
+|---|---|---|
+| Technology is `CWS` (a community water supply) | VWBA | VWBA 2.0, Appendix C, Table C-1, p.39: a WASH activity that gives household or community water supply is counted by the Volume Provided method, D-3 (Appendix D, D-3, p.44). |
+| Credited under the carbon method's V1.0 is yes | Carbon | The fact itself: the project already holds carbon credits under V1.0, as the person reports. |
+
+Rules this repo cannot cite yet:
+
+1. **`CWS` to carbon, and `HWT` to carbon.** Calvin's code cites the carbon method's sections for working out the
+   water: Method 1 for `CWS` and Method 2 for `HWT`. It doesn't cite the section that says which projects the method
+   covers. Which section is it, for V2.0?
+2. **`HWT` to VWBA.** Does household water treatment count as household water supply under D-3? If so, where does the
+   guidebook say so?
+3. **`other` to any pathway.** Does any pathway take a project whose technology is neither?
+4. **WQBA and WASH-BA.** Which project facts point to each, and from which source? This repo has no rule for either.
+
+When the code moves to the record, Violet's `WATER_ALWAYS_SHOWS` and `carbonShowsBeside` give way to `core`'s
+function, and her `CarbonReading` takes the three words.
 
 ## The two doors
 
@@ -185,8 +230,9 @@ where the module is working, not a fact about the project. `core` takes Violet's
 - **Inside a site's screening** (`site`): the host agent calls only the agents in play. A module reads the record and
   never asks again for a fact the record holds. It writes back its part. When it is done, it hands back to
   Wellington.
-- **Alone in the Agent Commons** (`agent-commons`): every agent opens alone. There is no site record and no
-  eligibility agent. The module starts an empty record of the same shape and fills it from the person's answers. The
+- **Alone in the Agent Commons** (`agent-commons`): every agent opens alone, whatever a reading says. There is no
+  site record and no eligibility agent. The agent builds a temporary record of the same shape from what the visitor
+  types. The
   same checks and the same engine then run, so a figure in the Commons and one on a site come from the same code. The
   module sends nothing to another agent. Calvin's two Commons choices (V17) set "credited under V1.0" in that record.
 
@@ -199,9 +245,9 @@ where the module is working, not a fact about the project. `core` takes Violet's
   served is below zero"). It doesn't say the fact is missing. Both sites and every module use the one check, so no
   calculator can ignore the count without a message.
 - **W2, an unlikely pathway still got a figure.** The eligibility agent writes "unlikely" into the record, with its
-  reason and what would change it. The host agent reads the pathways in play through the one function in `core`, and
-  doesn't call an agent whose pathway is unlikely. So no figure appears, and the visitor is told why and what would
-  change it. A test takes an invented project whose VWBA reading is unlikely, and shows Violet is not in play.
+  reason and what would change it. The one function in `core` drops that pathway from the screening the moment the
+  reading lands, and the host agent doesn't call its agent. So no figure appears, and the visitor is told why and what
+  would change it. A test takes an invented project whose VWBA reading is unlikely, and shows Violet is not in play.
 - **W3, a technology label read as "other".** The record keeps the site's own label next to the code. `core` holds
   one mapping from the sites' labels to the codes, so both sites read a label the same way. A label the mapping
   doesn't know gets no code, and the module says the label isn't known yet and shows it. Then the label is added to
@@ -215,8 +261,9 @@ Each step is its own pull request and trial release. Nothing changes for a site 
 
 1. **The shape and the check.** `ProjectRecord`, the fact check and the label mapping go in `core`, with tests on
    invented projects. `ModuleProject` keeps working: `core` turns a record into one, `standards` included. Lane 3.
-2. **The agents in play and the doors.** The function that turns readings into the pathways in play, and `Door` moved
-   into `core`. Violet's readings take the three words.
+2. **The agents in play and the doors.** The function that reads the whole record and says which pathways are in
+   play, with the cited rules from facts to pathways and tests for each. `Door` moves into `core`. Violet's readings
+   take the three words.
 3. **Calvin and Violet read the record.** Each module reads its facts from the record and hands back its part.
    Violet reads access level and the water before the project from the record, and takes her saved inputs back, as
    Calvin does.
@@ -248,12 +295,14 @@ through a normal pull request, as for Calvin's seeded files.
 3. How does Wellington ask for people served: as people, as households, or either? Does it ask for people per
    household?
 4. Is country stored as a three-letter code or as a name?
-5. Where does the open site keep the record between steps of the walk, and for how long?
+5. The record stays in the visit until the visitor saves. Where in the visit is it kept, and does it last across a
+   page reload?
 6. How does the eligibility result reach the other steps today?
 7. Does the open site's own water calculator stay once Violet is mounted, or does Violet take its place?
 8. Does the open site count questions today? If so, how?
 
 ## Still for the maintainer
 
-1. A pathway with no reading yet, inside a site's screening: should its agent be called with the "more to learn"
-   flag, or not called until there is a reading?
+1. The four rules this repo cannot cite yet, under "Which project facts point to which pathway".
+2. Whether a reading falls back to "more to learn" when a fact it rested on changes, as proposed under "Agents in
+   play".
