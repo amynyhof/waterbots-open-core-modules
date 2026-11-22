@@ -4,6 +4,31 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-11-21 — The shared record: the agents in play, and where the data lives
+
+**Done (branch `proposal-record-in-play`):**
+- Pull request #33 merged before its last commit, so `BUILD_PLAN.md` still said "ruled out". This pull request puts in
+  "unlikely" in Agent orchestration's "What belongs here" line and in W2. Those words follow the rulings of
+  2026-11-21 on the V9 proposal: the readings are "likely", "more to learn" and "unlikely", never "ruled out"; a
+  pathway in play decides which calculator agents the host agent calls inside a site's screening, in place of the
+  ruling of 2026-10-01 that the water calculator always shows; and the record lives only in `core`. Pull request #34
+  merged on its own, so pull request #35 carried those rulings.
+- Ruling 2026-11-21 on #35's question: which agents are called is dynamic. One function in `core` reads the whole
+  record and says which pathways are in play. A pathway the project facts point to is in play as soon as those facts
+  exist, with the "more to learn" flag until it has a reading. It is worked out again whenever the record changes.
+  "Unlikely" drops a pathway from the screening; it stays open in the Agent Commons. Pull request #35 merged on its
+  own too, so this pull request carries the ruling into the proposal.
+- `docs/proposals/shared-project-record.md`: the top now says `core` holds only the record's shape and rules, never
+  a project's data. The proposal adds the agents in play as ruled, and which project facts point to which pathway.
+  Two rules are cited. Four that this repo cannot cite are listed as questions.
+- `BUILD_PLAN.md`: M8.5, for a later release, under v1 proof and grading. Violet's hand-worked cases ship inside her
+  package, as Calvin's do. The open site's Road to v1 step 5 waits on it.
+
+**Open:** both sites install 0.5.0 (C5.5). The V9 proposal's questions for the paid site, the open site and the
+maintainer.
+
+---
+
 ## 2026-11-21 — The nine families, and the site walk's findings
 
 **Done (branch `plan-nine-families`):**
