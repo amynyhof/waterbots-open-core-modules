@@ -27,7 +27,11 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
   the three packed files match `SHA256SUMS.txt`, which is the same file as in the handoff folder. C5.4 and V20 are
   marked released.
 
-**Open:** both sites install it (C5.5).
+- Session C wrote a proposal for V9, the shared project record, in `docs/proposals/shared-project-record.md`, as lane 1
+  pull request #34. It is a proposal only. Its log line is here, so the two pull requests do not clash in this file.
+
+**Open:** both sites install it (C5.5). The maintainer's three calls in the V9 proposal, and the questions it asks the
+paid site and the open site.
 
 ---
 
