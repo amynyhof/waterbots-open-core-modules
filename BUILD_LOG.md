@@ -5,6 +5,9 @@ history keeps everything older and every longer entry.
 
 ---
 
+- 2026-11-22 — The maintainer's new agent rules page (21 rules) and rulings page are copied in. The tool notes
+  and the text the site writes into Calvin's prompt drop what repeats a rule. The four value words are now screen
+  labels in core's rulings.
 - 2026-11-22 — The foundational agent rules are copied into the repo root as `AGENT_RULES.md`. Rules 1 to 19
   reach the agents from one file in core. Calvin's and Violet's own files keep only what is theirs. On the
   maintainer's ruling of the same day, no line in an agent's own files repeats one of the 19 rules.
