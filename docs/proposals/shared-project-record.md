@@ -1,7 +1,7 @@
 # Proposal: one shared project record (step V9)
 
-**Status:** a proposal only. Nothing here is built. The maintainer has ruled on its decisions so far (rulings
-2026-11-21, below). The questions at the end still need answers from the paid site and the open site.
+**Status:** a proposal only. Nothing here is built. It follows `RULINGS.md` (sections 3 and 4) and
+`packages/core/RULINGS.md`. The questions at the end still need answers from the paid site and the open site.
 
 **Family:** Agent orchestration.
 
@@ -19,8 +19,7 @@ problems that come from this (W1 to W3 in `BUILD_PLAN.md`).
 
 This proposal puts **one project record** in `core`. Every module reads it and fills in its own part, and both
 sites use it. A *record* here means one structured set of facts about one project, in one agreed shape (a
-*schema*: the list of fields, their names and their types). The record's shape and rules live only in `core` (ruling
-2026-11-21). Each site keeps the data, and turns the record into its own storage and back.
+*schema*: the list of fields, their names and their types). The record's shape and rules live only in `core`. Each site keeps the data, and turns the record into its own storage and back.
 
 Some rules stay as they are:
 
@@ -29,26 +28,8 @@ Some rules stay as they are:
 - The engine does every sum. A site shows an estimate from the record, but never works one out.
 - A project fact is never guessed. While it is missing, its box is blank, with no label. A blank never counts as zero.
 
-We are guides, not gates (ruling 2026-11-21). A pathway's reading says how likely it is, and why. It never shuts a
+We are guides, not gates. A pathway's reading says how likely it is, and why. It never shuts a
 door for good.
-
-## The rulings of 2026-11-21
-
-1. **One set of status words, everywhere:** "likely", "more to learn" and "unlikely". "Ruled out" is never used.
-   Violet's code today calls her readings "likely", "not enough known" and "unlikely". "Not enough known" becomes
-   "more to learn", and "unlikely" stays.
-2. **Agents in play.** Which pathways are in play decides which calculator agents are called inside a site's
-   screening. See "Agents in play" below. This replaces the ruling of 2026-10-01 that the water calculator always shows.
-3. **The record lives only in `core`.** That is its shape and rules; the data stays on the site (see above).
-4. **Which agents are called is dynamic, worked out from the project's information.** No agent waits on the
-   eligibility agent as a gate. One function in `core` reads the whole record and says which pathways are in play.
-   A pathway the project facts point to is in play as soon as those facts exist, before any reading. It carries the
-   "more to learn" flag until it has one. The answer is worked out again whenever the record changes, so a pathway
-   can come into play or drop out during a visit. "Unlikely" drops a pathway from the screening; it stays open in the
-   Agent Commons.
-5. **When a fact changes in the open screening,** the old answer is treated as if it never existed. Every reading is
-   worked out again from the record as it stands. A reading that can no longer be worked out from the current facts
-   is "more to learn".
 
 ## What `core` holds today
 
@@ -175,7 +156,7 @@ Under this proposal:
 ## Agents in play
 
 Which agents are called is dynamic. It is worked out from the project's information, and no agent waits on the
-eligibility agent as a gate (ruling 2026-11-21).
+eligibility agent as a gate.
 
 One function in `core` reads the whole record and says which pathways are in play. The site runs it whenever the
 record changes and stores its answer in the record. So a pathway can come into play, or drop out, during a visit.
@@ -194,7 +175,7 @@ For each pathway, the function looks at its reading first, then at the project f
   learn" flag until it has a reading. The rules for which facts point to which pathway are in the next section.
 - **No reading yet, and no project fact points to it:** not in play yet.
 
-**When a fact changes in the open screening** (ruling 2026-11-21), the old answer is treated as if it never existed.
+**When a fact changes in the open screening,** the old answer is treated as if it never existed.
 Every reading is worked out again from the record as it stands. No reading is kept from before the change, and there
 is no separate step for falling back. A reading that can no longer be worked out from the current facts is simply
 "more to learn".
