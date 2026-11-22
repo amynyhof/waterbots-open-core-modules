@@ -9,12 +9,12 @@
  * SDWS 29 (p.65): Option 1 uses these tiered defaults and Option 2 uses a volume measured by WCFT;
  * the cap holds either way. SDWS 30 (p.66): a project on the tiered defaults keeps its data split
  * by age group. When a project has no age split, the census-based national shares in
- * `calculators/data/age-shares/` are the default (CALCULATOR_SPEC §3.1.1; the reviewer confirmed the
- * census source 2026-07-31 and the Table 9 tiers to the maintainer around July 2026 — verdicts.md row 1.5).
+ * `calculators/data/age-shares/` are the default (the reviewer confirmed the
+ * census source 2026-07-31 and the Table 9 tiers to the maintainer around July 2026).
  *
  * SUPPRESSED DEMAND (§7.3.11, p.31): a project that claims suppressed demand on the Option 1
  * defaults must take 5% off them — QPW_p = Table9 default × 0.95. The ×0.95 lives HERE and nowhere
- * else (CALCULATOR_SPEC §5.2 guard: it must never be applied twice).
+ * else: it must never be applied twice.
  *
  * Pure. Ruling R4 (2026-09-21, [#24]); calculator v0.5.0.
  */

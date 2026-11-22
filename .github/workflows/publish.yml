@@ -1,7 +1,7 @@
 # Publish to npm on a version tag, with provenance: a signed record, checkable by anyone, that the
 # package was built from this exact commit.
 #
-# It refuses to run unless: the tagged commit is on main; there are packages to publish; the npm
+# It refuses to run unless: the tagged commit is on main; the npm
 # scope is real (not the "@<scope>" placeholder); and the NPM_TOKEN secret is set.
 # It runs in the "npm-publish" environment. The maintainer's approval is required for every release: the
 # maintainer is the environment's required reviewer, and the only person who may create v* tags.
@@ -40,9 +40,6 @@ jobs:
           if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
             echo "::error::The tagged commit is not on main."; exit 1
           fi
-          if [ ! -f package.json ]; then
-            echo "::error::Nothing to publish yet: no root package.json."; exit 1
-          fi
           if grep -rIl --include=package.json --exclude-dir=node_modules '@<scope>' .; then
             echo "::error::The npm scope is still the '@<scope>' placeholder (waiting on the maintainer, N13)."; exit 1
           fi
@@ -56,9 +53,8 @@ jobs:
           registry-url: https://registry.npmjs.org
 
       - run: npm ci --ignore-scripts
-      - run: npm run typecheck
-      - run: npm test
-      - run: npm run build
+      # Builds each package once, then typechecks and tests what it built.
+      - run: npm run check
 
       - name: Publish
         env:

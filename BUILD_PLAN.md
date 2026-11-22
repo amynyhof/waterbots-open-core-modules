@@ -245,7 +245,7 @@ The first release does not wait for this.
 - [ ] **M8.3** *Family: Calculators and methods.* D-3 for irrigation supply (VWBA 2.0, Appendix D, Table D3.2, p.45). A later pull request.
 - [ ] **M8.4** *Family: Calculators and methods.* Rainwater harvesting for direct use. The guidebook works it out with the Recharge method, D-4 (p.45). A later pull request.
 - [ ] **M8.5** *Family: v1 proof and grading.* Violet's hand-worked cases ship inside her package, as Calvin's
-      reference cases do (`dist/expected-outputs.json`), so a site can run them. Today they sit in her tests
+      test cases do (`dist/expected-outputs.json`), so a site can run them. Today they sit in her tests
       (`d3/compute.test.ts`), which don't ship. For a later release. The open site's Road to v1 step 5 waits on this.
       Done when Violet's packed files hold her hand-worked cases, each with its citations, and a check runs them from
       the packed files.

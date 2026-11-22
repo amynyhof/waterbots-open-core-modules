@@ -9,7 +9,7 @@ import { checkSiteTables, fromSiteTable, siteRow, type BaselineMixRow, type Site
  * the EF_b inputs (stove strata + fuel mix) on the Vector calculator. Starting points;
  * every field is editable.
  *
- * VERSION-AWARE stove efficiency (FIND-001; CALCULATOR_SPEC §2.6): the methodology-default
+ * VERSION-AWARE stove efficiency (FIND-001): the methodology-default
  * η differs by version — V1 SDWS 11 (p.24) three-stone 0.10 / other-conv 0.20 / ICS 0.30;
  * V2 SDWS 11 (p.52) 0.15 / 0.25 / 0.30. Lower η inflates the baseline (SE = SE_o/η → higher
  * EF_b → more credits), so the V2 values are the conservative direction. A stratum that

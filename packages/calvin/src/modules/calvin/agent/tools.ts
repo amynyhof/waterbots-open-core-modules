@@ -71,7 +71,7 @@ function parseScenarioInput(raw: unknown): ScenarioInput {
   const countryIso = o.countryIso;
   if (typeof countryIso !== "string" || countryIso.trim() === "") throw new Error("countryIso must be a non-empty string");
 
-  // PROJECT FACTS ARE REQUIRED, NEVER DEFAULTED (CALCULATOR_SPEC §0.2): the method (from the
+  // PROJECT FACTS ARE REQUIRED, NEVER DEFAULTED: the method (from the
   // technology) and whether the count is people or households join the country and the count. A
   // missing one is refused in words that tell the model to ask, not to guess.
   if (o.method !== 1 && o.method !== 2) throw new Error("method is a project fact (1 = CWS/CWT, 2 = HWT/IWT, from the project's technology), and it is missing.");
@@ -162,5 +162,5 @@ export const transitionWaterfallTool: AgentTool = makeCalculatorTool<ScenarioInp
   ],
 });
 
-/** All gs4gg-carbon tools (registered globally in registry.ts). */
+/** All gs4gg-carbon tools. A site registers them with its agent. */
 export const GS4GG_CARBON_TOOLS: AgentTool[] = [computeScenarioTool, transitionWaterfallTool];

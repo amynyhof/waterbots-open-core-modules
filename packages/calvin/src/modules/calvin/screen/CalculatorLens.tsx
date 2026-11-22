@@ -20,7 +20,7 @@ import type { CalculatorState } from "./useCalculatorState";
  * were extracted, never restyled. It is mounted in the console rail (step 4); the
  * standalone page it came from is retired (step 5).
  *
- * CONTRACT (CALCULATOR_SPEC §9). A lens consumes from the state hook:
+ * CONTRACT. A lens consumes from the state hook:
  * `state`, `patch`, `dirty`, `saving`, `save`, `exportReport` — inputs and the
  * affordances that persist them. It never touches engine results; showing a
  * computed number is the work surface's job.

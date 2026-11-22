@@ -10,7 +10,7 @@
  *     The baseline equations own those — V1 in-baseline & subtractive
  *     (BE = EF_b·(1−C_b−X_cleanboil)·Q_y·M_qy), V2 on-quantity & multiplicative
  *     (Q_adj = Q_y·(1−X_cleanboil)·M_qy·U_p). Applying any of them here would
- *     DOUBLE-DEDUCT. (double-deduction territory: CALCULATOR_SPEC §5.1/§5.2.)
+ *     DOUBLE-DEDUCT.
  *
  * Every formula below was line-verified BYTE-FOR-BYTE against the primary PDFs
  * on 2026-07-21 (via `pdftotext -layout`, not a derived doc):

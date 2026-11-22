@@ -1,7 +1,7 @@
 /**
  * calculatorTool — the GLOBAL wrapper that turns any deterministic `/calculators` compute into an
  * agent tool (build-global-consume-locally). Every pathway's calculator becomes a tool through this
- * one factory; gs4gg-carbon is the first consumer (`gs4ggCarbonTools.ts`), VWBA follows as config.
+ * one factory; gs4gg-carbon is the first consumer (Calvin's `agent/tools.ts`), VWBA follows as config.
  *
  * The contract that keeps "no LLM math" honest: `compute` is a pure function from `/calculators`, and
  * this wrapper only (a) coerces/validates the model's JSON input, (b) calls compute, (c) extracts the

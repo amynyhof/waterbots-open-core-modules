@@ -30,7 +30,7 @@ import type { CalculatorState } from "./useCalculatorState";
  * NOTE: this is the seat's INNER tab (Calculator / Transition / Report), distinct
  * from the console's Calculator tab that selects the seat itself.
  *
- * CONTRACT (CALCULATOR_SPEC §9). A work surface consumes from the state hook:
+ * CONTRACT. A work surface consumes from the state hook:
  * `state`, `patch`, `seed`, the engine results (`result`, `legacyResult`,
  * `paaResult`, `waterfall`), the derived display values, and `printAt` /
  * `exportReport`. It COMPUTES NOTHING — every number it renders came from the
@@ -146,7 +146,7 @@ export default function CalculatorWork({
   const comparison = transition && legacyResult && waterfall ? { legacyER: legacyResult.result.ER, waterfall } : null;
 
   /**
-   * A MISSING PROJECT FACT, NO FIGURES (CALCULATOR_SPEC §0.2, ruling 2026-10-23). The seat used to fill
+   * A MISSING PROJECT FACT, NO FIGURES (ruling 2026-10-23). The seat used to fill
    * a missing fact itself — 10,000 people, Method 1 for no technology, an empty country code — and
    * every figure on the page was worked out from it. Now nothing is computed: the seat names what is
    * missing and where it is filled in, in the same words the paid site's record check uses. This

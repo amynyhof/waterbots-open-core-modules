@@ -5,7 +5,7 @@
  * mis-cited the current methodology (repro 2026-07-24).
  *
  * Section numbers are load-bearing provenance, NOT prose — sourced deliberately:
- *   • V1 (Legacy) numbers from CALCULATOR_SPEC.md §2 (EF_b §3.6.1–2, Q Method 1 §3.6.5–6,
+ *   • V1 (Legacy) numbers from the V1.0 rulebook (EF_b §3.6.1–2, Q Method 1 §3.6.5–6,
  *     Q Method 2 §3.6.7–8, BE §3.6.3, PE §3.7, LE §3.8, ER §3.9.1).
  *   • V2 (PAA) numbers retained from the existing vetted derivation (§7.3.7/8/10, §7.4.1/4,
  *     §7.6, §8.2, §9.3, §10.1).
@@ -75,8 +75,7 @@ export function citeLong(basis: Basis, key: CiteKey): string {
 // ── Symbols and parameter numbers per rulebook (external review, 2026-09-15, comments E2, 3.2, 3.6 and
 //    the rows around them; built 2026-09-21, step 7 of [#208]). Transcribed from the PDFs, not typed
 //    from memory: V2 equation pages 29–39, parameter tables pp.46–75; V1 pp.12–15, 24–40. The V2 typo
-//    (Eq.1 text cites fNRB as "SDWS 24" while the table numbers it SDWS 25) is recorded in
-//    evals/gs4gg-carbon/v2-coverage.json; we cite 25. ──────────────────────────────────────────────
+//    (Eq.1 text cites fNRB as "SDWS 24" while the table numbers it SDWS 25): we cite 25. ──────────
 
 /** The rulebook's name, written one way everywhere (comment 3.2). */
 export const RULEBOOK: Record<Basis, { long: string; short: string; version: string }> = {

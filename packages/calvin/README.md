@@ -71,7 +71,7 @@ The build bundles the entry into one file, `dist/screen.js`. React and `@waterbo
 
 ## Changes in 0.5.1
 
-With Violet 0.5.1, for both sites. No sum changed, and every reference case gives the same answer.
+With Violet 0.5.1, for both sites. No sum changed, and every test case gives the same answer.
 
 - **A missing value is a blank box, with no label.** In the ex-post ask, a monitoring value not yet entered has a
   blank box, its highlight and red dot, and nothing written under it. In the report's tables and on the equations, a
@@ -84,7 +84,7 @@ With Violet 0.5.1, for both sites. No sum changed, and every reference case give
 
 ## Changes in 0.5.0
 
-Released with Violet 0.5.0, for both sites. No sum changed, and every reference case gives the same answer.
+Released with Violet 0.5.0, for both sites. No sum changed, and every test case gives the same answer.
 
 **A pinned header.** The main credit figures stay at the top while the reader scrolls: the PAA v2.0 tile in tCO₂e a
 year, and for a project credited under V1.0 the Legacy V1.0 tile and the transition delta too. The smaller figures
@@ -122,7 +122,7 @@ and closes them. Both start open.
 
 ## Changes in 0.4.1
 
-Monitoring values are labelled by the analysis basis. No sum changed, and every reference case gives the same answer. Only what the screens say, and when they show figures, changed.
+Monitoring values are labelled by the analysis basis. No sum changed, and every test case gives the same answer. Only what the screens say, and when they show figures, changed.
 
 **Which values the rule covers.** The maintainer is asked to confirm this list.
 
@@ -149,7 +149,7 @@ Monitoring values are labelled by the analysis basis. No sum changed, and every 
 
 ## Changes in 0.4.0
 
-From the maintainer's walk of the open site (2026-11-16). No sum changed, and every reference case gives the same answer.
+From the maintainer's walk of the open site (2026-11-16). No sum changed, and every test case gives the same answer.
 
 **Two new settings on `useCalculatorState`.** Both are off by default, so a site that passes neither sees no change.
 
@@ -182,7 +182,7 @@ From the maintainer's walk of the open site (2026-11-16). No sum changed, and ev
 - Fixed: the figure tiles fit the width of their panel and no longer overlap at laptop width.
 - Calvin needs `@waterbots/core` 0.1.1. Core's only change is its package file, which no longer has a `url` line.
 
-No sum changed. The engine version and every reference case stay as they are.
+No sum changed. The engine version and every test case stay as they are.
 
 ## Notes
 

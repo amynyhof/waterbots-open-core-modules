@@ -1,6 +1,6 @@
 /* Calvin's stylesheet — the rules the calculator needs that are not utility classes.
-   Moved here from app/globals.css with the cut (PR C, seam S8): the report's print rules belong
-   to the module, so every host that mounts the calculator gets the same export. Every site
+   The report's print rules belong to the module, so every host that mounts the calculator gets
+   the same export. Every site
    imports it: `import "@waterbots/calvin/styles.css"`. The design tokens and the classes the
    screens use are in `@waterbots/core/base.css`, for a site without a design system of its own. */
 
