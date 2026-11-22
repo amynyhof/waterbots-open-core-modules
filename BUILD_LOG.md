@@ -4,6 +4,37 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-11-21 — The nine families, and the site walk's findings
+
+**Done (branch `plan-nine-families`):**
+- "Release it" for `calvin-violet-v0.5.0` (2026-11-21). Session C's local deny rules block pushing the tag and
+  `gh release create`, so Session C did neither. It gave the maintainer the exact commands, and wrote the release
+  notes into the handoff folder, as `calvin-violet-v0.5.0/RELEASE_NOTES.md`. The name scan found nothing in them. The
+  three packed files still match `SHA256SUMS.txt`.
+- `BUILD_PLAN.md`: the nine families (ruling 2026-11-21), each with its "What belongs here" line. Every open step, item
+  and open question carries one family label; the Road to v1 table has a Family column. Nothing taken out, no step
+  renumbered, the (V1) and (V2) marks kept. Nothing needs a family today.
+- `BUILD_PLAN.md`: three findings from a walk of the open site on 2026-11-21, W1 to W3, for the next release, under
+  Agent orchestration. For W1, Session C read Violet's code: her engine refuses a count below zero, but her screen, as
+  Calvin's does, takes a count of zero or below on the record as an empty field and says the record is missing people
+  served.
+
+- Ruling 2026-11-21: "family" means only the nine families. `BUILD_PLAN.md` calls its M and V groups steps, and
+  `CLAUDE.md`'s close-out rule says what a family close is: the close of work on one of the nine. Changing
+  `CLAUDE.md` puts this pull request in lane 3.
+- `BUILD_PLAN.md`: M1.2 and M1.5 marked merged (pull request #30), and M1.3 merged (pull request #2).
+- The maintainer pushed the tag `calvin-violet-v0.5.0` and published the release. Session C downloaded its four files:
+  the three packed files match `SHA256SUMS.txt`, which is the same file as in the handoff folder. C5.4 and V20 are
+  marked released.
+
+- Session C wrote a proposal for V9, the shared project record, in `docs/proposals/shared-project-record.md`, as lane 1
+  pull request #34. It is a proposal only. Its log line is here, so the two pull requests do not clash in this file.
+
+**Open:** both sites install it (C5.5). The maintainer's three calls in the V9 proposal, and the questions it asks the
+paid site and the open site.
+
+---
+
 ## 2026-11-21 — Calvin and Violet 0.5.0 packed and tagged
 
 **Done (branch `plan-calvin-violet-0.5.0-packed`):**

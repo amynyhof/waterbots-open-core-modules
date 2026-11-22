@@ -102,7 +102,7 @@ A commit that mixes kinds of work is split into two commits. Every pull request'
 
 ## Close-out
 
-At each family close, tidy what you touched (dead code, stale notes, duplicate logic) as part of close-out.
+At each family close (the close of work on one of the nine families in `BUILD_PLAN.md`), tidy what you touched (dead code, stale notes, duplicate logic) as part of close-out.
 
 ## Plain-English public copy
 
