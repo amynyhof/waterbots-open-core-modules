@@ -63,9 +63,9 @@ smaller tables, such as the six-row table of fallback factors, are fine as they 
 | V17 | Calvin's two doors. **Design only: build nothing yet.** One calculator, two doors. On the sites, the screening sets `creditedUnderV1`, and no door is shown. In the Agent Commons, Calvin opens with two choices: "new project estimate" (sets `false`) or "compare old and new rules" (sets `true`, and still asks for the filed V1.0 fNRB before any comparison). The choices' wording, what each sets and Calvin's opening line belong in the open core, as Violet's door does (ruling 2026-11-12). The Commons host only draws the buttons. | V16; the maintainer's ruling on the wording. | `packages/calvin/src/doors.ts` and Calvin's prompt hold both choices, and a test shows each choice sets the right value. |
 | V18 | [x] (Released: tag `calvin-v0.4.0` on commit `09dfc8d`.) Calvin's screens after the walk of the open site (2026-11-16): sixteen items, one pull request. No sum changes. | V16. | Merged, then a release; the private side reports pass. |
 | V19 | [x] (Released: tag `calvin-v0.4.1` on commit `8cd7971`.) Calvin 0.4.1: monitoring values labelled by the analysis basis (ruling 2026-11-21). Ex-ante, each is assumed from its starting value. Ex-post, each comes from the operation log or monitoring; until it is entered its box is blank, with a highlight and a red dot, and no figures show. The "entered" flag is saved. No sum changes. | V18. | Session C packs it, runs the release check and makes the tag. After "release it", Session C pushes the tag and publishes the release. The maintainer confirmed the values the rule covers: the operating days, M_q, U_p and X_cleanboil; Q_m is left out (2026-11-21). The paid site installs it. |
-| V20 | [~] (Open pull request.) Calvin and Violet 0.5.0, one release for both sites. Calvin: the main credit tiles (tCO₂e a year) are a pinned header, whether or not a site sets `unpinFigureBlock`; the smaller figures sit right under them; the sliders and the calculation collapse. The controls panel holds only the site's own top and Calvin's buttons, the work surface ends with the calculation, and the report's note on how the figures were produced is one sentence shorter. A phone pass: rows wrap instead of squeezing. Violet: people served come from the project record, as Calvin takes them, and "Draft — pending expert review" shows on the screen and on every result. No sum changes. | V19, V8. | Merged, then Session C packs both, runs the release check and makes the tags. After "release it", Session C pushes each tag and publishes. Both sites install it. |
+| V20 | [~] (Merged, pull request #31. Packed and checked; tag `calvin-violet-v0.5.0` made on commit `1bce514`, waiting for "release it". See the family "Calvin and Violet 0.5.0".) Calvin and Violet 0.5.0, one release for both sites. Calvin: the main credit tiles (tCO₂e a year) are a pinned header, whether or not a site sets `unpinFigureBlock`; the smaller figures sit right under them; the sliders and the calculation collapse. The controls panel holds only the site's own top and Calvin's buttons, the work surface ends with the calculation, and the report's note on how the figures were produced is one sentence shorter. A phone pass: rows wrap instead of squeezing. Violet: people served come from the project record, as Calvin takes them, and "Draft — pending expert review" shows on the screen and on every result. No sum changes. | V19, V8. | Session C packs all three packages, runs the release check and makes the tag. One release holds all three files (coach decision 2026-11-21). After "release it", Session C pushes the tag and publishes the release. Both sites install it. |
 
-**Where things stand (2026-11-21):** Calvin 0.4.1 is the latest release (`calvin-v0.4.1`), and V16, V18 and V19 are released. V20 (Calvin and Violet 0.5.0) is an open pull request. V17 waits on the maintainer's ruling on its wording.
+**Where things stand (2026-11-21):** Calvin 0.4.1 is the latest release (`calvin-v0.4.1`), and V16, V18 and V19 are released. V20 (Calvin and Violet 0.5.0) is merged, packed and tagged, and waits for "release it". V17 waits on the maintainer's ruling on its wording.
 
 **Sources still to find** (from V3): moved to the source sweep, M10.4 (ruling 2026-11-05).
 
@@ -246,6 +246,25 @@ and the IPCC 2006 citations.
 - [ ] **M10.4 (V2) The usage slider's source.** The share of homes that really use the device starts at 100%,
       labelled "assumed" (ruling 2026-11-05, settled). A cited source for it is found in the sweep.
       `startsWithoutSource` in `screen/exAnte.ts` lists every start with no source.
+
+## Calvin and Violet 0.5.0
+
+One release for both sites: Calvin 0.5.0, Violet 0.5.0 (her first release) and core 0.1.1, in one GitHub release
+holding all three packed files (coach decision 2026-11-21). It is V20 on the road to v1. No sum changes.
+
+*Stop for the maintainer:* "release it". *Waits on:* nothing else.
+
+- [x] **C5.1** The build: Calvin's pinned header, the parts that collapse, the phone pass and the tidied panel and
+      report; Violet's people served from the project record and her "Draft — pending expert review" label (merged,
+      pull request #31).
+- [x] **C5.2** The release check, Session C's own: a clean install, typecheck, build and the full test suite; two packs
+      with the same fingerprints; the name scan of every file inside the three packed files; GitHub's checks on
+      `1bce514`. The packs are in the handoff folder, in `calvin-violet-v0.5.0`, with `SHA256SUMS.txt`.
+- [x] **C5.3** The annotated tag `calvin-violet-v0.5.0` on `1bce514`, made locally. Not pushed.
+- [ ] **C5.4** After "release it": Session C pushes that one tag and publishes the release, titled "Calvin 0.5.0 and
+      Violet 0.5.0: a pinned header, a phone pass, and Violet's first release", with the three packed files and
+      `SHA256SUMS.txt`.
+- [ ] **C5.5** Both sites install it, and take the steps in Calvin's README, "Changes in 0.5.0".
 
 ---
 

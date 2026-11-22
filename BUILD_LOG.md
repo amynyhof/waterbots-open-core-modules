@@ -4,6 +4,25 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-11-21 — Calvin and Violet 0.5.0 packed and tagged
+
+**Done (branch `plan-calvin-violet-0.5.0-packed`):**
+- Coach decision 2026-11-21: one release holds all three files: Calvin 0.5.0, Violet 0.5.0 (her first release) and
+  core 0.1.1.
+- Session C packed the three packages from `main` at `1bce514` (pull request #31) into the handoff folder, in
+  `calvin-violet-v0.5.0`, with `SHA256SUMS.txt` and a packing list. This is the carry for this release.
+- The release check: a clean install, typecheck, build and the full test suite pass (Calvin 348 of 348, Violet 46 of
+  46); two packs gave the same fingerprints; the name scan of every file inside the three packed files, `.map` files
+  included, found nothing (209 files); GitHub's checks passed on `1bce514` (ci, names, secrets). Core 0.1.1 is the
+  same file, byte for byte, as in `calvin-v0.4.1`.
+- Session C made the annotated tag `calvin-violet-v0.5.0` on `1bce514`, locally. It is not pushed.
+- `BUILD_PLAN.md`: the new family "Calvin and Violet 0.5.0", V20 marked packed and tagged, and the line on where
+  things stand.
+
+**Open:** "release it". Then Session C pushes the tag and publishes the release. Both sites install it.
+
+---
+
 ## 2026-11-21 — Calvin and Violet 0.5.0
 
 **Done (branch `calvin-violet-0.5.0`):** one pull request for both sites. No sum changed, and every reference case gives
