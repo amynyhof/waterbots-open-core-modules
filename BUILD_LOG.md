@@ -4,6 +4,22 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-11-21 — The shared record: readings worked out again when a fact changes
+
+**Done (branch `proposal-record-reread`):**
+- Ruling 2026-11-21: in the open screening, when a fact changes, the old answer is treated as if it never existed.
+  Every reading is worked out again from the record as it stands. A reading that can no longer be worked out from the
+  current facts is "more to learn". This replaces the proposal's step for falling back. Pull request #36 had merged, so
+  this new pull request carries the ruling.
+- `docs/proposals/shared-project-record.md`: the ruling, and a new open question, not for now: what happens on the
+  paid site when a fact changes on a saved project, given that the evidence log is locked and nothing deletes on its
+  own. The proposal offers no answer. The four fact-to-pathway questions stay open.
+
+**Open:** both sites install 0.5.0 (C5.5). The V9 proposal's questions for the paid site, the open site and the
+maintainer.
+
+---
+
 ## 2026-11-21 — The shared record: the agents in play, and where the data lives
 
 **Done (branch `proposal-record-in-play`):**
