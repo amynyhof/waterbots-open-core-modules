@@ -6,7 +6,8 @@ history keeps everything older and every longer entry.
 ---
 
 - 2026-11-22 — The foundational agent rules are copied into the repo root as `AGENT_RULES.md`. Rules 1 to 19
-  reach the agents from one file in core. Calvin's and Violet's own files keep only what is theirs.
+  reach the agents from one file in core. Calvin's and Violet's own files keep only what is theirs. On the
+  maintainer's ruling of the same day, no line in an agent's own files repeats one of the 19 rules.
 - 2026-11-22 — The rulings page and the page on opening and closing a family are copied into the repo root
   (pull request #39). `CLAUDE.md` becomes a short note on how the repo works. Module rules move to each module's
   `RULINGS.md`. The log is cut to one line per item.
