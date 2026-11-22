@@ -369,6 +369,13 @@ The maintainer's safety passes cover all three repos. This repo's own parts are 
   request, with no new seal or seed. Then the two checks go back on for `calvin`.
 - **Linting is not set up yet.** *Family: Security and hygiene.* Only strict typing is on today. Adding a linter is its own pull request (lane 3):
   plan item M2.3, right after the seed lands.
+- [ ] *Family: Security and hygiene.* **For the engineer: confirm and delete unused code.** Nothing uses these, and
+      nothing planned needs them (ruling 2026-11-22):
+  - `sdwsNum` in `packages/calvin/src/modules/calvin/screen/citations.ts`.
+  - `endLabel` in `packages/calvin/src/modules/calvin/screen/exAnte.ts`, and its test.
+  - `peopleFromHouseholds` in `packages/calvin/src/calculators/gs4gg-carbon/quantity.ts`. It is on the engine entry.
+  - `moduleName` in `core`, `calvin` and `violet` (`src/index.ts`), with the "empty stub" tests in
+    `src/index.test.ts`. Without it, the package's `"."` entry is empty.
 
 ---
 
@@ -384,3 +391,13 @@ The maintainer's safety passes cover all three repos. This repo's own parts are 
 - **N15 (V1):** *Family: Experts and partners.* a cited starting value for the hours a motor-pumped or treatment-plant system runs in a year.
   VWBA 2.0 gives none. Until the outside expert group finds one, Violet's hours slider starts at 12 hours a day
   (4,380 hours a year), labelled "assumed: no source yet".
+- **N16:** *Family: Experts and partners.* When a country is missing from the data tables, should the calculator offer
+  a cautious stand-in value with a low, middle and high choice, or say it has no value? The retired fallback dial's
+  code waits on this answer (ruling 2026-11-22). Its pieces, in `packages/calvin/src`:
+  - `modules/calvin/screen/FallbackDial.tsx`, the whole file.
+  - The dead functions in `calculators/gs4gg-carbon/fallback.ts`: `EXPLANATION`, `PCT`, `creditEffectOf`,
+    `stopValue`, `defaultStop` and `fallbackStops`.
+  - `fallbackCount` in `modules/calvin/screen/useCalculatorState.ts`, and the lines that show it in
+    `CalculatorWork.tsx` and `ReportView.tsx`.
+  - `householdSizeFallbackStop` in `modules/calvin/screen/analysis.ts`.
+  - `FiredFallback` and the `fallbacks` field in `calculators/gs4gg-carbon/scenario.ts`.
