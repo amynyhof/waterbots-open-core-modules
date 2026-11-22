@@ -350,7 +350,8 @@ export default function ReportView({
   // (V2 Eq.6; V2.0 SDWS 33 sales/distribution records) — the v0.1.0 report printed "—" here (comment 1.1).
   const srcNp = result.premises != null
     ? (state.premises != null ? "Entered — households served (V2.0 SDWS 33: sales / distribution records)" : "Calculated from the project record — households served (V2.0 SDWS 33: sales / distribution records)")
-    : "Not entered — Eq.6 could not run; people-basis aggregate used";
+    // A missing count has no label (0.5.1); the sentence says what the sum used instead.
+    : "Eq.6 could not run; people-basis aggregate used";
   // QPW: an entered design/WCFT value, or THE RULEBOOK'S OWN DEFAULT — V1.0 SDWS 24 (4 L), V2.0 Table 9
   // (adults 4.0) — labelled as such. "Default — SDWS 11" once named the stove parameter (comment 1.4).
   const t9 = result.table9;
@@ -440,7 +441,7 @@ export default function ReportView({
             k={state.populationMode === "households" ? "People served" : "Households served (N_p)"}
             v={state.populationMode === "households"
               ? `${fmt(result.people, 0)} — calculated`
-              : `${result.premises != null ? fmt(result.premises, Number.isInteger(result.premises) ? 0 : 1) : "—"} — calculated`}
+              : result.premises != null ? `${fmt(result.premises, Number.isInteger(result.premises) ? 0 : 1)} — calculated` : ""}
             note={state.populationMode === "households"
               ? `${peopleServed(state).toLocaleString()} households × ${fmt(result.householdSizeUsed, 2)} people/household`
               : `${peopleServed(state).toLocaleString()} people ÷ ${fmt(result.householdSizeUsed, 2)} people/household`}
@@ -600,13 +601,13 @@ export default function ReportView({
           cite={citeLong(basis, "qMethod2")}
           eqNo="6" eq={v2 ? <S basis={basis} k="Qunadj" /> : <S basis={basis} k="Qy" />} value={`${ML(result.result.Q_y)}/yr`}
           rows={[
-            { sym: <S basis={basis} k="Np" />, value: result.premises != null ? fmt(result.premises, 0) : "—", source: srcNp, desc: "Households served — those with at least one treatment device", field: "premises" },
-            { sym: <S basis={basis} k="HN" />, value: result.individualsPerPremises != null ? fmt(result.individualsPerPremises, 2) : "—", source: result.premises != null ? `Project record — people ÷ households (${sdwsRef(basis, "HN")})` : "—", desc: "People per household" },
+            { sym: <S basis={basis} k="Np" />, value: result.premises != null ? fmt(result.premises, 0) : "", source: srcNp, desc: "Households served — those with at least one treatment device", field: "premises" },
+            { sym: <S basis={basis} k="HN" />, value: result.individualsPerPremises != null ? fmt(result.individualsPerPremises, 2) : "", source: result.premises != null ? `Project record — people ÷ households (${sdwsRef(basis, "HN")})` : "—", desc: "People per household" },
             { sym: <S basis={basis} k="QPW" />, value: fmt(result.qpwEffective, 2), source: srcQpw, desc: qpwDesc, field: "qpw" },
-            { sym: <S basis={basis} k="qi" />, value: state.deviceCapacityLPerHour != null ? `${fmt(state.deviceCapacityLPerHour, 2)} L/h` : "—", source: state.deviceCapacityLPerHour != null ? "Entered — manufacturer specification (V2.0 SDWS 13)" : "Not entered — manufacturer specification (V2.0 SDWS 13)", desc: "Device capacity — litres treated per hour, all units in the household" },
-            { sym: <S basis={basis} k="tp" />, value: deviceEvaluated ? `${fmt(state.usageHoursPerDay ?? 5, 1)} h/d` : "—", source: deviceEvaluated ? (state.usageHoursPerDay != null ? "Entered — usage survey (V2.0 SDWS 35)" : "Methodology V2.0 default — V2.0 SDWS 35, Option 1 (5 h/day)") : "—", desc: "Hours a day the device is used" },
-            { sym: <S basis={basis} k="DN" />, value: deviceEvaluated ? fmt(state.devicesPerPremises ?? 1, 0) : "—", source: deviceEvaluated ? (state.devicesPerPremises != null ? "Entered — sales / distribution records (V2.0 SDWS 37)" : "Assumed 1 — lowest, safest; enter your own (sales / distribution records, V2.0 SDWS 37)") : "—", desc: "Devices per household" },
-            { sym: <S basis={basis} k="QPWhh" />, value: result.qpwPerPremises != null ? fmt(result.qpwPerPremises, 1) : "—", source: srcQpwHh, desc: "Per-household daily volume (L/household/day) — the smaller of device capacity and people × daily need (Eq. 7)", field: "qpwHh" },
+            { sym: <S basis={basis} k="qi" />, value: state.deviceCapacityLPerHour != null ? `${fmt(state.deviceCapacityLPerHour, 2)} L/h` : "", source: state.deviceCapacityLPerHour != null ? "Entered — manufacturer specification (V2.0 SDWS 13)" : "", desc: "Device capacity — litres treated per hour, all units in the household" },
+            { sym: <S basis={basis} k="tp" />, value: deviceEvaluated ? `${fmt(state.usageHoursPerDay ?? 5, 1)} h/d` : "", source: deviceEvaluated ? (state.usageHoursPerDay != null ? "Entered — usage survey (V2.0 SDWS 35)" : "Methodology V2.0 default — V2.0 SDWS 35, Option 1 (5 h/day)") : "—", desc: "Hours a day the device is used" },
+            { sym: <S basis={basis} k="DN" />, value: deviceEvaluated ? fmt(state.devicesPerPremises ?? 1, 0) : "", source: deviceEvaluated ? (state.devicesPerPremises != null ? "Entered — sales / distribution records (V2.0 SDWS 37)" : "Assumed 1 — lowest, safest; enter your own (sales / distribution records, V2.0 SDWS 37)") : "—", desc: "Devices per household" },
+            { sym: <S basis={basis} k="QPWhh" />, value: result.qpwPerPremises != null ? fmt(result.qpwPerPremises, 1) : "", source: srcQpwHh, desc: "Per-household daily volume (L/household/day) — the smaller of device capacity and people × daily need (Eq. 7)", field: "qpwHh" },
             ...(basis === "legacy"
               ? [{ sym: <S basis={basis} k="Up" />, value: fmt(state.usageRate, 2), source: srcUp, desc: "Usage rate — folded into Eq. 6 under V1.0 (applied in Eq. 8 under V2.0)" }]
               : []),
@@ -714,7 +715,7 @@ export default function ReportView({
           ? [
               { sym: <S basis={basis} k="LEemb" />, value: fmt(p.LE_embodied, 1),
                 source: p.warnings.some((w) => /embodied emissions not entered/.test(w))
-                  ? "Not entered — V2.0 §9.2 requires it: Table 10 default (V2.0 SDWS 21) × new units from sales / distribution records (V2.0 SDWS 41); Eq. 18 or 19"
+                  ? "V2.0 §9.2 deducts it once the device class and unit count are given: Table 10 default (V2.0 SDWS 21) × new units from sales / distribution records (V2.0 SDWS 41); Eq. 18 or 19"
                   : "Methodology V2.0 default — Table 10 (V2.0 SDWS 21) × new units from sales / distribution records (V2.0 SDWS 41), Eq. 18 or 19",
                 desc: "Embodied emissions of the devices — once per new unit, upfront or spread over five years", field: "embodied" },
               { sym: <S basis={basis} k="LEmarket" />, value: fmt(p.LE_market, 1),
@@ -760,9 +761,9 @@ export default function ReportView({
           {m2 ? <AppxRow p={<S basis={basis} k="Up" />} d="Usage rate — how often the technology is used" u="—" v={fmt(state.usageRate, 2)} s={srcUp} /> : null}
           {v2 ? <AppxRow p={<S basis={basis} k="DAF" />} d="Downward adjustment factor — country-specific ambition trim" u="—" v={fmt(result.DAF, 4)} s={dafSiteSource ?? `Methodology V2.0 default — GS4GG Tool 05 (doc 457), host country × window${dafFallbackNote}`} /> : null}
           <AppxRow p={<span className="t-mono" style={{ fontSize: 11 }}>HH<sub style={{ fontSize: 8 }}>p,y</sub> × HN<sub style={{ fontSize: 8 }}>p,y</sub></span>} d={state.populationMode === "households" ? "Households served (N_p)" : "People served"} u={state.populationMode === "households" ? "households" : "people"} v={peopleServed(state).toLocaleString()} s={srcPop} />
-          {m2 ? <AppxRow p={<S basis={basis} k="Np" />} d="Households served (N_p) — Eq.6" u="households" v={result.premises != null ? fmt(result.premises, 0) : "—"} s={srcNp} /> : null}
-          {m2 ? <AppxRow p={<S basis={basis} k="qi" />} d="Device capacity" u="L/h" v={state.deviceCapacityLPerHour != null ? fmt(state.deviceCapacityLPerHour, 2) : "—"} s={state.deviceCapacityLPerHour != null ? "Entered — manufacturer specification (V2.0 SDWS 13)" : "Not entered — V2.0 SDWS 13"} /> : null}
-          {m2 ? <AppxRow p={<S basis={basis} k="QPWhh" />} d="Per-household volume — Eq.7" u="L/hh·d" v={result.qpwPerPremises != null ? fmt(result.qpwPerPremises, 1) : "—"} s={srcQpwHh} /> : null}
+          {m2 ? <AppxRow p={<S basis={basis} k="Np" />} d="Households served (N_p) — Eq.6" u="households" v={result.premises != null ? fmt(result.premises, 0) : ""} s={srcNp} /> : null}
+          {m2 ? <AppxRow p={<S basis={basis} k="qi" />} d="Device capacity" u="L/h" v={state.deviceCapacityLPerHour != null ? fmt(state.deviceCapacityLPerHour, 2) : ""} s={state.deviceCapacityLPerHour != null ? "Entered — manufacturer specification (V2.0 SDWS 13)" : ""} /> : null}
+          {m2 ? <AppxRow p={<S basis={basis} k="QPWhh" />} d="Per-household volume — Eq.7" u="L/hh·d" v={result.qpwPerPremises != null ? fmt(result.qpwPerPremises, 1) : ""} s={srcQpwHh} /> : null}
           <AppxRow p={<S basis={basis} k="QPW" />} d={v2 && t9 ? "Litres per person per day — Table 9 age-weighted" : "Litres per person per day (cap 5.5)"} u="L/p/d" v={fmt(result.qpwEffective, 2)} s={srcQpw} />
           {m2
             ? <AppxRow p={<S basis={basis} k="DP" />} d="Days the device was present in the household" u="d" v={fmt(state.operationalDays, 0)} s={srcDays} />

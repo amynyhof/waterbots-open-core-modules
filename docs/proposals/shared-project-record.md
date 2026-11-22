@@ -27,7 +27,7 @@ Some rules stay as they are:
 - A module never fetches or saves anything itself. The site hands it the record, and the site's `onSave` stores
   what the module gives back. A refused save always shows its reason.
 - The engine does every sum. A site shows an estimate from the record, but never works one out.
-- A project fact is never guessed. While it is missing, its field says "awaiting user project input".
+- A project fact is never guessed. While it is missing, its box is blank, with no label. A blank never counts as zero.
 
 We are guides, not gates (ruling 2026-11-21). A pathway's reading says how likely it is, and why. It never shuts a
 door for good.

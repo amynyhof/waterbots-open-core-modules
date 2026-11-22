@@ -68,8 +68,8 @@ function Metric({ label, value, sub, tip }: { label: string; value: string; sub?
 
 /**
  * ONE EX-POST MONITORING VALUE IN THE ASK (ruling 2026-11-21). Not entered: the box is blank, with a light highlight
- * and a small red dot, because the calculation needs it. Entered: the box holds the figure. The line under it says
- * where the figure comes from. Out-of-range entries are held to the ends, as on every other row.
+ * and a small red dot, because the calculation needs it, and no label under it (0.5.1). Entered: the box holds the
+ * figure, and the line under it says where the figure comes from. Out-of-range entries are held to the ends, as on every other row.
  */
 function MonitoringAskRow({ m, needed, value, onEnter, source }: {
   m: MonitoringValue; needed: boolean; value: number | null; onEnter: (v: number) => void; source: string;
@@ -98,7 +98,7 @@ function MonitoringAskRow({ m, needed, value, onEnter, source }: {
         <span className="t-mono shrink-0 text-fg-4" style={{ fontSize: 10, minWidth: 18 }}>{m.unit}</span>
         </span>
       </div>
-      <p className="t-caption text-fg-4" style={{ fontSize: 10 }}>{source}</p>
+      {source ? <p className="t-caption text-fg-4" style={{ fontSize: 10 }}>{source}</p> : null}
     </div>
   );
 }

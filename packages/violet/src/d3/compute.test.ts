@@ -45,7 +45,7 @@ describe("hand-worked cases (invented projects)", () => {
       withoutProjectM3PerYear: 500,
     });
     expect(val(r, "peopleServed").value).toBe(1500);
-    expect(val(r, "peopleServed").origin).toBe("derived");
+    expect(val(r, "peopleServed").origin).toBe("calculated");
     expect(val(r, "beneficiaryVolumeM3PerYear").value).toBe(10950);
     expect(val(r, "supplyCapacityM3PerYear").value).toBe(6000);
     expect(r.withProjectM3PerYear).toBe(6000);

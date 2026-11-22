@@ -151,7 +151,8 @@ function startWords(state: CalcState, key: MonitoringKey): string {
 
 /**
  * WHERE A MONITORING VALUE COMES FROM, as the report and the rows say it. Ex-ante it is always "assumed".
- * Ex-post it is from the log or monitoring once entered, and "not entered" until then.
+ * Ex-post it is from the log or monitoring once entered. Until then it is blank, with no label (0.5.1): the box is
+ * blank too, and a blank never counts as zero.
  */
 export function monitoringSource(state: CalcState, key: MonitoringKey): string {
   const m = monitoringValues(state).find((v) => v.key === key);
@@ -160,7 +161,7 @@ export function monitoringSource(state: CalcState, key: MonitoringKey): string {
   if (state.mode === "ex-post") {
     return entered
       ? `From ${m.record} (${m.sdws})`
-      : `Not entered — needed from ${m.record} (${m.sdws})`;
+      : "";
   }
   return entered
     ? `Assumed — your planned figure. After the project runs, it comes from ${m.record} (${m.sdws})`

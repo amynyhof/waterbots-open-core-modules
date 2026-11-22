@@ -63,7 +63,7 @@ of water is counted once (Step 3, p.21).
   another agent (ruling 2026-11-12).
 - **The sites.** She reads the project record, never asks again for a fact it holds, and hands back to Wellington.
 - **The screening.** The water calculator always shows. Carbon shows beside it only when Phoebe reads carbon as
-  "likely" or "not enough known" (ruling 2026-10-01).
+  "likely" or "more to learn" (ruling 2026-10-01; the words since ruling 2026-11-21).
 
 ## 5. Water and carbon: open item N14
 

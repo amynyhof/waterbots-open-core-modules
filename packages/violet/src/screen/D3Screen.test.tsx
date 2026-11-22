@@ -6,10 +6,11 @@ import D3Screen, { seedD3Input } from "./D3Screen.js";
 const project = { name: "Invented test project", standards: [], population: { mode: "people" as const, served: 1200 } };
 
 describe("the D-3 screen", () => {
-  it("starts ex-ante with sliders, and shows what is still awaited", () => {
+  it("starts ex-ante with sliders, and shows a value still awaited as a blank, with no label (0.5.1)", () => {
     const html = renderToStaticMarkup(<D3Screen project={project} />);
     expect(html).toMatch(/type="range"/);
-    expect(html).toMatch(/awaiting user project input/);
+    expect(html).not.toMatch(/awaiting/i);
+    expect(html).toContain('<tr data-value="accessLevel"><th scope="row">Full or limited access</th><td> </td><td data-origin="true"></td><td data-source="true">the project record</td><td data-note="true"></td>');
     expect(html).toMatch(/Table D3\.3, p\.46/);
   });
 
