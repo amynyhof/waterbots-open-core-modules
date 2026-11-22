@@ -4,6 +4,25 @@ Newest first. One entry per pull request: what was done, what is still open. Nev
 
 ---
 
+## 2026-11-21 — Calvin and Violet 0.5.1
+
+**Done (branch `calvin-violet-0.5.1`):** one lane 3 pull request with exactly four changes (approved 2026-11-21). No
+sum changed, and every reference case gives the same answer.
+- Violet: the value tag "derived" is now "calculated" (`Origin`). D-3's engine version is 0.1.1.
+- Calvin and Violet: a missing value is a blank box, with no label, in the tables and the tag cells. Calvin's ask rows
+  and report cells no longer say "Not entered" or show "—" for a missing value. Violet's screen no longer shows
+  "awaiting user project input". A blank never counts as zero.
+- Violet: the reading "not enough known" is now "more to learn" (`CarbonReading`).
+- Violet: a small stylesheet, `@waterbots/violet/styles.css`, with core's tokens and Orchid as her accent.
+- `CLAUDE.md`: the line on calculated values, and the line on what a missing project fact shows. The V9 proposal's
+  matching line too.
+- Versions: Calvin 0.5.1, Violet 0.5.1. Core stays 0.1.1.
+- `BUILD_PLAN.md`: V21 and the step "Calvin and Violet 0.5.1".
+
+**Open:** the merge, then the release check, the tag and "release it". Both sites install it.
+
+---
+
 ## 2026-11-21 — The shared record: readings worked out again when a fact changes
 
 **Done (branch `proposal-record-reread`):**

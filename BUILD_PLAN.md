@@ -85,8 +85,9 @@ smaller tables, such as the six-row table of fallback factors, are fine as they 
 | V18 | — | [x] (Released: tag `calvin-v0.4.0` on commit `09dfc8d`.) Calvin's screens after the walk of the open site (2026-11-16): sixteen items, one pull request. No sum changes. | V16. | Merged, then a release; the private side reports pass. |
 | V19 | — | [x] (Released: tag `calvin-v0.4.1` on commit `8cd7971`.) Calvin 0.4.1: monitoring values labelled by the analysis basis (ruling 2026-11-21). Ex-ante, each is assumed from its starting value. Ex-post, each comes from the operation log or monitoring; until it is entered its box is blank, with a highlight and a red dot, and no figures show. The "entered" flag is saved. No sum changes. | V18. | Session C packs it, runs the release check and makes the tag. After "release it", Session C pushes the tag and publishes the release. The maintainer confirmed the values the rule covers: the operating days, M_q, U_p and X_cleanboil; Q_m is left out (2026-11-21). The paid site installs it. |
 | V20 | Agent orchestration | [x] (Released: tag `calvin-violet-v0.5.0` on commit `1bce514`. Still to come: both sites install it. See the step "Calvin and Violet 0.5.0".) Calvin and Violet 0.5.0, one release for both sites. Calvin: the main credit tiles (tCO₂e a year) are a pinned header, whether or not a site sets `unpinFigureBlock`; the smaller figures sit right under them; the sliders and the calculation collapse. The controls panel holds only the site's own top and Calvin's buttons, the work surface ends with the calculation, and the report's note on how the figures were produced is one sentence shorter. A phone pass: rows wrap instead of squeezing. Violet: people served come from the project record, as Calvin takes them, and "Draft — pending expert review" shows on the screen and on every result. No sum changes. | V19, V8. | Session C packs all three packages, runs the release check and makes the tag. One release holds all three files (coach decision 2026-11-21). After "release it", Session C pushes the tag and publishes the release. Both sites install it. |
+| V21 | Console and surfaces | [~] (Open pull request.) Calvin and Violet 0.5.1, four changes (approved 2026-11-21). Violet's "derived" tag becomes "calculated". A missing value is a blank box with no label, on both screens, in the tables and the tag cells; a blank never counts as zero. Violet's "not enough known" becomes "more to learn". Violet ships a small stylesheet in Calvin's look, with Orchid as her accent. No sum changes. See the step "Calvin and Violet 0.5.1". | V20. | Merged, then Session C packs it, runs the release check and makes the tag. After "release it", the tag is pushed and the release published. Both sites install it. |
 
-**Where things stand (2026-11-21):** Calvin 0.5.0 and Violet 0.5.0, with core 0.1.1, are the latest release (`calvin-violet-v0.5.0`, V20). V16, V18, V19 and V20 are released. Both sites still install V20. V17 waits on the maintainer's ruling on its wording.
+**Where things stand (2026-11-21):** Calvin 0.5.0 and Violet 0.5.0, with core 0.1.1, are the latest release (`calvin-violet-v0.5.0`, V20). V16, V18, V19 and V20 are released. Both sites still install V20. V21 (Calvin and Violet 0.5.1) is an open pull request. V17 waits on the maintainer's ruling on its wording.
 
 **Sources still to find** (from V3): moved to the source sweep, M10.4 (ruling 2026-11-05).
 
@@ -313,6 +314,26 @@ holding all three packed files (coach decision 2026-11-21). It is V20 on the roa
       Violet 0.5.0: a pinned header, a phone pass, and Violet's first release", with the three packed files and
       `SHA256SUMS.txt`.
 - [ ] **C5.5** *Family: Agent orchestration.* Both sites install it, and take the steps in Calvin's README, "Changes in 0.5.0".
+
+## Calvin and Violet 0.5.1
+
+*Family: Console and surfaces.*
+
+A small release for both sites, with exactly four changes (approved 2026-11-21). It is V21 on the road to v1. No sum
+changes.
+
+*Stop for the maintainer:* the merge, then "release it". *Waits on:* nothing else.
+
+- [~] **C51.1** *Family: Calculators and methods.* Violet's value tag "derived" becomes "calculated", so both agents
+      use entered, default, calculated and assumed (open pull request).
+- [~] **C51.2** *Family: Console and surfaces.* A missing value is a blank box, with no label, on Calvin's and
+      Violet's screens, in the results tables and the tag cells. A blank never counts as zero (open pull request).
+- [~] **C51.3** *Family: Calculators and methods.* Violet's reading "not enough known" becomes "more to learn": one
+      set of words everywhere, likely, more to learn and unlikely (open pull request).
+- [~] **C51.4** *Family: Console and surfaces.* Violet ships a small stylesheet, `@waterbots/violet/styles.css`, in
+      Calvin's look, with Orchid as her accent (open pull request).
+- [ ] **C51.5** *Family: Agent orchestration.* Session C packs it, runs the release check and makes the tag. After
+      "release it", the tag is pushed and the release published. Both sites install it.
 
 ## Site walk of 2026-11-21: for the next release
 
