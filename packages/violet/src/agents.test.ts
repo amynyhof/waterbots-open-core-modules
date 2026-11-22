@@ -3,14 +3,10 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
-// Line endings are set aside: one copy of the repo may give one file CRLF and the other LF.
+// Line endings are set aside: one copy of the repo may give a file CRLF and another LF.
 const read = (rel: string) => readFileSync(fileURLToPath(new URL(rel, import.meta.url)), "utf8").replace(/\r\n/g, "\n");
 
 describe("Violet's agent files", () => {
-  it("carry the same base rules as Calvin, word for word", () => {
-    expect(read("./agents/_base-rules.md")).toBe(read("../../calvin/src/agents/_base-rules.md"));
-  });
-
   it("name her tool, her colour and both doors", () => {
     const config = read("./agents/violet/config.yaml");
     expect(config).toMatch(/calc\/vwba-d3\.computeD3/);
@@ -19,10 +15,10 @@ describe("Violet's agent files", () => {
     expect(config).toMatch(/hands back to Wellington/);
   });
 
-  it("tell her to work alone in the Commons and never add water to carbon", () => {
+  it("tell her to ask for every value in the Commons and never add water to carbon", () => {
     const prompt = read("./agents/violet/prompt.md");
     expect(prompt).toMatch(/In the Agent Commons, you work alone/);
-    expect(prompt).toMatch(/Never send the person to another agent/);
+    expect(prompt).toMatch(/ask the person for every value/);
     expect(prompt).toMatch(/Never add a water benefit to a carbon figure/);
   });
 });

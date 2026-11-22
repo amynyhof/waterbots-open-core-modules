@@ -2,14 +2,16 @@
 
 This repo is public and licensed Apache 2.0. Anyone can read every file, commit and pull request.
 
-The rules live in two pages at the root of this repo, and nowhere else in it:
+The rules live in three pages at the root of this repo, and nowhere else in it:
 
 - `RULINGS.md`: how the whole site behaves, and how the sessions work.
 - `FAMILY_OPEN_CLOSE.md`: how each family of work opens and closes.
+- `AGENT_RULES.md`: the foundational rules every agent reads, rules 1 to 19, and notes for builders.
 
-Each module's own rules are in its `RULINGS.md`: `packages/calvin`, `packages/violet` and `packages/core`. The rules
-every agent reads are in `src/agents/_base-rules.md`. Calvin and Violet each have a copy, and a test keeps the two
-the same. Only the maintainer changes any of these. The masters of the two root pages are in the handoff folder.
+Each module's own rules are in its `RULINGS.md`: `packages/calvin`, `packages/violet` and `packages/core`. Rules 1 to 19
+reach the agents from one file, `packages/core/src/agent-rules.md`, which a test keeps the same as the page. Each
+agent's own files, in `src/agents/<agent>/`, hold only what is different for that agent. Only the maintainer changes
+any of these. The masters of the three root pages are in the handoff folder.
 
 ## The packages
 

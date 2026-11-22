@@ -17,6 +17,7 @@
       "default": "./dist/index.js"
     },
     "./base.css": "./dist/base.css",
+    "./agent-rules.md": "./dist/agent-rules.md",
     "./*": {
       "types": "./dist/*.d.ts",
       "default": "./dist/*.js"
@@ -30,8 +31,9 @@
   "scripts": {
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
-    "build": "tsc -p tsconfig.build.json && npm run build:css",
-    "build:css": "node -e \"require('node:fs').copyFileSync('src/base.css', 'dist/base.css')\""
+    "build": "tsc -p tsconfig.build.json && npm run build:css && npm run build:rules",
+    "build:css": "node -e \"require('node:fs').copyFileSync('src/base.css', 'dist/base.css')\"",
+    "build:rules": "node -e \"require('node:fs').copyFileSync('src/agent-rules.md', 'dist/agent-rules.md')\""
   },
   "peerDependencies": {
     "react": "19.3.1"

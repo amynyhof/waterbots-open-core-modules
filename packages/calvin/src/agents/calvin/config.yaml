@@ -11,7 +11,7 @@ version: 0.6.0 # 2026-10-23 ([#257]): his tool takes a device flow rate and devi
 persona: calvin
 model: claude-sonnet-5
 role_prompt: prompt.md
-base_rules: ../_base-rules.md
+base_rules: "@waterbots/core/agent-rules.md" # the foundational agent rules, rules 1 to 19 of AGENT_RULES.md
 knowledge: knowledge.md
 context_packs: [] # none in the shared Calvin; a host that adds a search tool adds the packs it searches
 tools: # the shared Calvin's tools; a host may add its own (this site's are in a paid add-on, never seeded)
