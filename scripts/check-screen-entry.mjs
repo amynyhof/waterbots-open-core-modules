@@ -1,10 +1,10 @@
 // Screen-entry check. Proves a site can mount Calvin's two views from the packed files, through
 // `@waterbots/calvin/screen`, the way the release delivers them.
 //
-//   node scripts/check-screen-entry.mjs
+//   node scripts/check-screen-entry.mjs [--built]
 //
-// It builds `core` and `calvin`, packs both with `npm pack`, and unpacks them into a fresh folder outside the repo, as
-// a site's `node_modules` would hold them. It adds React from this repo's own install, and nothing else. A plain Node
+// It builds `core` and `calvin`, unless `--built` says they are already built. It packs both with `npm pack` and
+// unpacks them into a fresh folder outside the repo, as a site's `node_modules` would hold them. It adds React from this repo's own install, and nothing else. A plain Node
 // process there loads the screen entry and renders, on a made-up project:
 //   - the ex-ante view on a site locked to ex-ante: the sliders show, even for a saved ex-post analysis;
 //   - the ex-post view on a site that shows both: no sliders, the metered volume row instead;
@@ -140,7 +140,10 @@ function unpack(packs, file, site, name) {
 
 /** Packs both packages, installs them alone with React in a fresh folder, and renders the views there. */
 function runInstalled() {
-  execSync("npm run build -w @waterbots/core && npm run build -w @waterbots/calvin", { cwd: root, stdio: "ignore" });
+  // With --built, the caller has just built core and calvin (the root test script does), so they are not built again.
+  if (!process.argv.includes("--built")) {
+    execSync("npm run build -w @waterbots/core && npm run build -w @waterbots/calvin", { cwd: root, stdio: "ignore" });
+  }
   const work = mkdtempSync(join(tmpdir(), "calvin-screen-"));
   try {
     const packs = join(work, "packs");

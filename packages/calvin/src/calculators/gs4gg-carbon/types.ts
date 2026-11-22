@@ -1,6 +1,6 @@
 /**
  * GS Safe Water ER calculator — typed inputs/outputs (gs4gg-carbon, plugin 1).
- * Legacy (SDWS V1.0). See CALCULATOR_SPEC.md §2.
+ * Legacy (SDWS V1.0).
  *
  * Every input is passed explicitly (no hidden state, no I/O, no clock) so a UI can
  * drive live sensitivity sliders by re-invoking with varied inputs (§0).

@@ -45,7 +45,7 @@ export function calculatorPageContext({
   paaResult,
   waterfall,
 }: PageContextInput): string {
-  // A MISSING PROJECT FACT IS ASKED FOR, NEVER ASSUMED (CALCULATOR_SPEC §0.2). Calvin is told which
+  // A MISSING PROJECT FACT IS ASKED FOR, NEVER ASSUMED. Calvin is told which
   // ones, so he can ask the person for each — and told not to fill any of them in himself.
   if (missingFacts && missingFacts.length > 0) {
     return (

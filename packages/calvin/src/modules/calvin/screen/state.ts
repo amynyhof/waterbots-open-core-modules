@@ -66,7 +66,7 @@ export function transitionPatch(p: Partial<CalcState>, transition: boolean): Par
 export interface CalcState {
   version: "legacy" | "paa";
   /**
-   * PROJECT FACTS ARE NULL UNTIL PROVIDED (CALCULATOR_SPEC §0.2, ruling 2026-10-23): `method` (from the
+   * PROJECT FACTS ARE NULL UNTIL PROVIDED (ruling 2026-10-23): `method` (from the
    * technology), `countryIso`, `populationMode` and `populationCount`. None is guessed or defaulted;
    * with any one missing the seat computes nothing and asks for it (`missingProjectFacts`).
    */
@@ -191,12 +191,12 @@ export function recordOwnedFacts(project: CalvinProject): Pick<CalcState, "count
   const g = project.analysis ?? {};
   const country = project.country?.trim();
   return {
-    // A PROJECT FACT: the record's country, else null (CALCULATOR_SPEC §0.2) — never an empty code
+    // A PROJECT FACT: the record's country, else null — never an empty code
     // that a lookup would quietly resolve to something.
     countryIso: country ? country.toUpperCase() : null,
     // Method follows the TECHNOLOGY fact on the record (CWS → 1, HWT → 2); the calculator owns no
     // technology control. No technology (or "other") means NO method — never Method 1 assumed
-    // (CALCULATOR_SPEC §0.2, which retires decision #4's CWS fallback and the saved-method fallback).
+    // (which retires decision #4's CWS fallback and the saved-method fallback).
     method: technologyToMethod(project.technology) ?? null,
     // Population MODE is a fact on the record (the calculator has no mode control). The COUNT is
     // NOT here: it seeds from a saved analysis override when one exists, so it is working state.
@@ -215,7 +215,7 @@ export interface ProjectFact {
 }
 
 /**
- * THE PROJECT FACTS THIS SEAT IS MISSING (CALCULATOR_SPEC §0.2). Empty means it can compute. The
+ * THE PROJECT FACTS THIS SEAT IS MISSING. Empty means it can compute. The
  * order is the paid site's record check's (technology, country, people served), with "counted as
  * people or households" last, because it only matters once there is a count.
  */
@@ -377,7 +377,7 @@ export function toSavedAnalysis(s: CalcState): SavedAnalysis {
 export function effectivePremises(s: CalcState, tables?: SiteTables): number | undefined {
   if (s.method !== 2) return undefined;
   if (s.premises != null && s.premises > 0) return s.premises;
-  // A missing project fact means nothing to derive (CALCULATOR_SPEC §0.2).
+  // A missing project fact means nothing to derive.
   if (s.populationCount == null || s.countryIso == null || s.populationMode == null) return undefined;
   // BOTH DIRECTIONS, and the rule is the ENGINE's — called rather than copied, so the seat's N_p,
   // the record's box and the credited figure can never drift ([#225]). Entered as households, the

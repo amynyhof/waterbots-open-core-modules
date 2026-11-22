@@ -45,8 +45,8 @@
  *          seeded demo project's own record: households × household size = people, N_p the household
  *          count, HN_p the size — HN_p and the size used are exactly equal, and Q_pop reconciles by
  *          both routes. The ER was unchanged, and the same inputs read as PEOPLE would have credited
- *          less, which is the proof the seat was not doing that. (The demo project's figures are
- *          archived in docs/archive/SUPERSEDED_TEXT.md, not carried.)
+ *          less, which is the proof the seat was not doing that. (The demo project's figures were
+ *          not carried.)
  *          WHAT CHANGED IS WHAT THE SURFACES SHOW. `derivePeopleServed` and `derivedPremisesCount`
  *          are exported from `scenario.ts` as the ONE place the households→people and
  *          household-count-is-N_p rules live; `computeScenario`, the seat's `effectivePremises` and
@@ -87,7 +87,7 @@
  *          (1) THE GOLD STANDARD REGISTRY'S TIME WORDS: *crediting period*, *monitoring period*,
  *          *vintage*. "Crediting year" and "monitoring year" are retired everywhere — they read as
  *          synonyms for each other and for a vintage, and they are three different things.
- *          `monitoringYears()` is `monitoringPeriods()` (P1, P2 …); `creditingRules.ts` speaks in
+ *          `monitoringYears()` is `monitoringPeriods()` (P1, P2 …); the crediting rules speak in
  *          vintages throughout. The report labels each VINTAGE with its rules, and a monitoring
  *          period that straddles a year end shows as TWO VINTAGES.
  *          (2) THE TAG KEY IS FOUR WORDS, THE SAME ON EVERY SURFACE: entered · default · derived ·
@@ -171,7 +171,7 @@
  *          country default. Project figures are gone from four comments (the ER-tool note in
  *          emissions-legacy.ts, the U_p note in quantity.ts, the household-derivation notes here and in
  *          scenario.ts), and the two remaining presets' citations no longer name reference cases.
- *          The old wording is kept in docs/archive/SUPERSEDED_TEXT.md.
+ *          GitHub's history keeps the old wording.
  *   0.17.0 2026-10-19 — THE FULL DAF TABLE (E1 of the open core modules plan). The DAF data file
  *          now holds every row of the 457 tool's Table 03 (199 countries and areas, the 2026-2030
  *          window) where it held six; 165 selectable countries that took the 1.25% floor now take
@@ -184,7 +184,7 @@
  *          reference case moved: every PAA reference entry passes its DAF explicitly, and the
  *          real filings are V1.0, which has no DAF. Sealed 19 Oct 2026; the record was written before
  *          the tag, as at v0.16.1.
- *   0.18.0 2026-10-23 — NO PROJECT FACT IS ASSUMED (CALCULATOR_SPEC §0.2). `computeScenario`
+ *   0.18.0 2026-10-23 — NO PROJECT FACT IS ASSUMED. `computeScenario`
  *          refuses (`ProjectFactMissingError`) instead of assuming: (1) a technology — it used to take
  *          Method 1 from its default preset when a caller named neither a method nor a preset; (2) the
  *          counting unit — a count with no people/households choice was read as people; (3) a household

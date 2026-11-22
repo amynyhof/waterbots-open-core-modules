@@ -6,7 +6,7 @@
 # pull request's code; it only asks GitHub for the list of changed file names.
 #
 # It also arms GitHub's auto-merge on a lane 1 pull request that is not a draft, and disarms it on every other
-# pull request (ruling 2026-11-21). It never merges by itself: GitHub merges an armed pull request once every
+# pull request (RULINGS.md, section 7). It never merges by itself: GitHub merges an armed pull request once every
 # required check on the main ruleset is green. Arming needs the repo setting "Allow auto-merge"; while that is
 # off, the arm step only warns. The disarm step runs inside this job, and "lane label" is a required check, so a
 # pull request that leaves lane 1 is disarmed before it can merge.
@@ -65,11 +65,15 @@ jobs:
         run: |
           set -euo pipefail
           declare -A colour=([1]=0e8a16 [2]=fbca04 [3]=d93f0b)
-          declare -A about=([1]="Plain-writing files only. The maintainer merges with one click." \
-                            [2]="Visitors see it. The maintainer merges, then checks the live site." \
-                            [3]="The maintainer reviews, plus outside AI review.")
+          declare -A about=([1]="Docs only. Merges on its own once every check passes." \
+                            [2]="Visitors see it. The maintainer looks at the preview first." \
+                            [3]="Merges on the maintainer's word. No outside review step.")
           for n in 1 2 3; do
-            if ! gh api "repos/$REPO/labels/lane%20$n" --silent 2>/dev/null; then
+            if have=$(gh api "repos/$REPO/labels/lane%20$n" --jq .description 2>/dev/null); then
+              if [ "$have" != "${about[$n]}" ]; then
+                gh api -X PATCH "repos/$REPO/labels/lane%20$n" -f description="${about[$n]}" --silent
+              fi
+            else
               gh api -X POST "repos/$REPO/labels" -f name="lane $n" -f color="${colour[$n]}" \
                 -f description="${about[$n]}" --silent
             fi
@@ -84,7 +88,7 @@ jobs:
             gh api -X POST "repos/$REPO/issues/$PR/labels" -f "labels[]=lane $LANE" --silent
           fi
 
-      # LANE 1 AUTO-MERGE (ruling 2026-11-21). Lane 1 and not a draft: arm it. Anything else: disarm it.
+      # LANE 1 AUTO-MERGE (RULINGS.md, section 7). Lane 1 and not a draft: arm it. Anything else: disarm it.
       - name: Arm or disarm auto-merge
         env:
           GH_TOKEN: ${{ github.token }}

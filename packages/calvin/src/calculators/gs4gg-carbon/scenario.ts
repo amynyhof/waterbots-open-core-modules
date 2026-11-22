@@ -526,7 +526,7 @@ export class FiledFnrbRequiredError extends Error {
 }
 
 /**
- * A PROJECT FACT THE RUN WOULD OTHERWISE HAVE TO ASSUME (CALCULATOR_SPEC §0.2, ruling 2026-10-23).
+ * A PROJECT FACT THE RUN WOULD OTHERWISE HAVE TO ASSUME (ruling 2026-10-23).
  * Project facts are blank until provided, never defaulted. The engine used to take Method 1 from
  * its default baseline preset when a caller gave neither a method nor a preset — a technology
  * nobody said. A caller that names a preset has chosen that preset's method; one that names
@@ -636,7 +636,7 @@ export function computeScenario(input: ScenarioInput, tables?: SiteTables): Scen
   }
   const fuelMix = input.fuelMixOverride ?? edit?.fuelMix ?? countryResolved.fuelMix ?? preset.fuelMix;
   // The method is a PROJECT FACT (the technology): the caller's, or the method of the preset the
-  // caller chose — never the default preset's when the caller named neither (CALCULATOR_SPEC §0.2).
+  // caller chose — never the default preset's when the caller named neither.
   if (input.method == null && input.preset == null) throw new ProjectFactMissingError("technology");
   const method: QuantityMethod = input.method ?? preset.method;
   // Whether the count is people or households is a PROJECT FACT too: never read as people when

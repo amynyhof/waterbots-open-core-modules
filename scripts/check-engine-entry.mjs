@@ -1,9 +1,9 @@
 // Engine-entry check. Proves the built engine-only entry, `@waterbots/calvin/engine`, works with no React installed.
 //
-//   node scripts/check-engine-entry.mjs
+//   node scripts/check-engine-entry.mjs [--built]
 //
-// It builds the entry with the package's own `build:engine` script, then makes a fresh folder outside the repo and
-// installs only calvin's package.json and the built file there. No React, no `@waterbots/core`. A plain Node process
+// It builds `core` and `calvin`, unless `--built` says they are already built. Then it makes a fresh folder outside
+// the repo and installs only calvin's package.json and the built file there. No React, no `@waterbots/core`. A plain Node process
 // in that folder loads the entry through the package's exports, checks that React cannot be found, and re-runs every
 // case in `expected-outputs.json`, with the same steps as the package tests (`src/test-cases.ts`). All 48 checks (the
 // engine version and every case) must give the same answers. This shows nothing broke. It does not show a match to real
@@ -64,7 +64,10 @@ function checkTypes(work, names) {
 
 /** Builds the entry and its types, installs them alone in a fresh folder and checks them there. Returns what it found. */
 function runInstalled() {
-  execSync("npm run build -w @waterbots/core && npm run build -w @waterbots/calvin", { cwd: root, stdio: "ignore" });
+  // With --built, the caller has just built core and calvin (the root test script does), so they are not built again.
+  if (!process.argv.includes("--built")) {
+    execSync("npm run build -w @waterbots/core && npm run build -w @waterbots/calvin", { cwd: root, stdio: "ignore" });
+  }
   const work = mkdtempSync(join(tmpdir(), "calvin-engine-"));
   try {
     const installed = join(work, "node_modules", "@waterbots", "calvin");

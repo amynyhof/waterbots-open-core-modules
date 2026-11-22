@@ -17,8 +17,10 @@ any of these. The masters of the three root pages are in the handoff folder.
 
 - npm workspaces: `core`, `calvin`, `violet`, and two stubs, `phoebe` and `bridget`.
 - Node 24.20.0 exactly, TypeScript 7.0.2, vitest 5.0.5.
-- `npm ci`, then `npm run typecheck`, `npm test` and `npm run build`. `npm test` also runs the package, seed, entry
-  and paid-code checks in `scripts/`.
+- `npm ci`, then `npm run check`. It builds each package once, then typechecks and tests. `npm run typecheck`,
+  `npm test` and `npm run build` still run one at a time. `npm test` also runs the package, seed, entry and
+  paid-code checks in `scripts/`.
+- A docs-only change (lane 1): skip the full local check and run only the name scan. GitHub still runs everything.
 - Strict typing is on. `tsconfig.base.json` sets `strict` and extra checks, and every package extends it.
   `packages/calvin/tsconfig.json` leaves two of the extra checks off until the seed's code is brought up to them.
 - Every package is marked `private`. Nothing goes to npm yet. `scripts/check-packages.mjs` keeps each package

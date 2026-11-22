@@ -155,7 +155,7 @@ export interface CalculatorState {
 
   /* ── Engine results (computed by the engine, never here) ─────────────────── */
   /**
-   * THE PROJECT FACTS NOBODY HAS PROVIDED (CALCULATOR_SPEC §0.2, ruling 2026-10-23): technology,
+   * THE PROJECT FACTS NOBODY HAS PROVIDED (ruling 2026-10-23): technology,
    * country, people served, and whether they were counted as people or households. While any is
    * missing nothing below is computed, and the seat shows one plain prompt naming them instead.
    */
@@ -208,7 +208,7 @@ export interface CalculatorState {
   /**
    * What the hosting agent can SEE of this seat (`../agent/pageContext.ts`). A function, not a
    * memoised string: it is read at send-time, so the context reflects the state at the moment the
-   * question was asked. Part of the seat's contract (CALCULATOR_SPEC §9).
+   * question was asked. Part of the seat's contract.
    */
   pageContext: () => string;
 }
@@ -346,7 +346,7 @@ export function useCalculatorState(project: CalvinProject, options: CalculatorOp
     }
   }, [printAt]);
 
-  // A MISSING PROJECT FACT, NO FIGURES (CALCULATOR_SPEC §0.2). Every figure depends on the
+  // A MISSING PROJECT FACT, NO FIGURES. Every figure depends on the
   // technology, the country and the count, and a fact nobody provided is not this project's. So
   // nothing is computed and the seat asks for what is missing.
   const missingFacts = useMemo(() => missingProjectFacts(state, tables), [state, tables]);
