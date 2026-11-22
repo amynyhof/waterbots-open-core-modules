@@ -5,6 +5,8 @@ history keeps everything older and every longer entry.
 
 ---
 
+- 2026-11-22 — The agent rules page is copied in again: rules 4, 6 and 11 in a warmer voice, with three tone pairs
+  in rule 6. The page on opening and closing a family now has nine close steps.
 - 2026-11-22 — The maintainer's new agent rules page (21 rules) and rulings page are copied in. The tool notes
   and the text the site writes into Calvin's prompt drop what repeats a rule. The four value words are now screen
   labels in core's rulings.

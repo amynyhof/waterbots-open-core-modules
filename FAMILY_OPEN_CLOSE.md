@@ -8,7 +8,7 @@ Only the maintainer changes this page. The master is in the handoff folder; each
 3. Start when the maintainer says go.
 
 ## Closing a family
-A family close happens once, when the family's sprint is finished. Every session does all eight steps, in order, and reports them in one short report.
+A family close happens once, when the family's sprint is finished. Every session does all nine steps, in order, and reports them in one short report.
 
 1. Sort the findings. During a sprint, a new finding is written down and not chased, unless it blocks the sprint's work. At the close, every finding gets a family and goes into the build plan. Nothing is left loose.
 2. Clear finished work. When an item is done and merged, it leaves the build plan and becomes one line in the build log. The build log keeps only the last three months; older entries are deleted (GitHub's history keeps them).
@@ -17,4 +17,5 @@ A family close happens once, when the family's sprint is finished. Every session
 5. Check for private things. Run the name scan and the secret scans over the whole repo, and say what they found.
 6. Match GitHub. Confirm the main branch on the computer equals the one on GitHub, with nothing left unpushed.
 7. Name the friction. List the rules or checks that slowed the sprint down, and propose which to retire.
-8. Report. One short report to the handoff folder: what closed, what is left, what needs the maintainer.
+8. Update the status sheet. Tell the coach what this family finished, so the one build status sheet says what is live and what is coming.
+9. Report. One short report to the handoff folder: what closed, what is left, what needs the maintainer.
