@@ -1,6 +1,16 @@
 import type { FiledFnrbRefusal, FnrbRefusal, ScenarioResult, TransitionWaterfall } from "../engine";
 import type { CalcState, ProjectFact } from "../screen/state";
 import type { MonitoringValue } from "../screen/monitoring";
+import { hasProjectRecord, type Place } from "@waterbots/core/places";
+import type { EntryCheck } from "@waterbots/core/record";
+
+/** How a refused count is named to Calvin. Codes from core's fact check; he says it in his own words. */
+const REFUSED_FACT: Record<Extract<EntryCheck, { ok: false }>["fact"], string> = {
+  "population.served": "people served",
+  "population.householdSize": "people per household",
+  lpcd: "litres per person a day",
+  withoutProjectM3PerYear: "water the supply gave before the project",
+};
 
 /**
  * WHAT CALVIN CAN SEE OF THE SCREEN — the same figures the user is looking at, so he answers
@@ -29,6 +39,13 @@ export interface PageContextInput {
   legacyResult: ScenarioResult | null;
   paaResult: ScenarioResult | null;
   waterfall: TransitionWaterfall | null;
+  /**
+   * WHERE CALVIN IS WORKING (J2; agent rule 21), as the host names it. Left out, a site with a project record, as
+   * before. In the Agent Commons and at MCP there is no record: the person gives each fact.
+   */
+  place?: Place;
+  /** Counts on the record that the fact check refuses, such as people served below zero (W1). */
+  recordProblems?: Array<Extract<EntryCheck, { ok: false }>>;
 }
 
 export function calculatorPageContext({
@@ -44,14 +61,22 @@ export function calculatorPageContext({
   legacyResult,
   paaResult,
   waterfall,
+  place,
+  recordProblems = [],
 }: PageContextInput): string {
+  const withRecord = place === undefined || hasProjectRecord(place);
   // A MISSING PROJECT FACT IS ASKED FOR, NEVER ASSUMED. Calvin is told which
   // ones, so he can ask the person for each — and told not to fill any of them in himself.
   if (missingFacts && missingFacts.length > 0) {
+    // A COUNT THE RECORD HOLDS BUT THE FACT CHECK REFUSES (W1) is named as wrong, not as missing.
+    const refused = recordProblems.map((p) => `the project record's ${REFUSED_FACT[p.fact]} can't be used: ${p.problem}`);
     return (
       `The user is on the GS Safe Water calculator for project "${projectName}", and it is asking for project facts rather than showing a result. ` +
       `Missing project facts: ${missingFacts.map((f) => f.label).join("; ")}. There are NO figures on this screen. ` +
-      "Once the facts are on the project record, the calculator runs."
+      (refused.length > 0 ? `Of these, ${refused.join("; ")}. It is put right where the record is kept. ` : "") +
+      (withRecord
+        ? "Once the facts are on the project record, the calculator runs."
+        : "There is no project record here: the person gives each fact, and then the calculator runs.")
     );
   }
   if (activityAsk) {

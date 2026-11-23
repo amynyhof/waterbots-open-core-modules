@@ -69,6 +69,32 @@ const project = { name: "Invented project", standards: [], technology: "CWS", co
 
 The build bundles the entry into one file, `dist/screen.js`. React and `@waterbots/core` stay outside it, so a site has one copy of each. `scripts/check-screen-entry.mjs`, at the repo root, packs both packages, installs them alone with React, and renders the ex-ante view, the ex-post view and its report, a new project's V2.0-only view and report, and a transitioning project's view and report from the packed files.
 
+## The agent
+
+`@waterbots/calvin/agent` is what a host needs to run Calvin as an agent, at any door, with no React:
+
+- his two tools, `computeScenarioTool` and `transitionWaterfallTool` (`GS4GG_CARBON_TOOLS`);
+- the shared project record (J3): `calvinProjectFromRecord` reads it, `calvinNeeds` lists the facts it still lacks,
+  `addCalvinFacts` adds what the person gave him, and `addCalvinResults` writes his inputs and his V2.0 figure;
+- his two choices in the Agent Commons, `CALVIN_COMMONS_CHOICES`. Each sets `creditedUnderV1`. Their words wait for
+  the maintainer's ruling, so none are shipped yet;
+- `calculatorPageContext`, what he can see of his screen.
+
+A site tells the screens where Calvin is working with `place` (`"free-site"`, `"paid-site"`, `"agent-commons"` or
+`"mcp"`, from `@waterbots/core/places`). Left out, it is a site with a project record, as before.
+
+The build bundles the entry into one file, `dist/agent.js`. `@waterbots/core` stays outside it.
+`scripts/check-screen-entry.mjs` loads it from the packed files and runs his tool there.
+
+## Changes since 0.5.1 (not released yet)
+
+- **The shared project record (J3).** Calvin reads the record and adds what he asked for and his results. People
+  served keep the way they were entered.
+- **His place (J2).** The `place` option, and the agent entry above. In the Agent Commons and at MCP he is told there
+  is no record.
+- **A count below zero on the record (W1).** Calvin is told it is wrong, not missing. The screen's words are unchanged.
+- No sum changed.
+
 ## Changes in 0.5.1
 
 With Violet 0.5.1, for both sites. No sum changed, and every test case gives the same answer.

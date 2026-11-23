@@ -18,6 +18,9 @@
 //   - a project credited under V1.0 with no filed V1.0 fNRB on the record: the ask for it.
 // It also checks that both stylesheets are in the packed files and reachable by their names, and it typechecks a
 // small file that imports the entry, the way a site's bundler reads the types.
+// The agent entry, `@waterbots/calvin/agent`, is loaded from the same packed files: it must export Calvin's two
+// tools, and his tool must run on a made-up project read from a made-up shared project record (J2, J3). Core's agent
+// map must load beside it in plain Node.
 // Exit codes: 0 all pass, 1 something is wrong, 2 the check could not run.
 import { execFileSync, execSync } from "node:child_process";
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
@@ -47,6 +50,8 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import * as S from "@waterbots/calvin/screen";
+import * as A from "@waterbots/calvin/agent";
+import { agentMap } from "@waterbots/core/agentMap";
 const project = (analysis) => ({
   name: "Invented test project", standards: [], technology: "CWS", country: "LSO",
   population: { mode: "people", served: 1200 }, analysis: { fnrbFiledV1: 0.3, ...analysis },
@@ -76,6 +81,12 @@ process.stdout.write(JSON.stringify({
     transitionReport: render({ ...project(monitored), creditedUnderV1: true }, {}, "report"),
     transitionNeedsFiling: render({ ...project({}), analysis: {}, creditedUnderV1: true }, {}),
   },
+  agent: (() => {
+    const record = { recordVersion: 1, facts: { population: { value: { mode: "people", served: 1200 }, source: { by: "person", note: "invented" } } }, pathways: {}, place: { country: { value: "LSO", source: { by: "person", note: "invented" } } }, agents: {} };
+    const p = A.calvinProjectFromRecord(record);
+    const run = A.computeScenarioTool.execute({ version: "paa", method: 1, countryIso: p.country, populationMode: p.population.mode, populationCount: p.population.served, litresPerPersonPerDay: 4, operationalDays: 347 });
+    return { names: Object.keys(A), tools: A.GS4GG_CARBON_TOOLS.map((t) => t.id), runs: typeof run.output?.result?.ER === "number" && agentMap({ place: "mcp", opened: "calvin" }).next.step === "work alone" };
+  })(),
   stylesheets: { "@waterbots/calvin/styles.css": found("@waterbots/calvin/styles.css"), "@waterbots/core/base.css": found("@waterbots/core/base.css") },
 }));
 `;
@@ -87,6 +98,9 @@ export const parts = [useCalculatorState, CalculatorLens, CalculatorWork, Report
 export const project: CalvinProject | null = null;
 export const transitioning: CalvinProject = { name: "invented", standards: [], creditedUnderV1: true };
 export { options };
+import { calvinProjectFromRecord, GS4GG_CARBON_TOOLS, type CalvinProject as AgentProject } from "@waterbots/calvin/agent";
+export const fromAgent: AgentProject = calvinProjectFromRecord({ recordVersion: 1, facts: {}, pathways: {}, place: {}, agents: {} });
+export const tools = GS4GG_CARBON_TOOLS;
 `;
 
 const TSCONFIG = {
@@ -110,6 +124,9 @@ export const EXPECT = {
   transitionNeedsFiling: { has: [FILED_ASK], lacks: [V2_ONLY, ...TRANSITION] },
 };
 export const NAMES = ["useCalculatorState", "CalculatorLens", "CalculatorWork", "ReportView", "VersionTabs"];
+/** What the agent entry must export, and Calvin's two tools. */
+export const AGENT_NAMES = ["GS4GG_CARBON_TOOLS", "computeScenarioTool", "calvinProjectFromRecord", "addCalvinFacts", "addCalvinResults", "CALVIN_COMMONS_CHOICES"];
+export const AGENT_TOOLS = ["calc/gs4gg-carbon.computeScenario", "calc/gs4gg-carbon.transitionWaterfall"];
 
 /** Compares what the installed entry rendered with what each view must show. Returns the problems found. */
 export function compare(run) {
@@ -124,6 +141,9 @@ export function compare(run) {
     for (const s of has) if (!html.includes(s)) problems.push(`${view}: missing ${s}`);
     for (const s of lacks) if (html.includes(s)) problems.push(`${view}: should not show ${s}`);
   }
+  for (const n of AGENT_NAMES) if (!run.agent?.names?.includes(n)) problems.push(`the agent entry does not export ${n}`);
+  if (JSON.stringify(run.agent?.tools) !== JSON.stringify(AGENT_TOOLS)) problems.push("the agent entry does not hold Calvin's two tools");
+  if (run.agent?.runs !== true) problems.push("Calvin's tool or the agent map did not run from the packed files");
   for (const [name, ok] of Object.entries(run.stylesheets ?? {})) if (!ok) problems.push(`stylesheet not found: ${name}`);
   if (Object.keys(run.stylesheets ?? {}).length !== 2) problems.push("the stylesheets were not checked");
   for (const e of run.typeErrors ?? ["the types were not checked"]) problems.push(`types: ${e}`);
@@ -187,7 +207,7 @@ export function main(out = console.log, err = console.error) {
   }
   const problems = compare(run);
   for (const p of problems) out(`check-screen-entry: ${p}`);
-  out(`check-screen-entry: ${Object.keys(EXPECT).length} views rendered from the packed files; ${problems.length} problem(s)`);
+  out(`check-screen-entry: ${Object.keys(EXPECT).length} views rendered and the agent entry loaded from the packed files; ${problems.length} problem(s)`);
   return problems.length === 0 ? 0 : 1;
 }
 

@@ -9,6 +9,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useReadOnlySeat } from "@waterbots/core/readOnly";
 import type { ModuleProject } from "@waterbots/core/project";
+import type { ProjectRecord } from "@waterbots/core/record";
+import { d3InputFromRecord, violetProjectFromRecord } from "../record.js";
 import { computeD3 } from "../d3/compute.js";
 import { AWAITING, D3_STATUS, type D3Input, type D3Option, type D3Result, type D3Slider, type D3Value, type D3View } from "../d3/types.js";
 
@@ -177,6 +179,12 @@ function patchNumber<K extends keyof D3Input>(input: D3Input, key: K, n: number 
 
 export interface D3ScreenProps {
   project?: ModuleProject;
+  /**
+   * THE SHARED PROJECT RECORD (J3). When a site passes it, it takes the place of `project`: the screen opens on people
+   * served as entered, the access level and the water the supply gave before the project, and follows them when the
+   * record changes. Facts the record does not hold stay awaited.
+   */
+  record?: ProjectRecord;
   /** Which view to start in. */
   view?: D3View;
   /** Lock the screen to one view (the open site locks to ex-ante). */
@@ -185,19 +193,25 @@ export interface D3ScreenProps {
   onChange?: (input: D3Input, result: D3Result) => void;
 }
 
-export default function D3Screen({ project, view = "ex-ante", lockView, onChange }: D3ScreenProps) {
+export default function D3Screen({ project: given, record, view = "ex-ante", lockView, onChange }: D3ScreenProps) {
   const readOnly = useReadOnlySeat();
-  const [input, setInput] = useState<D3Input>(() => seedD3Input(project, lockView ?? view));
+  const project = record !== undefined ? violetProjectFromRecord(record) : given;
+  const [input, setInput] = useState<D3Input>(() => (record !== undefined ? d3InputFromRecord(record, lockView ?? view) : seedD3Input(project, lockView ?? view)));
   const [error, setError] = useState<string | null>(null);
 
   // PEOPLE SERVED FOLLOW THE RECORD (0.5.0), as in Calvin. When the record's count arrives or changes after the
   // screen opens, the screen takes it. The record is the one place it is kept: this screen has no box for it.
-  const recordKey = JSON.stringify(recordPopulation(project) ?? null);
+  // With the shared record (J3), the access level and the water before the project follow it too, when it holds them.
+  const fromRecord = record !== undefined ? d3InputFromRecord(record, input.view) : undefined;
+  const recordKey = JSON.stringify([recordPopulation(project) ?? null, fromRecord?.accessLevel ?? null, fromRecord?.withoutProjectM3PerYear ?? null]);
   const lastRecordKey = useRef(recordKey);
   useEffect(() => {
     if (lastRecordKey.current === recordKey) return;
     lastRecordKey.current = recordKey;
-    update(followRecord(input, project));
+    const next = followRecord(input, project);
+    if (fromRecord?.accessLevel !== undefined) next.accessLevel = fromRecord.accessLevel;
+    if (fromRecord?.withoutProjectM3PerYear !== undefined) next.withoutProjectM3PerYear = fromRecord.withoutProjectM3PerYear;
+    update(next);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recordKey]);
 

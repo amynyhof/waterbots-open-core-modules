@@ -2,7 +2,7 @@
 # Her colour is Orchid, #A457D4 (ruling 2026-10-31).
 # Status is draft: nothing here claims a grade or a credential.
 agent: violet
-version: 0.1.0
+version: 0.2.0 # 2026-11-22 (J3, J9): reads and adds to the shared project record, and her prompt names each needed fact
 persona: violet
 colour: "#A457D4"
 role_prompt: prompt.md
