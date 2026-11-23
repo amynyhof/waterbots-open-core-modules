@@ -66,7 +66,7 @@ sites pin that file by its fingerprint. The first pinned version includes the sl
 | V15 | v1 proof and grading | The v1 release: a GitHub release that both sites pin. | V8, V14; the maintainer's approval. | Both sites run the same pinned file. The maintainer confirms the whole journey on the live sites, and the average question count is reported. |
 | V20 | Agent orchestration | [x] (Released: tag `calvin-violet-v0.5.0` on commit `1bce514`. The sites install it through 0.5.1, J1.) Calvin and Violet 0.5.0, one release for both sites. Calvin: the main credit tiles (tCO₂e a year) are a pinned header, whether or not a site sets `unpinFigureBlock`; the smaller figures sit right under them; the sliders and the calculation collapse. The controls panel holds only the site's own top and Calvin's buttons, the work surface ends with the calculation, and the report's note on how the figures were produced is one sentence shorter. A phone pass: rows wrap instead of squeezing. Violet: people served come from the project record, as Calvin takes them, and "Draft — pending expert review" shows on the screen and on every result. No sum changes. | V8. | Session C packs all three packages, runs the release check and makes the tag. One release holds all three files. After "release it", Session C pushes the tag and publishes the release. Both sites install it. |
 
-**Where things stand (2026-11-23):** The latest release is `calvin-violet-v0.5.1` (J1): Calvin 0.5.1, Violet 0.5.1 and core 0.1.2. Both sites still install it. Family 1, Agent orchestration, is open: its v1 scope is J1 to J9. The core pull request for J2, J3 and J4 (#46) and the agents pull request for Calvin and Violet (#49) are merged, not released yet. Finished steps are in the build log.
+**Where things stand (2026-11-23):** The latest release is `calvin-violet-v0.5.1` (J1): Calvin 0.5.1, Violet 0.5.1 and core 0.1.2. Both sites still install it. Family 1, Agent orchestration, is open: its v1 scope is J1 to J9. The core pull request for J2, J3 and J4 (#46), the agents pull request for Calvin and Violet (#49) and the one calculator screen (#52) are merged, not released yet. Finished steps are in the build log.
 
 **Sources still to find:** in the source sweep, M10.4.
 
@@ -167,8 +167,7 @@ their tasks, collect what they need, and report back to him. He helps with the n
     gets a package. Each agent's files come as a carry from the site that holds them.
   - Waits on: the carries; Phoebe's and Bridget's rulings; the rights check on every one of Bridget's data files; a
     ruling on the shared map key.
-  - One calculator screen (ruled by the maintainer on 2026-11-23). Design first: nothing is built in the packages
-    until the maintainer says go.
+  - One calculator screen (ruled by the maintainer on 2026-11-23).
     - One calculator screen for every calculator agent. What is done for Violet is done for Calvin, and the other
       way round.
     - Violet's screen gets header rows and hero numbers like Calvin's, where it makes sense: the same height, the
@@ -178,7 +177,12 @@ their tasks, collect what they need, and report back to him. He helps with the n
       helps keep the tools apart.
     - The same rule holds on the Free site and the Paid site, where the screens are slightly different. Violet's
       paid screen matches Calvin's paid screen, and her free screen matches his free screen.
-    - [!] Waits on the maintainer's go on the design proposal (Session C's report, 2026-11-23).
+    - Merged, not released yet (#52): all of the above, for Calvin and Violet. Violet has a report like Calvin's. Notes
+      go in the export on both sites: the person's own on the Paid site, the agent's on the Free site. Calvin's colour
+      is Tide until Reef ships. Still to come: each site passes the place, the Paid site saves the notes, and later
+      calculator agents follow the same screen.
+    - [!] Waits on the maintainer: whether the Agent Commons' and MCP's exports carry the agents' notes, and whether
+      the Paid site's export carries them too.
 - [ ] **J6.** Saving a screening into the paid site: the count of people served crosses over correctly, and the paid
       record never shows "people" as a unit nobody chose.
   - In this repo: the record keeps people served the way it was entered, as people or as households. It never fills in
