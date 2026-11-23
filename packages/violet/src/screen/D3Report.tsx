@@ -28,7 +28,7 @@ export interface D3ReportProps {
   /** The words for the volume's option and the view, as the screen shows them. */
   optionLabel: string;
   viewLabel: string;
-  /** The "Notes on values" table: the person's notes on the Paid site, Violet's on the Free site. */
+  /** The "Notes on values": the person's notes on the Paid site, and Violet's, each under its own label. */
   noteLines: readonly NoteLine[];
   /** When the export was made. Blank until then. */
   generatedAt: string;
@@ -116,7 +116,7 @@ export default function D3Report({ projectName, input, result, optionLabel, view
         ))}
       </ul>
 
-      <NotesOnValues lines={noteLines} />
+      <NotesOnValues lines={noteLines} agent="Violet" />
 
       <p>This is an estimate, not a checked result. Only an independent auditor checks a claim.</p>
       <p>{REPORT_WORDS.made}</p>

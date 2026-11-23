@@ -20,6 +20,7 @@ import {
   type ScenarioResult,
 } from "../engine";
 import { fnrbTableLabel, FNRB_ORIGIN } from "../screen/citations";
+import { calvinToolFacts, calvinTransitionFacts } from "./exportNotes";
 
 type TransitionWaterfall = ReturnType<typeof computeTransitionWaterfall>;
 
@@ -126,11 +127,12 @@ export const computeScenarioTool: AgentTool = makeCalculatorTool<ScenarioInput, 
   version: GS4GG_CALCULATOR_VERSION,
   description:
     "Compute GS4GG Safe Water emission reductions (tCO2e) for a project scenario, legacy (SDWS V1.0) " +
-    "or PAA v2.0. Deterministic — returns the ER plus a full provenance trail.",
+    "or PAA v2.0. Deterministic — returns the ER plus a full provenance trail, and blankOrAssumed: the values this run left blank or assumed.",
   inputSchema: SCENARIO_INPUT_SCHEMA,
   compute: computeScenario,
   parseInput: parseScenarioInput,
   extractSources: extractScenarioSources,
+  blankOrAssumed: (input, out) => calvinToolFacts(input, out.baselineMix),
 });
 
 /**
@@ -148,10 +150,11 @@ export const transitionWaterfallTool: AgentTool = makeCalculatorTool<ScenarioInp
     "rule update as its own line (the project's filed V1.0 fNRB vs the current standardised value; null when " +
     "no filed value is on the record), and the ordered drivers of the methodology transition itself (stove " +
     "efficiency η, discount placement, volume basis, leakage, DAF) with fNRB held equal. Deterministic. " +
-    "Use this to explain why the number changes between methodologies.",
+    "Use this to explain why the number changes between methodologies. Also returns blankOrAssumed: the values this run left blank or assumed.",
   inputSchema: SCENARIO_INPUT_SCHEMA,
   compute: computeTransitionWaterfall,
   parseInput: parseScenarioInput,
+  blankOrAssumed: calvinTransitionFacts,
   extractSources: (out) => [
     `legacy ER ${out.legacyER.toFixed(1)} → PAA ER ${out.paaER.toFixed(1)} (total delta ${out.delta.toFixed(1)} tCO₂e)`,
     out.fnrbRuleUpdate.impact != null

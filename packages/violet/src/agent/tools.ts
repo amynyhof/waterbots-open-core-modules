@@ -6,6 +6,7 @@ import { makeCalculatorTool } from "@waterbots/core/calculatorTool";
 import { checkD3Input, computeD3 } from "../d3/compute.js";
 import { D3_ENGINE_VERSION } from "../d3/defaults.js";
 import type { D3Input, D3Result } from "../d3/types.js";
+import { violetNoteFacts } from "../exportNotes.js";
 
 const D3_INPUT_SCHEMA: Record<string, unknown> = {
   type: "object",
@@ -63,11 +64,12 @@ export const computeD3Tool: AgentTool = makeCalculatorTool<D3Input, D3Result>({
   id: "calc/vwba-d3.computeD3",
   version: D3_ENGINE_VERSION,
   description:
-    "Works out the volumetric water benefit of a household or community water supply project, by VWBA 2.0's Volume Provided method (D-3). Returns every value with where it came from, the steps of the sum, notes, and what is still awaited.",
+    "Works out the volumetric water benefit of a household or community water supply project, by VWBA 2.0's Volume Provided method (D-3). Returns every value with where it came from, the steps of the sum, notes, what is still awaited, and blankOrAssumed: the values this run left blank or assumed.",
   inputSchema: D3_INPUT_SCHEMA,
   compute: computeD3,
   parseInput: parseD3Input,
   extractSources: d3Sources,
+  blankOrAssumed: (_input, result) => violetNoteFacts(result),
 });
 
 /** Violet's tools. */

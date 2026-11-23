@@ -8,6 +8,7 @@
  * output's provenance as `sources`. No arithmetic on methodology values lives here.
  */
 import type { AgentTool, AgentToolResult } from "./agent";
+import type { AgentNoteFact } from "./noteFacts.js";
 
 export interface CalculatorToolSpec<TInput, TOutput> {
   /** Tool id, e.g. "calc/gs4gg-carbon.computeScenario". */
@@ -25,6 +26,11 @@ export interface CalculatorToolSpec<TInput, TOutput> {
   extractSources: (output: TOutput) => string[];
   /** Optional: shape the output the model sees (defaults to the whole output). */
   projectOutput?: (output: TOutput) => unknown;
+  /**
+   * Optional: the values this run left blank or assumed, as facts (J5). The tool adds them to its output as
+   * `blankOrAssumed`, so at MCP, where there is no export, the visitor's own AI can say them in its own words.
+   */
+  blankOrAssumed?: (input: TInput, output: TOutput) => AgentNoteFact[];
 }
 
 export function makeCalculatorTool<TInput, TOutput>(
@@ -38,8 +44,9 @@ export function makeCalculatorTool<TInput, TOutput>(
     execute(raw: unknown): AgentToolResult {
       const input = spec.parseInput(raw);
       const output = spec.compute(input);
+      const shown = spec.projectOutput ? spec.projectOutput(output) : output;
       return {
-        output: spec.projectOutput ? spec.projectOutput(output) : output,
+        output: spec.blankOrAssumed ? { ...(shown as object), blankOrAssumed: spec.blankOrAssumed(input, output) } : shown,
         sources: spec.extractSources(output),
         meta: { calculatorVersion: spec.version },
       };

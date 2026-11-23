@@ -30,7 +30,9 @@ VWBA is a way to count the water a project gives back.
 The water and carbon calculators sit side by side. They are never added together. Whether one project may claim
 both is an open question (N14 in `BUILD_PLAN.md`).
 
-## Changes since 0.5.1 (not released yet)
+## Changes in 0.6.0
+
+From 0.6.0 Calvin and Violet each have their own release. Violet needs `@waterbots/core` 0.2.0.
 
 - **The shared project record (J3).** `d3InputFromRecord` reads people served as entered, the access level and the
   water before the project. `violetNeeds` lists what the record still lacks. `addVioletFacts` adds what the person
@@ -47,8 +49,11 @@ both is an open question (N14 in `BUILD_PLAN.md`).
   - **Sliders or typed boxes**, as on Calvin's screens: the Free site keeps sliders; the Paid site gets typed boxes
     before the project runs. `exAnteSliders` lets a site choose.
   - **Notes on values.** On the Paid site every value takes the person's note, from `record.agents.violet.notes` (or
-    `notes`), and `onNotesChange` hands them back. On the Free site there is no note box: her report carries her own
-    notes on the values still blank or assumed (`violetAgentNoteLines`).
+    `notes`), and `onNotesChange` hands them back. Her report on the Paid site, the Free site and in the Agent Commons
+    carries her own notes on the values still blank or assumed (`violetAgentNoteLines`). The Paid site's report
+    shows both kinds of note, each under its own label. The Free site and the Agent Commons have no note box.
+  - **Her tool says which values are blank or assumed.** Its output gains `blankOrAssumed`: a key, a name and "blank"
+    or "assumed" for each, as facts. At MCP there is no export, so the visitor's own AI says them.
   - **Her report.** "Export (PDF)" prints her report alone, as Calvin's does. `hideExportButton` and `onExport` work
     as his do.
   - **Her colour, Orchid,** on the header card, through the shared `--agent` name. A site with a fixed top bar sets
@@ -56,8 +61,9 @@ both is an open question (N14 in `BUILD_PLAN.md`).
   - Her engine's own note on a value now sits under its source.
 - No sum changed.
 
-**What a site should change (J5).** Pass `place`. The Free site passes `hideExportButton`, as it does for Calvin, if it
-has its own export, and puts `violetAgentNoteLines` in it. The Paid site keeps the notes on the record.
+**What a site should change (J5).** Install `@waterbots/core` 0.2.0 with it. Pass `place`. A site with its own export
+passes `hideExportButton`, as it does for Calvin, and puts her notes (`violetAgentNoteLines`) in it under
+`agentNotesLabel("Violet")`, from `@waterbots/core/notes`. The Paid site keeps the person's notes on the record.
 
 ## Changes in 0.5.1
 

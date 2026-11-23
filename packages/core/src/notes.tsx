@@ -6,15 +6,20 @@
 // - The Paid site: the person writes a note on a value, to give context to their number. The "Your note" column and
 //   the "Notes on values" table show there. A read-only seat sees the notes and cannot write them. An agent never
 //   writes in the person's note box.
-// - The Free site's screening: there is no note box. The export carries the agent's notes instead: one for each
+// - The export on the Paid site, the Free site and the Agent Commons also carries the agent's notes: one for each
 //   value that is still blank or assumed. Core gives only the fact; each agent says it in its own words, and states
-//   no new number (agent rule 7).
-// - The Agent Commons and MCP: no note box, and no notes yet. That waits for the maintainer.
+//   no new number (agent rule 7). The Free site and the Agent Commons have no note box.
+// - Each kind of note has its own labelled table, so nobody takes an agent's note for the person's words.
+// - MCP: no note box and no export. The agent's tool gives the facts (`calculatorTool.ts`), and the visitor's own AI
+//   says them in its own words.
 
 import { createContext, useContext, useState, type ReactNode } from "react";
 import type { Place } from "./places.js";
+import type { NoteBy, NoteLine } from "./noteFacts.js";
 import type { ValueNotes } from "./record.js";
 import { useReadOnlySeat } from "./readOnly.js";
+
+export type { AgentNoteFact, NoteBy, NoteLine, NoteStanding } from "./noteFacts.js";
 
 /** The words the note parts show. The same on every calculator screen. */
 export const NOTE_WORDS = {
@@ -28,40 +33,37 @@ export const NOTE_WORDS = {
   value: "Value",
   amount: "Amount",
   note: "Note",
+  /** The label over the notes a person wrote. The agent's is `agentNotesLabel`. */
+  byPerson: "Notes written by a person",
 } as const;
 
-/** Whose notes a place shows: the person's on the Paid site, the agent's in the Free site's export, or none. */
+/** The label over the agent's notes: the agent's name, so nobody takes them for the person's words. */
+export function agentNotesLabel(agent: string): string {
+  return `Notes added by ${agent}, a WaterBots agent`;
+}
+
+/**
+ * Which notes a place shows. "person": the person writes notes on the screen, and the export carries theirs and the
+ * agent's. "agent": no note box, and the export carries the agent's. Null: no notes.
+ */
 export type NotesKind = "person" | "agent" | null;
 
 export function notesAt(place: Place | undefined): NotesKind {
   if (place === "paid-site") return "person";
-  if (place === "free-site") return "agent";
+  if (place === "free-site" || place === "agent-commons") return "agent";
   return null;
 }
 
-/** A value an agent's note is about: still blank, or assumed. A fact only: the agent words the note itself. */
-export type NoteStanding = "blank" | "assumed";
-
-export interface AgentNoteFact {
-  key: string;
-  label: string;
-  standing: NoteStanding;
-}
-
-/** One line of the export's "Notes on values" table. */
-export interface NoteLine {
-  key: string;
-  label: string;
-  /** The value as the screen shows it; empty when it is blank. */
-  amount: string;
-  text: string;
+/** The export's notes at a place: the person's first, then the agent's. Each is left out where the place has none. */
+export function exportNoteLines(kind: NotesKind, person: readonly NoteLine[], agent: readonly NoteLine[]): NoteLine[] {
+  return [...(kind === "person" ? person : []), ...(kind !== null ? agent : [])];
 }
 
 /** The person's notes as lines for the export, in the order of the values given. A value with no note is left out. */
 export function personNoteLines(notes: ValueNotes, values: ReadonlyArray<{ key: string; label: string; amount: string }>): NoteLine[] {
   return values.flatMap((v) => {
     const n = notes[v.key];
-    return n === undefined ? [] : [{ key: v.key, label: v.label, amount: v.amount, text: n.text }];
+    return n === undefined ? [] : [{ key: v.key, label: v.label, amount: v.amount, text: n.text, by: "person" as const }];
   });
 }
 
@@ -70,7 +72,7 @@ export function personNoteLines(notes: ValueNotes, values: ReadonlyArray<{ key: 
  * listed in one place. The amount is left empty: the report shows every value's amount in its own tables.
  */
 export function labelledNoteLines(notes: ValueNotes): NoteLine[] {
-  return Object.entries(notes).map(([key, n]) => ({ key, label: n.label ?? key, amount: "", text: n.text }));
+  return Object.entries(notes).map(([key, n]) => ({ key, label: n.label ?? key, amount: "", text: n.text, by: "person" }));
 }
 
 // ── The note box on the screen ──────────────────────────────────────────────────────────────────────────────────
@@ -164,14 +166,31 @@ const noteButton = {
 
 // ── The export's table ──────────────────────────────────────────────────────────────────────────────────────────
 
-/** The export's "Notes on values" table. Nothing when there are no lines. */
-export function NotesOnValues({ lines }: { lines: readonly NoteLine[] }) {
+/**
+ * The export's "Notes on values": the person's notes and the agent's, each in its own table under its own label.
+ * `agent` is the agent's name. Nothing when there are no lines.
+ */
+export function NotesOnValues({ lines, agent }: { lines: readonly NoteLine[]; agent: string }) {
   if (lines.length === 0) return null;
-  const withAmount = lines.some((l) => l.amount !== "");
-  const heads = withAmount ? [NOTE_WORDS.value, NOTE_WORDS.amount, NOTE_WORDS.note] : [NOTE_WORDS.value, NOTE_WORDS.note];
   return (
     <section data-notes-on-values="">
       <h2 style={{ fontSize: 13, marginTop: 16, marginBottom: 6 }}>{NOTE_WORDS.heading}</h2>
+      <NotesTable by="person" title={NOTE_WORDS.byPerson} lines={lines} />
+      <NotesTable by="agent" title={agentNotesLabel(agent)} lines={lines} />
+    </section>
+  );
+}
+
+const noteCell = { padding: "3px 6px", borderBottom: "1px solid var(--line)", verticalAlign: "top" } as const;
+
+function NotesTable({ by, title, lines }: { by: NoteBy; title: string; lines: readonly NoteLine[] }) {
+  const own = lines.filter((l) => l.by === by);
+  if (own.length === 0) return null;
+  const withAmount = own.some((l) => l.amount !== "");
+  const heads = withAmount ? [NOTE_WORDS.value, NOTE_WORDS.amount, NOTE_WORDS.note] : [NOTE_WORDS.value, NOTE_WORDS.note];
+  return (
+    <div data-notes-by={by}>
+      <h3 style={{ fontSize: 11.5, fontWeight: 600, marginTop: 8, marginBottom: 4 }}>{title}</h3>
       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 10.5 }}>
         <thead>
           <tr>
@@ -183,15 +202,15 @@ export function NotesOnValues({ lines }: { lines: readonly NoteLine[] }) {
           </tr>
         </thead>
         <tbody>
-          {lines.map((l) => (
+          {own.map((l) => (
             <tr key={l.key} data-note-line={l.key}>
-              <td style={{ padding: "3px 6px", borderBottom: "1px solid var(--line)", verticalAlign: "top" }}>{l.label}</td>
-              {withAmount ? <td style={{ padding: "3px 6px", borderBottom: "1px solid var(--line)", verticalAlign: "top", whiteSpace: "nowrap" }}>{l.amount}</td> : null}
-              <td style={{ padding: "3px 6px", borderBottom: "1px solid var(--line)", verticalAlign: "top" }}>{l.text}</td>
+              <td style={noteCell}>{l.label}</td>
+              {withAmount ? <td style={{ ...noteCell, whiteSpace: "nowrap" }}>{l.amount}</td> : null}
+              <td style={noteCell}>{l.text}</td>
             </tr>
           ))}
         </tbody>
       </table>
-    </section>
+    </div>
   );
 }

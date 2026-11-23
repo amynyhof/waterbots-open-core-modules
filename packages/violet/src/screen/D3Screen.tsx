@@ -8,8 +8,9 @@
 // with the same look: a header card that stays at the top (her hero number in a tile like his, three smaller
 // figures and a source line), a sentence under it, then parts that fold: the project facts, the anticipated
 // performance, the calculation step by step, and what must be true for the method. Her colour, Orchid, shows on the
-// header. On the Paid site every value takes the person's note, and the report lists them. On the Free site there is
-// no note box: the report carries her own notes on the values still blank or assumed.
+// header. On the Paid site every value takes the person's note, and the report lists them. The report there, on the
+// Free site and in the Agent Commons also carries her own notes on the values still blank or assumed, under their own
+// label. Those two have no note box.
 //
 // Water only. This screen never shows a carbon figure, and never a total of water and carbon (open item N14).
 
@@ -18,7 +19,7 @@ import { useReadOnlySeat } from "@waterbots/core/readOnly";
 import type { ModuleProject } from "@waterbots/core/project";
 import type { Place } from "@waterbots/core/places";
 import { withNote, type ProjectRecord, type ValueNotes } from "@waterbots/core/record";
-import { notesAt, personNoteLines, RowNote, ValueNotesProvider, type NoteLine } from "@waterbots/core/notes";
+import { exportNoteLines, notesAt, personNoteLines, RowNote, ValueNotesProvider, type NoteLine } from "@waterbots/core/notes";
 import { d3InputFromRecord, violetProjectFromRecord } from "../record.js";
 import { violetAgentNoteLines } from "../exportNotes.js";
 import { computeD3 } from "../d3/compute.js";
@@ -297,8 +298,9 @@ export interface D3ScreenProps {
   onChange?: (input: D3Input, result: D3Result) => void;
   /**
    * WHERE VIOLET IS WORKING (J2; agent rule 21). On the Paid site the values take the person's notes, and before the
-   * project runs the anticipated values are typed boxes, as on Calvin's paid screen. On the Free site there is no note
-   * box, the values are sliders, and the report carries her own notes. Left out: sliders and no notes, as before.
+   * project runs the anticipated values are typed boxes, as on Calvin's paid screen. On the Free site and in
+   * the Agent Commons there is no note box, and the values are sliders. On all three the report carries her own notes.
+   * Left out: sliders and no notes, as before.
    */
   place?: Place;
   /**
@@ -414,11 +416,11 @@ export default function D3Screen({
   const defaults = result.values.filter((v) => v.origin === "default").length;
   const assumed = result.values.filter((v) => v.origin === "assumed").length;
   const showsPersonNotes = notesKind === "person";
-  const noteLines: NoteLine[] = showsPersonNotes
-    ? personNoteLines(notes, result.values.map((v) => ({ key: v.key, label: v.label, amount: amountOf(v) })))
-    : notesKind === "agent"
-      ? violetAgentNoteLines(result)
-      : [];
+  const noteLines: NoteLine[] = exportNoteLines(
+    notesKind,
+    personNoteLines(notes, result.values.map((v) => ({ key: v.key, label: v.label, amount: amountOf(v) }))),
+    violetAgentNoteLines(result),
+  );
   const headline = (
     <span data-headline="">
       {SCREEN_WORDS.headline} <b>{shown(vwb)}</b> {vwb !== null ? "m³" : ""}
