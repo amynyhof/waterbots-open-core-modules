@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 
 import { ReadOnlySeat } from "../../core/readOnly";
+import { ValueNotesProvider } from "@waterbots/core/notes";
 import EquationStack from "./EquationStack";
 import ExAntePanel from "./ExAntePanel";
 import { CalculatedTag, InRowNum, TagLegend, WithEqNums } from "./EquationStack";
@@ -316,6 +317,19 @@ export default function CalculatorWork({
     );
   }
 
+  /**
+   * NOTES ON VALUES (J5, ruling 2026-11-23). On the Paid site every value row and equation row carries the person's
+   * note box (`RowNote`). A read-only seat sees the notes and cannot write them. Elsewhere the rows show no box.
+   */
+  const withNotes = (node: ReactNode) =>
+    calc.notesKind === "person" ? (
+      <ValueNotesProvider notes={calc.valueNotes} {...(readOnly ? {} : { onChange: calc.setValueNote })}>
+        {node}
+      </ValueNotesProvider>
+    ) : (
+      node
+    );
+
   /** The smaller figures, right under the main credit tiles. */
   const figureBlock = (
     <section className="rounded-lg border border-line bg-card shadow-sm" style={{ padding: "14px 20px" }} data-figure-numbers="">
@@ -354,7 +368,7 @@ export default function CalculatorWork({
   return (
     <ReadOnlySeat readOnly={readOnly}>
       {/* ── Calculator tab ── */}
-      {tab === "calculator" ? (
+      {tab === "calculator" ? withNotes(
         <>
           {/* THE PINNED HEADER (0.5.0). The main credit figures, the V1.0 and V2.0 tiles in tCO₂e a year, stay at the
               top while the reader scrolls, whatever the site sets. The smaller figures sit right under them: pinned
@@ -403,7 +417,7 @@ export default function CalculatorWork({
               <EquationStack result={result} state={state} patch={patch} canonPopulation={project.population?.served} seed={seed} sliders={calc.sliders} tables={calc.tables} screening={calc.exAnteOnly} />
             </div>
           </details>
-        </>
+        </>,
       ) : null}
 
       {/* ── A tab the host owns (the paid site's transition checklist) ── */}
@@ -449,6 +463,7 @@ export default function CalculatorWork({
           creditingPeriodYears={creditingPeriodYears}
           slots={report}
           tables={calc.tables}
+          noteLines={calc.noteLines}
         />
       </div>
     </ReadOnlySeat>

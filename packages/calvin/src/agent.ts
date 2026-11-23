@@ -17,6 +17,7 @@ export {
 export { CALVIN_COMMONS_CHOICES, commonsChoiceFacts, showsCommonsChoices } from "./modules/calvin/agent/commons.js";
 export type { CommonsChoice, CommonsChoiceId } from "./modules/calvin/agent/commons.js";
 export { calculatorPageContext } from "./modules/calvin/agent/pageContext.js";
+export { calvinAgentNoteLines, calvinNoteFacts, calvinNoteText } from "./modules/calvin/agent/exportNotes.js";
 export type { PageContextInput } from "./modules/calvin/agent/pageContext.js";
 export type { CalvinProject } from "./modules/calvin/screen/state.js";
 export type { SavedAnalysis } from "./modules/calvin/screen/analysis.js";

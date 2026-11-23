@@ -33,7 +33,8 @@ describe("2. a missing value is a blank box, with no label", () => {
   });
   it("leaves the value, its tag and its note blank", () => {
     const row = views[0]!.slice(views[0]!.indexOf('data-value="withoutProjectM3PerYear"'));
-    expect(row).toMatch(/^data-value="withoutProjectM3PerYear"><th scope="row">[^<]*<\/th><td> <\/td><td data-origin="true"><\/td><td data-source="true">[^<]*<\/td><td data-note="true"><\/td>/);
+    expect(row).toMatch(/^data-value="withoutProjectM3PerYear"><th scope="row">[^<]*<\/th><td> <\/td><td data-origin="true"><\/td><td data-source="true">[^<]*<\/td><\/tr>/);
+    // J5: the engine's own note sits under the source, and a blank value has none.
   });
   it("never counts a blank as zero: no benefit until the water before the project is given", () => {
     const r = computeD3({ view: "ex-ante", option: "beneficiaries", population: { mode: "people", served: 1200 }, accessLevel: "full", daysOfAccessPerYear: 365 });

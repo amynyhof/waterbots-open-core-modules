@@ -10,7 +10,8 @@ describe("the D-3 screen", () => {
     const html = renderToStaticMarkup(<D3Screen project={project} />);
     expect(html).toMatch(/type="range"/);
     expect(html).not.toMatch(/awaiting/i);
-    expect(html).toContain('<tr data-value="accessLevel"><th scope="row">Full or limited access</th><td> </td><td data-origin="true"></td><td data-source="true">the project record</td><td data-note="true"></td>');
+    expect(html).toContain('<tr data-value="accessLevel"><th scope="row">Full or limited access</th><td> </td><td data-origin="true"></td><td data-source="true">the project record</td></tr>');
+    // J5: the engine's own note on a value sits under its source; a blank value has none.
     expect(html).toMatch(/Table D3\.3, p\.46/);
   });
 

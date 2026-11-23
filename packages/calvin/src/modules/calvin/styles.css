@@ -38,17 +38,23 @@
    --calvin-pin-bg to its own page colour. Sticky needs every element between the header and the scrolling area to
    leave overflow visible. */
 .calvin-pin {
+  /* THE AGENT'S COLOUR (J5, one calculator screen). Every calculator screen sets --agent to its agent's own token:
+     Tide for Calvin now, Reef when Reef ships. It shows as a thin top edge and a faint wash on the header. */
+  --agent: var(--tide, #0e7c86);
+  --calvin-pin-wash: linear-gradient(180deg, color-mix(in oklab, var(--agent) 7%, var(--calvin-pin-bg, var(--card, #fff))) 0, var(--calvin-pin-bg, var(--card, #fff)) 64px);
   position: sticky;
   top: var(--calvin-pin-top, 0px);
   z-index: 10;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding-bottom: 8px;
-  background: var(--calvin-pin-bg, var(--card, #fff));
+  padding: 8px 8px 8px;
+  border-top: 3px solid var(--agent);
+  border-radius: 10px 10px 0 0;
+  background: var(--calvin-pin-wash);
   box-shadow: 0 1px 0 var(--line, #d9e0e3);
 }
-.calvin-pin-main { background: var(--calvin-pin-bg, var(--card, #fff)); }
+.calvin-pin-main { background: transparent; }
 /* On a phone only the tiles stay pinned, so the header never fills the screen. The smaller figures scroll. */
 @media (max-width: 639px) {
   .calvin-pin { display: contents; }
@@ -56,7 +62,10 @@
     position: sticky;
     top: var(--calvin-pin-top, 0px);
     z-index: 10;
-    padding-bottom: 6px;
+    padding: 6px 6px 6px;
+    border-top: 3px solid var(--agent);
+    border-radius: 10px 10px 0 0;
+    background: var(--calvin-pin-wash);
     box-shadow: 0 1px 0 var(--line, #d9e0e3);
   }
 }

@@ -9,4 +9,5 @@ export const D_METHODS = ["D-3"] as const;
 export * from "./engine.js";
 export * from "./doors.js";
 export * from "./record.js";
+export * from "./exportNotes.js";
 export { computeD3Tool, d3Sources, parseD3Input, VIOLET_TOOLS } from "./agent/tools.js";

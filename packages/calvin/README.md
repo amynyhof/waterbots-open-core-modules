@@ -93,7 +93,17 @@ The build bundles the entry into one file, `dist/agent.js`. `@waterbots/core` st
 - **His place (J2).** The `place` option, and the agent entry above. In the Agent Commons and at MCP he is told there
   is no record.
 - **A count below zero on the record (W1).** Calvin is told it is wrong, not missing. The screen's words are unchanged.
+- **One calculator screen (J5).** Calvin's screen and Violet's now match.
+  - **Notes on values.** On the Paid site (`place: "paid-site"`) every value row and equation row takes the person's
+    note, and the report lists them under "Notes on values". A read-only seat sees them and cannot write. The site
+    passes `notes` (the record's `agents.calvin.notes`) and `onNotesChange`, and saves the notes with the record.
+  - **Free site:** no note box. The report carries Calvin's own notes on the values still blank or assumed
+    (`calvinAgentNoteLines`, also for a site with its own export).
+  - **His colour** on the header card, through the shared `--agent` name: Tide for now.
 - No sum changed.
+
+**What a site should change (J5).** Pass `place`. The Paid site passes `notes` and `onNotesChange`, and keeps the notes
+on the record. The Free site puts `calvinAgentNoteLines` in its own export, if it has one.
 
 ## Changes in 0.5.1
 
