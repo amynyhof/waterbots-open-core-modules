@@ -5,6 +5,7 @@ history keeps everything older and every longer entry.
 
 ---
 
+- 2026-11-23 — One calculator screen: Violet's screen matches Calvin's, notes on values, each agent's colour (#52).
 - 2026-11-23 — Family 1 agents: Calvin and Violet read and add to the shared record, and take their place (#49).
 - 2026-11-22 — Family 1 core: the shared project record, the label list, the places and the agent map (#46).
 - 2026-11-22 — **Release** `calvin-violet-v0.5.1` on `b29c124`: Calvin 0.5.1, Violet 0.5.1 and core 0.1.2, with the lobby chat line as rewritten (#45, #47). **Carry:** packed to the handoff folder.
