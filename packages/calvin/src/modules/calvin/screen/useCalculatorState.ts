@@ -16,7 +16,7 @@ import {
 import { calculatorPageContext } from "../agent/pageContext";
 import { calvinRecordProblems } from "../agent/record";
 import type { Place } from "@waterbots/core/places";
-import { labelledNoteLines, notesAt, type NoteLine, type NotesKind } from "@waterbots/core/notes";
+import { exportNoteLines, labelledNoteLines, notesAt, type NoteLine, type NotesKind } from "@waterbots/core/notes";
 import { withNote, type ValueNotes } from "@waterbots/core/record";
 import { calvinAgentNoteLines } from "../agent/exportNotes";
 import type { SavedAnalysis } from "./analysis";
@@ -127,8 +127,9 @@ export interface CalculatorOptions {
   /**
    * THE PERSON'S NOTES ON CALVIN'S VALUES (J5, ruling 2026-11-23), as the project record keeps them
    * (`agents.calvin.notes`). On the Paid site (`place: "paid-site"`) every value row gets a note box, and the report
-   * lists the notes. A read-only seat sees them and cannot write. On the Free site there is no note box: the report
-   * carries Calvin's own notes on the values still blank or assumed. Elsewhere, no notes yet.
+   * lists the notes. A read-only seat sees them and cannot write. The report there, on the Free site and in the Agent
+   * Commons also carries Calvin's own notes on the values still blank or assumed, under their own label. Those two
+   * have no note box. Elsewhere, no notes.
    */
   notes?: ValueNotes;
   /** Told the notes after each change, so the host keeps them on the record and saves them when the person saves. */
@@ -159,7 +160,10 @@ export interface CalculatorState {
   valueNotes: ValueNotes;
   /** Writes the person's note on a value; an empty text removes it. **Inert when `readOnly`.** */
   setValueNote: (key: string, text: string, label: string) => void;
-  /** The lines of the report's "Notes on values" table: the person's notes, or Calvin's, as the place gives. */
+  /**
+   * The lines of the report's "Notes on values": the person's notes and Calvin's (`by`), as the place gives. A site
+   * with its own export puts these in it, under each kind's label.
+   */
   noteLines: NoteLine[];
 
   /* ── Working inputs ─────────────────────────────────────────────────────── */
@@ -451,7 +455,11 @@ export function useCalculatorState(project: CalvinProject, options: CalculatorOp
     setValueNotes(next);
     options.onNotesChange?.(next);
   };
-  const noteLines = notesKind === "person" ? labelledNoteLines(valueNotes) : notesKind === "agent" ? calvinAgentNoteLines(state) : [];
+  const noteLines = exportNoteLines(
+    notesKind,
+    labelledNoteLines(valueNotes),
+    calvinAgentNoteLines(state, { sliders: showSliders(exAnteSliders, state), result }),
+  );
 
   const pageContext = () =>
     calculatorPageContext({ projectName: project.name, state, missingFacts, activityAsk, missingMonitoring: monitoringAsk, fnrbRefusal, filedFnrbRefusal, transition, result, legacyResult, paaResult, waterfall, recordProblems: calvinRecordProblems(project), ...(options.place !== undefined ? { place: options.place } : {}) });

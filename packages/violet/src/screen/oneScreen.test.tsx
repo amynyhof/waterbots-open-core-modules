@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { emptyRecord, setValueNote, type ProjectRecord } from "@waterbots/core/record";
-import { NOTE_WORDS } from "@waterbots/core/notes";
+import { agentNotesLabel, NOTE_WORDS } from "@waterbots/core/notes";
 import { ReadOnlySeat } from "@waterbots/core/readOnly";
 import D3Screen, { SCREEN_WORDS, type D3ScreenProps } from "./D3Screen.js";
 import { REPORT_WORDS } from "./D3Report.js";
@@ -102,7 +102,25 @@ describe("notes on values", () => {
     expect(screen).toContain(NOTE_WORDS.add);
     expect(report).toContain(NOTE_WORDS.heading);
     expect(report).toContain("Counted at a made-up site visit.");
-    expect(report).not.toContain("will likely change");
+  });
+
+  it("the Paid site's export shows both kinds, the person's under their label and hers under hers", () => {
+    const { report } = parts(render({ record: noted(), place: "paid-site" }));
+    const at = report.indexOf('data-notes-by="agent"');
+    const person = report.slice(report.indexOf('data-notes-by="person"'), at);
+    const agent = report.slice(at);
+    expect(person).toContain(NOTE_WORDS.byPerson);
+    expect(person).toContain("Counted at a made-up site visit.");
+    expect(person).not.toContain("will likely change");
+    expect(agent).toContain(agentNotesLabel("Violet"));
+    expect(agent).toContain("Days of access in a year is an assumed value for now.");
+    expect(agent).not.toContain("Counted at a made-up site visit.");
+  });
+
+  it("after the project runs, the Paid site's export still notes a value left blank", () => {
+    const { report } = parts(render({ record: noted(), place: "paid-site", view: "ex-post", lockView: "ex-post" }));
+    expect(report).toContain(agentNotesLabel("Violet"));
+    expect(report).toContain("has not been given yet");
   });
 
   it("a read-only seat sees the notes and cannot write them", () => {
@@ -121,8 +139,19 @@ describe("notes on values", () => {
     expect(report).not.toContain("Counted at a made-up site visit.");
   });
 
-  it("the Agent Commons, MCP and a site that names no place: no notes yet", () => {
-    for (const place of ["agent-commons", "mcp", undefined] as const) {
+  it("the Agent Commons: no note box, and the export carries her own notes, as on the Free site", () => {
+    const notesOf = (place: "agent-commons" | "free-site") => {
+      const { screen, report } = parts(render({ record: noted(), place, lockView: "ex-ante" }));
+      expect(screen).not.toContain("data-row-note");
+      expect(report).not.toContain(NOTE_WORDS.byPerson);
+      return report.slice(report.indexOf("data-notes-on-values"), report.indexOf("This is an estimate"));
+    };
+    expect(notesOf("agent-commons")).toContain(agentNotesLabel("Violet"));
+    expect(notesOf("agent-commons")).toBe(notesOf("free-site"));
+  });
+
+  it("MCP and a site that names no place: no notes on the screen or in its export", () => {
+    for (const place of ["mcp", undefined] as const) {
       const html = render({ record: noted(), ...(place ? { place } : {}) });
       expect(html).not.toContain("data-row-note");
       expect(html).not.toContain(NOTE_WORDS.heading);
@@ -136,6 +165,8 @@ describe("notes on values", () => {
     const facts = violetNoteFacts(r);
     expect(facts).toContainEqual({ key: "accessLevel", label: "Full or limited access", standing: "blank" });
     expect(facts.every((f) => r.values.find((v) => v.key === f.key)?.kind !== "result")).toBe(true);
+    // A cited default nobody gives is not noted; the access level that chooses it is.
+    expect(facts.map((f) => f.key)).not.toContain("litresPerPersonPerDayDefault");
     for (const line of violetAgentNoteLines(r)) expect(line.text).not.toMatch(/\d/);
     expect(violetNoteText({ key: "x", label: "Something", standing: "blank" }, false)).toBe(
       "Something has not been given yet, so the water benefit cannot be worked out. Once it is known, it can be.",

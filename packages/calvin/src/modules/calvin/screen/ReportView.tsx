@@ -229,8 +229,8 @@ export default function ReportView({
   /** The site's own country tables (V13), from `useCalculatorState`; they give a site-only country its name. */
   tables?: SiteTables;
   /**
-   * The "Notes on values" table (J5): the person's notes on the Paid site, Calvin's notes on the values still blank
-   * or assumed on the Free site (`useCalculatorState`'s `noteLines`). Empty: no table.
+   * The "Notes on values" (J5): the person's notes on the Paid site, and Calvin's notes on the values still blank or
+   * assumed, each under its own label (`useCalculatorState`'s `noteLines`). Empty: nothing shows.
    */
   noteLines?: NoteLine[];
 }) {
@@ -813,7 +813,7 @@ export default function ReportView({
       {slots.afterFallbacks}
 
       {/* ── Notes on values (J5) ── */}
-      <NotesOnValues lines={noteLines} />
+      <NotesOnValues lines={noteLines} agent="Calvin" />
 
       {/* ── How these figures were produced — credentials, process only (before the footer) ── */}
       <H>How these figures were produced</H>

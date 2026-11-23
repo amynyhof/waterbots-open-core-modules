@@ -11,9 +11,12 @@ What is in `src/`:
 - `agent.ts` and `calculatorTool.ts`: the agent contract, and the helper that turns a calculator into an agent tool.
 - `record.ts`: the shared project record (J3): its shape, and the fact check a site runs where a fact is entered. A count below zero is refused. An agent adds only the facts the record lacks, each one counted as a question it asked, and writes its results to its own part. Not part of the seed.
 - `notes.tsx`: notes on values (J5, one calculator screen). The person's note box and the export's "Notes on values"
-  table, shared by every calculator screen. The person's notes live on the record, in each agent's own part. On the
-  Paid site the person writes them; on the Free site the export carries the agent's notes instead. Not part of the
-  seed.
+  tables, shared by every calculator screen. The person's notes live on the record, in each agent's own part. On the
+  Paid site the person writes them, and the export carries both the person's notes and the agent's, each under its own
+  label. On the Free site and in the Agent Commons there is no note box, and the export carries the agent's. Not part
+  of the seed.
+- `noteFacts.ts`: the shapes behind those notes, with no React. A calculator tool can return the values a run left
+  blank or assumed (`blankOrAssumed`), as facts, for a place with no export (MCP). Not part of the seed.
 - `technologyLabels.ts`: the one list that turns each site's technology label into the record's code. Not part of the seed.
 - `places.ts`: the four doors of agent rule 21, and the lobby chat, which is not a door. Not part of the seed.
 - `agentMap.ts`: the agent map (J4). It reads the record and the place, and says which agents are called, which method applies and the one next step. It gives codes, never words, and does no sums. Not part of the seed.
@@ -22,6 +25,6 @@ What is in `src/`:
 
 Since the seed landed, this repo is its home. Changes are made here, by pull request. `scripts/check-seed.mjs` proves what arrived against the commit where the seed landed, so later changes are allowed.
 
-- React is an optional peer. Only `SaveNotice.tsx` and `readOnly.tsx` use it.
-- Version 0.1.2: it ships `agent-rules.md`, the agent rules file. Nothing else changed but comments. Not published. Nothing in this repo goes to npm yet; the package is marked `private`.
+- React is an optional peer. Only `SaveNotice.tsx`, `readOnly.tsx` and `notes.tsx` use it.
+- Version 0.2.0: it adds the shared project record and its fact check, the label list, the places, the agent map, and notes on values. `base.css` adds `--agent`, the colour of the agent whose screen it is. Nothing is removed. 0.1.2 shipped `agent-rules.md`, the agent rules file. Not published. Nothing in this repo goes to npm yet; the package is marked `private`.
 - Apache License 2.0. See `LICENSE` and `NOTICE` in this folder.

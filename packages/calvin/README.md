@@ -86,7 +86,9 @@ A site tells the screens where Calvin is working with `place` (`"free-site"`, `"
 The build bundles the entry into one file, `dist/agent.js`. `@waterbots/core` stays outside it.
 `scripts/check-screen-entry.mjs` loads it from the packed files and runs his tool there.
 
-## Changes since 0.5.1 (not released yet)
+## Changes in 0.6.0
+
+From 0.6.0 Calvin and Violet each have their own release. Calvin needs `@waterbots/core` 0.2.0.
 
 - **The shared project record (J3).** Calvin reads the record and adds what he asked for and his results. People
   served keep the way they were entered.
@@ -97,13 +99,18 @@ The build bundles the entry into one file, `dist/agent.js`. `@waterbots/core` st
   - **Notes on values.** On the Paid site (`place: "paid-site"`) every value row and equation row takes the person's
     note, and the report lists them under "Notes on values". A read-only seat sees them and cannot write. The site
     passes `notes` (the record's `agents.calvin.notes`) and `onNotesChange`, and saves the notes with the record.
-  - **Free site:** no note box. The report carries Calvin's own notes on the values still blank or assumed
-    (`calvinAgentNoteLines`, also for a site with its own export).
+  - **Calvin's own notes.** The report on the Paid site, the Free site and in the Agent Commons carries his notes on
+    the values still blank or assumed. They follow the tags the screen shows. The Paid site's report shows both kinds
+    of note, each under its own label. The Free site and the Agent Commons have no note box.
+  - **His tools say which values are blank or assumed.** Each tool's output gains `blankOrAssumed`: a key, a name and
+    "blank" or "assumed" for each, as facts. At MCP there is no export, so the visitor's own AI says them.
   - **His colour** on the header card, through the shared `--agent` name: Tide for now.
 - No sum changed.
 
-**What a site should change (J5).** Pass `place`. The Paid site passes `notes` and `onNotesChange`, and keeps the notes
-on the record. The Free site puts `calvinAgentNoteLines` in its own export, if it has one.
+**What a site should change (J5).** Install `@waterbots/core` 0.2.0 with it. Pass `place`. The Paid site passes `notes`
+and `onNotesChange`, and keeps the notes on the record. A site with its own export puts `calc.noteLines` in it, the
+person's lines (`by: "person"`) and Calvin's (`by: "agent"`) each under its own label (`NOTE_WORDS.byPerson` and
+`agentNotesLabel("Calvin")`, from `@waterbots/core/notes`).
 
 ## Changes in 0.5.1
 
@@ -232,6 +239,6 @@ No sum changed. The engine version and every test case stay as they are.
 
 Since the seed landed, this repo is Calvin's home. Changes are made here, by pull request. `scripts/check-seed.mjs` proves what arrived against the commit where the seed landed, so later changes are allowed.
 
-- Version 0.5.1. Not published. Nothing in this repo goes to npm yet; the package is marked `private`.
+- Version 0.6.0. Not published. Nothing in this repo goes to npm yet; the package is marked `private`.
 - The build writes plain files for a bundler to pick up. Apart from `dist/engine.js` and `dist/screen.js`, they do not run on their own in Node.
 - Apache License 2.0. See `LICENSE` and `NOTICE` in this folder.

@@ -1,6 +1,6 @@
 {
   "name": "@waterbots/violet",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "private": true,
   "description": "WaterBots open core module: violet (the water-benefit agent). Hosts the VWBA 2.0 D-n methods, starting with D-3, Volume Provided. Not published.",
   "license": "Apache-2.0",
@@ -38,7 +38,7 @@
     "build:css": "node -e \"require('node:fs').copyFileSync('src/styles.css', 'dist/styles.css')\""
   },
   "dependencies": {
-    "@waterbots/core": "0.1.2"
+    "@waterbots/core": "0.2.0"
   },
   "peerDependencies": {
     "react": "19.3.1"
