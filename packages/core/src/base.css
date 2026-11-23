@@ -34,6 +34,8 @@
   --iris: #5b5bd6;
   --mint: #2f9e6e;
   --slate: #5f6f7a;
+  /* The calculator screen's own agent colour (J5). Each screen sets it to its agent's token; Tide when none does. */
+  --agent: var(--tide);
 
   /* States */
   --state-pending: var(--amber);

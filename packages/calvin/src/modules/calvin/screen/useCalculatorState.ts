@@ -16,6 +16,9 @@ import {
 import { calculatorPageContext } from "../agent/pageContext";
 import { calvinRecordProblems } from "../agent/record";
 import type { Place } from "@waterbots/core/places";
+import { labelledNoteLines, notesAt, type NoteLine, type NotesKind } from "@waterbots/core/notes";
+import { withNote, type ValueNotes } from "@waterbots/core/record";
+import { calvinAgentNoteLines } from "../agent/exportNotes";
 import type { SavedAnalysis } from "./analysis";
 import {
   missingProjectFacts,
@@ -121,6 +124,15 @@ export interface CalculatorOptions {
    * names it, and Calvin works with what that place gives him. Left out, a site with a project record, as before.
    */
   place?: Place;
+  /**
+   * THE PERSON'S NOTES ON CALVIN'S VALUES (J5, ruling 2026-11-23), as the project record keeps them
+   * (`agents.calvin.notes`). On the Paid site (`place: "paid-site"`) every value row gets a note box, and the report
+   * lists the notes. A read-only seat sees them and cannot write. On the Free site there is no note box: the report
+   * carries Calvin's own notes on the values still blank or assumed. Elsewhere, no notes yet.
+   */
+  notes?: ValueNotes;
+  /** Told the notes after each change, so the host keeps them on the record and saves them when the person saves. */
+  onNotesChange?: (notes: ValueNotes) => void;
 }
 
 export interface CalculatorState {
@@ -141,6 +153,14 @@ export interface CalculatorState {
   figureBlockPinned: boolean;
   /** See `CalculatorOptions.hideExportButton`. True when the screens show Calvin's export buttons. */
   exportButton: boolean;
+  /** Whose notes this place shows (`CalculatorOptions.notes`): the person's, Calvin's in the export, or none. */
+  notesKind: NotesKind;
+  /** The person's notes on Calvin's values. */
+  valueNotes: ValueNotes;
+  /** Writes the person's note on a value; an empty text removes it. **Inert when `readOnly`.** */
+  setValueNote: (key: string, text: string, label: string) => void;
+  /** The lines of the report's "Notes on values" table: the person's notes, or Calvin's, as the place gives. */
+  noteLines: NoteLine[];
 
   /* ── Working inputs ─────────────────────────────────────────────────────── */
   /** The live input state. */
@@ -421,6 +441,18 @@ export function useCalculatorState(project: CalvinProject, options: CalculatorOp
   const fallbackCount = result ? result.fallbacks.length : 0;
   const erPerPerson = result && result.people > 0 ? result.result.ER / result.people : 0;
 
+  // NOTES ON VALUES (J5). The person's notes are held here and handed to the host on each change; the host keeps them
+  // on the record and saves them when the person saves. Calvin's own notes are worked out from the run's facts.
+  const notesKind = notesAt(options.place);
+  const [valueNotes, setValueNotes] = useState<ValueNotes>(() => options.notes ?? {});
+  const setValueNote = (key: string, text: string, label: string) => {
+    if (readOnly || notesKind !== "person") return;
+    const next = withNote(valueNotes, key, text, new Date().toISOString(), label);
+    setValueNotes(next);
+    options.onNotesChange?.(next);
+  };
+  const noteLines = notesKind === "person" ? labelledNoteLines(valueNotes) : notesKind === "agent" ? calvinAgentNoteLines(state) : [];
+
   const pageContext = () =>
     calculatorPageContext({ projectName: project.name, state, missingFacts, activityAsk, missingMonitoring: monitoringAsk, fnrbRefusal, filedFnrbRefusal, transition, result, legacyResult, paaResult, waterfall, recordProblems: calvinRecordProblems(project), ...(options.place !== undefined ? { place: options.place } : {}) });
 
@@ -431,6 +463,10 @@ export function useCalculatorState(project: CalvinProject, options: CalculatorOp
     transition,
     figureBlockPinned: !options.unpinFigureBlock,
     exportButton: !options.hideExportButton,
+    notesKind,
+    valueNotes,
+    setValueNote,
+    noteLines,
     state,
     patch,
     seed,

@@ -22,6 +22,7 @@ export { default as CalculatorWork } from "./modules/calvin/screen/CalculatorWor
 export { default as ReportView, ReportHeading, ReportRow } from "./modules/calvin/screen/ReportView.js";
 export type { ReportSlots } from "./modules/calvin/screen/ReportView.js";
 export { default as VersionTabs } from "./modules/calvin/screen/VersionTabs.js";
+export { calvinAgentNoteLines } from "./modules/calvin/agent/exportNotes.js";
 export type { CalcState, CalvinProject } from "./modules/calvin/screen/state.js";
 export type { SavedAnalysis } from "./modules/calvin/screen/analysis.js";
 // A site's own country tables, passed to `useCalculatorState` as `options.tables` (V13).

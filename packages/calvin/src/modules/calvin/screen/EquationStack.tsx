@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { useReadOnlySeat } from "../../core/readOnly";
+import { RowNote } from "@waterbots/core/notes";
 import {
   PRESETS, DEFAULT_STOVE_ETA, STOVE_SHARE_KEYS, STOVE_CLASS_LABEL, FUEL_SHARE_KEYS, FUEL_LABEL, FUEL_FACTOR_NOTE,
   presetShares, defaultCharcoalConvention, validDevicesPerPremises, DEVICES_PER_PREMISES_RULE, type CharcoalConvention,
@@ -366,6 +367,7 @@ function VarRow({ label, value, unit, state, tip, baselineSdws, monitor }: { lab
         </span>
       </div>
       <ProveLater entered={state === "entered"} mark={mark} />
+      <RowNote noteKey={`value:${label}`} label={label} />
     </div>
   );
 }
@@ -428,6 +430,7 @@ function Param({ label, sdwsRef, value, onChange, min, max, step, unit, baseline
       </div>
       <div className="t-caption text-fg-4" style={{ fontSize: 10 }} data-source-note={note ? "" : undefined}>{note ?? `${resting === "assumed" ? "assumed" : "default"} ${baseline}`}</div>
       <ProveLater entered={changed} mark={rowMark(baselineSdws, monitor)} />
+      <RowNote noteKey={`value:${label}`} label={label} />
     </div>
   );
 }
@@ -521,6 +524,9 @@ function EqRow({ eqNum, symbol, title, formula, value, oneLiner, binding, open, 
         <span className="self-center"><StateBadge state="calculated" tip={`Worked out by this equation from the values inside it — change those and ${symbol} follows.`} /></span>
         <span className="t-mono shrink-0 text-fg-1" style={{ fontSize: 12 }}>{value}</span>
       </button>
+      <div style={{ paddingLeft: 40 }}>
+        <RowNote noteKey={`eq:${eqNum}:${symbol}`} label={`${symbol}, ${title}`} />
+      </div>
       {open ? (
         <div className="min-w-0 pb-3" style={{ paddingLeft: 40, overflowWrap: "anywhere" }}>
           {/* THE PLAIN EXPLANATION FIRST, THEN ITS REFERENCE, SMALL, LIKE A CITATION (item 15). */}

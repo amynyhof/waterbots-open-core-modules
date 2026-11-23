@@ -39,7 +39,25 @@ both is an open question (N14 in `BUILD_PLAN.md`).
 - **Her place (J2).** `readsProjectRecord` and `handsBackTo` take core's `Place`. `violetCall` reads her call on
   core's agent map. An unlikely water pathway's calculator is not called (W2). The old door names, `carbonShowsBeside`
   and `WATER_ALWAYS_SHOWS` still work, so a site keeps working until it moves. Nothing in this package uses them.
+- **One calculator screen (J5).** Her screen now matches Calvin's.
+  - **The header card** stays at the top. It holds her water benefit in a tile like Calvin's, with her draft label
+    on it, three smaller figures and a source line. Under it: the project facts, the anticipated performance, the
+    calculation step by step (each sum folds open to show its formula) and what must be true for the method. Each
+    part folds.
+  - **Sliders or typed boxes**, as on Calvin's screens: the Free site keeps sliders; the Paid site gets typed boxes
+    before the project runs. `exAnteSliders` lets a site choose.
+  - **Notes on values.** On the Paid site every value takes the person's note, from `record.agents.violet.notes` (or
+    `notes`), and `onNotesChange` hands them back. On the Free site there is no note box: her report carries her own
+    notes on the values still blank or assumed (`violetAgentNoteLines`).
+  - **Her report.** "Export (PDF)" prints her report alone, as Calvin's does. `hideExportButton` and `onExport` work
+    as his do.
+  - **Her colour, Orchid,** on the header card, through the shared `--agent` name. A site with a fixed top bar sets
+    `--wb-pin-top`.
+  - Her engine's own note on a value now sits under its source.
 - No sum changed.
+
+**What a site should change (J5).** Pass `place`. The Free site passes `hideExportButton`, as it does for Calvin, if it
+has its own export, and puts `violetAgentNoteLines` in it. The Paid site keeps the notes on the record.
 
 ## Changes in 0.5.1
 

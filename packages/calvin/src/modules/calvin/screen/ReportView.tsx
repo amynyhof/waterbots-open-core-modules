@@ -1,5 +1,6 @@
 "use client";
 
+import { NotesOnValues, type NoteLine } from "@waterbots/core/notes";
 import type { ReactNode } from "react";
 
 import {
@@ -205,6 +206,7 @@ export default function ReportView({
   creditingPeriodYears,
   slots = {},
   tables,
+  noteLines = [],
 }: {
   project: CalvinProject;
   state: CalcState;
@@ -226,6 +228,11 @@ export default function ReportView({
   slots?: ReportSlots;
   /** The site's own country tables (V13), from `useCalculatorState`; they give a site-only country its name. */
   tables?: SiteTables;
+  /**
+   * The "Notes on values" table (J5): the person's notes on the Paid site, Calvin's notes on the values still blank
+   * or assumed on the Free site (`useCalculatorState`'s `noteLines`). Empty: no table.
+   */
+  noteLines?: NoteLine[];
 }) {
   const v2 = state.version === "paa";
   const basis: Basis = state.version;
@@ -804,6 +811,9 @@ export default function ReportView({
       ) : null}
 
       {slots.afterFallbacks}
+
+      {/* ── Notes on values (J5) ── */}
+      <NotesOnValues lines={noteLines} />
 
       {/* ── How these figures were produced — credentials, process only (before the footer) ── */}
       <H>How these figures were produced</H>

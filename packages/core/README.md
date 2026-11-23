@@ -10,6 +10,10 @@ What is in `src/`:
 - `readOnly.tsx`: the read-only seat, for screens that must show a result but not allow edits.
 - `agent.ts` and `calculatorTool.ts`: the agent contract, and the helper that turns a calculator into an agent tool.
 - `record.ts`: the shared project record (J3): its shape, and the fact check a site runs where a fact is entered. A count below zero is refused. An agent adds only the facts the record lacks, each one counted as a question it asked, and writes its results to its own part. Not part of the seed.
+- `notes.tsx`: notes on values (J5, one calculator screen). The person's note box and the export's "Notes on values"
+  table, shared by every calculator screen. The person's notes live on the record, in each agent's own part. On the
+  Paid site the person writes them; on the Free site the export carries the agent's notes instead. Not part of the
+  seed.
 - `technologyLabels.ts`: the one list that turns each site's technology label into the record's code. Not part of the seed.
 - `places.ts`: the four doors of agent rule 21, and the lobby chat, which is not a door. Not part of the seed.
 - `agentMap.ts`: the agent map (J4). It reads the record and the place, and says which agents are called, which method applies and the one next step. It gives codes, never words, and does no sums. Not part of the seed.

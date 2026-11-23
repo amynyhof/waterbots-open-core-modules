@@ -99,7 +99,24 @@ export interface AgentPart {
   questionsAsked?: number;
   /** The agent has done its task and reported back to Wellington. */
   done?: boolean;
+  /**
+   * The person's notes on the agent's values, by the value's key (J5, one calculator screen). Written on the Paid
+   * site, to give context to a number. An agent never writes here.
+   */
+  notes?: ValueNotes;
 }
+
+/** A person's note on one value. */
+export interface ValueNote {
+  text: string;
+  /** When the note was last changed, as an ISO date and time. */
+  changed: string;
+  /** The value's name when the note was written, so an export can name it. No number is kept here. */
+  label?: string;
+}
+
+/** The person's notes on one agent's values, by the value's key. */
+export type ValueNotes = Record<string, ValueNote>;
 
 export interface ProjectRecord {
   recordVersion: typeof RECORD_VERSION;
@@ -342,5 +359,35 @@ export function setAgentResults(record: ProjectRecord, agent: AgentId, results: 
   else if (results.estimate !== undefined) part.estimate = { ...results.estimate };
   if (results.done !== undefined) part.done = results.done;
   out.agents[agent] = part;
+  return out;
+}
+
+// ── Notes on values (J5, one calculator screen) ─────────────────────────────────────────────────────────────────
+
+/** The person's notes on an agent's values. Empty when there are none. */
+export function valueNotes(record: ProjectRecord, agent: AgentId): ValueNotes {
+  return { ...(record.agents[agent]?.notes ?? {}) };
+}
+
+/**
+ * Writes the person's note on one of an agent's values. An empty note removes it. Returns a new record; the one
+ * handed in is not changed. Nothing is saved here: the site saves the record when the person chooses (rulings 5).
+ */
+export function setValueNote(record: ProjectRecord, agent: AgentId, key: string, text: string, changed: string, label?: string): ProjectRecord {
+  const out = structuredClone(record);
+  const part: AgentPart = { ...out.agents[agent] };
+  const notes = withNote(part.notes ?? {}, key, text, changed, label);
+  if (Object.keys(notes).length === 0) delete part.notes;
+  else part.notes = notes;
+  out.agents[agent] = part;
+  return out;
+}
+
+/** The notes with one note set, or removed when its text is empty. The notes handed in are not changed. */
+export function withNote(notes: ValueNotes, key: string, text: string, changed: string, label?: string): ValueNotes {
+  const out = { ...notes };
+  const trimmed = text.trim();
+  if (trimmed === "") delete out[key];
+  else out[key] = label !== undefined ? { text: trimmed, changed, label } : { text: trimmed, changed };
   return out;
 }
