@@ -188,14 +188,13 @@ describe("rule 9: worked out from facts, and worked out again when a fact change
 });
 
 describe("the lobby chat: only Wellington, no record, nothing calculated", () => {
-  test("he points the visitor to a door, whatever record is handed in", () => {
+  test("he answers questions, with the doors he may point to when that helps, whatever record is handed in", () => {
     const map = agentMap({ place: "lobby-chat", record: project({ pathways: readings({ carbon: "likely" }) }) });
     expect(called(map)).toEqual(["wellington"]);
     expect(map.pathways).toEqual([]);
     expect(map.tellVisitor).toEqual([]);
-    expect(map.next).toEqual({ step: "point to a door", doors: ["free-site", "paid-site", "agent-commons"] });
-  });
-});
+    expect(map.next).toEqual({ step: "answer questions", doors: ["free-site", "paid-site", "agent-commons"] });
+  });});
 
 describe("facts that point to a pathway, before it has a reading (the two rules this repo can cite)", () => {
   test("a community water supply puts water in play, with more to learn", () => {

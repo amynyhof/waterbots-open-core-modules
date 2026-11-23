@@ -8,8 +8,8 @@
  * - Paid site: the record is the Project Record page.
  * - Agent Commons: no project record and no memory. The agent asks for each fact it needs.
  * - MCP: the user's own AI calls the agent's tool. No project record; the user confirms each fact.
- * - Lobby chat: Wellington's open chat on the paid site's front page. No record, nothing is calculated, and he
- *   points the visitor to a door.
+ * - Lobby chat: Wellington's open chat on the paid site's front page. No record, and nothing is calculated. He
+ *   answers questions from what he has sources for, and points the visitor to a door when that helps.
  */
 
 /** The four doors (agent rule 21). */

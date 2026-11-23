@@ -168,7 +168,11 @@ export interface TellVisitor {
 }
 
 export type NextStep =
-  | { step: "point to a door"; doors: Door[] }
+  /**
+   * Lobby chat: Wellington answers the visitor's questions as helpfully and truthfully as he can, from what he has
+   * sources for. He points to one of `doors` only when that helps the visitor; he judges when.
+   */
+  | { step: "answer questions"; doors: Door[] }
   | { step: "choose an agent" }
   | { step: "work alone"; agent: AgentId }
   | { step: "gather facts"; facts: BasicFact[] }
@@ -189,7 +193,7 @@ export interface AgentMap {
 
 // ── The map ──────────────────────────────────────────────────────────────────────────────────────────────────────
 
-/** The doors the lobby chat points to. */
+/** The doors Wellington may point to from the lobby chat. */
 const LOBBY_DOORS: Door[] = ["free-site", "paid-site", "agent-commons"];
 
 /** Reads the record and the place, and says who is called, which method applies and what comes next. */
@@ -203,7 +207,10 @@ function notHere(agent: AgentId): AgentCall {
   return { agent, called: false, because: "not at this place" };
 }
 
-/** Lobby chat: only Wellington, no record, nothing calculated. He points the visitor to a door. */
+/**
+ * Lobby chat: only Wellington, no record, nothing calculated. He answers questions, and points to a door only when
+ * that helps the visitor.
+ */
 function lobbyChat(input: MapInput): AgentMap {
   const met = input.met ?? [];
   return {
@@ -212,7 +219,7 @@ function lobbyChat(input: MapInput): AgentMap {
     agents: AGENTS.map((a) => (a === "wellington" ? { agent: a, called: true, introduce: !met.includes(a) } : notHere(a))),
     pathways: [],
     tellVisitor: [],
-    next: { step: "point to a door", doors: [...LOBBY_DOORS] },
+    next: { step: "answer questions", doors: [...LOBBY_DOORS] },
   };
 }
 
