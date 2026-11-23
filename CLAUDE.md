@@ -41,6 +41,8 @@ any of these. The masters of the three root pages are in the handoff folder.
 - `node scripts/check-names.mjs <folder>` scans a folder. It reads the private list through the `WB_NAMES_LIST`
   variable and stops if that is not set. It never prints the list.
 - Check its exit code before posting anything. Do not pipe it into another command that hides the code.
+- A report or a pull request's text: scan it with `--report`, which lets this repo's own GitHub address through.
+  Never use `--report` on the repo's own files.
 - In CI it runs on every pull request and on `main`. It reads the list from the `NAMES_TO_BLOCK` secret.
 
 ## Lanes

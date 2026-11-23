@@ -142,6 +142,23 @@ test("the owner in a package.json repository link is let through, and nowhere el
   assert.deepEqual(scanText(other, entries, repositoryLines(other)), [3], "only in the repository field");
 });
 
+test("report mode lets the owner of this repo's own address through, and nothing else", () => {
+  const entries = parseNames(LIST);
+  const own = "See https://github.com/harbourvoss/waterbots-open-core-modules/pull/44 for it.";
+  assert.deepEqual(scanText(own, entries), [1], "files in the repo stay strict");
+  assert.deepEqual(scanText(own, entries, new Set(), true), []);
+  const report = (line) => scanText(line, entries, new Set(), true);
+  assert.deepEqual(report("[the pull request](https://github.com/plinth-orrery/waterbots-open-core-modules/pull/1)"), []);
+  assert.deepEqual(report("git@github.com:harbourvoss/waterbots-open-core-modules.git"), []);
+  assert.deepEqual(report("https://github.com/harbourvoss/waterbots-open-core-modules"), []);
+  assert.deepEqual(report("https://github.com/harbourvoss/made-up-repo"), [1], "another repo's address still hits");
+  assert.deepEqual(report("https://github.com/harbourvoss/waterbots-open-core-modules-copy"), [1], "a longer repo name still hits");
+  assert.deepEqual(report("https://github.com/harbourvoss/waterbots-open-core-modules.old"), [1], "a longer repo name still hits");
+  assert.deepEqual(report("https://github.com/someone/waterbots-open-core-modules by Zelda Quimby"), [1], "the rest of the line is checked");
+  assert.deepEqual(report("https://example.org/harbourvoss/waterbots-open-core-modules"), [1], "only in a GitHub address");
+  assert.deepEqual(report("Harbour Voss"), [1]);
+});
+
 test("a file name that holds a name is a hit", () => {
   const entries = parseNames(LIST);
   assert.equal(pathHasName("docs/zelda-quimby/notes.md", entries), true);
@@ -263,4 +280,18 @@ test("command line: a missing folder to scan is a failed run, not a pass", () =>
   const list = join(dir, "list.txt");
   writeFileSync(list, LIST);
   assert.equal(run([join(dir, "no-such-folder")], list).status, 2);
+});
+
+test("command line: --report scans only what it is given, and lets this repo's own address through", () => {
+  const dir = tmp();
+  const list = join(dir, "list.txt");
+  writeFileSync(list, LIST);
+  const text = join(dir, "report");
+  mkdirSync(text);
+  writeFileSync(join(text, "body.md"), "Merged: https://github.com/harbourvoss/waterbots-open-core-modules/pull/3\n");
+  assert.equal(run(["--report", text], list).status, 0);
+  assert.equal(run([text], list).status, 1, "without --report the address still hits");
+  const none = run(["--report"], list);
+  assert.equal(none.status, 2, "--report on its own never scans the repo's files");
+  assert.match(none.stderr, /--report needs a file or folder/);
 });

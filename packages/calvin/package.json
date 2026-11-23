@@ -40,7 +40,7 @@
     "build:css": "node -e \"require('node:fs').copyFileSync('src/modules/calvin/styles.css', 'dist/styles.css')\""
   },
   "dependencies": {
-    "@waterbots/core": "0.1.1"
+    "@waterbots/core": "0.1.2"
   },
   "peerDependencies": {
     "react": "19.3.1"

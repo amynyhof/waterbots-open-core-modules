@@ -1,6 +1,7 @@
 // Name scan. Checks every file name and every line of text against a private list of names.
 //
 //   node scripts/check-names.mjs [file-or-folder ...]
+//   node scripts/check-names.mjs --report <file-or-folder> [...]
 //
 // The list lives outside this repo and is read in place. It is never copied, never printed and never logged.
 // Where the list is: the WB_NAMES_LIST variable holds its full path. There is no default path in the code.
@@ -15,6 +16,11 @@
 // package.json "repository" field. That link names the owner's GitHub account until the repo moves to the WaterBots
 // organisation. Only the owner part is let through. The rest of the line is still checked, and so is every other
 // field, every other file and every other link.
+//
+// With `--report` only (ruled 2026-11-22): the owner part of this repo's own GitHub address
+// (`github.com/<owner>/waterbots-open-core-modules`) is let through on every line. It is for a report or a pull
+// request's text, scanned before it is posted. `--report` needs a file or folder to scan, so the repo's own files are
+// never scanned this way, and CI never passes it. Only the owner part of this one address is let through.
 //
 // Matching is by whole word, upper or lower case. A space, dot, dash or underscore inside an entry matches any
 // of those, or nothing. So `Ada Lovelace` also finds `ada_lovelace` and `AdaLovelace`. An entry with the
@@ -37,6 +43,8 @@ const COPYRIGHT_LINE = /^\s*(?:(?:\/\/+|\/\*+|\*+|#+|<!--|--|;+)\s*)*(?:copyrigh
 const ALLOW_NOTE = /^allowed on copyright and licen[cs]e lines(?: only)?$/i;
 // The owner part of a GitHub link: the account name between "github.com/" (or "github.com:") and the next "/".
 const GITHUB_OWNER = /(github\.com[/:])[^/\s"']+(?=\/)/gi;
+// The owner part of this repo's own GitHub address, and of no other repo's: `--report` only.
+const THIS_REPO_OWNER = /(github\.com[/:])[^/\s"']+(?=\/waterbots-open-core-modules(?:\.git)?(?![A-Za-z0-9_.-]))/gi;
 
 export class ListError extends Error {}
 
@@ -101,13 +109,15 @@ export function repositoryLines(text) {
 
 /**
  * Lines of `text` that hold a listed name. Returns line numbers only. `repoLines` holds the lines of a package.json
- * "repository" field, where the owner part of a GitHub link is let through.
+ * "repository" field, where the owner part of a GitHub link is let through. `report` lets the owner part of this
+ * repo's own address through on every line.
  */
-export function scanText(text, entries, repoLines = new Set()) {
+export function scanText(text, entries, repoLines = new Set(), report = false) {
   const hits = [];
   text.split(/\r?\n/).forEach((line, i) => {
     const isCopyrightLine = COPYRIGHT_LINE.test(line);
-    const checked = repoLines.has(i + 1) ? line.replace(GITHUB_OWNER, "$1") : line;
+    let checked = repoLines.has(i + 1) ? line.replace(GITHUB_OWNER, "$1") : line;
+    if (report) checked = checked.replace(THIS_REPO_OWNER, "$1");
     if (entries.some((e) => matches(e, checked) && !(e.copyrightOnly && isCopyrightLine))) hits.push(i + 1);
   });
   return hits;
@@ -122,8 +132,11 @@ function isBinary(buf) {
   return buf.subarray(0, 8000).includes(0);
 }
 
-/** Scans files under `root`. `files` are paths relative to `root`. Returns findings and counts, never text. */
-export function scanFiles(root, files, entries) {
+/**
+ * Scans files under `root`. `files` are paths relative to `root`. Returns findings and counts, never text. `report`
+ * is for a report or pull request text only (see the top of this file).
+ */
+export function scanFiles(root, files, entries, report = false) {
   const findings = [];
   let textFiles = 0;
   let skipped = 0;
@@ -138,7 +151,7 @@ export function scanFiles(root, files, entries) {
     textFiles++;
     const text = buf.toString("utf8");
     const repoLines = basename(f) === "package.json" ? repositoryLines(text) : new Set();
-    for (const line of scanText(text, entries, repoLines)) findings.push({ file: shown, line, kind: "name in text" });
+    for (const line of scanText(text, entries, repoLines, report)) findings.push({ file: shown, line, kind: "name in text" });
   }
   return { findings, files: files.length, textFiles, skipped };
 }
@@ -167,9 +180,12 @@ export function listFiles(targets, cwd) {
 export function main(argv, env = process.env, cwd = process.cwd(), out = console.log, err = console.error) {
   let entries;
   let sets;
+  const report = argv.includes("--report");
+  const targets = argv.filter((a) => a !== "--report");
   try {
+    if (report && targets.length === 0) throw new ListError("--report needs a file or folder to scan");
     entries = loadNames(listPathFromEnv(env));
-    sets = listFiles(argv, cwd);
+    sets = listFiles(targets, cwd);
   } catch (e) {
     if (!(e instanceof ListError)) throw e;
     err(`name scan: cannot run (${e.message}). No result.`);
@@ -179,7 +195,7 @@ export function main(argv, env = process.env, cwd = process.cwd(), out = console
   let files = 0;
   let textFiles = 0;
   for (const { root, files: list } of sets) {
-    const r = scanFiles(root, list, entries);
+    const r = scanFiles(root, list, entries, report);
     files += r.files;
     textFiles += r.textFiles;
     total += r.findings.length;

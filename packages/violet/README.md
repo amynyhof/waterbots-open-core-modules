@@ -44,9 +44,17 @@ With Calvin 0.5.1, for both sites. No sum changed.
   gone.
 - **A stylesheet.** `@waterbots/violet/styles.css` styles her screen with the same tokens, spacing and table style as
   Calvin's, and Orchid as her accent (`--orchid`, which a site may set). Every rule sits under `.violet-d3`.
+- **The agent rules come from core.** Violet reads the foundational agent rules, rules 1 to 21, from
+  `@waterbots/core/agent-rules.md`. The copy in `agents/_base-rules.md` is gone. Violet's prompt and notes now hold only
+  what is different for her, in a warmer voice.
+- **The tool's words.** The descriptions of her tool's inputs say what each fact is. They no longer list what
+  the agent must not do; the agent rules cover that.
+- **Core 0.1.2.** Violet needs `@waterbots/core` 0.1.2, which ships the agent rules file.
+- Old pointers in code comments are cleaned up. No code changed for them.
 
-**What a site should change.** Import `@waterbots/violet/styles.css`. Read `"calculated"` where it read
-`"derived"`, and pass `"more to learn"` where it passed `"not enough known"`. No exported name changed.
+**What a site should change.** A site that loads Violet's agent loads the rules from
+`@waterbots/core/agent-rules.md`, where it loaded `agents/_base-rules.md` before. Import
+`@waterbots/violet/styles.css`. Read `"calculated"` where it read `"derived"`, and pass `"more to learn"` where it passed `"not enough known"`. No exported name changed.
 
 ## Changes in 0.5.0
 
