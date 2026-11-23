@@ -24,10 +24,6 @@ nine. `[x]` done (merged), `[~]` open pull request, `[ ]` not started,
 `[!]` blocked until the maintainer acts. **(V1)** marks an item inside a step that v1 needs, even where the rest of its step
 comes after v1. **(V2)** marks an item planned for v2.
 
-**Every engine change is published first as a release candidate** (a trial version). The private side installs it,
-runs its real-filing tests, and reports back through the maintainer: pass or fail and the reference line. Only
-then is it released.
-
 All of M1 to M10 is `Grant: open`. Edits to this plan and the build log are `Grant: neither`.
 
 ## The nine families
@@ -63,21 +59,16 @@ sites pin that file by its fingerprint. The first pinned version includes the sl
 
 | # | Family | Step | Waits on | Done when |
 |---|---|---|---|---|
-| V4 | Console and surfaces | The simple view, shipped as the next release after V5: it hides the advanced material until asked, with bigger tap buttons (M5.3) and Reef (M5.4). See M5.5. | V5. | A test shows advanced parts are hidden at first and one control shows them. The maintainer checks the screen. |
-| V5 | v1 proof and grading | [~] (Released 2026-11-05: tag `calvin-v0.1.0` on commit `3020ee7`, recorded in `SEEDS.md`. Still to come: both sites pin it, and the private side reports pass or fail.) The first GitHub release: the packed packages (`calvin` and the `core` it needs) and their fingerprints, with both views: the ex-ante view with sliders, and the full ex-post view. A site mounts them through `@waterbots/calvin/screen`; the open site locks to ex-ante. Replaces the npm publish in M2.2. It does not wait for the simple view. | The maintainer's approval; branch protection and the tag rule (M1.4). | The release holds the files and their fingerprints. Both sites pin it. The private side reports pass or fail on both carbon filings. |
-| V6 | Agent orchestration | The method registry (M3): one entry per carbon method, so both sites pick a method the same way. | V5. | A trial release is out; the private side reports pass on both carbon filings. |
+| V5 | v1 proof and grading | [~] (Released 2026-11-05: tag `calvin-v0.1.0` on commit `3020ee7`, recorded in `SEEDS.md`. Still to come: both sites pin it, and the private side reports pass or fail.) The first GitHub release: the packed packages (`calvin` and the `core` it needs) and their fingerprints, with both views: the ex-ante view with sliders, and the full ex-post view. A site mounts them through `@waterbots/calvin/screen`; the open site locks to ex-ante. Replaces the npm publish in M2.2. It does not wait for the simple view. | The maintainer's approval; the tag rule (M1.4). | The release holds the files and their fingerprints. Both sites pin it. The private side reports pass or fail on both carbon filings. |
+| J1 to J9 | Agent orchestration | The v1 scope of family 1. See "Family 1: the v1 scope" below. | See each job. | See each job. |
 | V8 | Experts and partners | [x] (Merged, pull request #18. Still to come: the outside expert's check, and N14 and N15 for the outside expert group.) D-3, the water-supply module, inside Violet (M8.1). | It does not wait for the activity-type signature or N6: D-3 is a prototype the outside expert checks later. | Violet's D-3 tests are hand-worked cases, with every step cited to the guidebook (cited, not copied). The VWBA spec is written alongside the build, in `docs/`, and the maintainer reviews it then. An outside expert checks the module once the prototype is up. |
 | V9 | Agent orchestration | (Proposal: `docs/proposals/shared-project-record.md`, pull requests #34 and #35, and its follow-up.) The screening hand-off: one project record in `core` that every module fills in and the paid site reads. Each module writes how many questions it asked on that walk. | V5; the paid site's save format (paid repo); Wellington's fields (free-site repo). | A test takes an invented project through all four modules' parts, saves it, reads it back unchanged, and gives each module's question count. |
-| V10 | Agent orchestration | Phoebe (eligibility) to its first release (M9.1). | V9; Phoebe's rulings. | Released; Phoebe fills its part of the record and counts its questions. |
-| V11 | Agent orchestration | Bridget (the map) to its first release (M9.2). | V9; Bridget's rulings; a rights read on every data file; a ruling on the shared map key. | Released; Bridget fills its part of the record and counts its questions. |
 | V12 | Agent orchestration | Calvin's screening part: Calvin fills its part of the record and counts its questions. | V9. | A test shows Calvin's part saved and its count written. |
-| V14 | v1 proof and grading | The same-numbers check: a project saved by the screening, read back the way the paid site reads it, gives the same numbers, or a list of what changed and why. | V6, V10, V11, V12. | A test passes here on invented projects. The private side runs it on both real filings with the pinned release and reports pass. |
+| V14 | v1 proof and grading | The same-numbers check: a project saved by the screening, read back the way the paid site reads it, gives the same numbers, or a list of what changed and why. | J4, J5, V12. | A test passes here on invented projects. The private side runs it on both real filings with the pinned release and reports pass. |
 | V15 | v1 proof and grading | The v1 release: a GitHub release that both sites pin. | V8, V14; the maintainer's approval. | Both sites run the same pinned file. The maintainer confirms the whole journey on the live sites, and the average question count is reported. |
-| V17 | Agent orchestration | Calvin's two doors. **Design only: build nothing yet.** One calculator, two doors. On the sites, the screening sets `creditedUnderV1`, and no door is shown. In the Agent Commons, Calvin opens with two choices: "new project estimate" (sets `false`) or "compare old and new rules" (sets `true`, and still asks for the filed V1.0 fNRB before any comparison). The choices' wording, what each sets and Calvin's opening line belong in the open core, as Violet's door does. The Commons host only draws the buttons. | The maintainer's ruling on the wording. | `packages/calvin/src/doors.ts` and Calvin's prompt hold both choices, and a test shows each choice sets the right value. |
 | V20 | Agent orchestration | [x] (Released: tag `calvin-violet-v0.5.0` on commit `1bce514`. Still to come: both sites install it. See the step "Calvin and Violet 0.5.0".) Calvin and Violet 0.5.0, one release for both sites. Calvin: the main credit tiles (tCO₂e a year) are a pinned header, whether or not a site sets `unpinFigureBlock`; the smaller figures sit right under them; the sliders and the calculation collapse. The controls panel holds only the site's own top and Calvin's buttons, the work surface ends with the calculation, and the report's note on how the figures were produced is one sentence shorter. A phone pass: rows wrap instead of squeezing. Violet: people served come from the project record, as Calvin takes them, and "Draft — pending expert review" shows on the screen and on every result. No sum changes. | V8. | Session C packs all three packages, runs the release check and makes the tag. One release holds all three files. After "release it", Session C pushes the tag and publishes the release. Both sites install it. |
-| V21 | Console and surfaces | [x] (Merged, pull request #38. The release waits until the Agent orchestration family opens.) Calvin and Violet 0.5.1, four changes. Violet's "derived" tag becomes "calculated". A missing value is a blank box with no label, on both screens, in the tables and the tag cells; a blank never counts as zero. Violet's "not enough known" becomes "more to learn". Violet ships a small stylesheet in Calvin's look, with Orchid as her accent. No sum changes. See the step "Calvin and Violet 0.5.1". | V20; the Agent orchestration family opening. | Session C packs it, runs the release check and makes the tag. After "release it", the tag is pushed and the release published. Both sites install it. |
 
-**Where things stand (2026-11-22):** The latest release is `calvin-violet-v0.5.0` (V20): Calvin 0.5.0, Violet 0.5.0 and core 0.1.1. Both sites still install it. V21 (Calvin and Violet 0.5.1) is merged; its release waits until the Agent orchestration family opens and the maintainer says "release it". V17 waits on the maintainer's ruling on its wording. Finished steps are in the build log.
+**Where things stand (2026-11-22):** The latest release is `calvin-violet-v0.5.0` (V20): Calvin 0.5.0, Violet 0.5.0 and core 0.1.1. Both sites still install it. Family 1, Agent orchestration, is open: its v1 scope is J1 to J9. Its first job is the 0.5.1 release (J1), which waits for "release it". Finished steps are in the build log.
 
 **Sources still to find:** in the source sweep, M10.4.
 
@@ -87,13 +78,95 @@ sites pin that file by its fingerprint. The first pinned version includes the sl
 - *Family: v1 proof and grading.* Benchmarks and pass rates. This is v2.
 - *Family: Security and hygiene.* M2.3 linting.
 - *Family: Calculators and methods.* M4 openings and labels.
-- *Family: Console and surfaces.* M5 the friendly view, beyond the sliders (released) and the simple view in V4 and its items marked **(V1)**.
+- *Family: Console and surfaces.* M5 the friendly view, beyond the sliders (released) and its items marked **(V1)**.
+- *Family: Console and surfaces.* The simple view (V4, M5.5). This is v2.
 - *Family: Agent orchestration.* M9.2 Bridget's map, beyond its item marked **(V1)**.
 - *Family: Calculators and methods.* M6 the fuel-mix floor.
 - *Family: Calculators and methods.* M7 diesel and grid factors.
 - *Family: Calculators and methods.* M8.2 the free site's water file.
 - *Family: Security and hygiene.* The two extra typing checks back on for `calvin`, and the restricted words in the seed's comments.
 - *Family: Security and hygiene.* SP6, the human engineer review. It runs alongside and blocks nothing.
+
+## Family 1: the v1 scope (Agent orchestration)
+
+*Family: Agent orchestration.*
+
+Ruled by the maintainer on 2026-11-22. All three repos use these words for these jobs. Everything else in family 1
+stays after v1 and is not part of this sprint. The agent map's design is approved (2026-11-22).
+
+**Guiding line:** Wellington manages the team to gather what the project needs and keep it moving. The other agents do
+their tasks, collect what they need, and report back to him. He helps with the next steps.
+
+- [ ] **J1.** Release Calvin and Violet 0.5.1 as one joined release. After it, each agent gets its own release, so one
+      agent can be updated without the other. Both sites install the same release in the same batch.
+  - In this repo: core goes to 0.1.2, because it changed after 0.5.0. The release notes list everything since 0.5.0.
+    Session C packs it once the opening pull request merges, runs the release check, and waits for "release it".
+  - After 0.5.1: one tag and one GitHub release for each package, all going out in one batch at the family close.
+- [ ] **J2.** Doors. Each host tells each agent which door it is at: Free site, Paid site, Agent Commons or MCP (agent
+      rule 21). An agent working alone asks for what it needs itself. This covers how Calvin opens in the Agent
+      Commons.
+  - In this repo: one list of places in `core`. It holds the four doors, and the lobby chat, which is not a door.
+    Calvin and Violet take their door from the host. Violet's own `doors.ts` gives way to core's. Today it hands
+    back to no one in the Agent Commons and always shows water.
+  - Calvin in the Agent Commons (was V17): he opens with two choices. "New project estimate" sets `creditedUnderV1`
+    to `false`. "Compare old and new rules" sets it to `true`, and still asks for the filed V1.0 fNRB before any
+    comparison. The choices' wording, what each sets and his opening line live in the open core. The Commons host
+    only draws the buttons. On the sites, the record sets `creditedUnderV1`, and no choice is shown.
+    - [!] Waits on the maintainer's ruling on the wording.
+  - Calvin's agent tools are exported from his package, as Violet's are, or retired with his Commons choices.
+- [ ] **J3.** The shared project record. Every agent adds its facts and results to one record, and the paid site reads
+      it (agent rule 10). It holds each pathway's reading (likely, more to learn, unlikely) with its reason and what
+      would change it. It refuses a count below zero where it is entered. One shared list turns each site's
+      technology label into the record's code.
+  - In this repo: the record's shape, its fact check and the label list go in `core`. The proposal is
+    `docs/proposals/shared-project-record.md`. Then Calvin and Violet add their facts and results to it. Today Calvin
+    saves only his inputs, and Violet saves nothing.
+  - Was W1: a count of people served below zero got no message. Done when the record refuses it where it is entered,
+    and Calvin and Violet each say the record's count is below zero.
+  - Was W3: the label "Community level water treatment technologies" was read as `other`, so Calvin would not run.
+    Done when one list in `core` turns the sites' labels into the record's codes, and a test covers this label.
+  - Waits on: the free site's full list of technology labels; the paid site's save format. Each comes as a carry.
+- [ ] **J4.** The agent map. ONE map, kept in the core, reads the project's facts and the door, and says which agents
+      are in play, which method applies, and what comes next. It is worked out from facts, so the same project always
+      gets the same agents. Wellington leads from it on both sites. It replaces one-off rules. It must cover at least:
+      - on "likely" or "more to learn", a pathway's calculator agent is called and shows;
+      - on "unlikely", it is not called, and the visitor is told what would change it;
+      - with no pathway forward, Bridget is not called and Wellington points to the WaterBots team;
+      - a transitioning project also sees the legacy calculator (today it does not);
+      - one entry for each carbon method.
+  - In this repo: the map is one function and one table in `core`, with a test for each rule on made-up projects. It
+    also knows the lobby chat: there, only Wellington is called, there is no record, nothing is calculated, and his
+    one next step is to point the visitor to a door.
+  - Was V6 and M3, the method registry: the map's table holds one entry for each carbon method (V1.0, V2.0 and the
+    transition).
+  - Was W2: a pathway read as unlikely still got a water figure. Done when the host does not call the calculator agent
+    of an unlikely pathway.
+  - [!] Four rules that say which project facts point to which pathway have no source yet. They are listed in the
+    record proposal. Until the maintainer rules them, the map uses only the eligibility readings and the two rules this
+    repo can cite.
+- [ ] **J5.** Finalize all five current agents in v1: Wellington, Phoebe, Bridget, Calvin and Violet, each as an
+      installable package in the core. Bridget's map data needs a rights check before it goes into a public repo.
+      Violet becomes her own crew member on both sites, through the shared spec.
+  - In this repo: Phoebe (was V10 and M9.1) and Bridget (was V11 and M9.2) reach their first release, and Wellington
+    gets a package. Each agent's files come as a carry from the site that holds them.
+  - Waits on: the carries; Phoebe's and Bridget's rulings; the rights check on every one of Bridget's data files; a
+    ruling on the shared map key.
+- [ ] **J6.** Saving a screening into the paid site: the count of people served crosses over correctly, and the paid
+      record never shows "people" as a unit nobody chose.
+  - In this repo: the record keeps people served the way it was entered, as people or as households. It never fills in
+    a unit on its own. The paid site's save does the rest.
+- [ ] **J7.** The maintainer signs off the first water-benefit activity type (safe drinking water supply). No building.
+- [ ] **J8.** Reword the 30 lines the seed checks catch on the paid site, before the next agent moves into the core.
+  - The paid site's work. Files carried here for J5 pass this repo's checks.
+- [ ] **J9.** Close the gaps against the agent rules: agents never talk about their own limits (rule 6); a build rule for
+      a needed fact left blank (rule 11); no repeat introductions (rule 17); the link to the WaterBots team and the
+      consulting page (rule 13; the address waits on the maintainer).
+  - In this repo:
+    - Calvin's and Violet's words are checked for any talk of their own limits.
+    - The record lists each needed fact that is still blank, and which agent needs it.
+    - The map says when an agent still needs an introduction.
+    - The consulting page's address is kept in one shared file in `core`.
+  - [!] Two values stand in for a blank in Calvin. See "A value stands in for a missing one" below.
 
 ---
 
@@ -102,8 +175,6 @@ sites pin that file by its fingerprint. The first pinned version includes the sl
 *Family: Security and hygiene.*
 
 - **M1.4 The maintainer's hand-steps** *Family: Security and hygiene.* — blocked until the maintainer; Session C cannot do these. **Due before the first release (M2.2).**
-  - [!] *Family: Security and hygiene.* Branch protection on `main`: a pull request before merging, every check required, no force pushes or
-        deletions, applied to admins too. Can be done now; steps are in pull request #1.
   - [!] *Family: Security and hygiene.* The npm scope: create the npm organisation or confirm the maintainer owns it (N13)
   - [!] *Family: Security and hygiene.* The `NPM_TOKEN` Actions secret
   - [!] *Family: Security and hygiene.* The maintainer as required reviewer on the `npm-publish` environment, so every release needs their approval
@@ -118,7 +189,7 @@ sites pin that file by its fingerprint. The first pinned version includes the sl
 
 - [ ] **M2.2** *Family: Security and hygiene.* Publish `0.1.0` with no changes to what arrived. *Blocked until* the maintainer's hand-steps in M1.4 are done.
   - [!] *Family: Security and hygiene.* Publish. The maintainer's call, after M1.4.
-  - [ ] **(V1)** *Family: Security and hygiene.* Every release build runs the name scan on the packed files themselves, not only on the repo. Each packed file is unpacked into an empty folder and scanned there. A finding stops the release.
+  - [ ] *Family: Security and hygiene.* Every release build runs the name scan on the packed files themselves, not only on the repo. Each packed file is unpacked into an empty folder and scanned there. A finding stops the release. Not v1: until then, Session C scans the packed files by hand at each release, as `CLAUDE.md` says.
   - [ ] **(V2)** *Family: Security and hygiene.* Rebuild the release on a second machine and show it gives the same bytes: the same fingerprints.
 - [ ] **M2.3 Linting** *Family: Security and hygiene.* (was M1.6): add a linter that runs as part of CI, with the strictest settings that fit. It comes
       right after the seed lands (after M2.2), not before it.
@@ -126,17 +197,7 @@ sites pin that file by its fingerprint. The first pinned version includes the sl
       expected results are the calculator's own again. Done when each one's tag says so and the report's count rises
       with it.
 
-## M3 — The method registry (no look change)
-
-*Family: Agent orchestration.*
-
-*Waits on:* M2.
-
-- [ ] **M3.1** *Family: Agent orchestration.* Registry with one entry per method (carbon V1.0, carbon V2.0, the transition), each wrapping the
-      engine's pure functions and the seed's `Calculator` interface
-- [ ] **M3.2** *Family: Agent orchestration.* Release candidate; private side reports pass or fail
-
-## M4 — Openings and labels, one release candidate each
+## M4 — Openings and labels
 
 *Family: Calculators and methods.*
 
@@ -160,9 +221,9 @@ the litres check on the cap (N5). A step with no image yet has not started.
       and the maintainer checks them on a phone.
 - [ ] **M5.4 (V1)** *Family: Console and surfaces.* Calvin's color is Reef (`#0E8A94`) on his screens. Done when his screens use
       one Reef color token and the maintainer checks the screen.
-- [ ] **M5.5 (V1)** *Family: Console and surfaces.* The simple view ships as Calvin's next release, after the first. It is one
-      release: the simple view (V4), the bigger tap buttons (M5.3) and Reef (M5.4). Done when that release holds the
-      packed files and their fingerprints, and the maintainer checks the screens on a phone.
+- [ ] **M5.5 (V2)** *Family: Console and surfaces.* The simple view (V4): it hides the advanced material until asked.
+      Done when a test shows advanced parts are hidden at first and one control shows them, and the maintainer checks
+      the screens on a phone. M5.3 and M5.4 no longer wait for it.
 
 ## M6 — The fuel-mix floor
 
@@ -201,10 +262,9 @@ The first release does not wait for this.
 
 *Family: Agent orchestration.*
 
-*Waits on:* their own rulings. Bridget also needs a rights read on every data file and a ruling on the shared map key.
+Phoebe's and Bridget's first releases are J5. What is left here comes after v1.
 
-- [ ] **M9.1** *Family: Agent orchestration.* Phoebe (eligibility) to its first release
-- [ ] **M9.2** *Family: Agent orchestration.* Bridget (the map) to its first release
+- **M9.2** *Family: Agent orchestration.* Bridget (the map), beyond her first release
   - [ ] **(V1)** *Family: Console and surfaces.* The map's + and - buttons are big enough to tap on a phone. Done when a test checks their tap size
         and the maintainer checks them on a phone.
 
@@ -244,41 +304,6 @@ Released 2026-11-21. What is left:
 
 - [ ] **C5.5** *Family: Agent orchestration.* Both sites install it, and take the steps in Calvin's README, "Changes in 0.5.0".
 
-## Calvin and Violet 0.5.1
-
-*Family: Console and surfaces.*
-
-A small release for both sites, with exactly four changes, listed in V21 and merged (pull request #38). No sum
-changes.
-
-*Stop for the maintainer:* "release it". *Waits on:* the Agent orchestration family opening.
-
-- [ ] **C51.5** *Family: Agent orchestration.* When the Agent orchestration family opens, Session C packs it, runs the release check and makes the tag. After
-      "release it", the tag is pushed and the release published. Both sites install it.
-
-## Site walk of 2026-11-21: for the next release
-
-*Family: Agent orchestration.*
-
-Three findings from a walk of the open site on 2026-11-21. Each goes in the next release.
-
-- [ ] **W1** *Family: Agent orchestration.* A minus number of people served got no message. The open site still runs its own water
-      calculator, and it ignored the count. Violet's engine refuses a count below zero, with a message. Her screen,
-      like Calvin's, reads a count of zero or below on the record as an empty field, so it says the record is missing
-      people served, which is not quite true. Done when the shared project record refuses a count below zero where it
-      is entered, and Calvin and Violet each say the record's count is below zero.
-- [ ] **W2** *Family: Agent orchestration.* A pathway the eligibility agent had read as unlikely still got a water figure. Nothing told
-      the calculator: the shared project record has no place for each pathway's reading. Done when the record gives each
-      pathway's reading (likely, more to learn or unlikely), with its reason and what would change it, and inside a
-      site's screening the host agent does not call the calculator agent of an unlikely pathway.
-- [ ] **W3** *Family: Agent orchestration.* The site's record said "Community level water treatment technologies", and Calvin read the
-      technology as "other" and would not run. The record hands Calvin one of three codes: community water supply
-      (`CWS`), household water treatment (`HWT`) or `other`. The site turns its own label into a code, and this
-      label became `other`. Done when one shared mapping in `core` turns the sites' technology labels into the
-      record's codes, so both sites read a project the same way, and a test covers this label.
-
----
-
 ## Safety passes
 
 *Family: Security and hygiene.*
@@ -287,6 +312,7 @@ The maintainer's safety passes cover all three repos. This repo's own parts are 
 
 - [ ] *Family: Security and hygiene.* **SP6 — Human engineer review of the structure**, covering all three repos. A human engineer reads how the
       repos are laid out and how they fit together, and reports. Do it now. It does **not** block any M step.
+- [ ] *Family: Security and hygiene.* Routine hygiene, about once a month: check that nothing in this repo repeats or disagrees with a master page (rulings, agent rules, family page, status sheet). Fix what does.
 
 ## Code standards
 
@@ -296,8 +322,6 @@ The maintainer's safety passes cover all three repos. This repo's own parts are 
   access and exact optional properties flag its code in 95 places, so `packages/calvin/tsconfig.json` leaves them
   off. `core` keeps them. A known gap (see `SEEDS.md`): Session C fixes the code here, in this repo, by a normal pull
   request, with no new seal or seed. Then the two checks go back on for `calvin`.
-- **Linting is not set up yet.** *Family: Security and hygiene.* Only strict typing is on today. Adding a linter is its own pull request (lane 3):
-  plan item M2.3, right after the seed lands.
 - [ ] *Family: Security and hygiene.* **For the engineer: confirm and delete unused code.** Nothing uses these, and
       nothing planned needs them (ruling 2026-11-22):
   - `sdwsNum` in `packages/calvin/src/modules/calvin/screen/citations.ts`.
@@ -332,27 +356,10 @@ the maintainer.
       delete a branch when its pull request merges would stop new ones.
 - [!] *Family: Security and hygiene.* **Three rules wait in `CLAUDE.md`** ("Waiting for the maintainer"): the Grant
       line, the engine does every sum, and the three kinds of value. The maintainer places or drops each.
-- [!] *Family: Security and hygiene.* **The status sheet is not in this repo.** Rule 16 and close step 8 name
-      `BUILD_STATUS_SHEET.md`. The maintainer says where it lives.
-- [!] *Family: Console and surfaces.* **"Consultant" in Calvin's screen text and notes:** one line on screen in
-      `EquationStack.tsx`, a comment in `screen/state.ts`, a struck note in the fNRB data and a struck comment in
-      Calvin's settings. Rule 13 says "the WaterBots team". Site wording, so the maintainer rules.
-- [ ] *Family: Agent orchestration.* **Violet's `doors.ts`** hands back to no one in the Agent Commons, always shows
-      water, and cites an old ruling. `docs/vwba-d3-spec.md` says the same. `RULINGS.md` section 4 says the agents
-      called are worked out from the facts. Goes with V17 and W2.
-- [ ] *Family: Agent orchestration.* **No host tells an agent its door** (Free site, Paid site, Agent Commons or MCP;
-      rule 21). Calvin and Violet are not told today.
-- [!] *Family: Agent orchestration.* **The Agent Commons has no project record.** Rule 10 has an agent check the record
-      first. No rule says what an agent does where there is none.
-- [ ] *Family: Agent orchestration.* **Neither agent adds its results to the record** (rule 10). Calvin saves only his
-      inputs, and Violet saves nothing. Waits on V9.
-- [ ] *Family: Agent orchestration.* **A link to the WaterBots consulting page** (rule 13). Each door's host needs the
-      address, kept in one shared file. The address is not in this repo.
-- [ ] *Family: Agent orchestration.* **Calvin's agent tools are not exported** from his package, though his
-      `config.yaml` names them. Violet's are exported. Export them or retire them with V17.
 - [!] *Family: Calculators and methods.* **A value stands in for a missing one.** Calvin counts embodied emissions as 0
       when they are not entered, with a warning. `RULINGS.md` section 2 says a missing fact never counts as zero.
-      Devices per household is 1 when not given, as Calvin's own rulings say. Changing either changes a sum.
+      Devices per household is 1 when not given, as Calvin's own rulings say. Changing either changes a sum. Goes with
+      J9 (rule 11).
 
 ---
 

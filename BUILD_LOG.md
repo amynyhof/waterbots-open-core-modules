@@ -5,6 +5,7 @@ history keeps everything older and every longer entry.
 
 ---
 
+- 2026-11-22 — Family 1 (Agent orchestration) opened: the plan takes J1 to J9. Branch protection on `main` is done (M1.4).
 - 2026-11-22 — Family 8 (Security and hygiene) closed: finished items out of the plan, the sprint's findings filed.
 - 2026-11-22 — Plan: the fallback dial waits on N16; the rest of the unused code is an item for the engineer.
 - 2026-11-22 — Keep it light: checks and builds run once, the log cut to one line each, stale pointers fixed.
