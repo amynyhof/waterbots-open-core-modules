@@ -66,7 +66,7 @@ sites pin that file by its fingerprint. The first pinned version includes the sl
 | V15 | v1 proof and grading | The v1 release: a GitHub release that both sites pin. | V8, V14; the maintainer's approval. | Both sites run the same pinned file. The maintainer confirms the whole journey on the live sites, and the average question count is reported. |
 | V20 | Agent orchestration | [x] (Released: tag `calvin-violet-v0.5.0` on commit `1bce514`. The sites install it through 0.5.1, J1.) Calvin and Violet 0.5.0, one release for both sites. Calvin: the main credit tiles (tCO₂e a year) are a pinned header, whether or not a site sets `unpinFigureBlock`; the smaller figures sit right under them; the sliders and the calculation collapse. The controls panel holds only the site's own top and Calvin's buttons, the work surface ends with the calculation, and the report's note on how the figures were produced is one sentence shorter. A phone pass: rows wrap instead of squeezing. Violet: people served come from the project record, as Calvin takes them, and "Draft — pending expert review" shows on the screen and on every result. No sum changes. | V8. | Session C packs all three packages, runs the release check and makes the tag. One release holds all three files. After "release it", Session C pushes the tag and publishes the release. Both sites install it. |
 
-**Where things stand (2026-11-22):** The latest release is `calvin-violet-v0.5.1` (J1): Calvin 0.5.1, Violet 0.5.1 and core 0.1.2. Both sites still install it. Family 1, Agent orchestration, is open: its v1 scope is J1 to J9. The core pull request for J2, J3 and J4 (#46) waits for the maintainer's word. Finished steps are in the build log.
+**Where things stand (2026-11-23):** The latest release is `calvin-violet-v0.5.1` (J1): Calvin 0.5.1, Violet 0.5.1 and core 0.1.2. Both sites still install it. Family 1, Agent orchestration, is open: its v1 scope is J1 to J9. The core pull request for J2, J3 and J4 (#46) and the agents pull request for Calvin and Violet (#49) are merged, not released yet. Finished steps are in the build log.
 
 **Sources still to find:** in the source sweep, M10.4.
 
@@ -114,6 +114,10 @@ their tasks, collect what they need, and report back to him. He helps with the n
     only draws the buttons. On the sites, the record sets `creditedUnderV1`, and no choice is shown.
     - [!] Waits on the maintainer's ruling on the wording.
   - Calvin's agent tools are exported from his package, as Violet's are, or retired with his Commons choices.
+  - Merged, not released yet (#46, #49): the places in `core`; Calvin and Violet take their place from the host;
+    Violet's doors give way to the map, and her old names still work; Calvin's tools, record helpers and two Commons
+    choices are exported from `@waterbots/calvin/agent`. Each choice sets `creditedUnderV1`, and the comparison still
+    needs the filed V1.0 fNRB. Still to come: the choices' wording and his opening line.
 - [ ] **J3.** The shared project record. Every agent adds its facts and results to one record, and the paid site reads
       it (agent rule 10). It holds each pathway's reading (likely, more to learn, unlikely) with its reason and what
       would change it. It refuses a count below zero where it is entered. One shared list turns each site's
@@ -131,6 +135,11 @@ their tasks, collect what they need, and report back to him. He helps with the n
     count.
   - Waits on: the free site's full list of technology labels, and Wellington's fields; the paid site's save format.
     Each comes as a carry.
+  - Merged, not released yet (#46, #49): the record's shape, its fact check and the label list in `core` (W3 done).
+    Calvin and Violet read the record first, ask only for what it lacks, and add their facts, results and question
+    counts. A test takes a made-up project through Calvin's part and Violet's part, saves it, and reads it back
+    unchanged. Still to come: the parts of Wellington, Phoebe and Bridget (J5), and the screens' words for a count
+    below zero (W1; site wording, waits on the maintainer).
 - [ ] **J4.** The agent map. ONE map, kept in the core, reads the project's facts and the door, and says which agents
       are in play, which method applies, and what comes next. It is worked out from facts, so the same project always
       gets the same agents. Wellington leads from it on both sites. It replaces one-off rules. It must cover at least:
@@ -146,6 +155,8 @@ their tasks, collect what they need, and report back to him. He helps with the n
     transition).
   - Was W2: a pathway read as unlikely still got a water figure. Done when the host does not call the calculator agent
     of an unlikely pathway.
+  - Merged, not released yet (#46): the map and its table in `core`, with a test for each rule. Violet follows it
+    (#49), so an unlikely water pathway no longer gets her calculator (W2).
   - [!] Four rules that say which project facts point to which pathway have no source yet. They are listed in the
     record proposal. Until the maintainer rules them, the map uses only the eligibility readings and the two rules this
     repo can cite.
@@ -171,6 +182,10 @@ their tasks, collect what they need, and report back to him. He helps with the n
     - The record lists each needed fact that is still blank, and which agent needs it.
     - The map says when an agent still needs an introduction.
     - The consulting page's address is kept in one shared file in `core`.
+  - Merged, not released yet (#46, #49): Calvin's and Violet's words checked; Violet's prompt no longer frames her
+    method's standing as her own limits. Both prompts say what each needed fact is for and where it usually comes
+    from, and the record lists each needed fact still blank. The map says when an agent still needs an introduction.
+    Still to come: the consulting page's address.
   - [!] Two values stand in for a blank in Calvin. See "A value stands in for a missing one" below.
 
 ---
