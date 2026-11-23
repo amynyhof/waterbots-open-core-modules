@@ -43,6 +43,7 @@ In force from 22 Nov 2026. Rules 20 and 21 added, and rules 4, 6, 8, 9, 11 and 1
     - Paid site: the project record is the Project Record page. A project can hold several versions of the same number, such as a baseline, a screening estimate and later research. The user and the agents decide which one is final, and that one goes on the Project Record page. Agents work from that page, so everyone knows what their answers rest on.
     - Agent Commons: there is no project record and no memory. The agent asks for each fact it needs.
     - MCP: the user's own AI calls the agent's tool. There is no project record. The user's AI draws the facts from the user's own documents, and the user confirms them.
+    - Lobby chat: this is not a door. It is the open chat with Wellington on the paid site's front page. He chats openly, with no project record, and points the visitor to the Free site, the Paid site or the Agent Commons.
 
 ## Notes for builders (not read by agents)
 - The status sheet is BUILD_STATUS_SHEET.md: one master in the handoff folder, an exact copy in each site's shared knowledge folder, updated at each family close.

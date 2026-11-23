@@ -79,8 +79,16 @@ With Violet 0.5.1, for both sites. No sum changed, and every test case gives the
   "Not entered". A blank never counts as zero: with a monitoring value missing, no figures show.
 - Where a sentence says what the sum did without a value, it stays, without the "Not entered" label. For example:
   "Eq.6 could not run; people-basis aggregate used".
+- **The agent rules come from core.** Calvin reads the foundational agent rules, rules 1 to 21, from
+  `@waterbots/core/agent-rules.md`. The copy in `agents/_base-rules.md` is gone. Calvin's prompt and notes now hold only
+  what is different for him, in a warmer voice.
+- **The tool's words.** The descriptions of his tool's inputs, and the messages the tool hands back to the agent,
+  say what each fact is. They no longer list what the agent must not do; the agent rules cover that.
+- **Core 0.1.2.** Calvin needs `@waterbots/core` 0.1.2, which ships the agent rules file.
+- Old pointers in code comments are cleaned up. No code changed for them.
 
-**What a site should change.** Nothing. No exported name changed.
+**What a site should change.** A site that loads Calvin's agent loads the rules from
+`@waterbots/core/agent-rules.md`, where it loaded `agents/_base-rules.md` before. No exported name changed.
 
 ## Changes in 0.5.0
 
@@ -188,6 +196,6 @@ No sum changed. The engine version and every test case stay as they are.
 
 Since the seed landed, this repo is Calvin's home. Changes are made here, by pull request. `scripts/check-seed.mjs` proves what arrived against the commit where the seed landed, so later changes are allowed.
 
-- Version 0.5.0. Not published. Nothing in this repo goes to npm yet; the package is marked `private`.
+- Version 0.5.1. Not published. Nothing in this repo goes to npm yet; the package is marked `private`.
 - The build writes plain files for a bundler to pick up. Apart from `dist/engine.js` and `dist/screen.js`, they do not run on their own in Node.
 - Apache License 2.0. See `LICENSE` and `NOTICE` in this folder.
