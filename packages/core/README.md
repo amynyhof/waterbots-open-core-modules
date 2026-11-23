@@ -9,6 +9,10 @@ What is in `src/`:
 - `saveOutcome.ts` and `SaveNotice.tsx`: what a save can return, and the notice that shows it.
 - `readOnly.tsx`: the read-only seat, for screens that must show a result but not allow edits.
 - `agent.ts` and `calculatorTool.ts`: the agent contract, and the helper that turns a calculator into an agent tool.
+- `record.ts`: the shared project record (J3): its shape, and the fact check a site runs where a fact is entered. A count below zero is refused. Not part of the seed.
+- `technologyLabels.ts`: the one list that turns each site's technology label into the record's code. Not part of the seed.
+- `places.ts`: the four doors of agent rule 21, and the lobby chat, which is not a door. Not part of the seed.
+- `agentMap.ts`: the agent map (J4). It reads the record and the place, and says which agents are called, which method applies and the one next step. It gives codes, never words, and does no sums. Not part of the seed.
 - `agent-rules.md`: the foundational agent rules, rules 1 to 21 of `AGENT_RULES.md` at the root of this repo, word for word. Every agent reads them before its own files. A host reads them as `@waterbots/core/agent-rules.md`. A test keeps them the same as the page. Not part of the seed.
 - `base.css`: the design tokens and the classes the module screens use. A site without a design system of its own imports it: `import "@waterbots/core/base.css"`. The paid site does not; its own design system styles the screens. Every colour is a starting point that a site can set for itself. Not part of the seed.
 
