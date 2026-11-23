@@ -62,13 +62,11 @@ sites pin that file by its fingerprint. The first pinned version includes the sl
 | V5 | v1 proof and grading | [~] (Released 2026-11-05: tag `calvin-v0.1.0` on commit `3020ee7`, recorded in `SEEDS.md`. Still to come: both sites pin it, and the private side reports pass or fail.) The first GitHub release: the packed packages (`calvin` and the `core` it needs) and their fingerprints, with both views: the ex-ante view with sliders, and the full ex-post view. A site mounts them through `@waterbots/calvin/screen`; the open site locks to ex-ante. Replaces the npm publish in M2.2. It does not wait for the simple view. | The maintainer's approval; the tag rule (M1.4). | The release holds the files and their fingerprints. Both sites pin it. The private side reports pass or fail on both carbon filings. |
 | J1 to J9 | Agent orchestration | The v1 scope of family 1. See "Family 1: the v1 scope" below. | See each job. | See each job. |
 | V8 | Experts and partners | [x] (Merged, pull request #18. Still to come: the outside expert's check, and N14 and N15 for the outside expert group.) D-3, the water-supply module, inside Violet (M8.1). | It does not wait for the activity-type signature or N6: D-3 is a prototype the outside expert checks later. | Violet's D-3 tests are hand-worked cases, with every step cited to the guidebook (cited, not copied). The VWBA spec is written alongside the build, in `docs/`, and the maintainer reviews it then. An outside expert checks the module once the prototype is up. |
-| V9 | Agent orchestration | (Proposal: `docs/proposals/shared-project-record.md`, pull requests #34 and #35, and its follow-up.) The screening hand-off: one project record in `core` that every module fills in and the paid site reads. Each module writes how many questions it asked on that walk. | V5; the paid site's save format (paid repo); Wellington's fields (free-site repo). | A test takes an invented project through all four modules' parts, saves it, reads it back unchanged, and gives each module's question count. |
-| V12 | Agent orchestration | Calvin's screening part: Calvin fills its part of the record and counts its questions. | V9. | A test shows Calvin's part saved and its count written. |
-| V14 | v1 proof and grading | The same-numbers check: a project saved by the screening, read back the way the paid site reads it, gives the same numbers, or a list of what changed and why. | J4, J5, V12. | A test passes here on invented projects. The private side runs it on both real filings with the pinned release and reports pass. |
+| V14 | v1 proof and grading | The same-numbers check: a project saved by the screening, read back the way the paid site reads it, gives the same numbers, or a list of what changed and why. | J3, J4, J5. | A test passes here on invented projects. The private side runs it on both real filings with the pinned release and reports pass. |
 | V15 | v1 proof and grading | The v1 release: a GitHub release that both sites pin. | V8, V14; the maintainer's approval. | Both sites run the same pinned file. The maintainer confirms the whole journey on the live sites, and the average question count is reported. |
-| V20 | Agent orchestration | [x] (Released: tag `calvin-violet-v0.5.0` on commit `1bce514`. Still to come: both sites install it. See the step "Calvin and Violet 0.5.0".) Calvin and Violet 0.5.0, one release for both sites. Calvin: the main credit tiles (tCO₂e a year) are a pinned header, whether or not a site sets `unpinFigureBlock`; the smaller figures sit right under them; the sliders and the calculation collapse. The controls panel holds only the site's own top and Calvin's buttons, the work surface ends with the calculation, and the report's note on how the figures were produced is one sentence shorter. A phone pass: rows wrap instead of squeezing. Violet: people served come from the project record, as Calvin takes them, and "Draft — pending expert review" shows on the screen and on every result. No sum changes. | V8. | Session C packs all three packages, runs the release check and makes the tag. One release holds all three files. After "release it", Session C pushes the tag and publishes the release. Both sites install it. |
+| V20 | Agent orchestration | [x] (Released: tag `calvin-violet-v0.5.0` on commit `1bce514`. The sites install it through 0.5.1, J1.) Calvin and Violet 0.5.0, one release for both sites. Calvin: the main credit tiles (tCO₂e a year) are a pinned header, whether or not a site sets `unpinFigureBlock`; the smaller figures sit right under them; the sliders and the calculation collapse. The controls panel holds only the site's own top and Calvin's buttons, the work surface ends with the calculation, and the report's note on how the figures were produced is one sentence shorter. A phone pass: rows wrap instead of squeezing. Violet: people served come from the project record, as Calvin takes them, and "Draft — pending expert review" shows on the screen and on every result. No sum changes. | V8. | Session C packs all three packages, runs the release check and makes the tag. One release holds all three files. After "release it", Session C pushes the tag and publishes the release. Both sites install it. |
 
-**Where things stand (2026-11-22):** The latest release is `calvin-violet-v0.5.0` (V20): Calvin 0.5.0, Violet 0.5.0 and core 0.1.1. Both sites still install it. Family 1, Agent orchestration, is open: its v1 scope is J1 to J9. Its first job is the 0.5.1 release (J1), which waits for "release it". Finished steps are in the build log.
+**Where things stand (2026-11-22):** The latest release is `calvin-violet-v0.5.1` (J1): Calvin 0.5.1, Violet 0.5.1 and core 0.1.2. Both sites still install it. Family 1, Agent orchestration, is open: its v1 scope is J1 to J9. The core pull request for J2, J3 and J4 (#46) waits for the maintainer's word. Finished steps are in the build log.
 
 **Sources still to find:** in the source sweep, M10.4.
 
@@ -99,8 +97,10 @@ their tasks, collect what they need, and report back to him. He helps with the n
 
 - [ ] **J1.** Release Calvin and Violet 0.5.1 as one joined release. After it, each agent gets its own release, so one
       agent can be updated without the other. Both sites install the same release in the same batch.
-  - In this repo: core goes to 0.1.2, because it changed after 0.5.0. The release notes list everything since 0.5.0.
-    Session C packs it once the opening pull request merges, runs the release check, and waits for "release it".
+  - Released 2026-11-22: tag `calvin-violet-v0.5.1` on commit `b29c124`, with Calvin 0.5.1, Violet 0.5.1 and core
+    0.1.2. Its notes list everything since 0.5.0.
+  - Still to come: both sites install it in the same batch, and take the steps in Calvin's and Violet's READMEs,
+    "Changes in 0.5.0" and "Changes in 0.5.1". It takes the place of installing 0.5.0 (was C5.5).
   - After 0.5.1: one tag and one GitHub release for each package, all going out in one batch at the family close.
 - [ ] **J2.** Doors. Each host tells each agent which door it is at: Free site, Paid site, Agent Commons or MCP (agent
       rule 21). An agent working alone asks for what it needs itself. This covers how Calvin opens in the Agent
@@ -125,7 +125,12 @@ their tasks, collect what they need, and report back to him. He helps with the n
     and Calvin and Violet each say the record's count is below zero.
   - Was W3: the label "Community level water treatment technologies" was read as `other`, so Calvin would not run.
     Done when one list in `core` turns the sites' labels into the record's codes, and a test covers this label.
-  - Waits on: the free site's full list of technology labels; the paid site's save format. Each comes as a carry.
+  - Was V9 and V12, and stays v1, because the v1 finish line counts the questions on each walk: each agent writes how
+    many questions it asked on that walk. A fact read from the record is not a question. Done when a test takes a
+    made-up project through every agent's part, saves it, reads it back unchanged, and gives each agent's question
+    count.
+  - Waits on: the free site's full list of technology labels, and Wellington's fields; the paid site's save format.
+    Each comes as a carry.
 - [ ] **J4.** The agent map. ONE map, kept in the core, reads the project's facts and the door, and says which agents
       are in play, which method applies, and what comes next. It is worked out from facts, so the same project always
       gets the same agents. Wellington leads from it on both sites. It replaces one-off rules. It must cover at least:
@@ -293,17 +298,6 @@ and the IPCC 2006 citations.
       labelled "assumed". A cited source for it is found in the sweep.
       `startsWithoutSource` in `screen/exAnte.ts` lists every start with no source.
 
-## Calvin and Violet 0.5.0
-
-*Family: Agent orchestration.*
-
-One release for both sites: Calvin 0.5.0, Violet 0.5.0 (her first release) and core 0.1.1, in one GitHub release
-holding all three packed files. It is V20 on the road to v1. No sum changes.
-
-Released 2026-11-21. What is left:
-
-- [ ] **C5.5** *Family: Agent orchestration.* Both sites install it, and take the steps in Calvin's README, "Changes in 0.5.0".
-
 ## Safety passes
 
 *Family: Security and hygiene.*
@@ -350,8 +344,6 @@ the maintainer.
       still says "reference case" for the made-up test cases. Left as it is: a name in code.
 - [!] *Family: Security and hygiene.* **No copied-text check.** `RULINGS.md` section 1 says every release is checked for
       copied text. This repo's release check has none. A new check needs the maintainer's yes.
-- [!] *Family: Security and hygiene.* **Session C's local deny rules** still block pushing one release tag by name and
-      `gh release create`, though `CLAUDE.md`'s release steps have Session C do both after "release it".
 - [!] *Family: Security and hygiene.* **Merged branches stay on GitHub** (23 besides `main`). GitHub's setting to
       delete a branch when its pull request merges would stop new ones.
 - [!] *Family: Security and hygiene.* **Three rules wait in `CLAUDE.md`** ("Waiting for the maintainer"): the Grant
