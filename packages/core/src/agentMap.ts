@@ -11,9 +11,10 @@
  *
  * Design approved by the maintainer on 2026-11-22, with the lobby chat added.
  */
-import type { StandardId } from "./standards";
-import type { Door, Place } from "./places";
-import { type AgentId, type ProjectFacts, type ProjectRecord, type Reading, AGENTS, emptyRecord } from "./record";
+import type { StandardId } from "./standards.js";
+import type { Door, Place } from "./places.js";
+// The ".js" lets the built file load in plain Node, such as a host serving an agent's tool through MCP.
+import { type AgentId, type ProjectFacts, type ProjectRecord, type Reading, AGENTS, emptyRecord } from "./record.js";
 
 /** The map's version. A record notes the version it was last mapped with. */
 export const AGENT_MAP_VERSION = 1 as const;

@@ -14,7 +14,8 @@ VWBA is a way to count the water a project gives back.
   monitoring data. It computes nothing.
 - `src/agents/violet/`: Violet's prompt, settings and knowledge notes.
 - `src/agent/`: her calculator tool. The tool calls the engine; Violet does no sums.
-- `src/doors.ts`: where Violet works and what each place shows.
+- `src/record.ts`: how Violet reads the shared project record, and adds the facts she asked for and her results (J3).
+- `src/doors.ts`: where Violet works. It gives way to core's places and the agent map (J2).
 
 ## Entries
 
@@ -28,6 +29,17 @@ VWBA is a way to count the water a project gives back.
 
 The water and carbon calculators sit side by side. They are never added together. Whether one project may claim
 both is an open question (N14 in `BUILD_PLAN.md`).
+
+## Changes since 0.5.1 (not released yet)
+
+- **The shared project record (J3).** `d3InputFromRecord` reads people served as entered, the access level and the
+  water before the project. `violetNeeds` lists what the record still lacks. `addVioletFacts` adds what the person
+  gave her, and `addVioletResults` writes her input and her figure, with its status. Her screen takes `record` in
+  place of `project`.
+- **Her place (J2).** `readsProjectRecord` and `handsBackTo` take core's `Place`. `violetCall` reads her call on
+  core's agent map. An unlikely water pathway's calculator is not called (W2). The old door names, `carbonShowsBeside`
+  and `WATER_ALWAYS_SHOWS` still work, so a site keeps working until it moves. Nothing in this package uses them.
+- No sum changed.
 
 ## Changes in 0.5.1
 

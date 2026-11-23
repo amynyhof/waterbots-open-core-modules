@@ -14,6 +14,8 @@ import {
   type SiteTables,
 } from "../engine";
 import { calculatorPageContext } from "../agent/pageContext";
+import { calvinRecordProblems } from "../agent/record";
+import type { Place } from "@waterbots/core/places";
 import type { SavedAnalysis } from "./analysis";
 import {
   missingProjectFacts,
@@ -114,6 +116,11 @@ export interface CalculatorOptions {
    * here. Off by default: the buttons show. The report itself still shows on the report tab.
    */
   hideExportButton?: boolean;
+  /**
+   * WHERE CALVIN IS WORKING (J2; agent rule 21): the Free site, the Paid site, the Agent Commons or MCP. The host
+   * names it, and Calvin works with what that place gives him. Left out, a site with a project record, as before.
+   */
+  place?: Place;
 }
 
 export interface CalculatorState {
@@ -415,7 +422,7 @@ export function useCalculatorState(project: CalvinProject, options: CalculatorOp
   const erPerPerson = result && result.people > 0 ? result.result.ER / result.people : 0;
 
   const pageContext = () =>
-    calculatorPageContext({ projectName: project.name, state, missingFacts, activityAsk, missingMonitoring: monitoringAsk, fnrbRefusal, filedFnrbRefusal, transition, result, legacyResult, paaResult, waterfall });
+    calculatorPageContext({ projectName: project.name, state, missingFacts, activityAsk, missingMonitoring: monitoringAsk, fnrbRefusal, filedFnrbRefusal, transition, result, legacyResult, paaResult, waterfall, recordProblems: calvinRecordProblems(project), ...(options.place !== undefined ? { place: options.place } : {}) });
 
   return {
     readOnly,

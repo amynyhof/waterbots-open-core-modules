@@ -162,3 +162,185 @@ export function checkRecord(record: ProjectRecord): Array<Extract<EntryCheck, { 
   if (facts.withoutProjectM3PerYear !== undefined) entries.push(["withoutProjectM3PerYear", facts.withoutProjectM3PerYear.value]);
   return entries.map(([fact, value]) => checkEntry(fact, value)).filter((c): c is Extract<EntryCheck, { ok: false }> => !c.ok);
 }
+
+// ── Adding to the record ─────────────────────────────────────────────────────────────────────────────────────────
+// Agent rule 10: an agent checks the record first and asks only for what is missing. It adds the facts it asked for,
+// and its results. A fact already on the record is never changed here: it is edited where the host keeps it. Each
+// fact an agent adds is one question it asked; a fact read from the record is not a question.
+
+/** Every fact an agent may add, named by where it sits in the record. */
+export const FACT_KEYS = [
+  "name",
+  "technology",
+  "population.served",
+  "population.mode",
+  "population.householdSize",
+  "lpcd",
+  "pumpPower",
+  "creditedUnderV1",
+  "accessLevel",
+  "withoutProjectM3PerYear",
+  "country",
+  "region",
+] as const;
+export type FactKey = (typeof FACT_KEYS)[number];
+
+/** Facts as the person gave them to an agent. Each has the record's shape, without its source. */
+export interface GivenFacts {
+  name?: string;
+  technology?: { label: string; code?: Technology };
+  /** As entered. A count with no `mode` stays that way: no unit is filled in on its own (J6). */
+  population?: Population;
+  lpcd?: number;
+  pumpPower?: "hand" | "gravity" | "solar" | "diesel" | "grid";
+  creditedUnderV1?: boolean;
+  accessLevel?: "full" | "limited";
+  withoutProjectM3PerYear?: number;
+  country?: string;
+  region?: string;
+}
+
+/** True when the record does not hold this fact yet. */
+export function isBlank(record: ProjectRecord, key: FactKey): boolean {
+  const { facts, place } = record;
+  const pop = facts.population?.value;
+  switch (key) {
+    case "name":
+      return facts.name === undefined;
+    case "technology":
+      return facts.technology === undefined;
+    case "population.served":
+      return pop?.served === undefined;
+    case "population.mode":
+      return pop?.mode === undefined;
+    case "population.householdSize":
+      return pop?.householdSize === undefined;
+    case "country":
+      return place.country === undefined;
+    case "region":
+      return place.region === undefined;
+    default:
+      return facts[key] === undefined;
+  }
+}
+
+/** The needed facts the record does not hold yet, in the order given. Each agent names the facts it needs. */
+export function blankFacts(record: ProjectRecord, needed: readonly FactKey[]): FactKey[] {
+  return needed.filter((k) => isBlank(record, k));
+}
+
+export interface AddedFacts {
+  /** A new record. The one handed in is not changed. */
+  record: ProjectRecord;
+  /** The facts added. Each one counts as a question the agent asked. */
+  added: FactKey[];
+  /** Numbers that failed the fact check. They are not added; the agent says what is wrong, in its own words. */
+  refused: Array<Extract<EntryCheck, { ok: false }>>;
+}
+
+/**
+ * Adds the facts the person gave an agent. Only blank facts are filled; a fact already on the record stays as it is.
+ * Each number is checked first, and one that fails is refused. The agent's question count goes up by one for each
+ * fact added.
+ */
+export function addGivenFacts(record: ProjectRecord, agent: AgentId, given: GivenFacts): AddedFacts {
+  const out = structuredClone(record);
+  const added: FactKey[] = [];
+  const refused: AddedFacts["refused"] = [];
+  const source: Source = { by: "person", note: `given to ${agent}` };
+  const checked = (fact: CheckedFact, value: number): boolean => {
+    const c = checkEntry(fact, value);
+    if (!c.ok) refused.push(c);
+    return c.ok;
+  };
+  const blank = (key: FactKey): boolean => isBlank(out, key);
+  const { facts, place } = out;
+
+  if (given.name !== undefined && blank("name")) {
+    facts.name = given.name;
+    added.push("name");
+  }
+  if (given.technology !== undefined && blank("technology")) {
+    facts.technology = { ...given.technology, source };
+    added.push("technology");
+  }
+  if (given.population !== undefined) {
+    const pop: Population = { ...facts.population?.value };
+    const before = added.length;
+    const { served, mode, householdSize } = given.population;
+    if (served !== undefined && blank("population.served") && checked("population.served", served)) {
+      pop.served = served;
+      added.push("population.served");
+    }
+    if (mode !== undefined && blank("population.mode")) {
+      pop.mode = mode;
+      added.push("population.mode");
+    }
+    if (householdSize !== undefined && blank("population.householdSize") && checked("population.householdSize", householdSize)) {
+      pop.householdSize = householdSize;
+      added.push("population.householdSize");
+    }
+    if (added.length > before) {
+      // One source for the count: a part already on the record keeps who gave it, and the note says what was added.
+      const was = facts.population?.source;
+      const note = `${added.slice(before).join(", ")} given to ${agent}`;
+      facts.population = { value: pop, source: was === undefined ? source : { by: was.by, note: `${was.note}; ${note}` } };
+    }
+  }
+  if (given.lpcd !== undefined && blank("lpcd") && checked("lpcd", given.lpcd)) {
+    facts.lpcd = { value: given.lpcd, source };
+    added.push("lpcd");
+  }
+  if (given.pumpPower !== undefined && blank("pumpPower")) {
+    facts.pumpPower = { value: given.pumpPower, source };
+    added.push("pumpPower");
+  }
+  if (given.creditedUnderV1 !== undefined && blank("creditedUnderV1")) {
+    facts.creditedUnderV1 = { value: given.creditedUnderV1, source };
+    added.push("creditedUnderV1");
+  }
+  if (given.accessLevel !== undefined && blank("accessLevel")) {
+    facts.accessLevel = { value: given.accessLevel, source };
+    added.push("accessLevel");
+  }
+  if (given.withoutProjectM3PerYear !== undefined && blank("withoutProjectM3PerYear") && checked("withoutProjectM3PerYear", given.withoutProjectM3PerYear)) {
+    facts.withoutProjectM3PerYear = { value: given.withoutProjectM3PerYear, source };
+    added.push("withoutProjectM3PerYear");
+  }
+  if (given.country !== undefined && blank("country")) {
+    place.country = { value: given.country, source };
+    added.push("country");
+  }
+  if (given.region !== undefined && blank("region")) {
+    place.region = { value: given.region, source };
+    added.push("region");
+  }
+
+  if (added.length > 0) {
+    const part = out.agents[agent] ?? {};
+    out.agents[agent] = { ...part, questionsAsked: (part.questionsAsked ?? 0) + added.length };
+  }
+  return { record: out, added, refused };
+}
+
+/** An agent's results for the record. `estimate: null` clears an estimate that no longer holds. */
+export interface AgentResults {
+  inputs?: unknown;
+  estimate?: Estimate | null;
+  done?: boolean;
+}
+
+/**
+ * Writes an agent's results to its own part of the record: its inputs, its estimate and whether it is done. Its
+ * question count stays as it is. Returns a new record; the one handed in is not changed.
+ */
+export function setAgentResults(record: ProjectRecord, agent: AgentId, results: AgentResults): ProjectRecord {
+  const out = structuredClone(record);
+  const part: AgentPart = { ...out.agents[agent] };
+  if (results.inputs !== undefined) part.inputs = structuredClone(results.inputs);
+  if (results.estimate === null) delete part.estimate;
+  else if (results.estimate !== undefined) part.estimate = { ...results.estimate };
+  if (results.done !== undefined) part.done = results.done;
+  out.agents[agent] = part;
+  return out;
+}

@@ -1,7 +1,7 @@
 // Tests for the screen-entry check: how it judges what was rendered, on invented markup only.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { compare, EXPECT, FILED_ASK, MONITORING_ASK, NAMES, PACKAGE_DAF, SITE_DAF, SITE_SOURCE, V2_ONLY } from "./check-screen-entry.mjs";
+import { AGENT_NAMES, AGENT_TOOLS, compare, EXPECT, FILED_ASK, MONITORING_ASK, NAMES, PACKAGE_DAF, SITE_DAF, SITE_SOURCE, V2_ONLY } from "./check-screen-entry.mjs";
 
 const SLIDERS = 'aria-label="Anticipated performance"';
 const goodRun = () => ({
@@ -20,6 +20,7 @@ const goodRun = () => ({
     transitionReport: "<h1>PAA Transition Analysis</h1><p>Legacy V1.0 ER</p><h2>What changed — methodology transition</h2>",
     transitionNeedsFiling: `<span>${FILED_ASK}</span>`,
   },
+  agent: { names: [...AGENT_NAMES], tools: [...AGENT_TOOLS], runs: true },
   stylesheets: { "@waterbots/calvin/styles.css": true, "@waterbots/core/base.css": true },
   typeErrors: [],
 });
@@ -109,5 +110,15 @@ test("a missing export, view, stylesheet or type check is a problem", () => {
     "exPostReport: nothing rendered",
     "stylesheet not found: @waterbots/core/base.css",
     "types: the types were not checked",
+  ]);
+});
+
+test("an agent entry that lacks an export or a tool, or whose tool did not run, is a problem", () => {
+  const run = goodRun();
+  run.agent = { names: AGENT_NAMES.filter((n) => n !== "addCalvinResults"), tools: [AGENT_TOOLS[0]], runs: false };
+  assert.deepEqual(compare(run), [
+    "the agent entry does not export addCalvinResults",
+    "the agent entry does not hold Calvin's two tools",
+    "Calvin's tool or the agent map did not run from the packed files",
   ]);
 });
