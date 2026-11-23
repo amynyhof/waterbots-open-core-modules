@@ -167,6 +167,18 @@ their tasks, collect what they need, and report back to him. He helps with the n
     gets a package. Each agent's files come as a carry from the site that holds them.
   - Waits on: the carries; Phoebe's and Bridget's rulings; the rights check on every one of Bridget's data files; a
     ruling on the shared map key.
+  - One calculator screen (ruled by the maintainer on 2026-11-23). Design first: nothing is built in the packages
+    until the maintainer says go.
+    - One calculator screen for every calculator agent. What is done for Violet is done for Calvin, and the other
+      way round.
+    - Violet's screen gets header rows and hero numbers like Calvin's, where it makes sense: the same height, the
+      same format, collapsible formulas, and sliders where they make sense.
+    - A place to write notes on a value. Both calculators get it, and the notes make it into the export.
+    - Subtle colour grades on each calculator to match its agent: Calvin's colour for Calvin, Orchid for Violet. It
+      helps keep the tools apart.
+    - The same rule holds on the Free site and the Paid site, where the screens are slightly different. Violet's
+      paid screen matches Calvin's paid screen, and her free screen matches his free screen.
+    - [!] Waits on the maintainer's go on the design proposal (Session C's report, 2026-11-23).
 - [ ] **J6.** Saving a screening into the paid site: the count of people served crosses over correctly, and the paid
       record never shows "people" as a unit nobody chose.
   - In this repo: the record keeps people served the way it was entered, as people or as households. It never fills in
