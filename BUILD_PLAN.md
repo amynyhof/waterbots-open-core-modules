@@ -66,7 +66,7 @@ sites pin that file by its fingerprint. The first pinned version includes the sl
 | V15 | v1 proof and grading | The v1 release: a GitHub release that both sites pin. | V8, V14; the maintainer's approval. | Both sites run the same pinned file. The maintainer confirms the whole journey on the live sites, and the average question count is reported. |
 | V20 | Agent orchestration | [x] (Released: tag `calvin-violet-v0.5.0` on commit `1bce514`. The sites install it through 0.5.1, J1.) Calvin and Violet 0.5.0, one release for both sites. Calvin: the main credit tiles (tCO₂e a year) are a pinned header, whether or not a site sets `unpinFigureBlock`; the smaller figures sit right under them; the sliders and the calculation collapse. The controls panel holds only the site's own top and Calvin's buttons, the work surface ends with the calculation, and the report's note on how the figures were produced is one sentence shorter. A phone pass: rows wrap instead of squeezing. Violet: people served come from the project record, as Calvin takes them, and "Draft — pending expert review" shows on the screen and on every result. No sum changes. | V8. | Session C packs all three packages, runs the release check and makes the tag. One release holds all three files. After "release it", Session C pushes the tag and publishes the release. Both sites install it. |
 
-**Where things stand (2026-11-23):** The latest release is `calvin-violet-v0.5.1` (J1): Calvin 0.5.1, Violet 0.5.1 and core 0.1.2. Both sites still install it. Family 1, Agent orchestration, is open: its v1 scope is J1 to J9. The core pull request for J2, J3 and J4 (#46), the agents pull request for Calvin and Violet (#49) and the one calculator screen (#52) are merged, not released yet. Finished steps are in the build log.
+**Where things stand (2026-11-23):** The latest release is core 0.2.0, Calvin 0.6.0 and Violet 0.6.0, one tag each (`core-v0.2.0`, `calvin-v0.6.0`, `violet-v0.6.0`) on commit `9336e92`. It holds everything since 0.5.1. Both sites still install it, all three in one step. Family 1, Agent orchestration, is open: its v1 scope is J1 to J9. This repo's parts for Calvin and Violet (#46, #49, #52, #54) are released. Finished steps are in the build log.
 
 **Sources still to find:** in the source sweep, M10.4.
 
@@ -102,6 +102,8 @@ their tasks, collect what they need, and report back to him. He helps with the n
   - Still to come: both sites install it in the same batch, and take the steps in Calvin's and Violet's READMEs,
     "Changes in 0.5.0" and "Changes in 0.5.1". It takes the place of installing 0.5.0 (was C5.5).
   - After 0.5.1: one tag and one GitHub release for each package, all going out in one batch at the family close.
+    A batch went out on 2026-11-23, before the close: `core-v0.2.0`, `calvin-v0.6.0` and `violet-v0.6.0`, all on
+    commit `9336e92`. Both sites install the three together: Calvin and Violet each need exactly core 0.2.0.
 - [ ] **J2.** Doors. Each host tells each agent which door it is at: Free site, Paid site, Agent Commons or MCP (agent
       rule 21). An agent working alone asks for what it needs itself. This covers how Calvin opens in the Agent
       Commons.
@@ -114,7 +116,7 @@ their tasks, collect what they need, and report back to him. He helps with the n
     only draws the buttons. On the sites, the record sets `creditedUnderV1`, and no choice is shown.
     - [!] Waits on the maintainer's ruling on the wording.
   - Calvin's agent tools are exported from his package, as Violet's are, or retired with his Commons choices.
-  - Merged, not released yet (#46, #49): the places in `core`; Calvin and Violet take their place from the host;
+  - Released 2026-11-23 (#46, #49): the places in `core`; Calvin and Violet take their place from the host;
     Violet's doors give way to the map, and her old names still work; Calvin's tools, record helpers and two Commons
     choices are exported from `@waterbots/calvin/agent`. Each choice sets `creditedUnderV1`, and the comparison still
     needs the filed V1.0 fNRB. Still to come: the choices' wording and his opening line.
@@ -135,7 +137,7 @@ their tasks, collect what they need, and report back to him. He helps with the n
     count.
   - Waits on: the free site's full list of technology labels, and Wellington's fields; the paid site's save format.
     Each comes as a carry.
-  - Merged, not released yet (#46, #49): the record's shape, its fact check and the label list in `core` (W3 done).
+  - Released 2026-11-23 (#46, #49): the record's shape, its fact check and the label list in `core` (W3 done).
     Calvin and Violet read the record first, ask only for what it lacks, and add their facts, results and question
     counts. A test takes a made-up project through Calvin's part and Violet's part, saves it, and reads it back
     unchanged. Still to come: the parts of Wellington, Phoebe and Bridget (J5), and the screens' words for a count
@@ -155,7 +157,7 @@ their tasks, collect what they need, and report back to him. He helps with the n
     transition).
   - Was W2: a pathway read as unlikely still got a water figure. Done when the host does not call the calculator agent
     of an unlikely pathway.
-  - Merged, not released yet (#46): the map and its table in `core`, with a test for each rule. Violet follows it
+  - Released 2026-11-23 (#46): the map and its table in `core`, with a test for each rule. Violet follows it
     (#49), so an unlikely water pathway no longer gets her calculator (W2).
   - [!] Four rules that say which project facts point to which pathway have no source yet. They are listed in the
     record proposal. Until the maintainer rules them, the map uses only the eligibility readings and the two rules this
@@ -177,12 +179,13 @@ their tasks, collect what they need, and report back to him. He helps with the n
       helps keep the tools apart.
     - The same rule holds on the Free site and the Paid site, where the screens are slightly different. Violet's
       paid screen matches Calvin's paid screen, and her free screen matches his free screen.
-    - Merged, not released yet (#52): all of the above, for Calvin and Violet. Violet has a report like Calvin's. Notes
-      go in the export on both sites: the person's own on the Paid site, the agent's on the Free site. Calvin's colour
-      is Tide until Reef ships. Still to come: each site passes the place, the Paid site saves the notes, and later
-      calculator agents follow the same screen.
-    - [!] Waits on the maintainer: whether the Agent Commons' and MCP's exports carry the agents' notes, and whether
-      the Paid site's export carries them too.
+    - Released 2026-11-23 (#52, #54): all of the above, for Calvin and Violet. Violet has a report like Calvin's.
+      Calvin's colour is Tide until Reef ships.
+    - The notes, as the maintainer answered on 2026-11-23. The Paid site's export carries the person's notes and the
+      agent's, each labelled. The Free site's and the Agent Commons' exports carry the agent's. MCP has no export: the
+      tool returns which values are blank or assumed, as facts, and the visitor's own AI says it.
+    - Still to come: each site passes the place, the Paid site saves the notes, and later calculator agents follow the
+      same screen.
 - [ ] **J6.** Saving a screening into the paid site: the count of people served crosses over correctly, and the paid
       record never shows "people" as a unit nobody chose.
   - In this repo: the record keeps people served the way it was entered, as people or as households. It never fills in
@@ -198,7 +201,7 @@ their tasks, collect what they need, and report back to him. He helps with the n
     - The record lists each needed fact that is still blank, and which agent needs it.
     - The map says when an agent still needs an introduction.
     - The consulting page's address is kept in one shared file in `core`.
-  - Merged, not released yet (#46, #49): Calvin's and Violet's words checked; Violet's prompt no longer frames her
+  - Released 2026-11-23 (#46, #49): Calvin's and Violet's words checked; Violet's prompt no longer frames her
     method's standing as her own limits. Both prompts say what each needed fact is for and where it usually comes
     from, and the record lists each needed fact still blank. The map says when an agent still needs an introduction.
     Still to come: the consulting page's address.

@@ -5,6 +5,8 @@ history keeps everything older and every longer entry.
 
 ---
 
+- 2026-11-23 — **Release** `core-v0.2.0`, `calvin-v0.6.0` and `violet-v0.6.0` on `9336e92`: the first with a tag for each package (#46, #49, #52, #54). **Carry:** packed to the handoff folder.
+- 2026-11-23 — Notes on values: both kinds in the Paid export, the agents' notes in the Agent Commons, facts at MCP (#54).
 - 2026-11-23 — One calculator screen: Violet's screen matches Calvin's, notes on values, each agent's colour (#52).
 - 2026-11-23 — Family 1 agents: Calvin and Violet read and add to the shared record, and take their place (#49).
 - 2026-11-22 — Family 1 core: the shared project record, the label list, the places and the agent map (#46).
