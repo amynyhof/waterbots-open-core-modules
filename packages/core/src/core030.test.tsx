@@ -114,12 +114,12 @@ describe("a calculator agent's chat", () => {
   const base = { place: "free-site", asks, kept: [{ key: "k", label: "Days", called: "assumed", shown: "347 d", source: "V2.0 SDWS 32" }], figureShows: false, screen: "THE SCREEN" } as const;
   test("it asks for one thing, says why and where from, and lists the rest for later", () => {
     const block = chatContext({ ...base, known: ["Country: LSO"], opened: true });
-    expect(block).toContain("Ask for this one thing, in your own words: how many people it serves.");
+    expect(block).toContain("The one thing to ask now: how many people it serves.");
     expect(block).toContain("It is for: the water is worked out from it. It usually comes from: a count.");
-    expect(block).toContain("Later, one at a time, in this order: what powers the pump.");
-    expect(block).toContain("Already on the project record. Never ask for these again.\n- Country: LSO");
+    expect(block).toContain("Later, in this order: what powers the pump.");
+    expect(block).toContain("Already on the project record\n- Country: LSO");
     expect(block).toContain('Days: 347 d, called "assumed" (V2.0 SDWS 32).');
-    expect(block).toContain("Speak first.");
+    expect(block).toContain("has already met you. Speak first");
     expect(block).not.toContain("Your part is done");
   });
   test("a fact left for now is not asked again; one that is needed keeps the part open", () => {
@@ -137,10 +137,16 @@ describe("a calculator agent's chat", () => {
     for (const place of PLACES) expect(whenDone(place).length).toBeGreaterThan(10);
     expect(chatContext({ ...base, asks: [], figureShows: true })).toContain("Your part is done");
   });
+  test("the block restates none of the 21 rules: they reach every agent from one file", () => {
+    for (const place of PLACES) {
+      const block = chatContext({ ...base, place, opened: true, introduce: true, known: ["x"], refused: ["y"], asks: [], figureShows: true }) + chatContext({ ...base, place, opened: true });
+      expect(block).not.toMatch(/own words|one question|at a time|introduce|estimate|never guess|do not know|help them find|[Nn]ever ask/);
+    }
+  });
   test("where there is no record, none is listed; in the Agent Commons it introduces itself", () => {
     const block = chatContext({ ...base, place: "agent-commons", opened: true, introduce: true, known: ["Country: LSO"] });
     expect(block).not.toContain("Already on the project record");
-    expect(block).toContain("say who you are and what you do");
+    expect(block).toContain("has not met you");
     expect(openedTurn("Calvin")).toBe("(The visitor opened Calvin's chat.)");
   });
 });

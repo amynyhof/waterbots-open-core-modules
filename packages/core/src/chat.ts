@@ -70,13 +70,13 @@ export function partIsDone(asks: readonly Ask[], figureShows: boolean): boolean 
 export function whenDone(place: Place, saved = false): string {
   switch (place) {
     case "free-site":
-      return "Say the figure your tool gave, that it is an estimate, and what it rests on. Wellington comes next: say he will join this chat with the next step, and set handBack to \"wellington\". Never name that step, and never send the visitor to him.";
+      return "Give the figure and what it rests on. Wellington comes next: say he will join this chat with the next step, and set handBack to \"wellington\". Leave that step for him to name.";
     case "paid-site":
       return saved
-        ? "Say the figure your tool gave, that it is an estimate, and what it rests on. Their changes are kept when they press Save. Wellington comes next: he is on call in Dispatches, or by typing @wellington. Set handBack to \"wellington\"."
-        : "Say the figure your tool gave, that it is an estimate, and what it rests on. It is kept only if they save. Wellington comes next: say he will join this chat with the next step, and set handBack to \"wellington\". Never name that step, and never send the visitor to him.";
+        ? "Give the figure and what it rests on. Their changes are kept when they press Save. Wellington comes next: he is on call in Dispatches, or by typing @wellington. Set handBack to \"wellington\"."
+        : "Give the figure and what it rests on. It is kept only if they save. Wellington comes next: say he will join this chat with the next step, and set handBack to \"wellington\". Leave that step for him to name.";
     case "agent-commons":
-      return "Say the figure your tool gave, that it is an estimate, and what it rests on. You work alone here: Wellington is not here and nothing is kept, so hand back to no one and leave handBack \"none\". Offer to answer more questions, or to change a value.";
+      return "Give the figure and what it rests on. Wellington is not here, so hand back to no one and leave handBack \"none\".";
     case "mcp":
       return "There is no chat here. Your tool gives the figure, its sources and what was left blank or assumed, and the visitor's own AI says it. Hand back to no one.";
     case "lobby-chat":
@@ -88,13 +88,13 @@ export function whenDone(place: Place, saved = false): string {
 function placeLine(place: Place): string {
   switch (place) {
     case "free-site":
-      return "You are at the Free site. The project record below is what the crew has gathered in this visit.";
+      return "You are at the Free site. The project record is below.";
     case "paid-site":
-      return "You are at the Paid site. The project record below is the Project Record page.";
+      return "You are at the Paid site. The project record is below.";
     case "agent-commons":
-      return "You are in the Agent Commons. There is no project record and no memory: ask for each fact you need.";
+      return "You are in the Agent Commons.";
     case "mcp":
-      return "You are at MCP. The visitor's own AI calls your tool, and the visitor confirms each fact.";
+      return "You are at MCP.";
     case "lobby-chat":
       return "You are not called in the lobby chat.";
   }
@@ -128,25 +128,25 @@ export function chatContext(c: ChatContextInput): string {
   if (c.opened) {
     lines.push(
       c.introduce
-        ? "The visitor has just opened your chat. Speak first: say who you are and what you do, in a sentence or two, then ask the one question below."
-        : "The visitor has just opened your chat. Speak first. They have already met you, so do not introduce yourself: say in a sentence what you see on their record, then ask the one question below.",
+        ? "The visitor has just opened your chat, and has not met you. Speak first."
+        : "The visitor has just opened your chat, and has already met you. Speak first, from what you see on their record.",
     );
   }
   if (hasProjectRecord(c.place)) {
-    lines.push("", "## Already on the project record. Never ask for these again.", ...(c.known && c.known.length > 0 ? c.known.map((k) => `- ${k}`) : ["- Nothing yet."]));
+    lines.push("", "## Already on the project record", ...(c.known && c.known.length > 0 ? c.known.map((k) => `- ${k}`) : ["- Nothing yet."]));
   }
   if (c.refused !== undefined && c.refused.length > 0) {
-    lines.push("", "## Refused since the last turn. Not filled in.", ...c.refused.map((r) => `- ${r}`), "Say what the range is first, and help them find the right number.");
+    lines.push("", "## Refused since the last turn. Not filled in.", ...c.refused.map((r) => `- ${r}`), "Say what the range is first.");
   }
   lines.push("", "## What to ask");
   if (next === undefined) lines.push("Nothing is missing.");
   else {
     lines.push(
-      `Ask for this one thing, in your own words: ${next.about}.`,
+      `The one thing to ask now: ${next.about}.`,
       `It is for: ${next.why}. It usually comes from: ${next.from}.`,
-      next.needed ? "No figure can show without it. If they do not know, help them find it, or leave it for now." : "It may be left blank. If they do not know, leave it and go on.",
+      next.needed ? "No figure can show without it." : "It may be left blank, and the figure still shows.",
     );
-    if (later.length > 0) lines.push(`Later, one at a time, in this order: ${later.map((a) => a.about).join("; ")}.`);
+    if (later.length > 0) lines.push(`Later, in this order: ${later.map((a) => a.about).join("; ")}.`);
   }
   if (c.kept.length > 0) {
     lines.push(

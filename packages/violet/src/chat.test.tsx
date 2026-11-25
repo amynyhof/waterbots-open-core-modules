@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { agentMap } from "@waterbots/core/agentMap";
-import { REPLY_LIMIT, readingGrade } from "@waterbots/core/reply";
+import { REPLY_LIMIT } from "@waterbots/core/reply";
 import { emptyRecord, type ProjectRecord } from "@waterbots/core/record";
 import { VIOLET_ANSWER_SCHEMA, VIOLET_CHAT, VIOLET_OPENED, addVioletAnswer, fillViolet, readVioletAnswer, setVioletDone, violetAsks, violetChatContext, violetKept, violetPageContext } from "./agent/chat.js";
 import { computeD3 } from "./d3/compute.js";
@@ -155,15 +155,15 @@ describe("her chat opens first", () => {
   const turn = { projectName: "Invented", input, result: computeD3(input), chosen: true } as const;
   it("on a site: she speaks first, asks the one question, and does not introduce herself", () => {
     const block = violetChatContext({ ...turn, place: "free-site", opened: true });
-    expect(block).toContain("Speak first. They have already met you");
+    expect(block).toContain("has already met you. Speak first");
     expect(block).toContain("- People served: 1,200");
-    expect(block).toContain("Ask for this one thing, in your own words: whether people have full access");
+    expect(block).toContain("The one thing to ask now: whether people have full access");
     expect(VIOLET_OPENED).toBe("(The visitor opened Violet's chat.)");
   });
   it("in the Agent Commons: no record, and she introduces herself", () => {
     const block = violetChatContext({ ...turn, place: "agent-commons", opened: true, introduce: true });
     expect(block).not.toContain("Already on the project record");
-    expect(block).toContain("say who you are and what you do");
+    expect(block).toContain("has not met you");
   });
   it("when her figure shows and nothing is blank, Wellington comes next", () => {
     const full = fillViolet(input, { accessLevel: "full", withoutProjectM3PerYear: 0 }).input;
@@ -196,9 +196,9 @@ describe("her files ship, with her settings", () => {
     expect(config).toContain(`\nreply: { sentences: ${VIOLET_CHAT.reply.sentences}, characters: ${VIOLET_CHAT.reply.chars} }`);
     expect(VIOLET_CHAT.reply).toEqual(REPLY_LIMIT);
   });
-  it("her instructions name every ask, both labels and each place, and are plain enough to copy a tone from", () => {
+  it("her instructions name both labels, each field and each place, and restate none of the 21 rules", () => {
     const prompt = read("./agents/violet/prompt.md");
     for (const word of ["`values`", "`leftForNow`", '"default"', '"assumed"', "Agent Commons", "MCP", "free site", "paid site"]) expect(prompt).toContain(word);
-    expect(readingGrade("Say these in your own words. You share your step with the other calculator agent, and neither of you waits for the other.")).toBeLessThan(9);
+    expect(prompt).not.toMatch(/own words|one question at a time|do not know|what you filled in/);
   });
 });

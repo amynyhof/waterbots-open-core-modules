@@ -129,10 +129,10 @@ describe("his chat opens first", () => {
   it("he speaks first, with the record in hand and one question", () => {
     const calc = mount(invented());
     const block = calvinChatContext({ place: "free-site", state: calc.state, screen: calc.pageContext(), result: calc.paaResult, opened: true });
-    expect(block).toContain("Speak first. They have already met you");
+    expect(block).toContain("has already met you. Speak first");
     expect(block).toContain("- Technology: a community water supply");
-    expect(block).toContain("Ask for this one thing, in your own words: what powers the pump");
-    expect(block).toContain("It may be left blank.");
+    expect(block).toContain("The one thing to ask now: what powers the pump");
+    expect(block).toContain("It may be left blank, and the figure still shows.");
     expect(block).toContain("GS Safe Water calculator");
     expect(CALVIN_OPENED).toBe("(The visitor opened Calvin's chat.)");
   });
@@ -161,8 +161,9 @@ describe("his files ship, with his settings", () => {
     expect(config).toContain(`\nreply: { sentences: ${CALVIN_CHAT.reply.sentences}, characters: ${CALVIN_CHAT.reply.chars} }`);
     expect(CALVIN_CHAT.reply).toEqual(REPLY_LIMIT);
   });
-  it("his instructions name both labels, what is not covered yet, and each place", () => {
+  it("his instructions name both labels, what is not covered yet, and each place, and restate none of the 21 rules", () => {
     const prompt = read("../../../agents/calvin/prompt.md");
     for (const word of ["`facts`", "`values`", "`leftForNow`", '"default"', '"assumed"', "not covered yet", "Wellington comes next", "Agent Commons", "MCP"]) expect(prompt).toContain(word);
+    expect(prompt).not.toMatch(/own words|one question at a time|do not know|what you filled in/);
   });
 });
