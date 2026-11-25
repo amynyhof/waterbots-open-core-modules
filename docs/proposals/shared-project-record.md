@@ -190,7 +190,7 @@ it; none of them is guessed.
 
 | Project fact | Points to | Source |
 |---|---|---|
-| Technology is `CWS` (a community water supply) | VWBA | VWBA 2.0, Appendix C, Table C-1, p.39: a WASH activity that gives household or community water supply is counted by the Volume Provided method, D-3 (Appendix D, D-3, p.44). |
+| The project gives people water to use at home or in a community (ruled 2026-11-24). Treatment does not count yet. | VWBA | VWBA 2.0, Appendix C, Table C-1, pp.37 to 39: such an activity is counted by the Volume Provided method, D-3 (Appendix D, D-3, pp.44 to 46). |
 | Credited under the carbon method's V1.0 is yes | Carbon | The fact itself: the project already holds carbon credits under V1.0, as the person reports. |
 
 Rules this repo cannot cite yet:
