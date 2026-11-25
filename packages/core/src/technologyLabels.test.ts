@@ -25,7 +25,8 @@ test("each label appears once, and says why it gets its code", () => {
 });
 
 // ── Not covered yet (ruled 2026-11-23) ──
-const WAITING = ["Community level water treatment technologies", "Institutional water treatment technologies", "New or alternative water supply"];
+// Community level treatment was the first of these until 2026-11-25: it is counted for carbon again, treatment only included.
+const WAITING = ["Institutional water treatment technologies", "New or alternative water supply"];
 
 test.each(WAITING)("%s gets no technology code, and is not covered yet", (label) => {
   expect(technologyCode(label)).toBeUndefined();
@@ -47,7 +48,7 @@ test("the open site's four class names, word for word, each with its class", () 
   expect(TECHNOLOGY_CLASSES.map((c) => [c, technologyOfClass(c).label, technologyOfClass(c).code ?? null])).toEqual([
     ["HWT", "Household water treatment technologies", "HWT"],
     ["IWT", "Institutional water treatment technologies", null],
-    ["CWT", "Community level water treatment technologies", null],
+    ["CWT", "Community level water treatment technologies", "CWS"],
     ["CWS", "Community water supply technologies", "CWS"],
   ]);
 });

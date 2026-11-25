@@ -137,6 +137,11 @@ export interface CalculatorOptions {
   notes?: ValueNotes;
   /** Told the notes after each change, so the host keeps them on the record and saves them when the person saves. */
   onNotesChange?: (notes: ValueNotes) => void;
+  /**
+   * THE CHOICE TO REDO IT (2026-11-25): told when the owner of a project that already exists chooses the newer way. The site
+   * moves the record (core's `redoUnderTodaysRules`). Left out, the note shows with no button.
+   */
+  onRedo?: () => void;
 }
 
 export interface CalculatorState {
@@ -168,6 +173,9 @@ export interface CalculatorState {
    * with its own export puts these in it, under each kind's label.
    */
   noteLines: NoteLine[];
+
+  /** See `CalculatorOptions.onRedo`. */
+  onRedo?: () => void;
 
   /* ── Working inputs ─────────────────────────────────────────────────────── */
   /** The live input state. */
@@ -491,7 +499,7 @@ export function useCalculatorState(project: CalvinProject, options: CalculatorOp
   };
 
   const pageContext = () =>
-    calculatorPageContext({ projectName: project.name, state, missingFacts, activityAsk, missingMonitoring: monitoringAsk, outOfRange: refusedValues.map((r) => r.message), fnrbRefusal, filedFnrbRefusal, transition, result, legacyResult, paaResult, waterfall, recordProblems: calvinRecordProblems(project), ...(project.notCoveredYet !== undefined ? { notCoveredYet: project.notCoveredYet } : {}), ...(options.place !== undefined ? { place: options.place } : {}) });
+    calculatorPageContext({ projectName: project.name, state, missingFacts, activityAsk, missingMonitoring: monitoringAsk, outOfRange: refusedValues.map((r) => r.message), fnrbRefusal, filedFnrbRefusal, transition, result, legacyResult, paaResult, waterfall, recordProblems: calvinRecordProblems(project), ...(project.notCoveredYet !== undefined ? { notCoveredYet: project.notCoveredYet } : {}), ...(project.answer !== undefined ? { answer: project.answer } : {}), ...(project.newerWay ? { newerWay: true } : {}), ...(options.place !== undefined ? { place: options.place } : {}) });
 
   return {
     readOnly,
@@ -504,6 +512,7 @@ export function useCalculatorState(project: CalvinProject, options: CalculatorOp
     valueNotes,
     setValueNote,
     noteLines,
+    ...(options.onRedo !== undefined ? { onRedo: options.onRedo } : {}),
     state,
     patch,
     seed,
@@ -533,7 +542,7 @@ export function useCalculatorState(project: CalvinProject, options: CalculatorOp
     printAt,
     exportReport,
     fill,
-    asks: calvinAsks(state, { tables, transition, notCoveredYet: project.notCoveredYet }),
+    asks: calvinAsks(state, { tables, transition, notCoveredYet: project.notCoveredYet, answer: project.answer }),
     kept: calvinKept(state, { sliders: showSliders(exAnteSliders, state), result: paaResult }),
     pageContext,
   };

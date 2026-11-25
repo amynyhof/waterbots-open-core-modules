@@ -86,6 +86,28 @@ A site tells the screens where Calvin is working with `place` (`"free-site"`, `"
 The build bundles the entry into one file, `dist/agent.js`. `@waterbots/core` stays outside it.
 `scripts/check-screen-entry.mjs` loads it from the packed files and runs his tool there.
 
+## Changes in 0.8.0
+
+Calvin accepts any `@waterbots/core` in the 0.4 series.
+
+- **The kind of project is worked out from its facts (decided 2026-11-25).** Core's one table says what is counted. He asks for
+  one plain fact at a time, and nobody is asked for a kind. A project under today's rules has `answer` (core's
+  `carbonAnswer`); its `technology` is set only where the table counts it.
+- **Community level treatment is counted again, treatment only included.** Institutional treatment is not set up yet.
+- **A restored source** is counted once the conditions of the method's version in use, and whether the water is safe, are on
+  the record.
+- **A project that already exists keeps its answer,** with no new question. Where today's rules would answer differently its
+  screen says a newer way exists, and `onRedo` is told when the owner chooses it.
+- **His tools take the project's facts, not a technology.** Where a site has a record, `calvinToolsFor(facts)`: the record
+  decides, never the model. `GS4GG_CARBON_TOOLS` are for a place with no record.
+- **The guards on his numbers:** `guardCalvinReply`. `addCalvinFacts` also changes a fact the visitor changes, and says which
+  figures came off.
+- No sum changed.
+
+**What a site should change.** Register `calvinToolsFor(record.facts)`. Build his project with `calvinProjectFromRecord`, in the
+Agent Commons too. Pass `facts` and `answer` to `calvinChatContext`. Call `guardCalvinReply` on each answer; send `returned`
+back once, then show `told`. Pass `onRedo`.
+
 ## Changes in 0.7.0
 
 Calvin accepts any `@waterbots/core` in the 0.3 series, so he can be released on his own.

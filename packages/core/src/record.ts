@@ -10,9 +10,27 @@
  * where it came from.
  */
 import type { Technology } from "./project";
+import {
+  KINDS_SINCE,
+  KIND_FACTS,
+  NEEDS_EVIDENCE,
+  PROJECT_RULES,
+  carbonAnswerFor,
+  carbonVersions,
+  kindFactsOf,
+  kindRow,
+  readKindFacts,
+  waterAnswerFor,
+  type Answer,
+  type CarbonVersion,
+  type GivenKindFacts,
+  type KindFact,
+  type Treatment,
+  type WaterSource,
+} from "./projectKinds.js";
 import { checkRange, rangeMessage } from "./ranges.js";
 import type { StandardId } from "./standards";
-import { TECHNOLOGY_CLASSES, technologyCoverage, technologyOfClass, waterCoverage, type TechnologyClass } from "./technologyLabels.js";
+import { TECHNOLOGY_CLASSES, TECHNOLOGY_LABELS, technologyCoverage, technologyOfClass, waterCoverage, type TechnologyClass } from "./technologyLabels.js";
 
 /** The shape's version. A site can tell an older record from a newer one. */
 export const RECORD_VERSION = 1 as const;
@@ -83,6 +101,23 @@ export interface ProjectFacts {
   stage?: Fact<ProjectStage>;
   /** Whether people use the water at home. Asked of a new or alternative supply, which could be reuse or irrigation. */
   homeUse?: Fact<HomeUse>;
+  /**
+   * THE VERSION OF THE PROJECT RULES these facts were given under (`PROJECT_RULES`). A new project has it from the start
+   * (`newProjectRecord`), or from the first fact about its source or technology. A project made before these rules has
+   * none, and keeps its old answers. A site saves it and hands it back as it came; it never fills one in.
+   */
+  rules?: number;
+  /** A new source, one brought back after it had stopped, or one people already use. */
+  waterSource?: Fact<WaterSource>;
+  /** Where the project treats the water. */
+  treatment?: Fact<Treatment>;
+  /** Each of these is asked only when it applies (`projectKinds.ts`). */
+  sourceSafe?: Fact<boolean>;
+  outThreeMonths?: Fact<boolean>;
+  repairPlanned?: Fact<boolean>;
+  noRepairThreeMonths?: Fact<boolean>;
+  publicPiped?: Fact<boolean>;
+  pipedShownUnsafe?: Fact<boolean>;
 }
 
 /** Whether people use the water at home. "not sure" is an answer: nobody is asked again, and nothing is counted yet. */
@@ -241,11 +276,92 @@ export interface ProjectRecord {
   mapVersion?: number;
 }
 
+// ── New projects and projects that already exist (2026-11-25) ────────────────────────────────────────────────────
+
+/** True for a project under today's rules: its kind is worked out from its facts, never from a label. */
+export function underTodaysRules(facts: ProjectFacts): boolean {
+  return (facts.rules ?? 0) >= KINDS_SINCE;
+}
+
 /**
- * The technology code an agent may work with. A label that is not covered yet has none, even on a record saved before
- * the label list said so.
+ * True for a project that already exists: made before these rules, with a technology, a type or a figure on its record. It
+ * keeps its old answers until its owner changes a fact the rules touch, or chooses to redo it. A site does nothing to
+ * say so: it hands back the record as it was saved, with no `facts.rules`.
+ */
+export function projectExists(record: Pick<ProjectRecord, "facts" | "agents">): boolean {
+  const { rules, technology, type, technologyClass } = record.facts;
+  if (rules !== undefined) return rules < KINDS_SINCE;
+  return technology !== undefined || type !== undefined || technologyClass !== undefined || Object.values(record.agents).some((a) => a?.estimate !== undefined || a?.inputs !== undefined);
+}
+
+/** Whether these are a drinking-water project's facts, and whether home use still has to be said. Null: yes, and no. */
+function drinkingWater(facts: ProjectFacts, askHomeUse: boolean): Answer | null {
+  const { type, technology, homeUse } = facts;
+  const other: Answer = { says: "another kind of project" };
+  if (type !== undefined && type.value !== DRINKING_WATER_TYPE && type.value !== NEW_SUPPLY_TYPE) return other;
+  if (technology?.code === "other") return other;
+  if (homeUse?.value === "no") return other;
+  if (homeUse?.value === "yes") return null;
+  // A community supply's own label, or the drinking-water type, has already said it.
+  const label = technology === undefined ? "not known" : waterCoverage(technology.label);
+  const couldBeOther = label === "covered for home use" || (type?.value === NEW_SUPPLY_TYPE && label !== "covered");
+  if (!couldBeOther && (!askHomeUse || type?.value === DRINKING_WATER_TYPE || label !== "not known")) return null;
+  return homeUse?.value === "not sure" ? { says: "held for now" } : { says: "ask", fact: "homeUse" };
+}
+
+/**
+ * What Calvin does with a project under today's rules, read from the one table. A restored source's conditions are those of
+ * the version in use: `versions` names them, and left out they follow the record.
+ */
+export function carbonAnswer(facts: ProjectFacts, versions: readonly CarbonVersion[] = carbonVersions(facts)): Answer {
+  const scope = drinkingWater(facts, false);
+  if (scope?.says === "another kind of project") return scope;
+  const a = carbonAnswerFor(kindFactsOf(facts), versions);
+  return a.says === "counted" && scope !== null ? scope : a;
+}
+
+/** What Violet does with a project under today's rules, read from the one table. */
+export function waterAnswer(facts: ProjectFacts): Answer {
+  const scope = drinkingWater(facts, true);
+  if (scope?.says === "another kind of project") return scope;
+  const a = waterAnswerFor(kindFactsOf(facts));
+  return a.says === "counted" && scope !== null ? scope : a;
+}
+
+/**
+ * True when today's rules would give a project that already exists a different answer. It keeps its old one; its screen
+ * shows a plain note that a newer way exists, with a choice to redo it (`redoUnderTodaysRules`).
+ */
+export function newerWay(record: Pick<ProjectRecord, "facts" | "agents">, pathway: StandardId): boolean {
+  if (underTodaysRules(record.facts) || !projectExists(record)) return false;
+  const { technology, type, technologyClass, homeUse } = record.facts;
+  const label = technology?.label ?? technologyOfFacts(type?.value, technologyClass?.value)?.label;
+  const kinds = TECHNOLOGY_LABELS.find((t) => label !== undefined && t.label.toLowerCase() === label.trim().toLowerCase())?.kinds ?? [];
+  if (kinds.length === 0 || homeUse?.value === "no") return false;
+  // Only carbon's answers changed with version 1 of the rules.
+  return pathway === "carbon" && recordTechnology(record) === undefined && kinds.every((k) => kindRow(k).carbon.code !== null);
+}
+
+/** The plain note on a project that already exists, where `newerWay` is true. */
+export const NEWER_WAY_NOTE = "There is now a newer way to work this out. Your project keeps its answer unless you choose to redo it.";
+
+/** The choice to redo it: the project moves to today's rules. Its facts stay, and the agents ask for what is missing. */
+export function redoUnderTodaysRules(record: ProjectRecord): ProjectRecord {
+  const out = structuredClone(record);
+  out.facts.rules = PROJECT_RULES;
+  return out;
+}
+
+/**
+ * The technology code an agent may work with. Under today's rules it is worked out from the project facts, and a label
+ * cannot change it. A project that already exists keeps the code it was saved with; a label that is not covered yet has
+ * none.
  */
 export function recordTechnology(record: Pick<ProjectRecord, "facts">): Technology | undefined {
+  if (underTodaysRules(record.facts)) {
+    const a = carbonAnswer(record.facts);
+    return a.says === "counted" ? a.code : undefined;
+  }
   const t = record.facts.technology;
   return t === undefined || technologyCoverage(t.label) === "not covered yet" ? undefined : t.code;
 }
@@ -266,6 +382,25 @@ export function technologyOfFacts(type: ProjectTypeId | undefined, technologyCla
  * other methods for it, or the project is neither a supply nor treatment. "not known": the facts do not say yet.
  */
 export type WaterSupply = "covered" | "not covered yet" | "another kind of project" | "not known";
+
+/** A table answer, in the map's words. "ask" is not known yet, and "held for now" is not covered yet. */
+function supplyOf(a: Answer): WaterSupply {
+  if (a.says === "counted") return "covered";
+  if (a.says === "ask") return "not known";
+  return a.says === "another kind of project" || a.says === "not set up yet" ? "another kind of project" : "not covered yet";
+}
+
+/**
+ * Whether Calvin is called for the project. A blank fact of his own, or a method condition the project does not meet yet,
+ * keeps him called: he asks, or shows how to fix it. A project that already exists is as it was.
+ */
+export function recordCarbon(facts: ProjectFacts): WaterSupply | "not set up yet" {
+  if (!underTodaysRules(facts)) return "covered";
+  const a = carbonAnswer(facts);
+  if (a.says === "ask") return (a.fact === "waterSource" || a.fact === "treatment") && a.fix !== true ? "not known" : "covered";
+  if (a.says === "counted" || a.says === "falls short") return "covered";
+  return a.says === "held for now" ? "not covered yet" : a.says;
+}
 
 /** What each fact that names a technology says about water, and the label it says it by. */
 function waterAnswers(facts: ProjectFacts): { label: string; says: WaterSupply }[] {
@@ -288,6 +423,7 @@ function waterAnswers(facts: ProjectFacts): { label: string; says: WaterSupply }
  * new or alternative supply is asked first whether people use the water at home.
  */
 export function recordWaterSupply(facts: ProjectFacts): WaterSupply {
+  if (underTodaysRules(facts)) return supplyOf(waterAnswer(facts));
   const type = facts.type?.value;
   if (type !== undefined && type !== DRINKING_WATER_TYPE && type !== NEW_SUPPLY_TYPE) return "another kind of project";
   const says = waterAnswers(facts).map((a) => a.says);
@@ -296,12 +432,22 @@ export function recordWaterSupply(facts: ProjectFacts): WaterSupply {
 
 /** True when the one thing Violet's method still needs to know is whether people use the water at home. */
 export function needsHomeUse(facts: ProjectFacts): boolean {
+  if (underTodaysRules(facts)) {
+    const a = waterAnswer(facts);
+    return a.says === "ask" && a.fact === "homeUse";
+  }
   return recordWaterSupply(facts) === "not known" && waterAnswers(facts).length > 0;
 }
 
 /** The site's own label for a technology Violet's method does not count yet, or null. */
 export function waterNotCovered(facts: ProjectFacts): string | null {
+  if (underTodaysRules(facts)) return recordWaterSupply(facts) === "not covered yet" ? (facts.technology?.label ?? null) : null;
   return recordWaterSupply(facts) === "not covered yet" ? (waterAnswers(facts).find((a) => a.says === "not covered yet")?.label ?? null) : null;
+}
+
+/** A new project's record: every fact blank, under today's rules. A site starts every new project with it. */
+export function newProjectRecord(): ProjectRecord {
+  return { ...emptyRecord(), facts: { rules: PROJECT_RULES } };
 }
 
 /** An empty record: every fact blank, no reading, no agent part. */
@@ -372,11 +518,12 @@ export const FACT_KEYS = [
   "stage",
   "placeWords",
   "homeUse",
+  ...KIND_FACTS,
 ] as const;
 export type FactKey = (typeof FACT_KEYS)[number];
 
 /** Facts as the person gave them to an agent. Each has the record's shape, without its source. */
-export interface GivenFacts {
+export interface GivenFacts extends GivenKindFacts {
   name?: string;
   technology?: { label: string; code?: Technology };
   /** As entered. A count with no `mode` stays that way: no unit is filled in on its own (J6). */
@@ -442,10 +589,21 @@ export interface AddedFacts {
   dropped: FactKey[];
 }
 
+/** The first fact about what kind of project it is puts a blank record under today's rules. */
+function stampRules(out: ProjectRecord): void {
+  if (out.facts.rules === undefined && !projectExists(out)) out.facts.rules = PROJECT_RULES;
+}
+
+function setKindFact(facts: ProjectFacts, key: KindFact, value: WaterSource | Treatment | boolean, source: Source): void {
+  const note = NEEDS_EVIDENCE.includes(key) ? `${source.note}; evidence will be needed` : source.note;
+  Object.assign(facts, { [key]: { value, source: { ...source, note } } });
+}
+
 /**
  * Adds the facts the person gave an agent. Only blank facts are filled; a fact already on the record stays as it is.
  * Each number is checked first, and one that fails is refused. The agent's question count goes up by one for each
- * fact added.
+ * fact added. A project that already exists takes no fact about its kind here: its owner gives it on the Project Record
+ * page (`changeFacts`), so nothing said in a chat changes its answer.
  */
 export function addGivenFacts(record: ProjectRecord, agent: AgentId, given: GivenFacts): AddedFacts {
   const out = structuredClone(record);
@@ -487,8 +645,22 @@ export function addGivenFacts(record: ProjectRecord, agent: AgentId, given: Give
     facts.does = { value: does, source };
     added.push("does");
   }
+  const old = projectExists(out);
+  const kind = readKindFacts(given);
+  for (const key of KIND_FACTS) {
+    if (given[key] === undefined || !blank(key)) continue;
+    const value = kind[key];
+    if (value === undefined || old) {
+      dropped.push(key);
+      continue;
+    }
+    stampRules(out);
+    setKindFact(facts, key, value, source);
+    added.push(key);
+  }
   const type = listed("type", PROJECT_TYPE_IDS, given.type);
   if (type !== undefined) {
+    stampRules(out);
     facts.type = { value: type, source };
     added.push("type");
   }
@@ -513,6 +685,7 @@ export function addGivenFacts(record: ProjectRecord, agent: AgentId, given: Give
   if (given.technology !== undefined && blank("technology")) {
     // A label that is not covered yet gets no code, whoever hands one in.
     const { code, label } = given.technology;
+    stampRules(out);
     facts.technology = { label, ...(code !== undefined && technologyCoverage(label) !== "not covered yet" ? { code } : {}), source };
     added.push("technology");
   }
@@ -582,6 +755,107 @@ export function addGivenFacts(record: ProjectRecord, agent: AgentId, given: Give
     out.agents[agent] = { ...part, questionsAsked: (part.questionsAsked ?? 0) + added.length };
   }
   return { record: out, added, refused, dropped };
+}
+
+// ── When the facts change (2026-11-25) ───────────────────────────────────────────────────────────────────────────
+
+export interface ChangedFacts extends AddedFacts {
+  /** The facts whose answer changed: those the kind is worked out from, and home use. */
+  changed: (KindFact | "homeUse")[];
+  /** A saved project: kind facts the visitor changed in a chat. They stay as they are; the owner changes them on the Project Record page. */
+  onRecordPage: (KindFact | "homeUse")[];
+  /** The agents whose figure no longer fits. It is off the record, and their part is not done. */
+  figuresOff: AgentId[];
+}
+
+/** What each calculator would work with, to see whether its figure still fits. */
+function fits(record: ProjectRecord): { calvin: string; violet: string } {
+  return { calvin: recordTechnology(record) ?? "", violet: recordWaterSupply(record.facts) === "covered" ? (record.facts.waterSource?.value ?? "covered") : "" };
+}
+
+/** Takes off a figure that no longer fits the facts. The inputs stay, so nothing a person typed is lost. */
+function takeOff(before: ProjectRecord, after: ProjectRecord): AgentId[] {
+  // A project that already exists keeps every figure it has.
+  if (!underTodaysRules(after.facts)) return [];
+  const was = fits(before);
+  const now = fits(after);
+  return (["calvin", "violet"] as const).filter((a) => {
+    if (was[a] === now[a] && now[a] !== "") return false;
+    const part = after.agents[a];
+    if (part === undefined || (part.estimate === undefined && part.done !== true)) return false;
+    delete part.estimate;
+    if (part.done === true) part.done = false;
+    return true;
+  });
+}
+
+/** The facts the rules read. */
+const TOUCHED: readonly FactKey[] = [...KIND_FACTS, "type", "technology", "technologyClass", "homeUse", "creditedUnderV1"];
+
+/**
+ * THE VISITOR CHANGES A FACT (2026-11-25). In a screening, what they say in any agent's chat changes the record, the kind is
+ * worked out again, and a figure that no longer fits comes off. On a saved project only the owner changes it, on the
+ * Project Record page: there the site passes `by: "owner"`, which also moves a project made before these rules to them.
+ * Facts that are not about the kind are added as ever, only where blank. Returns a new record.
+ */
+export function changeFacts(record: ProjectRecord, agent: AgentId, given: GivenFacts, options: { saved?: boolean; by?: "agent" | "owner" } = {}): ChangedFacts {
+  const owner = options.by === "owner";
+  const start = structuredClone(record);
+  const wanted = readKindFacts(given);
+  const onRecordPage: ChangedFacts["onRecordPage"] = [];
+  const changed: ChangedFacts["changed"] = [];
+  const differs = KIND_FACTS.filter((k) => wanted[k] !== undefined && start.facts[k]?.value !== wanted[k]);
+  if (owner && differs.length > 0) start.facts.rules = PROJECT_RULES;
+  const old = projectExists(start);
+  for (const key of differs) {
+    const onRecord = start.facts[key] !== undefined;
+    if (!owner && (old || (options.saved === true && onRecord))) onRecordPage.push(key);
+    else if (onRecord) {
+      setKindFact(start.facts, key, wanted[key]!, { by: "person", note: owner ? "changed on the Project Record page" : `changed in ${agent}'s chat` });
+      changed.push(key);
+    }
+  }
+  // Home use is read by the rules too, and changes the same way. A project that already exists may still be told it once.
+  const was = start.facts.homeUse?.value;
+  if (given.homeUse !== undefined && was !== undefined && was !== given.homeUse && HOME_USES.includes(given.homeUse)) {
+    if (!owner && (old || options.saved === true)) onRecordPage.push("homeUse");
+    else {
+      start.facts.homeUse = { value: given.homeUse, source: { by: "person", note: owner ? "changed on the Project Record page" : `changed in ${agent}'s chat` } };
+      changed.push("homeUse");
+    }
+  }
+  // The water the source gave before the project was said about the other source, so it is asked again.
+  if (changed.includes("waterSource") && given.withoutProjectM3PerYear === undefined) delete start.facts.withoutProjectM3PerYear;
+  const rest: GivenFacts = { ...given };
+  for (const key of onRecordPage) delete rest[key];
+  const out = addGivenFacts(start, agent, rest);
+  const touched = changed.length > 0 || out.added.some((k) => TOUCHED.includes(k));
+  return { ...out, changed, onRecordPage, figuresOff: touched ? takeOff(record, out.record) : [] };
+}
+
+// ── The save ticket (2026-11-25) ─────────────────────────────────────────────────────────────────────────────────
+
+/** The kind facts and the rules they were given under, as they cross from a screening to a saved project. */
+export interface KindTicket extends GivenKindFacts {
+  rules?: number;
+}
+
+/** What a site puts in its save ticket. Plain values, so it can be stored as it is. */
+export function kindTicket(record: Pick<ProjectRecord, "facts">): KindTicket {
+  return { ...kindFactsOf(record.facts), ...(record.facts.rules !== undefined ? { rules: record.facts.rules } : {}) };
+}
+
+/** Reads a save ticket back on to a record. A value that does not hold is left out; a fact already there stays. */
+export function addKindTicket(record: ProjectRecord, ticket: unknown): ProjectRecord {
+  const out = structuredClone(record);
+  const rules = typeof ticket === "object" && ticket !== null ? (ticket as { rules?: unknown }).rules : undefined;
+  if (out.facts.rules === undefined && typeof rules === "number" && Number.isInteger(rules) && rules >= 1 && rules <= PROJECT_RULES) out.facts.rules = rules;
+  const given = readKindFacts(ticket);
+  for (const key of KIND_FACTS) {
+    const value = given[key];
+    if (value !== undefined && out.facts[key] === undefined) setKindFact(out.facts, key, value, { by: "person", note: "given in the screening" });
+  }
+  return out;
 }
 
 /** An agent's results for the record. `estimate: null` clears an estimate that no longer holds. */

@@ -8,7 +8,7 @@ import {
   householdSizeNeeded,
   type CharcoalConvention, type FuelShares, type ScenarioInput, type SiteTables, type StoveShares,
 } from "../engine";
-import { notCoveredYet } from "@waterbots/core/technologyLabels";
+import { FACT_LABEL, NO_CALCULATOR_YET, SHORTFALL_WORDS, type Answer } from "@waterbots/core/projectKinds";
 import type { SavedAnalysis } from "./analysis";
 import { technologyToMethod } from "./method";
 import { readMonitoringFlags } from "./monitoring";
@@ -40,6 +40,13 @@ export type CalvinProject = ModuleProject<SavedAnalysis> & {
    * then has no `technology`, and the seat says the label is not covered yet rather than asking for it.
    */
   notCoveredYet?: string;
+  /**
+   * WHAT THE ONE TABLE SAYS FOR THIS PROJECT (core's `carbonAnswer`, 2026-11-25). A project under today's rules has it, and its
+   * `technology` is set only where the table counts it. Left out: a project that already exists, as before.
+   */
+  answer?: Answer;
+  /** A project that already exists and that today's rules would answer differently (core's `newerWay`). Its screen says so. */
+  newerWay?: boolean;
 };
 
 /** What powers the water system's pump. */
@@ -252,17 +259,20 @@ const listFacts = (labels: string[]) =>
  * does not know the host's pages. A technology the calculator does not cover gets its own sentence:
  * it is not missing, so asking for it would be a dead end.
  */
-export function missingFactsPrompt(missing: ProjectFact[], technology?: string, uncovered?: string): string | null {
+export function missingFactsPrompt(missing: ProjectFact[], technology?: string, uncovered?: string, answer?: Answer, newerWay = false): string | null {
   if (missing.length === 0) return null;
-  // A LABEL THAT IS NOT COVERED YET IS NOT MISSING: asking for the technology again would be a dead end.
-  if (uncovered !== undefined && missing.some((f) => f.key === "technology")) {
-    return `The calculator can't run for this project yet. ${notCoveredYet(uncovered)}`;
-  }
+  const noTechnology = missing.some((f) => f.key === "technology");
+  // HELD FOR NOW, NOT SET UP YET, OR A LABEL THAT IS NOT COVERED YET: nothing is missing, so nothing is asked for again.
+  // One sentence for the visitor in every case (the maintainer's words, 2026-11-25).
+  if (noTechnology && answer?.says === "falls short") return SHORTFALL_WORDS[answer.because];
+  // A project that already exists, where a newer way would count it: the note above says so.
+  if (noTechnology && newerWay) return "The calculator can't run for this project yet.";
+  if (noTechnology && (answer === undefined ? uncovered !== undefined : answer.says !== "ask")) return NO_CALCULATOR_YET;
   if (technology === "other" && missing.some((f) => f.key === "technology")) {
     return "The calculator can't run for this project — it covers community water supply and household water treatment, and this project's technology is recorded as other.";
   }
   const it = missing.length === 1 ? "it" : "them";
-  return `The calculator can't run yet — this project's record is missing ${listFacts(missing.map((f) => f.label))}. Fill ${it} in on the project record and the numbers will appear here.`;
+  return `The calculator can't run yet — this project's record is missing ${listFacts(missing.map((f) => (f.key === "technology" && answer?.says === "ask" ? FACT_LABEL[answer.fact] : f.label)))}. Fill ${it} in on the project record and the numbers will appear here.`;
 }
 
 function positiveOrNull(n: number | undefined): number | null {

@@ -37,7 +37,7 @@ describe("the rest of the open site's facts", () => {
   test("the technology the facts name, and nothing for the rest", () => {
     expect(technologyOfFacts("C-19", "CWS")).toEqual({ label: "Community water supply technologies", code: "CWS" });
     expect(technologyOfFacts("C-19", "HWT")).toEqual({ label: "Household water treatment technologies", code: "HWT" });
-    expect(technologyOfFacts("C-19", "CWT")).toEqual({ label: "Community level water treatment technologies" });
+    expect(technologyOfFacts("C-19", "CWT")).toEqual({ label: "Community level water treatment technologies", code: "CWS" }); // counted for carbon again, 2026-11-25
     expect(technologyOfFacts("C-19", "IWT")).toEqual({ label: "Institutional water treatment technologies" });
     expect(technologyOfFacts("C-11", undefined)).toEqual({ label: "New or alternative water supply" });
     expect([technologyOfFacts("C-19", undefined), technologyOfFacts("C-3", undefined), technologyOfFacts(undefined, undefined)]).toEqual([null, null, null]);

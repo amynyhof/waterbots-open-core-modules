@@ -7,7 +7,7 @@ describe("Violet's calculator tool", () => {
   it("calls the engine and hands back its sources", async () => {
     // Invented: 1,200 people, full access, defaults. 1,200 × 20 × 365 ÷ 1,000 = 8,760 m³.
     const run = await computeD3Tool.execute({
-      technology: "CWS",
+      waterSource: "new", treatment: "none", homeUse: "yes",
       view: "ex-ante",
       option: "beneficiaries",
       population: { mode: "people", served: 1200 },
@@ -21,7 +21,7 @@ describe("Violet's calculator tool", () => {
 
   it("says which values are blank or assumed, as facts, in no words of hers (MCP)", async () => {
     const given = { view: "ex-ante", option: "beneficiaries", population: { mode: "people", served: 1200 }, accessLevel: "full" } as const;
-    const run = await computeD3Tool.execute({ technology: "CWS", ...given });
+    const run = await computeD3Tool.execute({ waterSource: "new", treatment: "none", homeUse: "yes", ...given });
     const { blankOrAssumed, ...rest } = run.output as { blankOrAssumed: { key: string; label: string; standing: string }[] };
     expect(blankOrAssumed).toEqual([
       { key: "daysOfAccessPerYear", label: "Days of access in a year", standing: "assumed" },
@@ -32,7 +32,7 @@ describe("Violet's calculator tool", () => {
   });
 
   it("refuses input it cannot use, in words the model can act on", () => {
-    expect(() => computeD3Tool.execute({ technology: "CWS", view: "ex-ante", option: "metered" })).toThrow(/after the project runs/);
+    expect(() => computeD3Tool.execute({ waterSource: "new", treatment: "none", homeUse: "yes", view: "ex-ante", option: "metered" })).toThrow(/after the project runs/);
     expect(() => computeD3Tool.execute("not an object")).toThrow(/must be an object/);
   });
 

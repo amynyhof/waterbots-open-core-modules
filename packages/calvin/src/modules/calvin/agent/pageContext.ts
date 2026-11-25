@@ -2,6 +2,7 @@ import type { FiledFnrbRefusal, FnrbRefusal, ScenarioResult, TransitionWaterfall
 import type { CalcState, ProjectFact } from "../screen/state";
 import type { MonitoringValue } from "../screen/monitoring";
 import { hasProjectRecord, type Place } from "@waterbots/core/places";
+import { FACT_LABEL, answerForAgent, type Answer } from "@waterbots/core/projectKinds";
 import type { EntryCheck } from "@waterbots/core/record";
 
 /** How a refused count is named to Calvin. Codes from core's fact check; he says it in his own words. */
@@ -48,6 +49,10 @@ export interface PageContextInput {
   outOfRange?: string[];
   /** The project's technology label, when it is not covered yet (ruled 2026-11-23). */
   notCoveredYet?: string;
+  /** What the one table says for the project (2026-11-25). Left out for a project that already exists. */
+  answer?: Answer;
+  /** A project that already exists, where a newer way would answer differently. */
+  newerWay?: boolean;
   /** Counts on the record that the fact check refuses, such as people served below zero (W1). */
   recordProblems?: Array<Extract<EntryCheck, { ok: false }>>;
 }
@@ -68,13 +73,20 @@ export function calculatorPageContext({
   place,
   outOfRange = [],
   notCoveredYet,
+  answer,
+  newerWay = false,
   recordProblems = [],
 }: PageContextInput): string {
   const withRecord = place === undefined || hasProjectRecord(place);
-  // A TECHNOLOGY THAT IS NOT COVERED YET IS SAID, NOT ASKED FOR AGAIN.
+  // HELD FOR NOW, NOT SET UP YET OR FALLING SHORT IS SAID, NOT ASKED FOR AGAIN (2026-11-25).
+  if (answer !== undefined && answer.says !== "counted" && answer.says !== "ask" && missingFacts?.some((f) => f.key === "technology")) {
+    return `The user is on the GS Safe Water calculator for project "${projectName}". ${answerForAgent(answer)} There are NO figures on this screen, and neither tool counts it.`;
+  }
+  // A PROJECT THAT ALREADY EXISTS, with a technology that is not covered yet: said, not asked for again.
   if (notCoveredYet !== undefined && missingFacts?.some((f) => f.key === "technology")) {
     return (
-      `The user is on the GS Safe Water calculator for project "${projectName}". Its technology is "${notCoveredYet}", which is not covered yet: the experts are being asked. ` +
+      `The user is on the GS Safe Water calculator for project "${projectName}". Its technology is "${notCoveredYet}", which is not covered yet. ` +
+      (newerWay ? "A newer way to work it out exists. The project keeps its answer, and its owner can choose to redo it on this screen. " : "") +
       "There are NO figures on this screen, and neither tool counts it."
     );
   }
@@ -85,7 +97,7 @@ export function calculatorPageContext({
     const refused = recordProblems.map((p) => `the project record's ${REFUSED_FACT[p.fact]} can't be used: ${p.problem}`);
     return (
       `The user is on the GS Safe Water calculator for project "${projectName}", and it is asking for project facts rather than showing a result. ` +
-      `Missing project facts: ${missingFacts.map((f) => f.label).join("; ")}. There are NO figures on this screen. ` +
+      `Missing project facts: ${missingFacts.map((f) => (f.key === "technology" && answer?.says === "ask" ? FACT_LABEL[answer.fact] : f.label)).join("; ")}. There are NO figures on this screen. ` +
       (refused.length > 0 ? `Of these, ${refused.join("; ")}. It is put right where the record is kept. ` : "") +
       (withRecord
         ? "Once the facts are on the project record, the calculator runs."

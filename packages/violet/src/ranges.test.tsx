@@ -36,10 +36,10 @@ describe("her tool refuses the same numbers, in the same words", () => {
     [{ litresPerPersonPerDay: { value: -1, source: "invented" } }, "Litres per person a day must be 0 or more."],
     [{ withoutProjectM3PerYear: -5 }, "Water before the project must be 0 or more."],
   ])("%j", (bad, message) => {
-    expect(() => computeD3Tool.execute({ technology: "CWS", ...people, ...bad })).toThrow(message);
+    expect(() => computeD3Tool.execute({ waterSource: "new", treatment: "none", homeUse: "yes", ...people, ...bad })).toThrow(message);
   });
   it("after the project runs, 400 days gets the message and no figure", () => {
-    expect(() => computeD3Tool.execute({ technology: "CWS", ...people, daysOfAccessPerYear: 400 })).toThrow("Days of access must be between 0 and 365.");
+    expect(() => computeD3Tool.execute({ waterSource: "new", treatment: "none", homeUse: "yes", ...people, daysOfAccessPerYear: 400 })).toThrow("Days of access must be between 0 and 365.");
     expect(d3Refusals(people)).toEqual([]);
   });
 });

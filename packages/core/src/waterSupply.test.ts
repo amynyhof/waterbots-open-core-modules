@@ -45,8 +45,9 @@ test("every label on the list is a supply, a supply for home use, or treatment, 
   expect(waterCoverage("A label nobody has sent yet")).toBe("not known");
 });
 
+// Community level treatment has its code again (2026-11-25). The rest are the ones they were.
 test("the carbon side does not change: the codes are the ones they were", () => {
-  expect(TECHNOLOGY_LABELS.filter((t) => t.code === "CWS").map((t) => t.label)).toEqual(["Community water supply", "Community water supply technologies", "A new water source a community collects from"]);
+  expect(TECHNOLOGY_LABELS.filter((t) => t.code === "CWS").map((t) => t.label)).toEqual(["Community water supply", "Community level water treatment technologies", "Community water supply technologies", "A new water source a community collects from"]);
   expect(TECHNOLOGY_LABELS.filter((t) => t.code === "HWT").map((t) => t.label)).toEqual(["Household water treatment", "Household water treatment technologies", "Water made safe in the home"]);
   expect(recordTechnology({ facts: label("New or alternative water supply") })).toBeUndefined();
 });
@@ -218,7 +219,8 @@ describe("what does not change", () => {
       for (const p of ["carbon", "wqba", "wash-ba"] as const) expect(noMethodFor(p, facts)).toBeNull();
     }
     expect(methodsFor("vwba", false)).toEqual(["vwba-d3"]);
-    expect(METHODS.filter((m) => m.counts !== undefined).map((m) => m.id)).toEqual(["vwba-d3"]);
+    // Every method reads the one table now (2026-11-25). A project that already exists is as it was.
+    expect(METHODS.every((m) => m.counts !== undefined)).toBe(true);
     expect(FACT_RULES.find((r) => r.pathway === "vwba")!.source).toContain("pp.37 to 39");
   });
 });

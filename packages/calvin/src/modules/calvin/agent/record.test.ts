@@ -35,7 +35,8 @@ describe("Calvin reads the record first", () => {
 
   it("asks only for what the record does not hold", () => {
     expect(calvinNeeds(gathered())).toEqual(["population.mode"]);
-    expect(calvinNeeds(emptyRecord())).toEqual(["technology", "country", "population.served", "population.mode"]);
+    // Nobody is asked for a kind: the source comes first (2026-11-25).
+    expect(calvinNeeds(emptyRecord())).toEqual(["waterSource", "country", "population.served", "population.mode"]);
   });
 
   it("an unlikely pathway is not one of the project's standards", () => {

@@ -2,7 +2,7 @@
 # Her colour is Orchid, #A457D4 (ruling 2026-10-31).
 # Status is draft: nothing here claims a grade or a credential.
 agent: violet
-version: 0.3.0 # 2026-11-24 (J5): her chat, its settings and her knowledge notes; 0.2.0 2026-11-22 (J3, J9): reads and adds to the shared project record, and her prompt names each needed fact
+version: 0.4.0 # 2026-11-25: the source and the treatment in place of a kind, and where the guidebook is quiet; 0.3.0 2026-11-24 (J5): her chat, its settings and her knowledge notes; 0.2.0 2026-11-22 (J3, J9): reads and adds to the shared project record, and her prompt names each needed fact
 persona: violet
 colour: "#A457D4"
 model: claude-opus-5

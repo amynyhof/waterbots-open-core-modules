@@ -84,7 +84,7 @@ process.stdout.write(JSON.stringify({
   agent: (() => {
     const record = { recordVersion: 1, facts: { population: { value: { mode: "people", served: 1200 }, source: { by: "person", note: "invented" } } }, pathways: {}, place: { country: { value: "LSO", source: { by: "person", note: "invented" } } }, agents: {} };
     const p = A.calvinProjectFromRecord(record);
-    const run = A.computeScenarioTool.execute({ version: "paa", technology: "CWS", countryIso: p.country, populationMode: p.population.mode, populationCount: p.population.served, litresPerPersonPerDay: 4, operationalDays: 347 });
+    const run = A.computeScenarioTool.execute({ version: "paa", waterSource: "new", treatment: "none", sourceSafe: true, countryIso: p.country, populationMode: p.population.mode, populationCount: p.population.served, litresPerPersonPerDay: 4, operationalDays: 347 });
     return { names: Object.keys(A), tools: A.GS4GG_CARBON_TOOLS.map((t) => t.id), runs: typeof run.output?.result?.ER === "number" && agentMap({ place: "mcp", opened: "calvin" }).next.step === "work alone" };
   })(),
   stylesheets: { "@waterbots/calvin/styles.css": found("@waterbots/calvin/styles.css"), "@waterbots/core/base.css": found("@waterbots/core/base.css") },

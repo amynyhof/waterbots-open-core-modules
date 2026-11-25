@@ -243,7 +243,7 @@ describe("Calvin's notes follow the tags the screen shows", () => {
 });
 
 describe("at MCP his tools return the facts", () => {
-  const input = { version: "paa", method: 1, technology: "CWS", countryIso: "KEN", populationMode: "people", populationCount: 1200, litresPerPersonPerDay: 4, operationalDays: 347 };
+  const input = { version: "paa", method: 1, waterSource: "new", treatment: "none", sourceSafe: true, countryIso: "KEN", populationMode: "people", populationCount: 1200, litresPerPersonPerDay: 4, operationalDays: 347 };
   type Out = { blankOrAssumed: { key: string; standing: string }[] };
 
   it("the calculator tool says which values are blank or assumed, in no words of his", async () => {

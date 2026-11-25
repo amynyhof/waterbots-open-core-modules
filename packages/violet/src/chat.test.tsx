@@ -198,7 +198,7 @@ describe("her files ship, with her settings", () => {
   });
   it("her instructions name both labels, each field and each place, and restate none of the 21 rules", () => {
     const prompt = read("./agents/violet/prompt.md");
-    for (const word of ["`facts`", "`values`", "`leftForNow`", "not covered yet", "use the water at home", '"default"', '"assumed"', "Agent Commons", "MCP", "free site", "paid site"]) expect(prompt).toContain(word);
+    for (const word of ["`facts`", "`values`", "`leftForNow`", "Held for now", "Not set up yet", "use the water at home", '"default"', '"assumed"', "Agent Commons", "MCP", "free site", "paid site"]) expect(prompt).toContain(word);
     expect(prompt).not.toMatch(/own words|one question at a time|do not know|what you filled in/);
   });
 });

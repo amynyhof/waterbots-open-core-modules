@@ -8,11 +8,11 @@
 
 import type { ModuleProject } from "@waterbots/core/project";
 import {
-  addGivenFacts,
   blankFacts,
+  changeFacts,
   checkRecord,
   setAgentResults,
-  type AddedFacts,
+  type ChangedFacts,
   type EntryCheck,
   type FactKey,
   type GivenFacts,
@@ -81,9 +81,13 @@ export function violetGivenFacts(input: D3Input): GivenFacts {
   return given;
 }
 
-/** Adds the facts the person gave Violet. Only blank facts are added, and each one counts as a question. */
-export function addVioletFacts(record: ProjectRecord, given: GivenFacts): AddedFacts {
-  return addGivenFacts(record, "violet", given);
+/**
+ * Adds the facts the person gave Violet. Only blank facts are added, and each one counts as a question. A fact about the
+ * source or the treatment that the visitor changes is changed (core's `changeFacts`); on a saved project (`saved`) it stays,
+ * and `onRecordPage` names it.
+ */
+export function addVioletFacts(record: ProjectRecord, given: GivenFacts, options: { saved?: boolean } = {}): ChangedFacts {
+  return changeFacts(record, "violet", given, options);
 }
 
 /**

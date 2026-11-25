@@ -7,10 +7,11 @@
  */
 import { ANSWER_FIELDS, CHAT_REPLY, chatContext, openAsks, openedTurn, readLeft, type Ask, type ChatSettings, type Kept } from "@waterbots/core/chat";
 import type { Place } from "@waterbots/core/places";
-import { checkRange } from "@waterbots/core/ranges";
+import { askedOutOfRange, checkAnswerNumbers, isShare, returnToAgent, takenOut, type AnswerNumber } from "@waterbots/core/numberGuard";
+import { KIND_ASKS, KIND_FACTS, KIND_FACT_SCHEMA, askFor, knownKindFacts, readKindFacts, type Answer } from "@waterbots/core/projectKinds";
+import { RANGES, checkRange } from "@waterbots/core/ranges";
 import { readHandBack, type HandBack } from "@waterbots/core/reply";
-import { setAgentResults, type GivenFacts, type ProjectRecord } from "@waterbots/core/record";
-import { TECHNOLOGY_CLASSES, technologyOfClass } from "@waterbots/core/technologyLabels";
+import { HOME_USES, setAgentResults, underTodaysRules, type GivenFacts, type ProjectFacts, type ProjectRecord } from "@waterbots/core/record";
 import type { ScenarioResult, SiteTables } from "../engine";
 import { sliderSpecs, shownValue, sliderLabel, storedValue } from "../screen/exAnte";
 import { isEntered, missingMonitoring, monitoringValues, MONITORING_FIELD } from "../screen/monitoring";
@@ -26,13 +27,6 @@ export const CALVIN_OPENED = openedTurn("Calvin");
 // ── What he asks for ─────────────────────────────────────────────────────────────────────────────────────────────
 
 const ASKS = {
-  technology: {
-    key: "technology",
-    about: "whether the project is a community water supply (a new or restored source) or household water treatment",
-    why: "it picks which of the method's two ways of counting is used",
-    from: "what the project builds",
-    needed: true,
-  },
   country: { key: "country", about: "which country the project is in", why: "it picks the country's default values, such as its fNRB", from: "where the project is", needed: true },
   served: { key: "population.served", about: "how many people or households the project serves", why: "the water the project gives is worked out from it", from: "the project's plan, or a count of the homes it serves", needed: true },
   mode: { key: "population.mode", about: "whether that count is of people or of households", why: "the two are counted in different ways", from: "the same plan or count", needed: true },
@@ -75,18 +69,20 @@ const ASKS = {
 } as const satisfies Record<string, Ask>;
 
 /** Every key he may ask for, for reading an answer. The monitored values are asked only once the project runs. */
-export const CALVIN_ASK_KEYS: readonly string[] = [...Object.values(ASKS).map((a) => a.key), ...Object.values(MONITORING_FIELD).map((f) => f.value)];
+export const CALVIN_ASK_KEYS: readonly string[] = [...KIND_FACTS, "homeUse", ...Object.values(ASKS).map((a) => a.key), ...Object.values(MONITORING_FIELD).map((f) => f.value)];
 
 /**
  * What is still missing, in the order he asks. The first one is his one question. `transition` is true for a project
- * already credited under V1.0, which alone is asked for its filing. `notCoveredYet` is the label of a technology that is
- * not covered yet: then he asks for nothing.
+ * already credited under V1.0, which alone is asked for its filing. `answer` is what the one table says: while one fact
+ * decides it, that fact comes first, and where no figure can show he asks for nothing. `notCoveredYet` is the label of a
+ * project that already exists and is not covered yet: then he asks for nothing too. Nobody is asked for a kind.
  */
-export function calvinAsks(state: CalcState, options: { tables?: SiteTables; transition?: boolean; notCoveredYet?: string } = {}): Ask[] {
-  if (options.notCoveredYet !== undefined) return [];
+export function calvinAsks(state: CalcState, options: { tables?: SiteTables; transition?: boolean; notCoveredYet?: string; answer?: Answer } = {}): Ask[] {
+  const { answer } = options;
+  if (options.notCoveredYet !== undefined || (answer !== undefined && answer.says !== "counted" && answer.says !== "ask")) return [];
   const out: Ask[] = [];
   const missing = new Set(missingProjectFacts(state, options.tables).map((f) => f.key));
-  if (missing.has("technology")) out.push(ASKS.technology);
+  if (missing.has("technology")) out.push(answer?.says === "ask" ? askFor(answer) : KIND_ASKS.waterSource);
   if (missing.has("country")) out.push(ASKS.country);
   if (missing.has("peopleServed")) out.push(ASKS.served);
   if (missing.has("peopleServed") ? state.populationMode == null : missing.has("countedAs")) out.push(ASKS.mode);
@@ -210,7 +206,7 @@ export const CALVIN_ANSWER_SCHEMA: Record<string, unknown> = {
     facts: {
       type: "object",
       additionalProperties: false,
-      description: "Project facts the visitor has just given, for the record. Leave out everything else.",
+      description: "Project facts the visitor has just given or changed, for the record. Leave out everything else.",
       properties: {
         country: { type: "string", description: "ISO 3166-1 alpha-3." },
         population: {
@@ -219,7 +215,8 @@ export const CALVIN_ANSWER_SCHEMA: Record<string, unknown> = {
           properties: { served: { type: "number" }, mode: { type: "string", enum: ["people", "households"] }, householdSize: { type: "number" } },
         },
         pumpPower: { type: "string", enum: ["hand", "gravity", "solar", "diesel", "grid"] },
-        technologyClass: { type: "string", enum: ["HWT", "IWT", "CWT", "CWS"], description: "The kind of project, when you asked for it." },
+        ...KIND_FACT_SCHEMA,
+        homeUse: { type: "string", enum: [...HOME_USES], description: "Whether people use the water at home." },
       },
     },
     values: {
@@ -239,20 +236,17 @@ export interface CalvinReply extends CalvinAnswer {
 
 const PUMPS = ["hand", "gravity", "solar", "diesel", "grid"] as const;
 
-/** The project facts in an answer, kept only where they hold. A kind of project becomes the label list's technology. */
+/** The project facts in an answer, kept only where they hold. */
 function readFacts(raw: unknown): GivenFacts {
   if (typeof raw !== "object" || raw === null) return {};
   const o = raw as Record<string, unknown>;
-  const out: GivenFacts = {};
+  const out: GivenFacts = { ...readKindFacts(o) };
+  const homeUse = HOME_USES.find((h) => h === o.homeUse);
+  if (homeUse !== undefined) out.homeUse = homeUse;
   if (typeof o.country === "string" && /^[A-Za-z]{3}$/.test(o.country)) out.country = o.country.toUpperCase();
   if (typeof o.population === "object" && o.population !== null) out.population = o.population as NonNullable<GivenFacts["population"]>;
   const pump = PUMPS.find((p) => p === o.pumpPower);
   if (pump !== undefined) out.pumpPower = pump;
-  const kind = TECHNOLOGY_CLASSES.find((c) => c === o.technologyClass);
-  if (kind !== undefined) {
-    const { label, code } = technologyOfClass(kind);
-    out.technology = { label, ...(code !== undefined ? { code } : {}) };
-  }
   return out;
 }
 
@@ -270,6 +264,67 @@ export function readCalvinAnswer(raw: unknown): CalvinReply | null {
   };
 }
 
+// ── The guards on his numbers (2026-11-25) ───────────────────────────────────────────────────────────────────────
+
+export interface CalvinGuardInput {
+  state: CalcState;
+  /** The visitor's own messages in this chat, oldest first. */
+  messages: readonly string[];
+  /** The key of the question just asked. */
+  asked?: string;
+}
+
+export interface GuardedCalvinReply {
+  /** His answer, with every number that did not pass taken out. */
+  reply: CalvinReply;
+  /** Send this back to him once, in the same turn. Null: nothing to send. On the second answer, show `told` instead. */
+  returned: string | null;
+  /** What the visitor is told when a number is taken out. */
+  told: string | null;
+  /** The out-of-range message for the fact just asked, whether or not he sent the number. */
+  outOfRange: string | null;
+}
+
+/** The question a number on his screen answers. */
+const ASK_OF: Partial<Record<CalvinAnswerValue, string>> = { populationCount: "population.served", householdSizeOverride: "population.householdSize" };
+
+/** Core's guards on his answer. The site calls it on each answer, and sends `returned` back once. */
+export function guardCalvinReply(reply: CalvinReply, { state, messages, asked }: CalvinGuardInput): GuardedCalvinReply {
+  const fields = new Map(stateValues(state).map((v) => [v.id, v]));
+  const nameOf = (id: string, fallback: string): string => {
+    const v = fields.get(id);
+    return v === undefined ? fallback : (v.words?.name ?? RANGES[v.key].name);
+  };
+  const numbers: AnswerNumber[] = [];
+  for (const id of CALVIN_ANSWER_VALUES) {
+    const value = reply.values?.[id];
+    if (typeof value !== "number") continue;
+    const v = fields.get(id);
+    numbers.push({ id: `values.${id}`, name: nameOf(id, id), value, held: v?.get(state), ask: ASK_OF[id] ?? id, share: v !== undefined && isShare(v.key) });
+  }
+  const pop = reply.facts?.population;
+  if (typeof pop?.served === "number") numbers.push({ id: "facts.served", name: nameOf("populationCount", "People served"), value: pop.served, held: state.populationCount, ask: "population.served" });
+  if (typeof pop?.householdSize === "number") numbers.push({ id: "facts.householdSize", name: "People per household", value: pop.householdSize, held: state.householdSizeOverride, ask: "population.householdSize" });
+
+  const { kept, faults } = checkAnswerNumbers(numbers, { messages, asked });
+  const keeps = (id: string): boolean => kept.includes(id);
+  const values = Object.fromEntries(Object.entries(reply.values ?? {}).filter(([id, v]) => typeof v !== "number" || keeps(`values.${id}`)));
+  const facts: GivenFacts = { ...reply.facts };
+  if (pop !== undefined) {
+    const { served, householdSize, ...rest } = pop;
+    const next = { ...rest, ...(served !== undefined && keeps("facts.served") ? { served } : {}), ...(householdSize !== undefined && keeps("facts.householdSize") ? { householdSize } : {}) };
+    if (Object.keys(next).length > 0) facts.population = next;
+    else delete facts.population;
+  }
+  const target = stateValues(state).find((v) => (ASK_OF[v.id as CalvinAnswerValue] ?? v.id) === asked);
+  return {
+    reply: { ...reply, facts, values },
+    returned: returnToAgent(faults),
+    told: takenOut(faults),
+    outOfRange: target === undefined ? null : askedOutOfRange(target.key, messages.at(-1) ?? "", target.words ?? {}),
+  };
+}
+
 /** Marks his part done on the record, or not done. */
 export function setCalvinDone(record: ProjectRecord, done: boolean): ProjectRecord {
   return setAgentResults(record, "calvin", { done });
@@ -278,9 +333,10 @@ export function setCalvinDone(record: ProjectRecord, done: boolean): ProjectReco
 // ── The block for a turn ─────────────────────────────────────────────────────────────────────────────────────────
 
 /** What the record already holds that he reads, as lines. */
-export function calvinKnown(state: CalcState): string[] {
-  const out: string[] = [];
-  if (state.method !== null) out.push(`Technology: ${state.method === 1 ? "a community water supply" : "household water treatment"}`);
+export function calvinKnown(state: CalcState, facts?: ProjectFacts): string[] {
+  const out: string[] = facts !== undefined && underTodaysRules(facts) ? knownKindFacts(facts) : [];
+  if (facts?.homeUse !== undefined) out.push(`People use the water at home: ${facts.homeUse.value}`);
+  if (out.length === 0 && state.method !== null) out.push(`Technology: ${state.method === 1 ? "a community water supply" : "household water treatment"}`);
   if (state.countryIso !== null) out.push(`Country: ${state.countryIso}`);
   if (state.populationCount !== null) out.push(`${state.populationMode === "households" ? "Households" : state.populationMode === "people" ? "People" : "People or households, not said which,"} served: ${state.populationCount.toLocaleString("en")}`);
   if (state.householdSizeOverride != null) out.push(`People per household: ${state.householdSizeOverride}`);
@@ -301,6 +357,10 @@ export interface CalvinTurn {
   sliders?: boolean;
   transition?: boolean;
   notCoveredYet?: string;
+  /** What the one table says (`CalvinProject.answer`). */
+  answer?: Answer;
+  /** The project's facts. In the Agent Commons, his temporary record's. */
+  facts?: ProjectFacts;
   tables?: SiteTables;
   leftForNow?: readonly string[];
   refused?: readonly string[];
@@ -313,8 +373,8 @@ export function calvinChatContext(t: CalvinTurn): string {
     saved: t.saved ?? false,
     opened: t.opened ?? false,
     introduce: t.introduce ?? false,
-    known: calvinKnown(t.state),
-    asks: openAsks(calvinAsks(t.state, { tables: t.tables, transition: t.transition, notCoveredYet: t.notCoveredYet }), t.leftForNow),
+    known: calvinKnown(t.state, t.facts),
+    asks: openAsks(calvinAsks(t.state, { tables: t.tables, transition: t.transition, notCoveredYet: t.notCoveredYet, answer: t.answer }), t.leftForNow),
     kept: calvinKept(t.state, { sliders: t.sliders, result: t.result }),
     figureShows: t.result != null,
     refused: t.refused ?? [],
