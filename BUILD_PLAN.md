@@ -171,9 +171,13 @@ their tasks, collect what they need, and report back to him. He helps with the n
   - Ruled by the maintainer on 2026-11-24: a later agent is called only when the agent before it has finished, and the
     map gives each agent its step and how many steps the project has. Calvin and Violet share the Quantify step, and
     neither waits for the other.
-  - [!] Found on 2026-11-24, not changed: where a water pathway reads likely, the map calls Violet's D-3 calculator
-    whatever the project type is. D-3 counts a household or community water supply (VWBA 2.0, Appendix C, Table C-1,
-    p.39). Waits on the maintainer.
+  - Ruled by the maintainer on 2026-11-24: the map calls Violet for the kinds of project that give people water, starting
+    with the kinds the guidebook lists for D-3 by name (VWBA 2.0, Appendix C, Table C-1, pp.37 to 39; Appendix D, D-3,
+    pp.44 to 46). Treatment is not covered yet (N18). For any other kind the pathway stays in play with no calculator
+    agent. A new or alternative water supply is covered for water; its carbon side still waits (N17).
+  - [!] Rainwater harvesting for direct use: the 2026-11-24 ruling lists it for D-3. Violet's rulings and M8.4 leave it for
+    a later pull request, because the guidebook works it out with D-4 (p.45). No label names it, so nothing is built.
+    Waits on the maintainer.
   - [!] Four rules that say which project facts point to which pathway have no source yet. They are listed in the
     record proposal. Until the maintainer rules them, the map uses only the eligibility readings and the two rules this
     repo can cite.
@@ -438,3 +442,9 @@ the maintainer.
   - Does community level water treatment count with community supply?
   - Does institutional water treatment count with household treatment?
   - Does a new well logged as an alternative water supply count as community supply?
+- **N18 (V1):** *Family: Experts and partners.* three questions on what D-3 counts. Until the experts answer, Violet is not
+  called for treatment, reuse or irrigation supply.
+  - How is treatment counted under D-3 when people already collected the same water untreated? (The same question as
+    for carbon.)
+  - Which of D-3's two printed forms of the sum holds for treatment?
+  - Do reuse and irrigation supply belong?
