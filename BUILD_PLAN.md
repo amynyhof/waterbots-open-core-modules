@@ -147,6 +147,10 @@ their tasks, collect what they need, and report back to him. He helps with the n
     gives no technology code to it, to institutional treatment, or to a new well logged as an alternative water supply,
     until the experts answer (N17). Each says it is not covered yet. Core 0.2.0 gave community level treatment a code;
     core 0.3.0 takes it away.
+  - Decided by the maintainer on 2026-11-25: a project's kind is worked out in core from a few plain facts, and nobody is asked
+    for it. One table in core says what Calvin and Violet do with each. Community level treatment is counted for carbon
+    again, treatment only included; institutional treatment is not set up yet. A project that already exists keeps its
+    answers. Core also holds the guards on an agent's numbers. Open pull request.
   - Value ranges, ruled by the maintainer on 2026-11-23. Each value a person can enter has a range. A number outside it
     is refused where it is typed, with a message that names the value and the range. One list, one check and one message
     in `core`; the record's fact check, both screens and both tools use them. A method cap is not a range. This gives
@@ -177,7 +181,7 @@ their tasks, collect what they need, and report back to him. He helps with the n
     with the kinds the guidebook lists for D-3 by name (VWBA 2.0, Appendix C, Table C-1, pp.37 to 39; Appendix D, D-3,
     pp.44 to 46). Treatment is not covered yet (N18). For any other kind the pathway stays in play with no calculator
     agent. A new or alternative water supply is covered for water only where people use the water at home, and that is
-    asked first; its carbon side still waits (N17). Violet's tool refuses treatment in the Agent Commons and at MCP too,
+    asked first. Violet's tool refuses treatment in the Agent Commons and at MCP too,
     as Calvin's do. Rainwater harvesting stays for later (M8.4). Released 2026-11-25 (#57).
   - [!] Four rules that say which project facts point to which pathway have no source yet. They are listed in the
     record proposal. Until the maintainer rules them, the map uses only the eligibility readings and the two rules this
@@ -438,14 +442,16 @@ the maintainer.
     `CalculatorWork.tsx` and `ReportView.tsx`.
   - `householdSizeFallbackStop` in `modules/calvin/screen/analysis.ts`.
   - `FiredFallback` and the `fallbacks` field in `calculators/gs4gg-carbon/scenario.ts`.
-- **N17 (V1):** *Family: Experts and partners.* three questions on what the calculators may count. Until the experts
-  answer, the label list gives none of the three a technology code, and Calvin's tools refuse the first two.
-  - Does community level water treatment count with community supply?
-  - Does institutional water treatment count with household treatment?
-  - Does a new well logged as an alternative water supply count as community supply?
-- **N18 (V1):** *Family: Experts and partners.* three questions on what D-3 counts. Until the experts answer, Violet is not
-  called for treatment, reuse or irrigation supply.
-  - How is treatment counted under D-3 when people already collected the same water untreated? (The same question as
-    for carbon.)
-  - Which of D-3's two printed forms of the sum holds for treatment?
-  - Do reuse and irrigation supply belong?
+- **N17 (V1):** *Family: Experts and partners.* still open on carbon, for the methodology sprint. They replace the older
+  questions, which the maintainer decided on 2026-11-25.
+  - Improving a source that still works: the text does not say. Held for now.
+  - A chlorine dispenser's class in the 2026 version.
+  - Which method a supply combined with home or institution treatment uses.
+  - Does the 2026 version's silence on where treated water comes from mean what we read it to mean? The 2021 version says it
+    in words.
+- **N18 (V1):** *Family: Experts and partners.* still open on water benefits, for the methodology sprint.
+  - How is treatment counted when people already collected the same water untreated, and which of D-3's two printed forms of
+    the sum holds? The maintainer's own thought, not yet confirmed: treatment may be counted as unsafe water made safe, and
+    the form of the sum that takes water off may work like the carbon method's value for people who already had safe water.
+    Both are questions for the experts.
+  - Restoration: is "water before the project" enough, or are more checks needed?
