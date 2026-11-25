@@ -47,7 +47,9 @@ test("the open site's four class names, word for word, each with its class", () 
   ]);
 });
 
-test.each(WAITING)("%s: a code handed in, or saved before this rule, is not used", (label) => {
+// SWITCHED OFF 2026-11-24, never deleted: it expects a new or alternative water supply to stay out of the water pathway.
+// The maintainer ruled on 2026-11-24 that it is covered there. The test after it, and `waterSupply.test.ts`, hold the rule.
+test.skip.each(WAITING)("%s: a code handed in, or saved before this rule, is not used", (label) => {
   const { record } = addGivenFacts(emptyRecord(), "wellington", { technology: { label, code: "CWS" } });
   expect(record.facts.technology).toEqual({ label, source: { by: "person", note: "given to wellington" } });
   const saved = emptyRecord();
@@ -55,4 +57,15 @@ test.each(WAITING)("%s: a code handed in, or saved before this rule, is not used
   expect(recordTechnology(saved)).toBeUndefined();
   // So the saved code no longer points the project to the water pathway.
   expect(agentMap({ place: "free-site", record: saved }).pathways.every((p) => !p.inPlay)).toBe(true);
+});
+
+test.each(WAITING)("%s: a code handed in, or saved before the rule, is still not used (2026-11-24)", (label) => {
+  const { record } = addGivenFacts(emptyRecord(), "wellington", { technology: { label, code: "CWS" } });
+  expect(record.facts.technology).toEqual({ label, source: { by: "person", note: "given to wellington" } });
+  const saved = emptyRecord();
+  saved.facts.technology = { label, code: "CWS", source: { by: "site intake", note: "made up" } };
+  expect(recordTechnology(saved)).toBeUndefined();
+  // The code never points the project to carbon. Whether water is in play comes from the label alone.
+  const map = agentMap({ place: "free-site", record: saved });
+  expect(map.pathways.filter((p) => p.inPlay).map((p) => p.pathway)).toEqual(label === "New or alternative water supply" ? ["vwba"] : []);
 });

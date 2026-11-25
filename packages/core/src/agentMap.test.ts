@@ -14,6 +14,12 @@ function project(extra: Partial<ProjectRecord> = {}): ProjectRecord {
   r.place.country = { value: "XKX", source: by };
   return { ...r, ...extra };
 }
+/** The same made-up project, as a supply: the kind Violet is called for. */
+function supply(extra: Partial<ProjectRecord> = {}): ProjectRecord {
+  const r = project(extra);
+  r.facts.technology = { label: "Community water supply", code: "CWS", source: by };
+  return r;
+}
 const read = (reading: Reading): PathwayReading => ({
   reading,
   reason: `made-up reason for ${reading}`,
@@ -237,7 +243,9 @@ describe("introductions (agent rule 17) and the order of the next steps", () => 
     const map = agentMap({ place: "paid-site", record: project({ pathways: readings({ carbon: "likely" }) }), saved: true });
     expect(map.agents.filter((a) => a.called).every((a) => a.called && !a.introduce)).toBe(true);
   });
-  test("Bridget, then Calvin, then Violet, then the report or sign-up", () => {
+  // SWITCHED OFF 2026-11-24, never deleted: it expects Violet to be called for household treatment. The maintainer ruled on
+  // 2026-11-24 that she is called for supplies only. `waterSupply.test.ts` holds the new rule.
+  test.skip("Bridget, then Calvin, then Violet, then the report or sign-up", () => {
     const record = project({ pathways: readings({ carbon: "likely", vwba: "likely" }) });
     expect(agentMap({ place: "free-site", record }).next).toEqual({ step: "call", agent: "bridget" });
     record.agents.bridget = { done: true };
@@ -269,7 +277,7 @@ describe("a site that reads two of the four pathways", () => {
 });
 
 describe("a later agent is called only when the agent before it has finished (ruled 2026-11-24)", () => {
-  const both = (extra: ProjectRecord["agents"] = {}) => project({ pathways: readings({ carbon: "likely", vwba: "more to learn" }), agents: extra });
+  const both = (extra: ProjectRecord["agents"] = {}) => supply({ pathways: readings({ carbon: "likely", vwba: "more to learn" }), agents: extra });
   const waiting = { called: false, because: "waiting for the agent before" };
 
   test("a community water supply, with nothing read yet: water is in play, and only Phoebe is called", () => {
@@ -309,7 +317,7 @@ describe("a later agent is called only when the agent before it has finished (ru
     expect(call(agentMap({ place: "free-site", record }), "violet")).toEqual({ agent: "violet", called: false, because: "pathway unlikely" });
   });
   test("when a reading changes, nothing is kept from before", () => {
-    const at = (named: Partial<Record<StandardId, Reading>>) => called(agentMap({ place: "free-site", record: project({ pathways: readings(named), agents: { bridget: { done: true } } }) }));
+    const at = (named: Partial<Record<StandardId, Reading>>) => called(agentMap({ place: "free-site", record: supply({ pathways: readings(named), agents: { bridget: { done: true } } }) }));
     expect(at({ carbon: "likely" })).toEqual(["wellington", "bridget", "calvin"]);
     expect(at({ carbon: "unlikely", vwba: "likely" })).toEqual(["wellington", "bridget", "violet"]);
   });
@@ -334,7 +342,7 @@ describe("a later agent is called only when the agent before it has finished (ru
 describe("the steps this project has", () => {
   const steps = (map: AgentMap) => map.steps.map((x) => [x.number, x.of, x.name, x.agents]);
   test("Step 1 Eligibility, Step 2 Partners, Step 3 Quantify; Calvin and Violet share the last", () => {
-    const map = agentMap({ place: "free-site", record: project({ pathways: readings({ carbon: "likely", vwba: "likely" }) }) });
+    const map = agentMap({ place: "free-site", record: supply({ pathways: readings({ carbon: "likely", vwba: "likely" }) }) });
     expect(steps(map)).toEqual([
       [1, 3, "Eligibility", ["phoebe"]],
       [2, 3, "Partners", ["bridget"]],

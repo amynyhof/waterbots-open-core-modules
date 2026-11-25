@@ -12,7 +12,7 @@
 import type { Technology } from "./project";
 import { checkRange, rangeMessage } from "./ranges.js";
 import type { StandardId } from "./standards";
-import { TECHNOLOGY_CLASSES, technologyCoverage, technologyOfClass, type TechnologyClass } from "./technologyLabels.js";
+import { TECHNOLOGY_CLASSES, technologyCoverage, technologyOfClass, waterCoverage, type TechnologyClass } from "./technologyLabels.js";
 
 /** The shape's version. A site can tell an older record from a newer one. */
 export const RECORD_VERSION = 1 as const;
@@ -93,7 +93,7 @@ export type ProjectTypeId = (typeof PROJECT_TYPE_IDS)[number];
 
 /** The one type that also has a class. */
 export const DRINKING_WATER_TYPE = "C-19" satisfies ProjectTypeId;
-/** A new or alternative water supply. Not covered yet. */
+/** A new or alternative water supply. Covered for the water pathway; it has no technology code yet. */
 export const NEW_SUPPLY_TYPE = "C-11" satisfies ProjectTypeId;
 
 /** On paper, being built, or already running. */
@@ -253,6 +253,30 @@ export function technologyOfFacts(type: ProjectTypeId | undefined, technologyCla
   if (type !== DRINKING_WATER_TYPE || technologyClass === undefined) return null;
   const { label, code } = technologyOfClass(technologyClass);
   return { label, ...(code !== undefined ? { code } : {}) };
+}
+
+/**
+ * Whether Violet's D-3 counts the project, from the facts as they stand. "another kind of project": the guidebook has
+ * other methods for it, or the project is neither a supply nor treatment. "not known": the facts do not say yet.
+ */
+export type WaterSupply = "covered" | "not covered yet" | "another kind of project" | "not known";
+
+/**
+ * Violet is called for the kinds of project that give people water, and for nothing else (ruled 2026-11-24). Where two
+ * facts disagree, or a label is not on the list and has no code, it is not sure, so she has nothing to count yet.
+ */
+export function recordWaterSupply(facts: ProjectFacts): WaterSupply {
+  const type = facts.type?.value;
+  if (type !== undefined && type !== DRINKING_WATER_TYPE && type !== NEW_SUPPLY_TYPE) return "another kind of project";
+  const named = [facts.technology ?? null, technologyOfFacts(type, facts.technologyClass?.value)].filter((t) => t !== null);
+  if (named.length === 0) return "not known";
+  const each = named.map(({ label, code }): WaterSupply => {
+    const listed = waterCoverage(label);
+    if (listed !== "not known") return listed;
+    // A label the list does not know: only a code the site gave it can say.
+    return code === "CWS" ? "covered" : code === "other" ? "another kind of project" : "not covered yet";
+  });
+  return each.find((x) => x !== "covered") ?? "covered";
 }
 
 /** An empty record: every fact blank, no reading, no agent part. */

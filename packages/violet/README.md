@@ -52,6 +52,9 @@ Violet accepts any `@waterbots/core` in the 0.3 series, so she can be released o
 - **On a phone** her tile stays at the top of the screen. The parts inside a fold have space between them.
 - No sum changed.
 
+**Which projects call her.** Core's map calls her for the kinds of project that give people water. It does not call her for
+treatment, which is not covered yet, or for another kind of project. In the Agent Commons and at MCP she opens as before.
+
 **What a site should change.** Install core 0.3 with it. A site that shows her when its own rule says so can read her call on
 core's map instead: she is called once Bridget has finished.
 

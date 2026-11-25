@@ -14,7 +14,7 @@
 import type { StandardId } from "./standards.js";
 import type { Door, Place } from "./places.js";
 // The ".js" lets the built file load in plain Node, such as a host serving an agent's tool through MCP.
-import { type AgentId, type ProjectFacts, type ProjectRecord, type Reading, AGENTS, emptyRecord, recordTechnology } from "./record.js";
+import { type AgentId, type ProjectFacts, type ProjectRecord, type Reading, type WaterSupply, AGENTS, emptyRecord, recordWaterSupply } from "./record.js";
 
 /** The map's version. A record notes the version it was last mapped with. */
 export const AGENT_MAP_VERSION = 2 as const;
@@ -34,6 +34,8 @@ export interface MethodEntry {
   /** True when only a transitioning project (credited under V1.0) gets it. */
   transitioningOnly: boolean;
   what: string;
+  /** Which projects it counts, from their facts. Left out: every project on its pathway. */
+  counts?: (facts: ProjectFacts) => WaterSupply;
 }
 
 /** One entry for each carbon method (was V6 and M3), and the water method. */
@@ -65,6 +67,9 @@ export const METHODS: readonly MethodEntry[] = [
     agent: "violet",
     transitioningOnly: false,
     what: "VWBA 2.0, D-3, the Volume Provided method.",
+    // Ruled by the maintainer on 2026-11-24: the supplies the guidebook lists for D-3 by name (VWBA 2.0, Appendix C,
+    // Table C-1, pp.37 to 39; Appendix D, D-3, pp.44 to 46). Anything not sure gets no calculator yet.
+    counts: recordWaterSupply,
   },
 ];
 
@@ -78,9 +83,25 @@ export function isTransitioning(facts: ProjectFacts): boolean {
   return facts.creditedUnderV1?.value === true;
 }
 
-/** The methods that apply to a pathway in play. A transitioning project also gets the legacy calculator. */
-export function methodsFor(pathway: StandardId, transitioning: boolean): MethodId[] {
-  return METHODS.filter((m) => m.pathway === pathway && (transitioning || !m.transitioningOnly)).map((m) => m.id);
+/**
+ * The methods that apply to a pathway in play. A transitioning project also gets the legacy calculator. With the
+ * project's facts, only the methods that count that kind of project.
+ */
+export function methodsFor(pathway: StandardId, transitioning: boolean, facts?: ProjectFacts): MethodId[] {
+  return METHODS.filter(
+    (m) => m.pathway === pathway && (transitioning || !m.transitioningOnly) && (facts === undefined || (m.counts?.(facts) ?? "covered") === "covered"),
+  ).map((m) => m.id);
+}
+
+/** Why a pathway has no method for this project. */
+export type NoMethod = "not covered yet" | "another kind of project" | "waiting for basic facts";
+
+/** Why no method of a pathway counts this project, or null when one does. A pathway nobody covers gives null too. */
+export function noMethodFor(pathway: StandardId, facts: ProjectFacts): NoMethod | null {
+  const own = METHODS.filter((m) => m.pathway === pathway).map((m) => m.counts?.(facts) ?? "covered");
+  const why = own.includes("covered") ? undefined : own[0];
+  if (why === undefined || why === "covered") return null;
+  return why === "not known" ? "waiting for basic facts" : why;
 }
 
 // ── Facts that point to a pathway ────────────────────────────────────────────────────────────────────────────────
@@ -96,10 +117,10 @@ export interface FactRule {
 export const FACT_RULES: readonly FactRule[] = [
   {
     pathway: "vwba",
-    applies: (facts) => recordTechnology({ facts }) === "CWS",
+    applies: (facts) => recordWaterSupply(facts) === "covered",
     source:
-      "VWBA 2.0, Appendix C, Table C-1, p.39: a WASH activity that gives household or community water supply is " +
-      "counted by the Volume Provided method, D-3.",
+      "VWBA 2.0, Appendix C, Table C-1, pp.37 to 39, and Appendix D, D-3, pp.44 to 46: an activity that gives people " +
+      "water to use at home or in a community is counted by the Volume Provided method, D-3.",
   },
   {
     pathway: "carbon",
@@ -151,7 +172,11 @@ export type NotCalled =
   | "no pathway in play yet"
   | "pathway not in play yet"
   | "pathway unlikely"
-  | "no pathway forward";
+  | "no pathway forward"
+  /** In play, and the agent's method does not count this kind of project yet. */
+  | "not covered yet"
+  /** In play, and the agent's method is not for this kind of project. */
+  | "another kind of project";
 
 export type AgentCall = { agent: AgentId; called: true; introduce: boolean } | { agent: AgentId; called: false; because: NotCalled };
 
@@ -181,10 +206,12 @@ export interface PathwayPlan {
   moreToLearn: boolean;
   /** What put the pathway in play, or kept it out. */
   because: "reading" | "project facts" | "no reading" | "opened by the user";
-  /** The pathway's calculator agent, or null when none covers it yet. */
+  /** The pathway's calculator agent, or null when none covers it yet, or none counts this kind of project. */
   agent: AgentId | null;
-  /** The methods that apply. Empty when the pathway is not in play. */
+  /** The methods that apply. Empty when the pathway is not in play, or when no method counts this project. */
   methods: MethodId[];
+  /** Why no method counts this project. Left out when one does, and when nobody covers the pathway. */
+  noMethod?: NoMethod;
 }
 
 /** An unlikely pathway: what the visitor is told. The words come from the reading. */
@@ -298,7 +325,10 @@ function site(input: MapInput, place: "free-site" | "paid-site"): AgentMap {
   const reads = PATHWAYS.filter((p) => input.reads === undefined || input.reads.includes(p));
 
   const pathways: PathwayPlan[] = reads.map((p) => {
-    const agent = calculatorAgent(p);
+    const none = noMethodFor(p, record.facts);
+    // While the facts do not say yet, the agent is still ahead. Once they say it does not count, there is none.
+    const agent = none === null || none === "waiting for basic facts" ? calculatorAgent(p) : null;
+    const noMethod = none === null ? {} : { noMethod: none };
     const read = record.pathways[p];
     if (read !== undefined) {
       const inPlay = read.reading !== "unlikely";
@@ -309,7 +339,8 @@ function site(input: MapInput, place: "free-site" | "paid-site"): AgentMap {
         moreToLearn: read.reading === "more to learn",
         because: "reading",
         agent,
-        methods: inPlay ? methodsFor(p, transitioning) : [],
+        methods: inPlay ? methodsFor(p, transitioning, record.facts) : [],
+        ...noMethod,
       };
     }
     const pointed = FACT_RULES.some((r) => r.pathway === p && r.applies(record.facts));
@@ -320,7 +351,8 @@ function site(input: MapInput, place: "free-site" | "paid-site"): AgentMap {
       moreToLearn: pointed,
       because: pointed ? "project facts" : "no reading",
       agent,
-      methods: pointed ? methodsFor(p, transitioning) : [],
+      methods: pointed ? methodsFor(p, transitioning, record.facts) : [],
+      ...noMethod,
     };
   });
 
@@ -349,7 +381,9 @@ function site(input: MapInput, place: "free-site" | "paid-site"): AgentMap {
     }
     if (noPathwayForward && finished("phoebe")) return no("no pathway forward");
     if (agent === "bridget") return !anyInPlay ? no("no pathway in play yet") : finished("phoebe") ? yes() : no("waiting for the agent before");
-    const own = pathways.filter((p) => p.agent === agent);
+    const own = pathways.filter((p) => calculatorAgent(p.pathway) === agent);
+    const none = own.find((p) => p.inPlay)?.noMethod;
+    if (none !== undefined) return no(none);
     if (own.some((p) => p.inPlay)) return finished("phoebe") && finished("bridget") ? yes() : no("waiting for the agent before");
     return own.some((p) => p.reading === "unlikely") ? no("pathway unlikely") : no("pathway not in play yet");
   };
