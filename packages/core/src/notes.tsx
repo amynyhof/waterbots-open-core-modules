@@ -16,7 +16,7 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
 import type { Place } from "./places.js";
 import type { NoteBy, NoteLine } from "./noteFacts.js";
-import type { ValueNotes } from "./record.js";
+import { NOTE_LIMIT, NOTE_TOO_LONG, type ValueNotes } from "./record.js";
 import { useReadOnlySeat } from "./readOnly.js";
 
 export type { AgentNoteFact, NoteBy, NoteLine, NoteStanding } from "./noteFacts.js";
@@ -109,6 +109,7 @@ export function RowNote({ noteKey, label }: { noteKey: string; label: string }) 
   if (ctx === null) return null;
   const note = ctx.notes[noteKey];
   const canWrite = ctx.onChange !== undefined && !readOnly;
+  const tooLong = draft !== null && draft.trim().length > NOTE_LIMIT;
 
   if (draft !== null && canWrite) {
     return (
@@ -122,6 +123,7 @@ export function RowNote({ noteKey, label }: { noteKey: string; label: string }) 
         />
         <button
           type="button"
+          disabled={tooLong}
           onClick={() => {
             ctx.onChange!(noteKey, draft, label);
             setDraft(null);
@@ -130,6 +132,11 @@ export function RowNote({ noteKey, label }: { noteKey: string; label: string }) 
         >
           {NOTE_WORDS.done}
         </button>
+        {tooLong ? (
+          <span role="alert" data-note-too-long="" style={{ flexBasis: "100%", color: "var(--warn-text, var(--fg-1))", fontSize: 11 }}>
+            {NOTE_TOO_LONG}
+          </span>
+        ) : null}
       </div>
     );
   }

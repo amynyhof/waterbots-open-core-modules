@@ -1,0 +1,214 @@
+# THE CREW — one roster, read by Wellington when he runs and checked against the
+# screens on every build. The maintainer edits this file by hand. No code lives here.
+#
+# HOW TO EDIT SAFELY
+# - Keep the shape. Every seat has the same fields. A missing field fails the build
+#   and names this file and the seat.
+# - Words allowed for `level`: meet, screen, work, later, none (defined under `levels`).
+# - Words allowed for `built`: "yes", "no", "unconfirmed" (in quotes).
+# - A retired or reserved name may never be used as a seat, a face, or an id.
+# - No private content. This same file is carried by hand to the open site.
+#
+# WHO CONFIRMS "BUILT"
+# Each door is confirmed by its own site's check. The paid door is confirmed here,
+# in this repository, by the roster check (`roster:check`). Free and Commons are
+# confirmed by the open site's own check when the file is carried there. Until then
+# they stay "unconfirmed" and Wellington treats them as the plan, never as a promise.
+
+version: 0.4.1
+ruled: 2026-11-23
+ruled_by: the maintainer
+
+notes: |
+  One crew everywhere. Each door sets how much an agent may do (see levels).
+
+  How agents hand off: agents pass official values through the project
+  context. Example: Calvin posts an official emission reduction to the
+  project context. Goldie reads that number and posts back an official
+  revenue estimate.
+
+levels:
+  meet: >-
+    Chats only from its own job card (what it knows, what it helps with). It
+    cannot do the work at this door yet.
+  screen: Uses its tools. Keeps no memory.
+  work: Uses its tools plus the saved project.
+  later: Not open at this door yet. No level ruled.
+  none: This seat does not appear at this door.
+
+doors:
+  free: The Free site. Screening. No account, no saved project.
+  commons: The Agent Commons on the open site, where the crew can be met.
+  paid: The Paid site. A signed-in person on their own project.
+
+# A place that is not a door. It has no level of its own.
+places:
+  lobby:
+    name: Lobby chat
+    what: The open chat on the Paid site's front page. Not a door. No saved project.
+    seats: [wellington]
+
+confirmed:
+  paid: "yes — checked against this repository's code by the roster check"
+  free: unconfirmed
+  commons: unconfirmed
+
+seats:
+  - id: wellington
+    name: Wellington
+    faces: [Wellington]
+    seat: Team Lead
+    job: Hosts every door and orchestrates the six phases. Deploys the right specialist for the phase and tracks whether the project moved forward.
+    helps_with:
+      - Finding where you are on the six-phase journey and the next step
+      - Calling in the right seat for the phase
+      - Answers about safe water, impact funding, and the platform
+    phase: all
+    doors:
+      free: { level: screen, built: "unconfirmed" }
+      commons: { level: none, built: "no" }
+      paid: { level: work, built: "yes" }
+
+  - id: phoebe
+    name: Phoebe
+    faces: [Phoebe]
+    seat: Eligibility
+    job: Works out which monetization pathways a project could fit, and what would make it fit if it does not yet.
+    helps_with:
+      - Pathway eligibility and feasibility screening
+      - What would change eligibility for a project already built and running
+    phase: Eligibility
+    doors:
+      free: { level: screen, built: "unconfirmed" }
+      commons: { level: screen, built: "unconfirmed" }
+      paid: { level: work, built: "no" }
+
+  - id: bridget
+    name: Bridget & Ally
+    faces: [Bridget, Ally]
+    seat: Partners
+    job: One seat with two faces. They host and answer together. Their job is the Partners phase, the map and the partnerships. Stakeholders for implementation and funding, people whose permission is legally required, others needed to deploy the work, and the place and basin.
+    helps_with:
+      - The project's place and basin on the map
+      - Who the partners are and whose permission is needed
+    phase: Partners
+    doors:
+      free: { level: screen, built: "unconfirmed" }
+      commons: { level: screen, built: "unconfirmed" }
+      paid: { level: work, built: "no" }
+
+  - id: calvin
+    name: Calvin
+    faces: [Calvin]
+    seat: Carbon credits calculator
+    job: Quantify. Screening estimate on the Free site, refined estimate with project memory on the Paid site. Posts official values to the project context.
+    helps_with:
+      - Emission reductions from the deterministic calculators
+      - Methodology questions
+    phase: Quantify
+    doors:
+      free: { level: screen, built: "unconfirmed" }
+      commons: { level: screen, built: "unconfirmed" }
+      paid: { level: work, built: "yes" }
+
+  - id: violet
+    name: Violet
+    faces: [Violet]
+    seat: Volumetric water benefits calculator
+    job: Quantify. Counts the water a project provides, by the VWBA 2.0 method D-3, Volume Provided.
+    helps_with:
+      - The volumetric water benefit of a project that supplies water, from the deterministic calculator
+      - Questions about the D-3 method
+    phase: Quantify
+    doors:
+      free: { level: screen, built: "unconfirmed" }
+      commons: { level: screen, built: "unconfirmed" }
+      paid: { level: work, built: "no" }
+
+  - id: reggie
+    name: Reggie
+    faces: [Reggie]
+    seat: Library
+    job: Library and official filings. Official outputs that go to standards bodies, such as registration packages and project design documents.
+    helps_with:
+      - Which documents a project's pathways call for, phase by phase
+      - Registration paperwork and formal filings
+    phase: Plan
+    doors:
+      free: { level: meet, built: "unconfirmed" }
+      commons: { level: meet, built: "unconfirmed" }
+      paid: { level: work, built: "no" }
+
+  - id: goldie
+    name: Goldie
+    faces: [Goldie]
+    seat: Revenue
+    job: Revenue specialist. Reads the official numbers other seats post to the project context, such as Calvin's emission reduction, and posts back an official revenue estimate.
+    helps_with:
+      - What a quantified impact could be worth on each pathway
+    phase: Quantify
+    doors:
+      free: { level: meet, built: "unconfirmed" }
+      commons: { level: meet, built: "unconfirmed" }
+      paid: { level: later, built: "no" }
+
+  - id: edgar
+    name: Edgar
+    faces: [Edgar]
+    seat: Engineer
+    job: Engineering and technical design of the water project itself.
+    helps_with:
+      - Technical design questions about the works on the ground
+    phase: Plan
+    doors:
+      free: { level: meet, built: "unconfirmed" }
+      commons: { level: meet, built: "unconfirmed" }
+      paid: { level: later, built: "no" }
+
+  - id: monty
+    name: Monty
+    faces: [Monty]
+    seat: Monitor
+    job: Remote sensing and similar technical evidence once a project is running. A seat of his own.
+    helps_with:
+      - Remote-sensing evidence for monitoring
+    phase: Monitor
+    doors:
+      free: { level: meet, built: "unconfirmed" }
+      commons: { level: meet, built: "unconfirmed" }
+      paid: { level: later, built: "no" }
+
+  - id: melody
+    name: Melody
+    faces: [Melody]
+    seat: Evaluation
+    job: Monitoring and evaluation with people and programs, such as surveys. A seat of her own, not part of Monty.
+    helps_with:
+      - Survey design and monitoring and evaluation with communities
+    phase: Monitor
+    doors:
+      free: { level: meet, built: "unconfirmed" }
+      commons: { level: meet, built: "unconfirmed" }
+      paid: { level: later, built: "no" }
+
+  - id: audrey
+    name: Audrey
+    faces: [Audrey]
+    seat: Audit
+    job: Audit readiness. Helps a team get ready for outside review. Audit preparation support, not a verification stamp.
+    helps_with:
+      - Getting ready for an outside audit or verification
+    phase: Communicate
+    doors:
+      free: { level: meet, built: "unconfirmed" }
+      commons: { level: meet, built: "unconfirmed" }
+      paid: { level: later, built: "no" }
+
+# Names that were seats once and are not any more. The work moved to `now`.
+retired:
+  - { name: Vector, now: calvin, since: 2026-09-17, note: Vector is not a second chatbot face. Same work, one face, Calvin. }
+
+# Names held for a job that is not a seat yet. The validator allows them here and
+# nowhere else.
+reserved:
+  - { name: Courtney, job: communications }

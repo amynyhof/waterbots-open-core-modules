@@ -1,6 +1,6 @@
 // The agent map: a test for each of its rules. Every project here is made up.
 import { describe, expect, test } from "vitest";
-import { AGENT_MAP_VERSION, METHODS, agentMap, type AgentCall, type AgentMap, type MapInput } from "./agentMap";
+import { AGENT_MAP_VERSION, METHODS, agentMap, stepOf, type AgentCall, type AgentMap, type MapInput } from "./agentMap";
 import { emptyRecord, type AgentId, type PathwayReading, type ProjectRecord, type Reading } from "./record";
 import type { StandardId } from "./standards";
 
@@ -13,6 +13,12 @@ function project(extra: Partial<ProjectRecord> = {}): ProjectRecord {
   r.facts.technology = { label: "Household water treatment", code: "HWT", source: by };
   r.place.country = { value: "XKX", source: by };
   return { ...r, ...extra };
+}
+/** The same made-up project, as a supply: the kind Violet is called for. */
+function supply(extra: Partial<ProjectRecord> = {}): ProjectRecord {
+  const r = project(extra);
+  r.facts.technology = { label: "Community water supply", code: "CWS", source: by };
+  return r;
 }
 const read = (reading: Reading): PathwayReading => ({
   reading,
@@ -92,12 +98,16 @@ describe("rule 3: the eligibility agent is called once the basic facts are in, w
 });
 
 describe("rule 4: on likely or more to learn, the pathway's calculator agent is called and shows", () => {
-  test("likely carbon calls Calvin", () => {
+  // SWITCHED OFF 2026-11-24, never deleted: it expects a later agent to be called before the agent before it has finished.
+  // That changed on 2026-11-24. The tests at the end of this file hold the new rule.
+  test.skip("likely carbon calls Calvin", () => {
     const map = agentMap({ place: "free-site", record: project({ pathways: readings({ carbon: "likely" }) }) });
     expect(call(map, "calvin").called).toBe(true);
     expect(pathway(map, "carbon")).toEqual(expect.objectContaining({ inPlay: true, moreToLearn: false, agent: "calvin" }));
   });
-  test("more to learn on water calls Violet, with the flag", () => {
+  // SWITCHED OFF 2026-11-24, never deleted: it expects a later agent to be called before the agent before it has finished.
+  // That changed on 2026-11-24. The tests at the end of this file hold the new rule.
+  test.skip("more to learn on water calls Violet, with the flag", () => {
     const map = agentMap({ place: "paid-site", record: project({ pathways: readings({ vwba: "more to learn" }) }) });
     expect(call(map, "violet").called).toBe(true);
     expect(pathway(map, "vwba")).toEqual(expect.objectContaining({ inPlay: true, moreToLearn: true, methods: ["vwba-d3"] }));
@@ -176,7 +186,9 @@ describe("rule 9: worked out from facts, and worked out again when a fact change
     expect(agentMap(input)).toEqual(agentMap(input));
     expect(JSON.stringify(record)).toBe(frozen);
   });
-  test("when a reading changes, nothing is kept from before", () => {
+  // SWITCHED OFF 2026-11-24, never deleted: it expects a later agent to be called before the agent before it has finished.
+  // That changed on 2026-11-24. The tests at the end of this file hold the new rule.
+  test.skip("when a reading changes, nothing is kept from before", () => {
     const before = agentMap({ place: "free-site", record: project({ pathways: readings({ carbon: "likely" }) }) });
     const after = agentMap({ place: "free-site", record: project({ pathways: readings({ carbon: "unlikely", vwba: "likely" }) }) });
     expect(called(before)).toEqual(["wellington", "bridget", "calvin"]);
@@ -197,7 +209,9 @@ describe("the lobby chat: only Wellington, no record, nothing calculated", () =>
   });});
 
 describe("facts that point to a pathway, before it has a reading (the two rules this repo can cite)", () => {
-  test("a community water supply puts water in play, with more to learn", () => {
+  // SWITCHED OFF 2026-11-24, never deleted: it expects a later agent to be called before the agent before it has finished.
+  // That changed on 2026-11-24. The tests at the end of this file hold the new rule.
+  test.skip("a community water supply puts water in play, with more to learn", () => {
     const record = project();
     record.facts.technology = { label: "Community water supply", code: "CWS", source: by };
     const map = agentMap({ place: "free-site", record });
@@ -218,7 +232,9 @@ describe("facts that point to a pathway, before it has a reading (the two rules 
 });
 
 describe("introductions (agent rule 17) and the order of the next steps", () => {
-  test("an agent already met is not introduced again", () => {
+  // SWITCHED OFF 2026-11-24, never deleted: it expects a later agent to be called before the agent before it has finished.
+  // That changed on 2026-11-24. The tests at the end of this file hold the new rule.
+  test.skip("an agent already met is not introduced again", () => {
     const map = agentMap({ place: "free-site", record: project({ pathways: readings({ carbon: "likely" }) }), met: ["calvin"] });
     expect(call(map, "calvin")).toEqual({ agent: "calvin", called: true, introduce: false });
     expect(call(map, "bridget")).toEqual({ agent: "bridget", called: true, introduce: true });
@@ -227,7 +243,9 @@ describe("introductions (agent rule 17) and the order of the next steps", () => 
     const map = agentMap({ place: "paid-site", record: project({ pathways: readings({ carbon: "likely" }) }), saved: true });
     expect(map.agents.filter((a) => a.called).every((a) => a.called && !a.introduce)).toBe(true);
   });
-  test("Bridget, then Calvin, then Violet, then the report or sign-up", () => {
+  // SWITCHED OFF 2026-11-24, never deleted: it expects Violet to be called for household treatment. The maintainer ruled on
+  // 2026-11-24 that she is called for supplies only. `waterSupply.test.ts` holds the new rule.
+  test.skip("Bridget, then Calvin, then Violet, then the report or sign-up", () => {
     const record = project({ pathways: readings({ carbon: "likely", vwba: "likely" }) });
     expect(agentMap({ place: "free-site", record }).next).toEqual({ step: "call", agent: "bridget" });
     record.agents.bridget = { done: true };
@@ -255,5 +273,110 @@ describe("a site that reads two of the four pathways", () => {
     expect(map.next).toEqual({ step: "point to the WaterBots team" });
     // Left alone, it waits for the other two.
     expect(agentMap({ place: "free-site", record }).next).toEqual({ step: "call", agent: "phoebe" });
+  });
+});
+
+describe("a later agent is called only when the agent before it has finished (ruled 2026-11-24)", () => {
+  const both = (extra: ProjectRecord["agents"] = {}) => supply({ pathways: readings({ carbon: "likely", vwba: "more to learn" }), agents: extra });
+  const waiting = { called: false, because: "waiting for the agent before" };
+
+  test("a community water supply, with nothing read yet: water is in play, and only Phoebe is called", () => {
+    const record = project();
+    record.facts.technology = { label: "Community water supply", code: "CWS", source: by };
+    const map = agentMap({ place: "free-site", record });
+    expect(pathway(map, "vwba")).toEqual(expect.objectContaining({ inPlay: true, moreToLearn: true, because: "project facts" }));
+    expect(called(map)).toEqual(["wellington", "phoebe"]);
+    for (const a of ["bridget", "violet"] as const) expect(call(map, a)).toMatchObject(waiting);
+    expect(map.next).toEqual({ step: "call", agent: "phoebe" });
+  });
+  test("readings that show while Phoebe is still at work do not call anyone early", () => {
+    const map = agentMap({ place: "free-site", record: both({ phoebe: { done: false } }) });
+    expect(called(map)).toEqual(["wellington", "phoebe"]);
+    expect(map.next).toEqual({ step: "call", agent: "phoebe" });
+  });
+  test("all unlikely while Phoebe is still at work: she finishes first, then Wellington points to the team", () => {
+    const record = project({ pathways: readings({}), agents: { phoebe: { done: false } } });
+    expect(called(agentMap({ place: "free-site", record }))).toEqual(["wellington", "phoebe"]);
+    record.agents.phoebe = { done: true };
+    expect(agentMap({ place: "free-site", record }).next).toEqual({ step: "point to the WaterBots team" });
+  });
+  test("Phoebe done: Bridget is called, and both calculators wait for her", () => {
+    for (const agents of [{}, { phoebe: { done: true } }]) {
+      const map = agentMap({ place: "paid-site", record: both(agents) });
+      expect(called(map)).toEqual(["wellington", "bridget"]);
+      for (const a of ["calvin", "violet"] as const) expect(call(map, a)).toMatchObject(waiting);
+    }
+  });
+  test("Bridget done: Calvin and Violet are called together, and neither waits for the other", () => {
+    for (const agents of [{}, { calvin: { done: true } }, { violet: { done: true } }, { calvin: { done: false } }]) {
+      expect(called(agentMap({ place: "free-site", record: both({ bridget: { done: true }, ...agents }) }))).toEqual(["wellington", "bridget", "calvin", "violet"]);
+    }
+  });
+  test("an unlikely pathway's agent is still not called, whoever has finished", () => {
+    const record = project({ pathways: readings({ carbon: "likely" }), agents: { bridget: { done: true } } });
+    expect(call(agentMap({ place: "free-site", record }), "violet")).toEqual({ agent: "violet", called: false, because: "pathway unlikely" });
+  });
+  test("when a reading changes, nothing is kept from before", () => {
+    const at = (named: Partial<Record<StandardId, Reading>>) => called(agentMap({ place: "free-site", record: supply({ pathways: readings(named), agents: { bridget: { done: true } } }) }));
+    expect(at({ carbon: "likely" })).toEqual(["wellington", "bridget", "calvin"]);
+    expect(at({ carbon: "unlikely", vwba: "likely" })).toEqual(["wellington", "bridget", "violet"]);
+  });
+  test("an agent already met is not introduced again", () => {
+    const map = agentMap({ place: "free-site", record: both({ bridget: { done: true } }), met: ["calvin"] });
+    expect(call(map, "calvin")).toEqual({ agent: "calvin", called: true, introduce: false });
+    expect(call(map, "violet")).toEqual({ agent: "violet", called: true, introduce: true });
+  });
+  test("a site without an agent: it is never called, and nobody waits for it", () => {
+    const map = agentMap({ place: "paid-site", record: both(), crew: ["wellington", "calvin"] });
+    expect(called(map)).toEqual(["wellington", "calvin"]);
+    expect(call(map, "bridget")).toEqual({ agent: "bridget", called: false, because: "not at this place" });
+  });
+  test("a saved project on the paid site: the walk is over, so nobody waits", () => {
+    expect(called(agentMap({ place: "paid-site", record: both(), saved: true }))).toEqual(["wellington", "bridget", "calvin", "violet"]);
+  });
+  test("in the Agent Commons and at MCP the one agent opened waits for nobody", () => {
+    for (const place of ["agent-commons", "mcp"] as const) expect(called(agentMap({ place, opened: "violet" }))).toEqual(["violet"]);
+  });
+});
+
+describe("the steps this project has", () => {
+  const steps = (map: AgentMap) => map.steps.map((x) => [x.number, x.of, x.name, x.agents]);
+  test("Step 1 Eligibility, Step 2 Partners, Step 3 Quantify; Calvin and Violet share the last", () => {
+    const map = agentMap({ place: "free-site", record: supply({ pathways: readings({ carbon: "likely", vwba: "likely" }) }) });
+    expect(steps(map)).toEqual([
+      [1, 3, "Eligibility", ["phoebe"]],
+      [2, 3, "Partners", ["bridget"]],
+      [3, 3, "Quantify", ["calvin", "violet"]],
+    ]);
+    expect(stepOf(map, "calvin")).toEqual(stepOf(map, "violet"));
+    expect(stepOf(map, "phoebe")).toMatchObject({ number: 1, of: 3 });
+    expect(stepOf(map, "wellington")).toBeNull();
+  });
+  test("before anything is read, all three are ahead", () => {
+    expect(steps(agentMap({ place: "free-site" })).map((x) => x[2])).toEqual(["Eligibility", "Partners", "Quantify"]);
+  });
+  test("one pathway unlikely: its agent is not in the last step", () => {
+    const map = agentMap({ place: "free-site", record: project({ pathways: readings({ carbon: "likely" }) }) });
+    expect(map.steps.at(-1)).toMatchObject({ id: "quantify", agents: ["calvin"] });
+    expect(stepOf(map, "violet")).toBeNull();
+  });
+  test("no calculator agent for the pathway in play: two steps", () => {
+    expect(steps(agentMap({ place: "free-site", record: project({ pathways: readings({ wqba: "likely" }) }) }))).toEqual([
+      [1, 2, "Eligibility", ["phoebe"]],
+      [2, 2, "Partners", ["bridget"]],
+    ]);
+  });
+  test("no pathway forward: one step", () => {
+    expect(steps(agentMap({ place: "free-site", record: project({ pathways: readings({}) }) }))).toEqual([[1, 1, "Eligibility", ["phoebe"]]]);
+  });
+  test("a site without an agent has no step for it, and the numbers run on", () => {
+    const map = agentMap({ place: "paid-site", record: project({ pathways: readings({ carbon: "likely" }) }), crew: ["wellington", "phoebe", "calvin"] });
+    expect(steps(map)).toEqual([
+      [1, 2, "Eligibility", ["phoebe"]],
+      [2, 2, "Quantify", ["calvin"]],
+    ]);
+  });
+  test("where one agent works alone, and in the lobby chat, there are none", () => {
+    for (const input of [{ place: "agent-commons", opened: "calvin" }, { place: "mcp", opened: "violet" }, { place: "lobby-chat" }] as const) expect(agentMap(input).steps).toEqual([]);
   });
 });

@@ -1,6 +1,6 @@
 {
   "name": "@waterbots/violet",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "private": true,
   "description": "WaterBots open core module: violet (the water-benefit agent). Hosts the VWBA 2.0 D-n methods, starting with D-3, Volume Provided. Not published.",
   "license": "Apache-2.0",
@@ -24,7 +24,10 @@
       "types": "./dist/screen.d.ts",
       "default": "./dist/screen.js"
     },
-    "./styles.css": "./dist/styles.css"
+    "./styles.css": "./dist/styles.css",
+    "./prompt.md": "./dist/prompt.md",
+    "./knowledge.md": "./dist/knowledge.md",
+    "./config.yaml": "./dist/config.yaml"
   },
   "files": [
     "dist",
@@ -34,11 +37,12 @@
   "scripts": {
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
-    "build": "tsc -p tsconfig.build.json && npm run build:css",
-    "build:css": "node -e \"require('node:fs').copyFileSync('src/styles.css', 'dist/styles.css')\""
+    "build": "tsc -p tsconfig.build.json && npm run build:css && npm run build:agent-files",
+    "build:css": "node -e \"require('node:fs').copyFileSync('src/styles.css', 'dist/styles.css')\"",
+    "build:agent-files": "node -e \"for (const f of ['prompt.md', 'knowledge.md', 'config.yaml']) require('node:fs').copyFileSync('src/agents/violet/' + f, 'dist/' + f)\""
   },
   "dependencies": {
-    "@waterbots/core": "0.2.0"
+    "@waterbots/core": "0.3.x"
   },
   "peerDependencies": {
     "react": "19.3.1"

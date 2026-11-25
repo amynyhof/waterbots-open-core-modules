@@ -13,12 +13,24 @@ describe("Violet's agent files", () => {
     expect(config).toMatch(/#A457D4/);
   });
 
-  it("keep only what is hers: her tool, the facts it needs and her method's limits", () => {
+  // SWITCHED OFF 2026-11-24, never deleted: it expects no colleague's name in her file. The maintainer asked that each
+  // calculator agent say Wellington comes next when its part is done. The test after it holds the rest.
+  it.skip("keep only what is hers: her tool, the facts it needs and her method's limits", () => {
     const prompt = read("./agents/violet/prompt.md");
     expect(prompt).toMatch(/computeD3/);
     expect(prompt).toMatch(/people or households/);
     expect(prompt).toMatch(/Draft — pending\s+expert review/);
     // Who the rest of the crew are belongs to Wellington, not to her file.
     expect(prompt).not.toMatch(/Wellington|Calvin|Phoebe|Bridget/);
+  });
+
+  it("keep only what is hers, and say that Wellington comes next", () => {
+    const prompt = read("./agents/violet/prompt.md");
+    expect(prompt).toMatch(/computeD3/);
+    expect(prompt).toMatch(/people or households/);
+    expect(prompt).toMatch(/Draft — pending\s+expert review/);
+    expect(prompt).toMatch(/Wellington comes next/);
+    // Who the rest of the crew are belongs to Wellington, not to her file.
+    expect(prompt).not.toMatch(/Calvin|Phoebe|Bridget/);
   });
 });

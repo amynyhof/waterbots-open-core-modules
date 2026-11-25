@@ -48,7 +48,9 @@ describe("the agent map decides whether Violet is called (W2)", () => {
     return r;
   };
 
-  it("on a likely water pathway she is called", () => {
+  // SWITCHED OFF 2026-11-24, never deleted: it expects Violet before Bridget has finished. That changed on 2026-11-24.
+  // `chat.test.tsx` holds the new test.
+  it.skip("on a likely water pathway she is called", () => {
     expect(violetCall(agentMap({ place: "free-site", record: read("likely") }))).toEqual({ agent: "violet", called: true, introduce: true });
   });
 

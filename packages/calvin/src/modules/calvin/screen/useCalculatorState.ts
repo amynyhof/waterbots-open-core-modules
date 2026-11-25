@@ -15,6 +15,8 @@ import {
 } from "../engine";
 import { calculatorPageContext } from "../agent/pageContext";
 import { calvinRecordProblems, calvinRecordRefusals } from "../agent/record";
+import { calvinAsks, calvinKept, fillCalvin, type CalvinAnswer, type CalvinFill } from "../agent/chat";
+import type { Ask, Kept } from "@waterbots/core/chat";
 import type { Place } from "@waterbots/core/places";
 import { exportNoteLines, labelledNoteLines, notesAt, type NoteLine, type NotesKind } from "@waterbots/core/notes";
 import { withNote, type ValueNotes } from "@waterbots/core/record";
@@ -246,6 +248,15 @@ export interface CalculatorState {
 
   /* ── Chat host ──────────────────────────────────────────────────────────── */
   /**
+   * FILLS THE SEAT FROM AN ANSWER (J5): the values in it, each checked against its range. A refused number is left out, and
+   * the result says why. Project facts go to the record, and the seat follows it. **Inert when `readOnly`.**
+   */
+  fill: (answer: CalvinAnswer) => CalvinFill;
+  /** What he still asks for, in order. The first one is his one question. */
+  asks: Ask[];
+  /** The values he leaves at their default or their assumed start. */
+  kept: Kept[];
+  /**
    * What the hosting agent can SEE of this seat (`../agent/pageContext.ts`). A function, not a
    * memoised string: it is read at send-time, so the context reflects the state at the moment the
    * question was asked. Part of the seat's contract.
@@ -472,6 +483,13 @@ export function useCalculatorState(project: CalvinProject, options: CalculatorOp
     calvinAgentNoteLines(state, { sliders: showSliders(exAnteSliders, state), result }),
   );
 
+  const fill = (answer: CalvinAnswer): CalvinFill => {
+    if (readOnly) return { patch: {}, filled: [], refused: [] };
+    const f = fillCalvin(state, answer);
+    if (f.filled.length > 0) patch(f.patch);
+    return f;
+  };
+
   const pageContext = () =>
     calculatorPageContext({ projectName: project.name, state, missingFacts, activityAsk, missingMonitoring: monitoringAsk, outOfRange: refusedValues.map((r) => r.message), fnrbRefusal, filedFnrbRefusal, transition, result, legacyResult, paaResult, waterfall, recordProblems: calvinRecordProblems(project), ...(project.notCoveredYet !== undefined ? { notCoveredYet: project.notCoveredYet } : {}), ...(options.place !== undefined ? { place: options.place } : {}) });
 
@@ -514,6 +532,9 @@ export function useCalculatorState(project: CalvinProject, options: CalculatorOp
     creditingPeriodYears,
     printAt,
     exportReport,
+    fill,
+    asks: calvinAsks(state, { tables, transition, notCoveredYet: project.notCoveredYet }),
+    kept: calvinKept(state, { sliders: showSliders(exAnteSliders, state), result: paaResult }),
     pageContext,
   };
 }
