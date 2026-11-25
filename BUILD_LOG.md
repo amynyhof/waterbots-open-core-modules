@@ -5,6 +5,7 @@ history keeps everything older and every longer entry.
 
 ---
 
+- 2026-11-25 — The J5 core step: both calculator chats, the map's order, and which projects call Violet (#57).
 - 2026-11-24 — Value ranges: a number outside its range is refused where it is typed (#56).
 - 2026-11-24 — **Carry:** the crew list, `roster.yaml` 0.4.1, byte for byte, into core. Fingerprint matched; name scan 0.
 - 2026-11-24 — **Carry:** from the open site (`carry-B-to-C`, 74 of 74 match; name scan 0): the checks on a reply, the hand-back field, the technology labels, the seven fields and the shape of Phoebe's rows, into core. The rest waits for its own step.
