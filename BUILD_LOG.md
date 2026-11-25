@@ -5,6 +5,11 @@ history keeps everything older and every longer entry.
 
 ---
 
+- 2026-11-24 — Value ranges: a number outside its range is refused where it is typed (#56).
+- 2026-11-24 — **Carry:** the crew list, `roster.yaml` 0.4.1, byte for byte, into core. Fingerprint matched; name scan 0.
+- 2026-11-24 — **Carry:** from the open site (`carry-B-to-C`, 74 of 74 match; name scan 0): the checks on a reply, the hand-back field, the technology labels, the seven fields and the shape of Phoebe's rows, into core. The rest waits for its own step.
+- 2026-11-24 — **Carry:** the paid site's save-format answers (`carry-A-to-C`, 1 of 1 matches; name scan 0), read for the record's notes and facts. No file of it is in the repo.
+- 2026-11-24 — **Carry:** the agent rules master, with rule 6's fourth pair. The page and rules 1 to 21 match the master.
 - 2026-11-23 — **Release** `core-v0.2.0`, `calvin-v0.6.0` and `violet-v0.6.0` on `9336e92`: the first with a tag for each package (#46, #49, #52, #54). **Carry:** packed to the handoff folder.
 - 2026-11-23 — Notes on values: both kinds in the Paid export, the agents' notes in the Agent Commons, facts at MCP (#54).
 - 2026-11-23 — One calculator screen: Violet's screen matches Calvin's, notes on values, each agent's colour (#52).
