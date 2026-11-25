@@ -66,7 +66,7 @@ sites pin that file by its fingerprint. The first pinned version includes the sl
 | V15 | v1 proof and grading | The v1 release: a GitHub release that both sites pin. | V8, V14; the maintainer's approval. | Both sites run the same pinned file. The maintainer confirms the whole journey on the live sites, and the average question count is reported. |
 | V20 | Agent orchestration | [x] (Released: tag `calvin-violet-v0.5.0` on commit `1bce514`. The sites install it through 0.5.1, J1.) Calvin and Violet 0.5.0, one release for both sites. Calvin: the main credit tiles (tCO₂e a year) are a pinned header, whether or not a site sets `unpinFigureBlock`; the smaller figures sit right under them; the sliders and the calculation collapse. The controls panel holds only the site's own top and Calvin's buttons, the work surface ends with the calculation, and the report's note on how the figures were produced is one sentence shorter. A phone pass: rows wrap instead of squeezing. Violet: people served come from the project record, as Calvin takes them, and "Draft — pending expert review" shows on the screen and on every result. No sum changes. | V8. | Session C packs all three packages, runs the release check and makes the tag. One release holds all three files. After "release it", Session C pushes the tag and publishes the release. Both sites install it. |
 
-**Where things stand (2026-11-23):** The latest release is core 0.2.0, Calvin 0.6.0 and Violet 0.6.0, one tag each (`core-v0.2.0`, `calvin-v0.6.0`, `violet-v0.6.0`) on commit `9336e92`. It holds everything since 0.5.1. Both sites still install it, all three in one step. Family 1, Agent orchestration, is open: its v1 scope is J1 to J9. This repo's parts for Calvin and Violet (#46, #49, #52, #54) are released. Finished steps are in the build log.
+**Where things stand (2026-11-25):** The latest release is core 0.3.0, Calvin 0.7.0 and Violet 0.7.0, one tag each (`core-v0.3.0`, `calvin-v0.7.0`, `violet-v0.7.0`) on commit `d59a385`. It holds value ranges (#56) and the J5 core step (#57). Both sites still install it, all three in one step. Family 1, Agent orchestration, is open: its v1 scope is J1 to J9. This repo's parts for Calvin and Violet (#46, #49, #52, #54, #56, #57) are released. Finished steps are in the build log.
 
 **Sources still to find:** in the source sweep, M10.4.
 
@@ -104,6 +104,8 @@ their tasks, collect what they need, and report back to him. He helps with the n
   - After 0.5.1: one tag and one GitHub release for each package, all going out in one batch at the family close.
     A batch went out on 2026-11-23, before the close: `core-v0.2.0`, `calvin-v0.6.0` and `violet-v0.6.0`, all on
     commit `9336e92`. Both sites install the three together: Calvin and Violet each need exactly core 0.2.0.
+    A second batch went out on 2026-11-25: `core-v0.3.0`, `calvin-v0.7.0` and `violet-v0.7.0`, all on commit `d59a385`.
+    Calvin and Violet each take any core 0.3 version from here.
 - [ ] **J2.** Doors. Each host tells each agent which door it is at: Free site, Paid site, Agent Commons or MCP (agent
       rule 21). An agent working alone asks for what it needs itself. This covers how Calvin opens in the Agent
       Commons.
@@ -144,11 +146,11 @@ their tasks, collect what they need, and report back to him. He helps with the n
   - W3 is changed by the maintainer's ruling of 2026-11-23: community level treatment is not counted. Core's label list
     gives no technology code to it, to institutional treatment, or to a new well logged as an alternative water supply,
     until the experts answer (N17). Each says it is not covered yet. Core 0.2.0 gave community level treatment a code;
-    the next release takes it away.
+    core 0.3.0 takes it away.
   - Value ranges, ruled by the maintainer on 2026-11-23. Each value a person can enter has a range. A number outside it
     is refused where it is typed, with a message that names the value and the range. One list, one check and one message
     in `core`; the record's fact check, both screens and both tools use them. A method cap is not a range. This gives
-    the screens their words for a count below zero (W1). Done when the next release holds it.
+    the screens their words for a count below zero (W1). Released 2026-11-25 (#56).
 - [ ] **J4.** The agent map. ONE map, kept in the core, reads the project's facts and the door, and says which agents
       are in play, which method applies, and what comes next. It is worked out from facts, so the same project always
       gets the same agents. Wellington leads from it on both sites. It replaces one-off rules. It must cover at least:
@@ -176,7 +178,7 @@ their tasks, collect what they need, and report back to him. He helps with the n
     pp.44 to 46). Treatment is not covered yet (N18). For any other kind the pathway stays in play with no calculator
     agent. A new or alternative water supply is covered for water only where people use the water at home, and that is
     asked first; its carbon side still waits (N17). Violet's tool refuses treatment in the Agent Commons and at MCP too,
-    as Calvin's do. Rainwater harvesting stays for later (M8.4). Done when the next release holds it.
+    as Calvin's do. Rainwater harvesting stays for later (M8.4). Released 2026-11-25 (#57).
   - [!] Four rules that say which project facts point to which pathway have no source yet. They are listed in the
     record proposal. Until the maintainer rules them, the map uses only the eligibility readings and the two rules this
     repo can cite.
@@ -188,7 +190,7 @@ their tasks, collect what they need, and report back to him. He helps with the n
   - The plan, approved by the maintainer on 2026-11-23, in this order: core, Phoebe, Wellington, Bridget without map
     data, then Bridget's map after the rights check. Each is its own pull request.
   - Step 1, core: the crew list, the checks on a reply, the rest of the open site's facts, Phoebe's rows, and Calvin's and
-    Violet's own files, settings and chats. Merged 2026-11-25 (#57). Done when the next release holds it.
+    Violet's own files, settings and chats. Released 2026-11-25 (#57).
   - Waits on: Phoebe's and Bridget's rulings; the rights check on every one of Bridget's data files; a ruling on the
     shared map key.
   - One calculator screen (ruled by the maintainer on 2026-11-23).
