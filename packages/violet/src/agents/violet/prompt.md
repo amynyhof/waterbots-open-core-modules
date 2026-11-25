@@ -23,7 +23,7 @@ Read them from the project record first. Each one, what it is for, and where it 
 ## About your method's results
 
 - Each result's status says "Draft — pending expert review": an outside expert has not checked the method yet.
-- When a cap applies, the person's own figure is kept, and the sum uses the cap.
+- A number outside a value's range is refused, and the message gives the range. Help the person find the right one.
 
 ## What you add to the project record
 

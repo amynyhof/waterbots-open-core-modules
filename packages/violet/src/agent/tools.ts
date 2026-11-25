@@ -7,6 +7,7 @@ import { checkD3Input, computeD3 } from "../d3/compute.js";
 import { D3_ENGINE_VERSION } from "../d3/defaults.js";
 import type { D3Input, D3Result } from "../d3/types.js";
 import { violetNoteFacts } from "../exportNotes.js";
+import { d3Refusals } from "../ranges.js";
 
 const D3_INPUT_SCHEMA: Record<string, unknown> = {
   type: "object",
@@ -25,14 +26,14 @@ const D3_INPUT_SCHEMA: Record<string, unknown> = {
       additionalProperties: false,
       properties: {
         mode: { type: "string", enum: ["people", "households"], description: "A PROJECT FACT: whether 'served' counts people or households." },
-        served: { type: "number", minimum: 0, description: "A PROJECT FACT: how many are served." },
-        householdSize: { type: "number", minimum: 0, description: "A PROJECT FACT, needed only when mode is households: people per household." },
+        served: { type: "integer", minimum: 1, description: "A PROJECT FACT: how many are served." },
+        householdSize: { type: "number", exclusiveMinimum: 0, description: "A PROJECT FACT, needed only when mode is households: people per household." },
       },
     },
     accessLevel: { type: "string", enum: ["full", "limited"], description: "A PROJECT FACT: full access (at home or nearby, all year) or limited access (for example a school). It picks the default litres per person." },
     meteredM3PerYear: { type: "number", minimum: 0, description: "Ex-post, option metered: the metered volume for the year, in m³." },
     flowM3PerHour: { type: "number", minimum: 0, description: "A PROJECT FACT: the system's design delivery or pumping capacity, or its expected average flow, in m³ per hour." },
-    operatingHoursPerYear: { type: "number", minimum: 0, description: "Hours a year the system runs at that flow. Ex-ante: the user's planned figure. Ex-post: from operating logs." },
+    operatingHoursPerYear: { type: "number", minimum: 0, maximum: 8760, description: "Hours a year the system runs at that flow. Ex-ante: the user's planned figure. Ex-post: from operating logs." },
     litresPerPersonPerDay: {
       type: "object",
       additionalProperties: false,
@@ -43,7 +44,7 @@ const D3_INPUT_SCHEMA: Record<string, unknown> = {
       },
       description: "Only when the user gives their own figure with its source. Leave it out and the engine uses the cited default.",
     },
-    daysOfAccessPerYear: { type: "number", minimum: 0, description: "Days of access in the year. Ex-ante: the user's planned figure. Ex-post: from monitoring." },
+    daysOfAccessPerYear: { type: "number", minimum: 0, maximum: 365, description: "Days of access in the year. Ex-ante: the user's planned figure. Ex-post: from monitoring." },
   },
 };
 
@@ -51,6 +52,10 @@ const D3_INPUT_SCHEMA: Record<string, unknown> = {
 export function parseD3Input(raw: unknown): D3Input {
   if (typeof raw !== "object" || raw === null) throw new Error("The D-3 input must be an object.");
   const input = raw as D3Input;
+  // Every number in its range (ruled 2026-11-23), with the same check and the same words as her screen. A refused number
+  // never reaches the engine.
+  const [refused] = d3Refusals(input);
+  if (refused !== undefined) throw new Error(refused.message);
   checkD3Input(input);
   return input;
 }

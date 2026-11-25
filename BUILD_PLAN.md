@@ -135,13 +135,20 @@ their tasks, collect what they need, and report back to him. He helps with the n
     many questions it asked on that walk. A fact read from the record is not a question. Done when a test takes a
     made-up project through every agent's part, saves it, reads it back unchanged, and gives each agent's question
     count.
-  - Waits on: the free site's full list of technology labels, and Wellington's fields; the paid site's save format.
-    Each comes as a carry.
+  - Waits on: nothing more. The free site's labels, Wellington's fields and the paid site's save format came as carries
+    on 2026-11-23.
   - Released 2026-11-23 (#46, #49): the record's shape, its fact check and the label list in `core` (W3 done).
     Calvin and Violet read the record first, ask only for what it lacks, and add their facts, results and question
     counts. A test takes a made-up project through Calvin's part and Violet's part, saves it, and reads it back
-    unchanged. Still to come: the parts of Wellington, Phoebe and Bridget (J5), and the screens' words for a count
-    below zero (W1; site wording, waits on the maintainer).
+    unchanged. Still to come: the parts of Wellington, Phoebe and Bridget (J5).
+  - W3 is changed by the maintainer's ruling of 2026-11-23: community level treatment is not counted. Core's label list
+    gives no technology code to it, to institutional treatment, or to a new well logged as an alternative water supply,
+    until the experts answer (N17). Each says it is not covered yet. Core 0.2.0 gave community level treatment a code;
+    the next release takes it away.
+  - Value ranges, ruled by the maintainer on 2026-11-23. Each value a person can enter has a range. A number outside it
+    is refused where it is typed, with a message that names the value and the range. One list, one check and one message
+    in `core`; the record's fact check, both screens and both tools use them. A method cap is not a range. This gives
+    the screens their words for a count below zero (W1). Done when the next release holds it.
 - [ ] **J4.** The agent map. ONE map, kept in the core, reads the project's facts and the door, and says which agents
       are in play, which method applies, and what comes next. It is worked out from facts, so the same project always
       gets the same agents. Wellington leads from it on both sites. It replaces one-off rules. It must cover at least:
@@ -159,6 +166,8 @@ their tasks, collect what they need, and report back to him. He helps with the n
     of an unlikely pathway.
   - Released 2026-11-23 (#46): the map and its table in `core`, with a test for each rule. Violet follows it
     (#49), so an unlikely water pathway no longer gets her calculator (W2).
+  - Found on the open site's install: the map asked about four pathways, and that site reads two, so it never reached
+    "no pathway forward". A site now names the pathways it reads, and the map asks only about those.
   - [!] Four rules that say which project facts point to which pathway have no source yet. They are listed in the
     record proposal. Until the maintainer rules them, the map uses only the eligibility readings and the two rules this
     repo can cite.
@@ -391,6 +400,9 @@ the maintainer.
 
 ## Open questions
 
+- **Notes along a slider** *Family: Calculators and methods.* (Not v1.) Notes along a slider that say what a value
+  means at a threshold, each with a cited source (the maintainer's idea, 2026-11-23).
+
 - **N4:** *Family: Calculators and methods.* how the transition splits (not ruled). The recommendation: build the maths, not the checklist.
 - **N5:** *Family: Calculators and methods.* whether a higher litres cap applies with true meters — affects the cap only.
 - **N6:** *Family: Calculators and methods.* whether further gates stand on D-3.
@@ -411,3 +423,8 @@ the maintainer.
     `CalculatorWork.tsx` and `ReportView.tsx`.
   - `householdSizeFallbackStop` in `modules/calvin/screen/analysis.ts`.
   - `FiredFallback` and the `fallbacks` field in `calculators/gs4gg-carbon/scenario.ts`.
+- **N17 (V1):** *Family: Experts and partners.* three questions on what the calculators may count. Until the experts
+  answer, the label list gives none of the three a technology code, and Calvin's tools refuse the first two.
+  - Does community level water treatment count with community supply?
+  - Does institutional water treatment count with household treatment?
+  - Does a new well logged as an alternative water supply count as community supply?

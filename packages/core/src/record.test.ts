@@ -107,3 +107,14 @@ describe("an agent writes its results to its own part", () => {
     expect(r.agents.violet?.estimate).toBeUndefined();
   });
 });
+
+describe("Bridget's basin", () => {
+  test("she adds it to a record that lacks one, and it counts as one question", () => {
+    const basin = { id: 4040, level: 6 as const, areaKm2: 1200, stressLabel: "High (40-80%)" };
+    const { record, added } = addGivenFacts(emptyRecord(), "bridget", { basin });
+    expect(added).toEqual(["basin"]);
+    expect(record.place.basin).toEqual({ value: basin, source: { by: "person", note: "given to bridget" } });
+    expect(blankFacts(record, ["basin", "country"])).toEqual(["country"]);
+    expect(addGivenFacts(record, "bridget", { basin: { ...basin, id: 5050 } }).added).toEqual([]);
+  });
+});

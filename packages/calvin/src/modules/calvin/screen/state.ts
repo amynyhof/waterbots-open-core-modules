@@ -8,6 +8,7 @@ import {
   householdSizeNeeded,
   type CharcoalConvention, type FuelShares, type ScenarioInput, type SiteTables, type StoveShares,
 } from "../engine";
+import { notCoveredYet } from "@waterbots/core/technologyLabels";
 import type { SavedAnalysis } from "./analysis";
 import { technologyToMethod } from "./method";
 import { readMonitoringFlags } from "./monitoring";
@@ -34,6 +35,11 @@ export type CalvinProject = ModuleProject<SavedAnalysis> & {
    * until they are entered. Left out, the seat keeps today's zero and says when zero is right.
    */
   pumpPower?: PumpPower;
+  /**
+   * The site's own label for a technology that is not covered yet (core's label list, ruled 2026-11-23). The project
+   * then has no `technology`, and the seat says the label is not covered yet rather than asking for it.
+   */
+  notCoveredYet?: string;
 };
 
 /** What powers the water system's pump. */
@@ -246,8 +252,12 @@ const listFacts = (labels: string[]) =>
  * does not know the host's pages. A technology the calculator does not cover gets its own sentence:
  * it is not missing, so asking for it would be a dead end.
  */
-export function missingFactsPrompt(missing: ProjectFact[], technology?: string): string | null {
+export function missingFactsPrompt(missing: ProjectFact[], technology?: string, uncovered?: string): string | null {
   if (missing.length === 0) return null;
+  // A LABEL THAT IS NOT COVERED YET IS NOT MISSING: asking for the technology again would be a dead end.
+  if (uncovered !== undefined && missing.some((f) => f.key === "technology")) {
+    return `The calculator can't run for this project yet. ${notCoveredYet(uncovered)}`;
+  }
   if (technology === "other" && missing.some((f) => f.key === "technology")) {
     return "The calculator can't run for this project — it covers community water supply and household water treatment, and this project's technology is recorded as other.";
   }

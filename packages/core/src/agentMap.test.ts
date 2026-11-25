@@ -238,3 +238,22 @@ describe("introductions (agent rule 17) and the order of the next steps", () => 
     expect(agentMap({ place: "free-site", record }).next).toEqual({ step: "report or sign-up" });
   });
 });
+
+describe("a site that reads two of the four pathways", () => {
+  const reads = ["carbon", "vwba"] as const;
+  const two = (carbon: Reading, vwba: Reading) => project({ pathways: { carbon: read(carbon), vwba: read(vwba) } });
+  test("the map asks only about those two, and the eligibility agent is done once both are read", () => {
+    const map = agentMap({ place: "free-site", record: two("likely", "unlikely"), reads });
+    expect(map.pathways.map((p) => p.pathway)).toEqual(["carbon", "vwba"]);
+    expect(call(map, "phoebe")).toEqual({ agent: "phoebe", called: false, because: "every pathway has a reading" });
+    expect(map.tellVisitor.map((t) => t.pathway)).toEqual(["vwba"]);
+  });
+  test("both unlikely: it reaches no pathway forward, though the other two were never read", () => {
+    const record = two("unlikely", "unlikely");
+    const map = agentMap({ place: "free-site", record, reads });
+    expect(called(map)).toEqual(["wellington"]);
+    expect(map.next).toEqual({ step: "point to the WaterBots team" });
+    // Left alone, it waits for the other two.
+    expect(agentMap({ place: "free-site", record }).next).toEqual({ step: "call", agent: "phoebe" });
+  });
+});

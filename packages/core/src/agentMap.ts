@@ -14,7 +14,7 @@
 import type { StandardId } from "./standards.js";
 import type { Door, Place } from "./places.js";
 // The ".js" lets the built file load in plain Node, such as a host serving an agent's tool through MCP.
-import { type AgentId, type ProjectFacts, type ProjectRecord, type Reading, AGENTS, emptyRecord } from "./record.js";
+import { type AgentId, type ProjectFacts, type ProjectRecord, type Reading, AGENTS, emptyRecord, recordTechnology } from "./record.js";
 
 /** The map's version. A record notes the version it was last mapped with. */
 export const AGENT_MAP_VERSION = 1 as const;
@@ -96,7 +96,7 @@ export interface FactRule {
 export const FACT_RULES: readonly FactRule[] = [
   {
     pathway: "vwba",
-    applies: (facts) => facts.technology?.code === "CWS",
+    applies: (facts) => recordTechnology({ facts }) === "CWS",
     source:
       "VWBA 2.0, Appendix C, Table C-1, p.39: a WASH activity that gives household or community water supply is " +
       "counted by the Volume Provided method, D-3.",
@@ -124,6 +124,11 @@ export interface MapInput {
   place: Place;
   /** The site's record. In the Agent Commons, the agent's temporary record, if it keeps one. Ignored in the lobby chat. */
   record?: ProjectRecord;
+  /**
+   * The pathways this site reads. The map asks only about these: a site that reads two never waits for a reading of
+   * the other two. Left out, all four.
+   */
+  reads?: readonly StandardId[];
   /** Agent Commons and MCP: the agent the user opened. */
   opened?: AgentId;
   /** The agents the user has already met. */
@@ -258,8 +263,9 @@ function site(input: MapInput, place: "free-site" | "paid-site"): AgentMap {
   const record = input.record ?? emptyRecord();
   const met = input.met ?? [];
   const transitioning = isTransitioning(record.facts);
+  const reads = PATHWAYS.filter((p) => input.reads === undefined || input.reads.includes(p));
 
-  const pathways: PathwayPlan[] = PATHWAYS.map((p) => {
+  const pathways: PathwayPlan[] = reads.map((p) => {
     const agent = calculatorAgent(p);
     const read = record.pathways[p];
     if (read !== undefined) {
@@ -287,7 +293,7 @@ function site(input: MapInput, place: "free-site" | "paid-site"): AgentMap {
   });
 
   const missing = missingBasicFacts(record);
-  const everyRead = PATHWAYS.every((p) => record.pathways[p] !== undefined);
+  const everyRead = reads.length > 0 && reads.every((p) => record.pathways[p] !== undefined);
   const anyInPlay = pathways.some((p) => p.inPlay);
   const noPathwayForward = everyRead && !anyInPlay;
   const introduce = (a: AgentId): boolean => !(place === "paid-site" && input.saved === true) && !met.includes(a);
@@ -308,7 +314,7 @@ function site(input: MapInput, place: "free-site" | "paid-site"): AgentMap {
   };
   const agents = AGENTS.map(call);
 
-  const tellVisitor: TellVisitor[] = PATHWAYS.flatMap((p) => {
+  const tellVisitor: TellVisitor[] = reads.flatMap((p) => {
     const read = record.pathways[p];
     return read?.reading === "unlikely"
       ? [{ pathway: p, reason: read.reason, wouldChange: read.wouldChange, inAgentCommons: calculatorAgent(p) }]

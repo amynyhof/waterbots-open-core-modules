@@ -14,7 +14,7 @@ import {
   type SiteTables,
 } from "../engine";
 import { calculatorPageContext } from "../agent/pageContext";
-import { calvinRecordProblems } from "../agent/record";
+import { calvinRecordProblems, calvinRecordRefusals } from "../agent/record";
 import type { Place } from "@waterbots/core/places";
 import { exportNoteLines, labelledNoteLines, notesAt, type NoteLine, type NotesKind } from "@waterbots/core/notes";
 import { withNote, type ValueNotes } from "@waterbots/core/record";
@@ -36,6 +36,7 @@ import {
 import { zeroCreditWarning } from "./warnings";
 import { exAnteOnlyPatch, exAnteOnlySeed, showSliders, withSliderStarts } from "./exAnte";
 import { missingMonitoring, withModeChange, type MonitoringValue } from "./monitoring";
+import { outOfRange, type OutOfRange } from "./valueRanges";
 
 /**
  * The GS4GG carbon calculator's state, lifted out of the standalone calculator page
@@ -191,6 +192,14 @@ export interface CalculatorState {
    * missing nothing below is computed, and the seat shows one plain prompt naming them instead.
    */
   missingFacts: ProjectFact[];
+  /**
+   * NUMBERS THE SEAT HOLDS THAT ARE OUTSIDE THEIR RANGE (value ranges, ruled 2026-11-23): from the record, an older save
+   * or the site. A number typed here is refused where it is typed and never gets this far. Nothing is computed while
+   * there is one; the work surface shows each number with its message. Empty on every ordinary run.
+   */
+  outOfRange: OutOfRange[];
+  /** The messages for the record's own people served, when the fact check refuses them. */
+  recordRefusals: string[];
   /**
    * THE PUMP RUNS ON DIESEL OR GRID POWER AND ITS EMISSIONS ARE NOT ENTERED (item 15). Nothing is computed; the work
    * surface asks for the yearly figure. Null on every other run.
@@ -386,9 +395,11 @@ export function useCalculatorState(project: CalvinProject, options: CalculatorOp
   const activityAsk = useMemo(() => activityEmissionsAsk(state), [state]);
   // AN EX-POST MONITORING VALUE NOT ENTERED: no figures, and the seat asks (ruling 2026-11-21). Never a fallback.
   const monitoringAsk = useMemo(() => missingMonitoring(state), [state]);
+  // A NUMBER OUTSIDE ITS RANGE: no figures, and the seat says which number and what its range is. Never used in a sum.
+  const refusedValues = useMemo(() => outOfRange(state), [state]);
   const inputBase = useMemo(
-    () => (missingFacts.length > 0 || activityAsk || monitoringAsk.length > 0 ? null : toScenarioInput(state, tables)),
-    [state, missingFacts, activityAsk, monitoringAsk, tables],
+    () => (missingFacts.length > 0 || refusedValues.length > 0 || activityAsk || monitoringAsk.length > 0 ? null : toScenarioInput(state, tables)),
+    [state, missingFacts, refusedValues, activityAsk, monitoringAsk, tables],
   );
   // ASK BEFORE COMPUTING. `computeScenario` REFUSES (it throws) for a country with no official
   // fNRB and no filed value; the seat must show that refusal, not crash on it, so it checks first.
@@ -462,7 +473,7 @@ export function useCalculatorState(project: CalvinProject, options: CalculatorOp
   );
 
   const pageContext = () =>
-    calculatorPageContext({ projectName: project.name, state, missingFacts, activityAsk, missingMonitoring: monitoringAsk, fnrbRefusal, filedFnrbRefusal, transition, result, legacyResult, paaResult, waterfall, recordProblems: calvinRecordProblems(project), ...(options.place !== undefined ? { place: options.place } : {}) });
+    calculatorPageContext({ projectName: project.name, state, missingFacts, activityAsk, missingMonitoring: monitoringAsk, outOfRange: refusedValues.map((r) => r.message), fnrbRefusal, filedFnrbRefusal, transition, result, legacyResult, paaResult, waterfall, recordProblems: calvinRecordProblems(project), ...(project.notCoveredYet !== undefined ? { notCoveredYet: project.notCoveredYet } : {}), ...(options.place !== undefined ? { place: options.place } : {}) });
 
   return {
     readOnly,
@@ -486,6 +497,8 @@ export function useCalculatorState(project: CalvinProject, options: CalculatorOp
     tables,
     save,
     missingFacts,
+    outOfRange: refusedValues,
+    recordRefusals: calvinRecordRefusals(project),
     activityAsk,
     missingMonitoring: monitoringAsk,
     fnrbRefusal,

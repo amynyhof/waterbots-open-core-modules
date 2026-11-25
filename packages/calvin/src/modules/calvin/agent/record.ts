@@ -14,6 +14,8 @@ import {
   addGivenFacts,
   blankFacts,
   checkEntry,
+  entryMessage,
+  recordTechnology,
   setAgentResults,
   type AddedFacts,
   type EntryCheck,
@@ -21,6 +23,7 @@ import {
   type GivenFacts,
   type ProjectRecord,
 } from "@waterbots/core/record";
+import { technologyCoverage } from "@waterbots/core/technologyLabels";
 import { GS4GG_CALCULATOR_VERSION, type ScenarioResult } from "../engine";
 import type { SavedAnalysis } from "../screen/analysis";
 import type { CalcState, CalvinProject } from "../screen/state";
@@ -44,7 +47,10 @@ export function calvinProjectFromRecord(record: ProjectRecord): CalvinProject {
     return reading !== undefined && reading !== "unlikely";
   });
   const project: CalvinProject = { name: facts.name ?? "", standards };
-  if (facts.technology?.code !== undefined) project.technology = facts.technology.code;
+  // A label that is not covered yet has no code (ruled 2026-11-23), and the seat says so.
+  const technology = recordTechnology(record);
+  if (technology !== undefined) project.technology = technology;
+  else if (facts.technology !== undefined && technologyCoverage(facts.technology.label) === "not covered yet") project.notCoveredYet = facts.technology.label;
   if (place.country !== undefined) project.country = place.country.value;
   if (place.region !== undefined) project.region = place.region.value;
   if (facts.population !== undefined) project.population = { ...facts.population.value };
@@ -72,6 +78,16 @@ export function calvinRecordProblems(project: Pick<CalvinProject, "population">)
     if (!c.ok) out.push(c);
   }
   return out;
+}
+
+/**
+ * The messages for a count on the record that the fact check refuses. A zero is an empty field written as a number,
+ * so it reads as missing and gets no message.
+ */
+export function calvinRecordRefusals(project: Pick<CalvinProject, "population">): string[] {
+  return calvinRecordProblems(project)
+    .filter((p) => p.problem !== "zero")
+    .map((p) => entryMessage(p.fact, project.population?.mode));
 }
 
 /**

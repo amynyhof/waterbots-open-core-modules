@@ -14,6 +14,8 @@ import { fnrbSourceLine } from "./citations";
 import { missingFactsPrompt, type CalvinProject } from "./state";
 import { enterMonitoring, isEntered, monitoringSource, monitoringValues, MONITORING_FIELD, type MonitoringValue } from "./monitoring";
 import type { CalculatorState } from "./useCalculatorState";
+import { monitoringRange, refuseIn, type OutOfRange } from "./valueRanges";
+import { RangeMessage } from "@waterbots/core/rangedNumber";
 
 /**
  * CalculatorWork — the calculator's WORK SURFACE (OPEN #72 step 2).
@@ -70,10 +72,11 @@ function Metric({ label, value, sub, tip }: { label: string; value: string; sub?
 /**
  * ONE EX-POST MONITORING VALUE IN THE ASK (ruling 2026-11-21). Not entered: the box is blank, with a light highlight
  * and a small red dot, because the calculation needs it, and no label under it (0.5.1). Entered: the box holds the
- * figure, and the line under it says where the figure comes from. Out-of-range entries are held to the ends, as on every other row.
+ * figure, and the line under it says where the figure comes from. A number outside its range is refused, as on every other row.
  */
-function MonitoringAskRow({ m, needed, value, onEnter, source }: {
+function MonitoringAskRow({ m, needed, value, onEnter, source, refuse }: {
   m: MonitoringValue; needed: boolean; value: number | null; onEnter: (v: number) => void; source: string;
+  refuse: (v: number) => string | null;
 }) {
   return (
     <div data-monitoring={m.key} data-needed={needed ? "" : undefined}>
@@ -85,7 +88,7 @@ function MonitoringAskRow({ m, needed, value, onEnter, source }: {
           className="relative inline-flex shrink-0 rounded-sm"
           style={needed ? { padding: 2, background: "color-mix(in oklab, var(--coral) 10%, transparent)" } : { padding: 2 }}
         >
-          <InRowNum value={value} onChange={(v) => onEnter(Math.min(m.max, Math.max(m.min, v)))} step={m.step} min={m.min} width={72} />
+          <InRowNum value={value} onChange={onEnter} refuse={refuse} settle step={m.step} min={m.min} width={72} />
           {needed ? (
             <span
               role="img"
@@ -100,6 +103,32 @@ function MonitoringAskRow({ m, needed, value, onEnter, source }: {
         </span>
       </div>
       {source ? <p className="t-caption text-fg-4" style={{ fontSize: 10 }}>{source}</p> : null}
+    </div>
+  );
+}
+
+/**
+ * ONE NUMBER OUTSIDE ITS RANGE (value ranges, ruled 2026-11-23). It came from the record, an older save or the site. The
+ * box shows it as it is, with the message. No figures show until it is put right, or cleared where it may be blank.
+ */
+function OutOfRangeRow({ r, state, patch }: { r: OutOfRange } & Pick<CalculatorState, "state" | "patch">) {
+  const { value } = r;
+  return (
+    <div data-out-of-range={value.id}>
+      <div className="flex flex-wrap items-baseline gap-2">
+        <InRowNum
+          value={r.shown}
+          onChange={(v) => patch(value.set(state, v / value.scale))}
+          {...(value.clear ? { optional: true, onClear: () => patch(value.clear!(state)) } : {})}
+          refuse={refuseIn(value.key, value.scale, value.words)}
+          settle
+          showMessage={false}
+          step={1 / value.scale}
+          width={92}
+        />
+        {value.scale === 100 ? <span className="t-mono shrink-0 text-fg-4" style={{ fontSize: 10 }}>%</span> : null}
+        <RangeMessage message={r.message} />
+      </div>
     </div>
   );
 }
@@ -153,7 +182,7 @@ export default function CalculatorWork({
    * missing and where it is filled in, in the same words the paid site's record check uses. This
    * comes first because every figure, on every tab, depends on these facts.
    */
-  const factsPrompt = missingFactsPrompt(missingFacts, project.technology);
+  const factsPrompt = missingFactsPrompt(missingFacts, project.technology, project.notCoveredYet);
   if (factsPrompt) {
     return (
       <ReadOnlySeat readOnly={readOnly}>
@@ -164,6 +193,26 @@ export default function CalculatorWork({
         >
           <span className="eyebrow warn">Project facts needed</span>
           <p className="t-body mt-2 text-fg-1" style={{ fontSize: 13 }}>{factsPrompt}</p>
+          {calc.recordRefusals.map((m) => <p key={m} className="mt-2"><RangeMessage message={m} /></p>)}
+        </section>
+      </ReadOnlySeat>
+    );
+  }
+
+  /** A NUMBER OUTSIDE ITS RANGE, NO FIGURES. The number is shown with its message, never used (`valueRanges.ts`). */
+  if (calc.outOfRange.length > 0) {
+    return (
+      <ReadOnlySeat readOnly={readOnly}>
+        <section
+          className="rounded-lg p-4"
+          style={{ border: "1px solid var(--amber)", background: "color-mix(in oklab, var(--amber) 8%, transparent)" }}
+          role="status"
+          data-out-of-range-ask=""
+        >
+          <span className="eyebrow warn">Outside the range</span>
+          <div className="mt-3 flex flex-col gap-2">
+            {calc.outOfRange.map((r) => <OutOfRangeRow key={r.value.id} r={r} state={state} patch={patch} />)}
+          </div>
         </section>
       </ReadOnlySeat>
     );
@@ -191,7 +240,7 @@ export default function CalculatorWork({
             <span className="t-caption text-fg-2">Pump emissions a year</span>
             {/* The controls move together when the row wraps on a narrow screen. */}
             <span className="inline-flex min-w-0 flex-wrap items-baseline gap-2">
-            <InRowNum value={null} onChange={(v) => patch({ activityEmissions: v })} step={0.1} width={92} />
+            <InRowNum value={null} onChange={(v) => patch({ activityEmissions: v })} refuse={refuseIn("pumpEmissions")} settle step={0.1} width={92} />
             <span className="t-mono text-fg-4" style={{ fontSize: 10 }}>tCO₂e</span>
             </span>
           </div>
@@ -229,6 +278,10 @@ export default function CalculatorWork({
                 value={isEntered(state, m.key) ? state[MONITORING_FIELD[m.key].value] : null}
                 onEnter={(v) => patch(enterMonitoring(m.key, v))}
                 source={monitoringSource(state, m.key)}
+                refuse={(v) => {
+                  const r = monitoringRange(state, m.key);
+                  return refuseIn(r.key, 1, r.words)(v);
+                }}
               />
             ))}
           </div>
@@ -283,6 +336,8 @@ export default function CalculatorWork({
               <InRowNum
                 value={state.fnrbFiledV1}
                 onChange={(v) => patch({ fnrbFiledV1: v })}
+                refuse={refuseIn("fnrb")}
+                settle
                 onClear={() => patch({ fnrbFiledV1: null })}
                 optional
                 step={0.001}

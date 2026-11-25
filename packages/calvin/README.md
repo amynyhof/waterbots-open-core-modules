@@ -86,6 +86,23 @@ A site tells the screens where Calvin is working with `place` (`"free-site"`, `"
 The build bundles the entry into one file, `dist/agent.js`. `@waterbots/core` stays outside it.
 `scripts/check-screen-entry.mjs` loads it from the packed files and runs his tool there.
 
+## Changes in the next release
+
+- **Value ranges (ruled 2026-11-23).** A number outside a value's range is refused where it is typed, with a message that
+  names the value and the range. It is never used: the value in force goes back to what it was. A number from the
+  record or an older save that is outside its range is shown with its message, and no figures show until it is put
+  right. His tools refuse the same numbers in the same words. The 5.5 litres stays a method cap: a higher figure is
+  kept, and the credit is capped.
+- **Two top ends with no source are gone.** Litres a day has no top. Stove efficiency runs up to 100%.
+- **Not covered yet.** His tools now ask for the `technology`, and the method follows it. They refuse community level
+  and institutional treatment. A project whose label is not covered yet gets a sentence that says so (`notCoveredYet`
+  on the project; `calvinProjectFromRecord` sets it).
+- **A box in an asking panel waits** for Enter, for the person to leave it, or for a short pause. Before, the panel closed
+  on the first digit.
+- No sum changed.
+
+**What a site should change.** A site that calls his tools itself passes `technology`.
+
 ## Changes in 0.6.0
 
 From 0.6.0 Calvin and Violet each have their own release. Calvin needs `@waterbots/core` 0.2.0.

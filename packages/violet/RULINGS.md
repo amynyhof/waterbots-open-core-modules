@@ -11,8 +11,8 @@ these rules.
   later.
 - Only systems counted by their capacity get an hours slider. It starts at 12 hours a day, labelled "assumed: no
   source yet". Handpumps and household systems never show it.
-- A value above a cap: after the project runs, the typed value is kept, the sum uses the cap, and a note says so.
-  Before the project runs, a typed value is held to the slider's top.
+- A number outside a value's range is refused where it is typed, and the message gives the range. A method cap is not
+  a range.
 - A slider's default and its cap are two separate values, even when they hold the same number.
 - The screen and every result show "Draft — pending expert review".
 - Irrigation supply and rainwater harvesting come in later pull requests (plan items M8.3 and M8.4).

@@ -10,7 +10,9 @@
  * where it came from.
  */
 import type { Technology } from "./project";
+import { checkRange, rangeMessage } from "./ranges.js";
 import type { StandardId } from "./standards";
+import { technologyCoverage } from "./technologyLabels.js";
 
 /** The shape's version. A site can tell an older record from a newer one. */
 export const RECORD_VERSION = 1 as const;
@@ -73,11 +75,24 @@ export interface ProjectFacts {
   withoutProjectM3PerYear?: Fact<number>;
 }
 
-/** Place facts. The map agent adds the point and the basin later. */
+/** Place facts. Bridget adds the basin. */
 export interface PlaceFacts {
   /** ISO 3166-1 alpha-3. */
   country?: Fact<string>;
   region?: Fact<string>;
+  /** The river basin the person pinned on Bridget's map, with the map's own reading of it. */
+  basin?: Fact<Basin>;
+}
+
+/** A pinned basin, as the map reads it. The map's data stays with the site. */
+export interface Basin {
+  /** The basin's id in the map's data. */
+  id: number;
+  /** The size of basin the map was showing. */
+  level: 4 | 6;
+  areaKm2: number;
+  /** The map's water-stress label, word for word. */
+  stressLabel: string;
 }
 
 /** An agent's estimate. Always the engine's answer; the record only keeps it. */
@@ -128,6 +143,15 @@ export interface ProjectRecord {
   mapVersion?: number;
 }
 
+/**
+ * The technology code an agent may work with. A label that is not covered yet has none, even on a record saved before
+ * the label list said so.
+ */
+export function recordTechnology(record: Pick<ProjectRecord, "facts">): Technology | undefined {
+  const t = record.facts.technology;
+  return t === undefined || technologyCoverage(t.label) === "not covered yet" ? undefined : t.code;
+}
+
 /** An empty record: every fact blank, no reading, no agent part. */
 export function emptyRecord(): ProjectRecord {
   return { recordVersion: RECORD_VERSION, facts: {}, pathways: {}, place: {}, agents: {} };
@@ -146,26 +170,16 @@ export type Problem = "not a number" | "below zero" | "zero" | "not a whole numb
 
 export type EntryCheck = { ok: true } | { ok: false; fact: CheckedFact; problem: Problem };
 
-/** What each number must be. */
-const RULES: Record<CheckedFact, { whole: boolean; zeroAllowed: boolean }> = {
-  // A count of people or households: a whole number, at least 1.
-  "population.served": { whole: true, zeroAllowed: false },
-  // People per household: above zero; it may be an average such as 4.6.
-  "population.householdSize": { whole: false, zeroAllowed: false },
-  // A volume can't be below zero.
-  lpcd: { whole: false, zeroAllowed: true },
-  // 0 for a brand-new supply.
-  withoutProjectM3PerYear: { whole: false, zeroAllowed: true },
-};
-
-/** Checks one number where it is entered. A count below zero is refused. */
+/** Checks one number where it is entered, against its range (`ranges.ts`). A count below zero is refused. */
 export function checkEntry(fact: CheckedFact, value: unknown): EntryCheck {
-  const rule = RULES[fact];
-  if (typeof value !== "number" || !Number.isFinite(value)) return { ok: false, fact, problem: "not a number" };
-  if (value < 0) return { ok: false, fact, problem: "below zero" };
-  if (value === 0 && !rule.zeroAllowed) return { ok: false, fact, problem: "zero" };
-  if (rule.whole && !Number.isInteger(value)) return { ok: false, fact, problem: "not a whole number" };
-  return { ok: true };
+  const c = checkRange(fact, value);
+  // These four values have no top, so "outside the range" never comes up for them.
+  return c.ok ? { ok: true } : { ok: false, fact, problem: c.problem as Problem };
+}
+
+/** The message for a fact the check refused: the value's name and its range. A count of households says so. */
+export function entryMessage(fact: CheckedFact, mode?: Population["mode"]): string {
+  return rangeMessage(fact, fact === "population.served" && mode === "households" ? { name: "Households served" } : {});
 }
 
 /** Every number in a record that fails the check. Empty means the record's numbers are fine. Blanks are not checked. */
@@ -199,6 +213,7 @@ export const FACT_KEYS = [
   "withoutProjectM3PerYear",
   "country",
   "region",
+  "basin",
 ] as const;
 export type FactKey = (typeof FACT_KEYS)[number];
 
@@ -215,6 +230,7 @@ export interface GivenFacts {
   withoutProjectM3PerYear?: number;
   country?: string;
   region?: string;
+  basin?: Basin;
 }
 
 /** True when the record does not hold this fact yet. */
@@ -236,6 +252,8 @@ export function isBlank(record: ProjectRecord, key: FactKey): boolean {
       return place.country === undefined;
     case "region":
       return place.region === undefined;
+    case "basin":
+      return place.basin === undefined;
     default:
       return facts[key] === undefined;
   }
@@ -278,7 +296,9 @@ export function addGivenFacts(record: ProjectRecord, agent: AgentId, given: Give
     added.push("name");
   }
   if (given.technology !== undefined && blank("technology")) {
-    facts.technology = { ...given.technology, source };
+    // A label that is not covered yet gets no code, whoever hands one in.
+    const { code, label } = given.technology;
+    facts.technology = { label, ...(code !== undefined && technologyCoverage(label) !== "not covered yet" ? { code } : {}), source };
     added.push("technology");
   }
   if (given.population !== undefined) {
@@ -331,6 +351,10 @@ export function addGivenFacts(record: ProjectRecord, agent: AgentId, given: Give
   if (given.region !== undefined && blank("region")) {
     place.region = { value: given.region, source };
     added.push("region");
+  }
+  if (given.basin !== undefined && blank("basin")) {
+    place.basin = { value: { ...given.basin }, source };
+    added.push("basin");
   }
 
   if (added.length > 0) {

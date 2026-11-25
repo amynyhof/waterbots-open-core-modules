@@ -2,6 +2,8 @@ import type { ScenarioResult } from "../engine";
 import { sdwsRef, type Basis } from "./citations";
 import { anticipatedInput, type CalcState } from "./state";
 import { MONITORING_FIELD, SENSOR_DAYS, SENSOR_SOURCE } from "./monitoring";
+import { rangeRefusal, type RangeKey, type RangeWords } from "@waterbots/core/ranges";
+import { DEVICE_DAYS } from "./valueRanges";
 
 export { SENSOR_DAYS } from "./monitoring";
 
@@ -34,6 +36,9 @@ export interface End {
 
 export interface SliderSpec {
   key: SliderKey;
+  /** The value's range (value ranges, ruled 2026-11-23), and what the message calls it. */
+  range: RangeKey;
+  rangeWords?: RangeWords;
   label: string;
   /** Unit shown after the number. Shares are shown and typed as percentages. */
   unit: string;
@@ -69,6 +74,7 @@ export function sliderSpecs(state: Pick<CalcState, "version" | "method">): Slide
   const specs: SliderSpec[] = [
     {
       key: "litres",
+      range: "lpcd",
       label: "Drinking water per person per day",
       unit: "L",
       scale: 1,
@@ -93,6 +99,8 @@ export function sliderSpecs(state: Pick<CalcState, "version" | "method">): Slide
     },
     {
       key: "days",
+      range: "daysOfOperation",
+      rangeWords: hwt ? DEVICE_DAYS : {},
       label: hwt ? "Days a year the device is in the home" : "Days of operation a year",
       unit: "d",
       scale: 1,
@@ -111,6 +119,8 @@ export function sliderSpecs(state: Pick<CalcState, "version" | "method">): Slide
     },
     {
       key: "testsPass",
+      range: "testsPass",
+      rangeWords: { shownAs: "percent" },
       label: "Share of water tests that pass",
       unit: "%",
       scale: 100,
@@ -127,6 +137,7 @@ export function sliderSpecs(state: Pick<CalcState, "version" | "method">): Slide
   if (hwt) {
     specs.push({
       key: "usage",
+      range: "homesThatUse",
       label: "Share of homes that really use the device",
       unit: "%",
       scale: 100,
@@ -185,19 +196,15 @@ export type SliderChange =
   | { ok: false; reason: string };
 
 /**
- * A slider moved or a value typed with the pencil, in DISPLAY units. The value the engine gets is held
- * inside the ends. A typed value past the ceiling is kept beside it, so the row can say the credit is
- * capped; a value back inside the ends clears that note.
+ * A slider moved or a value typed with the pencil, in DISPLAY units. A number outside the value's range is refused,
+ * with the range in the message (ruled 2026-11-23). A METHOD CAP IS NOT A RANGE: litres typed above the cited cap are
+ * kept beside the held value, so the row can say the credit is capped; a value back inside the ends clears that note.
  */
 export function applySlider(state: CalcState, spec: SliderSpec, display: number): SliderChange {
   if (!Number.isFinite(display)) return { ok: false, reason: "Type a number." };
   const typed = display / spec.scale;
-  if (spec.key === "usage" && typed <= 0) {
-    return { ok: false, reason: "The share of homes using the device can't be 0." };
-  }
-  if (typed < spec.floor.value) {
-    return { ok: false, reason: `This value can't be below ${shownValue(spec, spec.floor.value)}.` };
-  }
+  const refused = rangeRefusal(spec.range, typed, spec.rangeWords);
+  if (refused !== null) return { ok: false, reason: refused };
   const held = Math.min(spec.ceiling.value, typed);
   const slidersTyped = { ...state.slidersTyped };
   if (held !== typed) slidersTyped[spec.key] = typed;

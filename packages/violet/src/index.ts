@@ -10,4 +10,5 @@ export * from "./engine.js";
 export * from "./doors.js";
 export * from "./record.js";
 export * from "./exportNotes.js";
+export * from "./ranges.js";
 export { computeD3Tool, d3Sources, parseD3Input, VIOLET_TOOLS } from "./agent/tools.js";
