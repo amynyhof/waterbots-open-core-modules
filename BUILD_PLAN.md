@@ -168,6 +168,12 @@ their tasks, collect what they need, and report back to him. He helps with the n
     (#49), so an unlikely water pathway no longer gets her calculator (W2).
   - Found on the open site's install: the map asked about four pathways, and that site reads two, so it never reached
     "no pathway forward". A site now names the pathways it reads, and the map asks only about those.
+  - Ruled by the maintainer on 2026-11-24: a later agent is called only when the agent before it has finished, and the
+    map gives each agent its step and how many steps the project has. Calvin and Violet share the Quantify step, and
+    neither waits for the other.
+  - [!] Found on 2026-11-24, not changed: where a water pathway reads likely, the map calls Violet's D-3 calculator
+    whatever the project type is. D-3 counts a household or community water supply (VWBA 2.0, Appendix C, Table C-1,
+    p.39). Waits on the maintainer.
   - [!] Four rules that say which project facts point to which pathway have no source yet. They are listed in the
     record proposal. Until the maintainer rules them, the map uses only the eligibility readings and the two rules this
     repo can cite.
@@ -176,8 +182,12 @@ their tasks, collect what they need, and report back to him. He helps with the n
       Violet becomes her own crew member on both sites, through the shared spec.
   - In this repo: Phoebe (was V10 and M9.1) and Bridget (was V11 and M9.2) reach their first release, and Wellington
     gets a package. Each agent's files come as a carry from the site that holds them.
-  - Waits on: the carries; Phoebe's and Bridget's rulings; the rights check on every one of Bridget's data files; a
-    ruling on the shared map key.
+  - The plan, approved by the maintainer on 2026-11-23, in this order: core, Phoebe, Wellington, Bridget without map
+    data, then Bridget's map after the rights check. Each is its own pull request.
+  - Step 1, core: the crew list, the checks on a reply, the rest of the open site's facts, Phoebe's rows, and Calvin's and
+    Violet's own files, settings and chats. Done when the next release holds it.
+  - Waits on: Phoebe's and Bridget's rulings; the rights check on every one of Bridget's data files; a ruling on the
+    shared map key.
   - One calculator screen (ruled by the maintainer on 2026-11-23).
     - One calculator screen for every calculator agent. What is done for Violet is done for Calvin, and the other
       way round.
