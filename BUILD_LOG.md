@@ -5,6 +5,7 @@ history keeps everything older and every longer entry.
 
 ---
 
+- 2026-11-25 — **Release** `core-v0.3.0`, `calvin-v0.7.0` and `violet-v0.7.0` on `d59a385` (#56, #57). **Carry:** packed to the handoff folder.
 - 2026-11-25 — The J5 core step: both calculator chats, the map's order, and which projects call Violet (#57).
 - 2026-11-24 — Value ranges: a number outside its range is refused where it is typed (#56).
 - 2026-11-24 — **Carry:** the crew list, `roster.yaml` 0.4.1, byte for byte, into core. Fingerprint matched; name scan 0.
