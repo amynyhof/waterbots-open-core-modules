@@ -174,10 +174,9 @@ their tasks, collect what they need, and report back to him. He helps with the n
   - Ruled by the maintainer on 2026-11-24: the map calls Violet for the kinds of project that give people water, starting
     with the kinds the guidebook lists for D-3 by name (VWBA 2.0, Appendix C, Table C-1, pp.37 to 39; Appendix D, D-3,
     pp.44 to 46). Treatment is not covered yet (N18). For any other kind the pathway stays in play with no calculator
-    agent. A new or alternative water supply is covered for water; its carbon side still waits (N17).
-  - [!] Rainwater harvesting for direct use: the 2026-11-24 ruling lists it for D-3. Violet's rulings and M8.4 leave it for
-    a later pull request, because the guidebook works it out with D-4 (p.45). No label names it, so nothing is built.
-    Waits on the maintainer.
+    agent. A new or alternative water supply is covered for water only where people use the water at home, and that is
+    asked first; its carbon side still waits (N17). Violet's tool refuses treatment in the Agent Commons and at MCP too,
+    as Calvin's do. Rainwater harvesting stays for later (M8.4). Done when the next release holds it.
   - [!] Four rules that say which project facts point to which pathway have no source yet. They are listed in the
     record proposal. Until the maintainer rules them, the map uses only the eligibility readings and the two rules this
     repo can cite.
