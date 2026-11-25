@@ -81,7 +81,13 @@ export interface ProjectFacts {
   technologyClass?: Fact<TechnologyClass>;
   /** Where the project is in its life. */
   stage?: Fact<ProjectStage>;
+  /** Whether people use the water at home. Asked of a new or alternative supply, which could be reuse or irrigation. */
+  homeUse?: Fact<HomeUse>;
 }
+
+/** Whether people use the water at home. "not sure" is an answer: nobody is asked again, and nothing is counted yet. */
+export const HOME_USES = ["yes", "no", "not sure"] as const;
+export type HomeUse = (typeof HOME_USES)[number];
 
 /** The project types both sites list: the guidebook's C-1 to C-20, and none of these. */
 export const PROJECT_TYPE_IDS = [
@@ -93,7 +99,7 @@ export type ProjectTypeId = (typeof PROJECT_TYPE_IDS)[number];
 
 /** The one type that also has a class. */
 export const DRINKING_WATER_TYPE = "C-19" satisfies ProjectTypeId;
-/** A new or alternative water supply. Covered for the water pathway; it has no technology code yet. */
+/** A new or alternative water supply. Covered for the water pathway for home use; it has no technology code yet. */
 export const NEW_SUPPLY_TYPE = "C-11" satisfies ProjectTypeId;
 
 /** On paper, being built, or already running. */
@@ -261,22 +267,41 @@ export function technologyOfFacts(type: ProjectTypeId | undefined, technologyCla
  */
 export type WaterSupply = "covered" | "not covered yet" | "another kind of project" | "not known";
 
+/** What each fact that names a technology says about water, and the label it says it by. */
+function waterAnswers(facts: ProjectFacts): { label: string; says: WaterSupply }[] {
+  const named = [facts.technology ?? null, technologyOfFacts(facts.type?.value, facts.technologyClass?.value)].filter((t) => t !== null);
+  return named.map(({ label, code }) => {
+    const listed = waterCoverage(label);
+    if (listed === "covered for home use") {
+      const home = facts.homeUse?.value;
+      return { label, says: home === "yes" ? "covered" : home === "no" ? "another kind of project" : home === "not sure" ? "not covered yet" : "not known" };
+    }
+    if (listed !== "not known") return { label, says: listed };
+    // A label the list does not know: only a code the site gave it can say.
+    return { label, says: code === "CWS" ? "covered" : code === "other" ? "another kind of project" : "not covered yet" };
+  });
+}
+
 /**
  * Violet is called for the kinds of project that give people water, and for nothing else (ruled 2026-11-24). Where two
- * facts disagree, or a label is not on the list and has no code, it is not sure, so she has nothing to count yet.
+ * facts disagree, or a label is not on the list and has no code, it is not sure, so she has nothing to count yet. A
+ * new or alternative supply is asked first whether people use the water at home.
  */
 export function recordWaterSupply(facts: ProjectFacts): WaterSupply {
   const type = facts.type?.value;
   if (type !== undefined && type !== DRINKING_WATER_TYPE && type !== NEW_SUPPLY_TYPE) return "another kind of project";
-  const named = [facts.technology ?? null, technologyOfFacts(type, facts.technologyClass?.value)].filter((t) => t !== null);
-  if (named.length === 0) return "not known";
-  const each = named.map(({ label, code }): WaterSupply => {
-    const listed = waterCoverage(label);
-    if (listed !== "not known") return listed;
-    // A label the list does not know: only a code the site gave it can say.
-    return code === "CWS" ? "covered" : code === "other" ? "another kind of project" : "not covered yet";
-  });
-  return each.find((x) => x !== "covered") ?? "covered";
+  const says = waterAnswers(facts).map((a) => a.says);
+  return says.find((x) => x === "another kind of project" || x === "not covered yet") ?? says.find((x) => x === "covered") ?? "not known";
+}
+
+/** True when the one thing Violet's method still needs to know is whether people use the water at home. */
+export function needsHomeUse(facts: ProjectFacts): boolean {
+  return recordWaterSupply(facts) === "not known" && waterAnswers(facts).length > 0;
+}
+
+/** The site's own label for a technology Violet's method does not count yet, or null. */
+export function waterNotCovered(facts: ProjectFacts): string | null {
+  return recordWaterSupply(facts) === "not covered yet" ? (waterAnswers(facts).find((a) => a.says === "not covered yet")?.label ?? null) : null;
 }
 
 /** An empty record: every fact blank, no reading, no agent part. */
@@ -346,6 +371,7 @@ export const FACT_KEYS = [
   "technologyClass",
   "stage",
   "placeWords",
+  "homeUse",
 ] as const;
 export type FactKey = (typeof FACT_KEYS)[number];
 
@@ -367,6 +393,7 @@ export interface GivenFacts {
   type?: ProjectTypeId;
   technologyClass?: TechnologyClass;
   stage?: ProjectStage;
+  homeUse?: HomeUse;
   /** Where it is, in the visitor's own words. */
   placeWords?: string;
 }
@@ -477,6 +504,11 @@ export function addGivenFacts(record: ProjectRecord, agent: AgentId, given: Give
   if (stage !== undefined) {
     facts.stage = { value: stage, source };
     added.push("stage");
+  }
+  const homeUse = listed("homeUse", HOME_USES, given.homeUse);
+  if (homeUse !== undefined) {
+    facts.homeUse = { value: homeUse, source };
+    added.push("homeUse");
   }
   if (given.technology !== undefined && blank("technology")) {
     // A label that is not covered yet gets no code, whoever hands one in.

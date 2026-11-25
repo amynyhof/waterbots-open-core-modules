@@ -1,7 +1,7 @@
 // Which projects the map sends to Violet (ruled by the maintainer on 2026-11-24). Every project here is made up.
 import { describe, expect, test } from "vitest";
 import { FACT_RULES, METHODS, agentMap, methodsFor, noMethodFor, stepOf, type MapInput } from "./agentMap";
-import { PROJECT_TYPE_IDS, emptyRecord, recordTechnology, recordWaterSupply, type PathwayReading, type ProjectFacts, type ProjectRecord } from "./record";
+import { HOME_USES, PROJECT_TYPE_IDS, addGivenFacts, emptyRecord, needsHomeUse, recordTechnology, recordWaterSupply, waterNotCovered, type HomeUse, type PathwayReading, type ProjectFacts, type ProjectRecord } from "./record";
 import { TECHNOLOGY_LABELS, technologyCode, waterCoverage } from "./technologyLabels";
 
 const by = { by: "person", note: "made up for a test" } as const;
@@ -27,7 +27,9 @@ const map = (facts: ProjectFacts, extra: Partial<MapInput> = {}) => agentMap({ p
 const violet = (m: ReturnType<typeof agentMap>) => m.agents.find((a) => a.agent === "violet")!;
 const water = (m: ReturnType<typeof agentMap>) => m.pathways.find((p) => p.pathway === "vwba")!;
 
-const SUPPLIES = ["Community water supply", "Community water supply technologies", "New or alternative water supply", "A new water source a community collects from"];
+const home = (value: HomeUse): ProjectFacts => ({ homeUse: { value, source: by } });
+const NEW_SUPPLY = "New or alternative water supply";
+const SUPPLIES = ["Community water supply", "Community water supply technologies", "A new water source a community collects from"];
 const TREATMENT = [
   "Household water treatment",
   "Household water treatment technologies",
@@ -36,8 +38,9 @@ const TREATMENT = [
   "Water made safe in the home",
 ];
 
-test("every label on the list is one or the other, with a source", () => {
-  expect(TECHNOLOGY_LABELS.map((t) => t.label).sort()).toEqual([...SUPPLIES, ...TREATMENT].sort());
+test("every label on the list is a supply, a supply for home use, or treatment, with a source", () => {
+  expect(TECHNOLOGY_LABELS.map((t) => t.label).sort()).toEqual([...SUPPLIES, NEW_SUPPLY, ...TREATMENT].sort());
+  expect(waterCoverage(NEW_SUPPLY)).toBe("covered for home use");
   for (const t of TECHNOLOGY_LABELS) expect(t.whyWater).toContain("VWBA 2.0");
   expect(waterCoverage("A label nobody has sent yet")).toBe("not known");
 });
@@ -59,9 +62,6 @@ describe("a supply that gives people water", () => {
     const record = { ...likely(label(words)), pathways: {}, agents: {} };
     expect(water(agentMap({ place: "free-site", record, reads }))).toMatchObject({ inPlay: true, moreToLearn: true, because: "project facts", methods: ["vwba-d3"] });
   });
-  test("a new supply's type alone says it, before a site writes the label", () => {
-    expect(violet(map(type("C-11"))).called).toBe(true);
-  });
   test("a drinking-water type with a supply's class", () => {
     expect(violet(map({ ...type("C-19"), technologyClass: { value: "CWS", source: by } })).called).toBe(true);
   });
@@ -79,6 +79,67 @@ describe("a supply that gives people water", () => {
     expect(next()).toEqual({ step: "call", agent: "violet" });
     record.agents.violet = { done: true };
     expect(next()).toEqual({ step: "report or sign-up" });
+  });
+});
+
+describe("a new or alternative supply: home use is asked first", () => {
+  const ways: ProjectFacts[] = [label(NEW_SUPPLY), type("C-11"), { ...label(NEW_SUPPLY), ...type("C-11") }];
+  test("before it is said: she waits, and Wellington gathers the one fact next", () => {
+    for (const facts of [ways[0]!, ways[2]!]) {
+      expect(needsHomeUse(facts)).toBe(true);
+      for (const extra of [{}, { place: "paid-site", saved: true }] as const) {
+        const m = map(facts, extra);
+        expect(violet(m)).toEqual({ agent: "violet", called: false, because: "waiting for basic facts" });
+        expect(water(m)).toMatchObject({ inPlay: true, agent: "violet", methods: [], noMethod: "waiting for basic facts" });
+        expect(stepOf(m, "violet")).not.toBeNull();
+        expect(m.next).toEqual({ step: "gather facts", facts: ["homeUse"] });
+        expect(m.agents.find((a) => a.agent === "calvin")).toMatchObject({ called: true });
+      }
+    }
+  });
+  test("by the type alone, the technology is still a basic fact and comes first", () => {
+    expect(map(ways[1]!).next).toEqual({ step: "gather facts", facts: ["technology"] });
+  });
+  test("yes: Violet is called, with D-3, and it points to water by itself", () => {
+    for (const facts of ways) {
+      const m = map({ ...facts, ...home("yes") });
+      expect(violet(m)).toEqual({ agent: "violet", called: true, introduce: true });
+      expect(water(m)).toMatchObject({ methods: ["vwba-d3"] });
+      const unread = { ...likely({ ...facts, ...home("yes") }), pathways: {}, agents: {} };
+      expect(water(agentMap({ place: "free-site", record: unread, reads }))).toMatchObject({ inPlay: true, because: "project facts" });
+    }
+  });
+  test("no, and not sure: the pathway stays in play with no calculator agent, and nobody is asked again", () => {
+    for (const [answer, because] of [["no", "another kind of project"], ["not sure", "not covered yet"]] as const) {
+      const m = map({ ...label(NEW_SUPPLY), ...home(answer) });
+      expect(violet(m)).toEqual({ agent: "violet", called: false, because });
+      expect(water(m)).toMatchObject({ inPlay: true, agent: null, methods: [], noMethod: because });
+      expect(m.next).toEqual({ step: "call", agent: "calvin" });
+    }
+    expect(waterNotCovered({ ...label(NEW_SUPPLY), ...home("not sure") })).toBe(NEW_SUPPLY);
+    expect(waterNotCovered({ ...label(NEW_SUPPLY), ...home("no") })).toBeNull();
+  });
+  test("it is not asked before Phoebe is done, where water is unlikely, on a site without Violet, or of any other project", () => {
+    const unread = { ...likely(label(NEW_SUPPLY)), pathways: {}, agents: {} };
+    expect(agentMap({ place: "free-site", record: unread, reads }).next).toEqual({ step: "call", agent: "phoebe" });
+    expect(water(agentMap({ place: "free-site", record: unread, reads })).inPlay).toBe(false);
+    const unlikely = likely(label(NEW_SUPPLY));
+    unlikely.pathways.vwba = read("unlikely");
+    expect(agentMap({ place: "free-site", record: unlikely, reads }).next).toEqual({ step: "call", agent: "calvin" });
+    expect(map(label(NEW_SUPPLY), { crew: ["wellington", "phoebe", "bridget", "calvin"] }).next).toEqual({ step: "call", agent: "calvin" });
+    for (const words of [...SUPPLIES, ...TREATMENT]) expect(needsHomeUse(label(words)), words).toBe(false);
+    expect([needsHomeUse({}), needsHomeUse(type("C-12")), needsHomeUse(type("C-19"))]).toEqual([false, false, false]);
+  });
+  test("a community supply's own label has already said it, and a plain no still counts", () => {
+    expect(recordWaterSupply({ ...label("Community water supply"), ...type("C-11") })).toBe("covered");
+    expect(recordWaterSupply({ ...label("Community water supply"), ...type("C-11"), ...home("no") })).toBe("another kind of project");
+  });
+  test("Wellington adds it once, and only a word on the list", () => {
+    const { record, added } = addGivenFacts(emptyRecord(), "wellington", { homeUse: "yes" });
+    expect([record.facts.homeUse?.value, added]).toEqual(["yes", ["homeUse"]]);
+    expect(addGivenFacts(record, "violet", { homeUse: "no" }).record.facts.homeUse?.value).toBe("yes");
+    expect(addGivenFacts(emptyRecord(), "wellington", { homeUse: "maybe" as HomeUse }).dropped).toEqual(["homeUse"]);
+    expect(HOME_USES).toEqual(["yes", "no", "not sure"]);
   });
 });
 

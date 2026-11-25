@@ -5,7 +5,7 @@
 // `state`, and fills it from an answer with `fill`. It computes nothing: every figure comes from `computeD3`.
 
 import { useEffect, useRef, useState } from "react";
-import type { Place } from "@waterbots/core/places";
+import { hasProjectRecord, type Place } from "@waterbots/core/places";
 import type { ModuleProject } from "@waterbots/core/project";
 import type { ProjectRecord } from "@waterbots/core/record";
 import { useReadOnlySeat } from "@waterbots/core/readOnly";
@@ -13,6 +13,7 @@ import { fillViolet, violetAsks, violetKept, violetPageContext, type VioletAnswe
 import { computeD3 } from "../d3/compute.js";
 import type { D3Input, D3Result, D3View } from "../d3/types.js";
 import { d3InputFromRecord, violetProjectFromRecord } from "../record.js";
+import { d3Stop, type D3Stop } from "../supply.js";
 import { followRecord, recordPopulation, recordRefusals, seedD3Input } from "./recordInput.js";
 import type { Ask, Kept } from "@waterbots/core/chat";
 
@@ -38,6 +39,11 @@ export interface D3State {
   refusals: string[];
   /** True once the person, or an answer, has said how the water can be counted. */
   chosen: boolean;
+  /**
+   * Why she works out nothing for this project, or null. It comes from the record: in the Agent Commons, the temporary one
+   * a site keeps. With no record, or while the record does not say the kind of project, it is null.
+   */
+  stop: D3Stop | null;
   update: (next: D3Input) => void;
   choose: (option: D3Input["option"]) => void;
   switchView: (v: D3View) => void;
@@ -58,6 +64,9 @@ export function useD3State({ project: given, record, view = "ex-ante", lockView,
   const seat = useReadOnlySeat();
   const readOnly = locked ?? seat;
   const project = record !== undefined ? violetProjectFromRecord(record) : given;
+  // The kind of project is asked for where there is no record too.
+  const facts = record?.facts ?? (place !== undefined && !hasProjectRecord(place) ? {} : undefined);
+  const stop = facts === undefined ? null : d3Stop(facts);
   const [input, setInput] = useState<D3Input>(() => (record !== undefined ? d3InputFromRecord(record, lockView ?? view) : seedD3Input(project, lockView ?? view)));
   const [error, setError] = useState<string | null>(null);
   const [chosen, setChosen] = useState(false);
@@ -108,7 +117,7 @@ export function useD3State({ project: given, record, view = "ex-ante", lockView,
   }
 
   function fill(answer: VioletAnswer): VioletFill {
-    if (readOnly) return { input: latest.current, filled: [], refused: [] };
+    if (readOnly || stop !== null) return { input: latest.current, filled: [], refused: [] };
     const f = fillViolet(latest.current, answer);
     if (f.filled.includes("option")) setChosen(true);
     if (f.filled.length > 0) update(f.input);
@@ -126,12 +135,13 @@ export function useD3State({ project: given, record, view = "ex-ante", lockView,
     readOnly,
     refusals,
     chosen,
+    stop,
     update,
     choose,
     switchView,
     fill,
-    asks: violetAsks(input, chosen),
-    kept: violetKept(result),
-    pageContext: () => violetPageContext({ projectName: project?.name ?? "", input, result, refusals, ...(place !== undefined ? { place } : {}) }),
+    asks: violetAsks(input, chosen, facts),
+    kept: stop !== null ? [] : violetKept(result),
+    pageContext: () => violetPageContext({ projectName: project?.name ?? "", input, result, refusals, ...(place !== undefined ? { place } : {}), ...(facts !== undefined ? { facts } : {}) }),
   };
 }

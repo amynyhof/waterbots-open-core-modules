@@ -6,14 +6,15 @@ import { ANSWER_FIELDS, CHAT_REPLY, chatContext, openAsks, openedTurn, readLeft,
 import { rangeRefusal } from "@waterbots/core/ranges";
 import { readHandBack, type HandBack } from "@waterbots/core/reply";
 import { hasProjectRecord, type Place } from "@waterbots/core/places";
-import { addGivenFacts, setAgentResults, type AddedFacts, type ProjectRecord } from "@waterbots/core/record";
+import { HOME_USES, addGivenFacts, needsHomeUse, setAgentResults, type AddedFacts, type GivenFacts, type ProjectFacts, type ProjectRecord } from "@waterbots/core/record";
 import { computeD3 } from "../d3/compute.js";
 import { D3_STATUS, type AccessLevel, type D3Input, type D3Option, type D3Result, type D3Value } from "../d3/types.js";
 import { D3_RANGES, d3Refusals, refuseD3, type D3NumberKey, type D3Refusal } from "../ranges.js";
 import { addVioletResults, violetGivenFacts } from "../record.js";
+import { D3_TECHNOLOGIES, d3Stop, d3Technology, readKind } from "../supply.js";
 
 /** The settings her chat runs on. The same as in `config.yaml`; a test keeps them so. */
-export const VIOLET_CHAT: ChatSettings = { model: "claude-sonnet-5", effort: "medium", maxOutputTokens: 16000, reply: CHAT_REPLY };
+export const VIOLET_CHAT: ChatSettings = { model: "claude-opus-5", effort: "medium", maxOutputTokens: 16000, reply: CHAT_REPLY };
 
 /** The turn the site sends when it opens her chat, so she speaks first. */
 export const VIOLET_OPENED = openedTurn("Violet");
@@ -22,6 +23,20 @@ export const VIOLET_OPENED = openedTurn("Violet");
 
 /** Everything she may ask for. A project fact each time, or a monitored figure once the project runs. */
 const ASKS = {
+  technology: {
+    key: "technology",
+    about: "what kind of project it is: a community water supply, a new or alternative water supply, or one that treats water",
+    why: "it says whether the method can count the project",
+    from: "what the project builds",
+    needed: true,
+  },
+  homeUse: {
+    key: "homeUse",
+    about: "whether people use the water at home",
+    why: "a new or alternative supply can also be reuse or irrigation, and only water people use at home is counted",
+    from: "who the water is for, in the project's plan",
+    needed: true,
+  },
   option: {
     key: "option",
     about: "how the water can be counted: from what the system can supply, or from the people it serves (after the project runs, from meter readings too)",
@@ -70,14 +85,21 @@ export const VIOLET_ASK_KEYS: readonly string[] = [...new Set(Object.values(ASKS
 
 /**
  * What is still missing, in the order she asks. The first one is her one question. `chosen` is true once the visitor has
- * said how the water can be counted; before that the screen only shows where it starts.
+ * said how the water can be counted; before that the screen only shows where it starts. With the project's facts, the
+ * kind of project comes first, and she asks for nothing when D-3 does not count it.
  */
-export function violetAsks(input: D3Input, chosen = false): Ask[] {
+export function violetAsks(input: D3Input, chosen = false, facts?: ProjectFacts): Ask[] {
+  const stop = facts === undefined ? null : d3Stop(facts);
+  if (stop !== null && stop.because !== "home use not given") return [];
   const out: Ask[] = [];
   const pop = input.population;
   const ask = (blank: boolean, a: Ask): void => {
     if (blank) out.push(a);
   };
+  if (facts !== undefined) {
+    ask(facts.technology === undefined && facts.type === undefined, ASKS.technology);
+    ask(needsHomeUse(facts), ASKS.homeUse);
+  }
   ask(!chosen, ASKS.option);
   if (input.option === "beneficiaries") {
     ask(pop?.served === undefined, ASKS.served);
@@ -210,6 +232,15 @@ export const VIOLET_ANSWER_SCHEMA: Record<string, unknown> = {
   required: ["reply", "handBack"],
   properties: {
     ...ANSWER_FIELDS,
+    facts: {
+      type: "object",
+      additionalProperties: false,
+      description: "Project facts for the record, only what the visitor has just said.",
+      properties: {
+        technology: { type: "string", enum: [...D3_TECHNOLOGIES], description: "The kind of project: CWS a community water supply, C-11 a new or alternative supply, HWT household, CWT community level and IWT institutional treatment." },
+        homeUse: { type: "string", enum: [...HOME_USES], description: "Whether people use the water at home." },
+      },
+    },
     values: {
       type: "object",
       additionalProperties: false,
@@ -238,28 +269,33 @@ export interface VioletReply {
   reply: string;
   handBack: HandBack;
   leftForNow: string[];
+  /** The kind of project and home use, for the record (`addVioletFacts`). In the Agent Commons, for her temporary record. */
+  facts: GivenFacts;
   values: VioletAnswer;
 }
 
 /** Reads her answer as the model gave it. Null when there is no reply. The numbers are checked by `fillViolet`. */
 export function readVioletAnswer(raw: unknown): VioletReply | null {
   if (typeof raw !== "object" || raw === null) return null;
-  const o = raw as { reply?: unknown; handBack?: unknown; leftForNow?: unknown; values?: unknown };
+  const o = raw as { reply?: unknown; handBack?: unknown; leftForNow?: unknown; facts?: unknown; values?: unknown };
   if (typeof o.reply !== "string" || o.reply.trim() === "") return null;
+  const { technology, homeUse } = readKind(o.facts);
   return {
     reply: o.reply.trim(),
     handBack: readHandBack(o.handBack),
     leftForNow: readLeft(o.leftForNow, VIOLET_ASK_KEYS),
+    facts: { ...(technology !== undefined ? { technology: d3Technology(technology) } : {}), ...(homeUse !== undefined ? { homeUse } : {}) },
     values: typeof o.values === "object" && o.values !== null ? (o.values as VioletAnswer) : {},
   };
 }
 
 /**
  * Adds what an answer gave to the project record: the project facts it lacked, her inputs and her figure. Returns a new
- * record. A count that failed the fact check is in `refused`.
+ * record. A count that failed the fact check is in `refused`. For a project D-3 does not count, only the facts are added.
  */
 export function addVioletAnswer(record: ProjectRecord, fill: VioletFill, done?: boolean): AddedFacts {
   const facts = addGivenFacts(record, "violet", violetGivenFacts(fill.input));
+  if (d3Stop(record.facts) !== null) return facts;
   return { ...facts, record: addVioletResults(facts.record, { input: fill.input, result: computeD3(fill.input), ...(done !== undefined ? { done } : {}) }) };
 }
 
@@ -278,13 +314,26 @@ export interface VioletScreen {
   place?: Place;
   /** The messages for numbers on the record that are outside their range. */
   refusals?: readonly string[];
+  /** The project's facts. In the Agent Commons, her temporary record's. Left out, she does not look at the kind of project. */
+  facts?: ProjectFacts;
 }
 
 /**
  * What Violet can see of her own screen: the same figures the visitor is looking at, from the engine's result, never
  * worked out here. The site reads it when it sends a turn.
  */
-export function violetPageContext({ projectName, input, result, place, refusals = [] }: VioletScreen): string {
+export function violetPageContext({ projectName, input, result, place, refusals = [], facts }: VioletScreen): string {
+  // A PROJECT D-3 DOES NOT COUNT IS SAID, NOT ASKED FOR AGAIN.
+  const stop = facts === undefined ? null : d3Stop(facts);
+  if (stop !== null) {
+    const why =
+      stop.because === "not covered yet"
+        ? `Its technology is ${stop.label === null ? "not known well enough" : `"${stop.label}"`}, which is not covered yet: the experts are being asked.`
+        : stop.because === "another kind of project"
+          ? "It is another kind of project, and D-3 does not count it. Its water pathway stays in play."
+          : "Whether people use the water at home has not been said yet.";
+    return `The user is on the water-benefit calculator (VWBA 2.0, D-3) for project "${projectName}". ${why} There are NO figures on this screen${stop.because === "home use not given" ? "." : ", and the tool does not count it."}`;
+  }
   const ways: Record<D3Option, string> = { metered: "meter readings", capacity: "what the system can supply", beneficiaries: "the people served" };
   const lines = [
     `The user is on the water-benefit calculator (VWBA 2.0, D-3) for project "${projectName}", ${input.view === "ex-ante" ? "before the project runs" : "after the project runs"}, counted from ${ways[input.option]}. Its status is "${D3_STATUS}".`,
@@ -303,8 +352,10 @@ export function violetPageContext({ projectName, input, result, place, refusals 
 // ── The block for a turn ─────────────────────────────────────────────────────────────────────────────────────────
 
 /** What the record already holds that she reads, as lines. */
-export function violetKnown(input: D3Input): string[] {
+export function violetKnown(input: D3Input, facts?: ProjectFacts): string[] {
   const out: string[] = [];
+  if (facts?.technology !== undefined) out.push(`Kind of project: ${facts.technology.label}`);
+  if (facts?.homeUse !== undefined) out.push(`People use the water at home: ${facts.homeUse.value}`);
   const pop = input.population;
   if (pop?.served !== undefined) out.push(`${pop.mode === "households" ? "Households" : pop.mode === "people" ? "People" : "People or households, not said which,"} served: ${pop.served.toLocaleString("en")}`);
   if (pop?.householdSize !== undefined) out.push(`People per household: ${pop.householdSize}`);
@@ -327,15 +378,16 @@ export interface VioletTurn extends VioletScreen {
 
 /** The block a site adds after her instructions, for one turn. */
 export function violetChatContext(t: VioletTurn): string {
+  const stopped = t.facts !== undefined && d3Stop(t.facts) !== null;
   return chatContext({
     place: t.place,
     ...(t.saved !== undefined ? { saved: t.saved } : {}),
     ...(t.opened !== undefined ? { opened: t.opened } : {}),
     ...(t.introduce !== undefined ? { introduce: t.introduce } : {}),
-    known: violetKnown(t.input),
-    asks: openAsks(violetAsks(t.input, t.chosen), t.leftForNow),
-    kept: violetKept(t.result),
-    figureShows: t.result.vwbM3PerYear !== null,
+    known: violetKnown(t.input, t.facts),
+    asks: openAsks(violetAsks(t.input, t.chosen, t.facts), t.leftForNow),
+    kept: stopped ? [] : violetKept(t.result),
+    figureShows: !stopped && t.result.vwbM3PerYear !== null,
     refused: t.refused ?? [],
     screen: violetPageContext(t),
   });

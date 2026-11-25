@@ -18,7 +18,7 @@ import { activityEmissionsAsk, missingProjectFacts, type CalcState } from "../sc
 import { stateValues } from "../screen/valueRanges";
 
 /** The settings his chat runs on. The same as in `config.yaml`; a test keeps them so. */
-export const CALVIN_CHAT: ChatSettings = { model: "claude-sonnet-5", effort: "medium", maxOutputTokens: 16000, reply: CHAT_REPLY };
+export const CALVIN_CHAT: ChatSettings = { model: "claude-opus-5", effort: "medium", maxOutputTokens: 16000, reply: CHAT_REPLY };
 
 /** The turn the site sends when it opens his chat, so he speaks first. */
 export const CALVIN_OPENED = openedTurn("Calvin");

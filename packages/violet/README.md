@@ -53,7 +53,13 @@ Violet accepts any `@waterbots/core` in the 0.3 series, so she can be released o
 - No sum changed.
 
 **Which projects call her.** Core's map calls her for the kinds of project that give people water. It does not call her for
-treatment, which is not covered yet, or for another kind of project. In the Agent Commons and at MCP she opens as before.
+treatment, which is not covered yet, or for another kind of project. A new or alternative supply calls her only where
+people use the water at home.
+
+**She refuses the same projects at every door** (`d3Stop`). Her tool now asks for the `technology`, and for `homeUse` when it
+is a new or alternative supply. It refuses treatment, as Calvin's tools do. In the Agent Commons her chat asks for the kind of
+project first. A site keeps her temporary record there, adds `reply.facts` to it with `addVioletFacts`, and passes it as
+`record`. Her screen then shows a sentence in place of the calculator for a project she does not count.
 
 **What a site should change.** Install core 0.3 with it. A site that shows her when its own rule says so can read her call on
 core's map instead: she is called once Bridget has finished.

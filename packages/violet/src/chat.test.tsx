@@ -114,7 +114,7 @@ describe("filling her screen from an answer", () => {
 
 describe("her answer", () => {
   it("reads the reply, the hand-back, what was left and the values; a reply with no words is none", () => {
-    expect(readVioletAnswer({ reply: " Thanks. ", handBack: "wellington", leftForNow: ["accessLevel", "nonsense"], values: { accessLevel: "full" } })).toEqual({ reply: "Thanks.", handBack: "wellington", leftForNow: ["accessLevel"], values: { accessLevel: "full" } });
+    expect(readVioletAnswer({ reply: " Thanks. ", handBack: "wellington", leftForNow: ["accessLevel", "nonsense"], values: { accessLevel: "full" } })).toEqual({ reply: "Thanks.", handBack: "wellington", leftForNow: ["accessLevel"], facts: {}, values: { accessLevel: "full" } });
     expect([readVioletAnswer({ reply: " " }), readVioletAnswer(null), readVioletAnswer("x")]).toEqual([null, null, null]);
     expect(readVioletAnswer({ reply: "Hi.", handBack: "phoebe" })?.handBack).toBe("none");
   });
@@ -198,7 +198,7 @@ describe("her files ship, with her settings", () => {
   });
   it("her instructions name both labels, each field and each place, and restate none of the 21 rules", () => {
     const prompt = read("./agents/violet/prompt.md");
-    for (const word of ["`values`", "`leftForNow`", '"default"', '"assumed"', "Agent Commons", "MCP", "free site", "paid site"]) expect(prompt).toContain(word);
+    for (const word of ["`facts`", "`values`", "`leftForNow`", "not covered yet", "use the water at home", '"default"', '"assumed"', "Agent Commons", "MCP", "free site", "paid site"]) expect(prompt).toContain(word);
     expect(prompt).not.toMatch(/own words|one question at a time|do not know|what you filled in/);
   });
 });

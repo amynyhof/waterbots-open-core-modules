@@ -22,6 +22,7 @@ import { RangeMessage, useRangedNumber } from "@waterbots/core/rangedNumber";
 import { exportNoteLines, notesAt, personNoteLines, RowNote, ValueNotesProvider, type NoteLine } from "@waterbots/core/notes";
 import { refuseD3, type D3NumberKey } from "../ranges.js";
 import { violetAgentNoteLines } from "../exportNotes.js";
+import { d3StopMessage } from "../supply.js";
 import { AWAITING, D3_STATUS, type D3Input, type D3Option, type D3Result, type D3Slider, type D3Value, type D3ValueKey, type D3View } from "../d3/types.js";
 import D3Report from "./D3Report.js";
 import { useD3State, type D3State } from "./useD3State.js";
@@ -346,7 +347,7 @@ export default function D3Screen({
           ...(onChange !== undefined ? { onChange } : {}),
         },
   );
-  const { project, input, result, error, readOnly, refusals, update, choose, switchView } = givenState ?? own;
+  const { project, input, result, error, readOnly, refusals, stop, update, choose, switchView } = givenState ?? own;
   const notesKind = notesAt(place);
   const [notes, setNotes] = useState<ValueNotes>(() => givenNotes ?? record?.agents.violet?.notes ?? {});
   const [printAt, setPrintAt] = useState<string | null>(null);
@@ -378,6 +379,16 @@ export default function D3Screen({
   function exportReport() {
     if (onExport) onExport();
     else setPrintAt(new Date().toISOString());
+  }
+
+  // A PROJECT D-3 DOES NOT COUNT: no figure and nothing to fill in, as on Calvin's screen (ruled 2026-11-24).
+  if (stop !== null) {
+    return (
+      <section className="violet-d3" data-place={place} data-stopped={stop.because} aria-label="Water benefit, VWBA 2.0 D-3">
+        <h2>Water provided (VWBA 2.0, D-3)</h2>
+        <p data-record-ask="" role="status">{d3StopMessage(stop)}</p>
+      </section>
+    );
   }
 
   const options: D3Option[] = input.view === "ex-post" ? ["metered", "capacity", "beneficiaries"] : ["capacity", "beneficiaries"];

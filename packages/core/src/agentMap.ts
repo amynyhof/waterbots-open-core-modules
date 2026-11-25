@@ -14,7 +14,7 @@
 import type { StandardId } from "./standards.js";
 import type { Door, Place } from "./places.js";
 // The ".js" lets the built file load in plain Node, such as a host serving an agent's tool through MCP.
-import { type AgentId, type ProjectFacts, type ProjectRecord, type Reading, type WaterSupply, AGENTS, emptyRecord, recordWaterSupply } from "./record.js";
+import { type AgentId, type ProjectFacts, type ProjectRecord, type Reading, type WaterSupply, AGENTS, emptyRecord, needsHomeUse, recordWaterSupply } from "./record.js";
 
 /** The map's version. A record notes the version it was last mapped with. */
 export const AGENT_MAP_VERSION = 2 as const;
@@ -134,6 +134,8 @@ export const FACT_RULES: readonly FactRule[] = [
 /** The facts Wellington gathers before the eligibility agent reads the pathways. */
 export const BASIC_FACTS = ["technology", "country"] as const;
 export type BasicFact = (typeof BASIC_FACTS)[number];
+/** A fact Wellington may be asked to gather: a basic fact, or the one thing a pathway in play still needs. */
+export type GatheredFact = BasicFact | "homeUse";
 
 function missingBasicFacts(record: ProjectRecord): BasicFact[] {
   return BASIC_FACTS.filter((f) => (f === "technology" ? record.facts.technology === undefined : record.place.country === undefined));
@@ -231,7 +233,7 @@ export type NextStep =
   | { step: "answer questions"; doors: Door[] }
   | { step: "choose an agent" }
   | { step: "work alone"; agent: AgentId }
-  | { step: "gather facts"; facts: BasicFact[] }
+  | { step: "gather facts"; facts: GatheredFact[] }
   | { step: "call"; agent: AgentId }
   | { step: "point to the WaterBots team" }
   | { step: "report or sign-up" };
@@ -408,6 +410,9 @@ function site(input: MapInput, place: "free-site" | "paid-site"): AgentMap {
   });
 
   const isCalled = (a: AgentId): boolean => agents.some((c) => c.agent === a && c.called);
+  // A NEW OR ALTERNATIVE SUPPLY IS ASKED FIRST whether people use the water at home (ruled 2026-11-24). Asked once the water
+  // pathway is in play, so nobody is asked for nothing.
+  const askHomeUse = here("violet") && needsHomeUse(record.facts) && pathways.some((p) => p.pathway === "vwba" && p.inPlay);
   const nextAgent = (["bridget", "calvin", "violet"] as const).find((a) => isCalled(a) && record.agents[a]?.done !== true);
   const next: NextStep =
     missing.length > 0
@@ -416,9 +421,11 @@ function site(input: MapInput, place: "free-site" | "paid-site"): AgentMap {
         ? { step: "call", agent: "phoebe" }
         : noPathwayForward
           ? { step: "point to the WaterBots team" }
-          : nextAgent !== undefined
-            ? { step: "call", agent: nextAgent }
-            : { step: "report or sign-up" };
+          : askHomeUse
+            ? { step: "gather facts", facts: ["homeUse"] }
+            : nextAgent !== undefined
+              ? { step: "call", agent: nextAgent }
+              : { step: "report or sign-up" };
 
   return { mapVersion: AGENT_MAP_VERSION, place, agents, steps, pathways, tellVisitor, next };
 }

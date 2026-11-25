@@ -13,8 +13,9 @@
  *
  * THE WATER PATHWAY HAS ITS OWN ANSWER (ruled by the maintainer on 2026-11-24). The code is what the carbon method
  * reads. Each label also says whether Violet's D-3 counts it: a supply that gives people water at home or in a
- * community is covered, and treatment is not covered yet. So a new or alternative water supply is covered for water
- * and has no code.
+ * community is covered, and treatment is not covered yet. A new or alternative water supply could be for homes, for
+ * reuse or for fields, so it is covered only where people use the water at home, and that is asked first. It has no
+ * code.
  *
  * The labels come from the open site's list, carried on 2026-11-23, and from the site walk of 2026-11-21.
  */
@@ -34,7 +35,7 @@ export interface TechnologyLabel {
   /** Where the label comes from, and why it gets this code, or none. */
   why: string;
   /** Whether Violet's D-3 counts it (VWBA 2.0). Apart from the code, which the carbon method reads. */
-  water: Exclude<Coverage, "not known">;
+  water: Exclude<WaterCoverage, "not known">;
   /** Why, with the source. */
   whyWater: string;
 }
@@ -45,6 +46,13 @@ const WAITS = "Not covered yet: it gets no code until the experts answer (ruled 
 const SUPPLY = {
   water: "covered",
   whyWater: "The guidebook lists it for D-3 (VWBA 2.0, Appendix C, Table C-1, pp.37 to 39; Appendix D, D-3, pp.44 to 46). Ruled 2026-11-24.",
+} as const;
+/** A supply that could be for homes, for reuse or for fields. */
+const HOME_USE = {
+  water: "covered for home use",
+  whyWater:
+    "The guidebook lists new water supply for domestic use for D-3 (VWBA 2.0, Appendix C, Table C-1, pp.37 to 39). The " +
+    "label could also be reuse or irrigation, so home use is asked first. Ruled 2026-11-24.",
 } as const;
 /** Treatment. */
 const TREATMENT = {
@@ -96,7 +104,7 @@ export const TECHNOLOGY_LABELS: readonly TechnologyLabel[] = [
   {
     label: "New or alternative water supply",
     why: `The open site's project type C-11, which a new well can be logged as. ${WAITS}`,
-    ...SUPPLY,
+    ...HOME_USE,
   },
   {
     label: "A new water source a community collects from",
@@ -134,8 +142,11 @@ export function technologyCoverage(label: string): Coverage {
   return t.code === undefined ? "not covered yet" : "covered";
 }
 
+/** A label's answer for the water pathway. "covered for home use": only where people use the water at home. */
+export type WaterCoverage = Coverage | "covered for home use";
+
 /** Whether Violet's D-3 counts a project with this label. It says nothing about the carbon method. */
-export function waterCoverage(label: string): Coverage {
+export function waterCoverage(label: string): WaterCoverage {
   return find(label)?.water ?? "not known";
 }
 

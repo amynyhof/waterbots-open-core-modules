@@ -65,7 +65,6 @@ test.each(WAITING)("%s: a code handed in, or saved before the rule, is still not
   const saved = emptyRecord();
   saved.facts.technology = { label, code: "CWS", source: { by: "site intake", note: "made up" } };
   expect(recordTechnology(saved)).toBeUndefined();
-  // The code never points the project to carbon. Whether water is in play comes from the label alone.
-  const map = agentMap({ place: "free-site", record: saved });
-  expect(map.pathways.filter((p) => p.inPlay).map((p) => p.pathway)).toEqual(label === "New or alternative water supply" ? ["vwba"] : []);
+  // The code points the project to no pathway. `waterSupply.test.ts` holds what the label says about water.
+  expect(agentMap({ place: "free-site", record: saved }).pathways.every((p) => !p.inPlay)).toBe(true);
 });
