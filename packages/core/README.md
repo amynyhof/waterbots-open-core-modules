@@ -23,7 +23,8 @@ What is in `src/`:
   is typed, and puts the value in force back as it was. Not part of the seed.
 - `technologyLabels.ts`: the one list that turns each site's technology label into the record's code. A label that is
   not covered yet has no code: community level treatment, institutional treatment, and a new or alternative water
-  supply. Not part of the seed.
+  supply. It also holds what a visitor reads when no calculator covers a project: `NO_CALCULATOR_YET` for another kind of
+  project, and `SAVED_WATER_FIGURE_STAYS` for a saved treatment project with a water figure. Not part of the seed.
 - `places.ts`: the four doors of agent rule 21, and the lobby chat, which is not a door. Not part of the seed.
 - `agentMap.ts`: the agent map (J4). It reads the record and the place, and says which agents are called, which method applies and the one next step. It gives codes, never words, and does no sums. Violet is called only for the kinds of project that give people water (`recordWaterSupply`); for treatment the reason is "not covered yet", and for the rest "another kind of project". The pathway then stays in play with no calculator agent, and `noMethod` says why. Not part of the seed.
 - `chat.ts`: what a calculator agent's chat shares (J5): the one question to ask, the values left at their default or their

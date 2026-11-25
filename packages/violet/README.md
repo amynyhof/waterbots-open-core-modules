@@ -30,7 +30,7 @@ VWBA is a way to count the water a project gives back.
 The water and carbon calculators sit side by side. They are never added together. Whether one project may claim
 both is an open question (N14 in `BUILD_PLAN.md`).
 
-## Changes in 0.7.0 (not released yet)
+## Changes in 0.7.0
 
 Violet accepts any `@waterbots/core` in the 0.3 series, so she can be released on her own.
 

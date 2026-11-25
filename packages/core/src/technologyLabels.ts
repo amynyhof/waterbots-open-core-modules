@@ -159,3 +159,10 @@ export function technologyOfClass(classId: TechnologyClass): TechnologyLabel {
 export function notCoveredYet(label: string): string {
   return `“${label}” is not covered yet.`;
 }
+
+/** What a visitor reads for another kind of project, one no calculator here covers (the maintainer's words, 2026-11-25). */
+export const NO_CALCULATOR_YET =
+  "We do not have a calculator for this kind of project yet. To ask for it to be added, contact WaterBots at hello@waterbots.ai.";
+
+/** What a visitor reads on a saved treatment project that holds a water figure Violet no longer works out. */
+export const SAVED_WATER_FIGURE_STAYS = `Your saved water figure stays on your record. ${NO_CALCULATOR_YET}`;

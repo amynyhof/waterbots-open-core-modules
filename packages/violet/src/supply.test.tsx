@@ -2,6 +2,7 @@
 import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { addGivenFacts, emptyRecord, recordWaterSupply, type ProjectRecord } from "@waterbots/core/record";
+import { NO_CALCULATOR_YET } from "@waterbots/core/technologyLabels";
 import { addVioletAnswer, fillViolet, readVioletAnswer, violetAsks, violetChatContext, violetPageContext } from "./agent/chat.js";
 import { computeD3Tool, parseD3Input } from "./agent/tools.js";
 import { computeD3 } from "./d3/compute.js";
@@ -120,10 +121,21 @@ describe("her screen", () => {
     expect(state.kept).toEqual([]);
     expect(state.fill({ accessLevel: "limited" })).toMatchObject({ filled: [], refused: [] });
   });
-  it("home use not given, or no: no figure", () => {
+  // Switched off: another kind of project now gets the maintainer's own sentence (2026-11-25). The check after it has it.
+  it.skip("home use not given, or no: no figure", () => {
     for (const kind of [{ technology: "C-11" }, { technology: "C-11", homeUse: "no" }] as const) {
       const { html } = mount({ place: "agent-commons", record: record(kind) });
       expect(html).toContain("can&#x27;t run for this project yet.");
+      expect(html).not.toContain("8,760");
+    }
+  });
+  it("home use not given, or no: no figure, each with its own words", () => {
+    for (const [kind, words] of [
+      [{ technology: "C-11" }, "can&#x27;t run for this project yet."],
+      [{ technology: "C-11", homeUse: "no" }, NO_CALCULATOR_YET],
+    ] as const) {
+      const { html } = mount({ place: "agent-commons", record: record(kind) });
+      expect(html).toContain(words);
       expect(html).not.toContain("8,760");
     }
   });
@@ -141,4 +153,5 @@ it("every kind of project is on core's list, and the stop is core's answer", () 
   }
   expect(d3Stop({})).toBeNull();
   expect(d3StopMessage({ because: "not covered yet", label: null })).toBe("The calculator can't run for this project yet.");
+  expect(d3StopMessage({ because: "another kind of project" })).toBe(NO_CALCULATOR_YET);
 });

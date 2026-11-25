@@ -86,7 +86,7 @@ A site tells the screens where Calvin is working with `place` (`"free-site"`, `"
 The build bundles the entry into one file, `dist/agent.js`. `@waterbots/core` stays outside it.
 `scripts/check-screen-entry.mjs` loads it from the packed files and runs his tool there.
 
-## Changes in 0.7.0 (not released yet)
+## Changes in 0.7.0
 
 Calvin accepts any `@waterbots/core` in the 0.3 series, so he can be released on his own.
 

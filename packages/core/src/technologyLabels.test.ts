@@ -2,7 +2,7 @@
 import { expect, test } from "vitest";
 import { agentMap } from "./agentMap";
 import { addGivenFacts, emptyRecord, recordTechnology } from "./record";
-import { TECHNOLOGY_CLASSES, TECHNOLOGY_LABELS, notCoveredYet, technologyCode, technologyCoverage, technologyOfClass } from "./technologyLabels";
+import { NO_CALCULATOR_YET, SAVED_WATER_FIGURE_STAYS, TECHNOLOGY_CLASSES, TECHNOLOGY_LABELS, notCoveredYet, technologyCode, technologyCoverage, technologyOfClass } from "./technologyLabels";
 
 // SWITCHED OFF 2026-11-24, never deleted: the maintainer ruled on 2026-11-23 that community level treatment is not
 // counted until the experts answer. The tests after it hold the new rule.
@@ -36,6 +36,11 @@ test.each(WAITING)("%s gets no technology code, and is not covered yet", (label)
 test("a label with a code is covered, and one the list does not know is neither", () => {
   expect(technologyCoverage("Community water supply technologies")).toBe("covered");
   expect(technologyCoverage("A label nobody has sent yet")).toBe("not known");
+});
+
+test("the maintainer's words for a project no calculator covers, and for a saved treatment project", () => {
+  expect(NO_CALCULATOR_YET).toBe("We do not have a calculator for this kind of project yet. To ask for it to be added, contact WaterBots at hello@waterbots.ai.");
+  expect(SAVED_WATER_FIGURE_STAYS).toBe("Your saved water figure stays on your record. We do not have a calculator for this kind of project yet. To ask for it to be added, contact WaterBots at hello@waterbots.ai.");
 });
 
 test("the open site's four class names, word for word, each with its class", () => {

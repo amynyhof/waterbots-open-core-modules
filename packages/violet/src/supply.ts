@@ -2,7 +2,7 @@
 // the agent map calls her by, so she refuses the same projects at every door (ruled by the maintainer on 2026-11-24).
 
 import { HOME_USES, NEW_SUPPLY_TYPE, needsHomeUse, recordWaterSupply, technologyOfFacts, waterNotCovered, type GivenFacts, type HomeUse, type ProjectFacts } from "@waterbots/core/record";
-import { TECHNOLOGY_CLASSES, notCoveredYet, technologyOfClass } from "@waterbots/core/technologyLabels";
+import { NO_CALCULATOR_YET, TECHNOLOGY_CLASSES, notCoveredYet, technologyOfClass } from "@waterbots/core/technologyLabels";
 
 /** The kinds of project her tool and her chat name: the four drinking-water classes, and a new or alternative supply. */
 export const D3_TECHNOLOGIES = [...TECHNOLOGY_CLASSES, NEW_SUPPLY_TYPE] as const;
@@ -44,8 +44,9 @@ export function d3Stop(facts: ProjectFacts): D3Stop | null {
   return needsHomeUse(facts) ? { because: "home use not given" } : null;
 }
 
-/** What her screen says then. Both sentences are ones Calvin's screen already shows. */
+/** What her screen says then. The words for another kind of project are core's; the rest are ones Calvin's screen shows. */
 export function d3StopMessage(stop: D3Stop): string {
+  if (stop.because === "another kind of project") return NO_CALCULATOR_YET;
   const words = "The calculator can't run for this project yet.";
   return stop.because === "not covered yet" && stop.label !== null ? `${words} ${notCoveredYet(stop.label)}` : words;
 }
