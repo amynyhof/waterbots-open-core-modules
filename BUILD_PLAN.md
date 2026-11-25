@@ -188,7 +188,7 @@ their tasks, collect what they need, and report back to him. He helps with the n
   - The plan, approved by the maintainer on 2026-11-23, in this order: core, Phoebe, Wellington, Bridget without map
     data, then Bridget's map after the rights check. Each is its own pull request.
   - Step 1, core: the crew list, the checks on a reply, the rest of the open site's facts, Phoebe's rows, and Calvin's and
-    Violet's own files, settings and chats. Done when the next release holds it.
+    Violet's own files, settings and chats. Merged 2026-11-25 (#57). Done when the next release holds it.
   - Waits on: Phoebe's and Bridget's rulings; the rights check on every one of Bridget's data files; a ruling on the
     shared map key.
   - One calculator screen (ruled by the maintainer on 2026-11-23).
