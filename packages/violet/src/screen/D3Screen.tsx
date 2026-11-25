@@ -14,76 +14,19 @@
 //
 // Water only. This screen never shows a carbon figure, and never a total of water and carbon (open item N14).
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
-import { useReadOnlySeat } from "@waterbots/core/readOnly";
+import { useEffect, useState, type ReactNode } from "react";
 import type { ModuleProject } from "@waterbots/core/project";
 import type { Place } from "@waterbots/core/places";
-import { checkEntry, entryMessage, withNote, type ProjectRecord, type ValueNotes } from "@waterbots/core/record";
+import { withNote, type ProjectRecord, type ValueNotes } from "@waterbots/core/record";
 import { RangeMessage, useRangedNumber } from "@waterbots/core/rangedNumber";
 import { exportNoteLines, notesAt, personNoteLines, RowNote, ValueNotesProvider, type NoteLine } from "@waterbots/core/notes";
-import { d3InputFromRecord, violetProjectFromRecord, violetRecordProblems } from "../record.js";
 import { refuseD3, type D3NumberKey } from "../ranges.js";
 import { violetAgentNoteLines } from "../exportNotes.js";
-import { computeD3 } from "../d3/compute.js";
 import { AWAITING, D3_STATUS, type D3Input, type D3Option, type D3Result, type D3Slider, type D3Value, type D3ValueKey, type D3View } from "../d3/types.js";
 import D3Report from "./D3Report.js";
+import { useD3State, type D3State } from "./useD3State.js";
 
-/**
- * A count the record holds and the fact check accepts, or nothing. Zero is an empty field written as a number, not a
- * fact (as in Calvin).
- */
-function accepted(fact: "population.served" | "population.householdSize", n: number | undefined): number | undefined {
-  return n !== undefined && checkEntry(fact, n).ok ? n : undefined;
-}
-
-/** The messages for numbers on the record that the fact check refuses. They are never used (ruled 2026-11-23). */
-export function recordRefusals(project: ModuleProject | undefined, record?: ProjectRecord): string[] {
-  const mode = project?.population?.mode;
-  if (record !== undefined) return violetRecordProblems(record).filter((p) => p.problem !== "zero").map((p) => entryMessage(p.fact, mode));
-  return (["served", "householdSize"] as const).flatMap((k) => {
-    const v = project?.population?.[k];
-    const c = v === undefined || v === 0 ? null : checkEntry(`population.${k}`, v);
-    return c === null || c.ok ? [] : [entryMessage(c.fact, mode)];
-  });
-}
-
-/**
- * People served, from the project record, the way Calvin takes it (0.5.0): only a count above zero counts, with
- * whether it counts people or households, and people per household when the record has them. Nothing is guessed. A
- * number the fact check refuses is left out, and `recordRefusals` gives its message.
- */
-export function recordPopulation(project: ModuleProject | undefined): D3Input["population"] {
-  const pop = project?.population;
-  if (pop === undefined) return undefined;
-  const served = accepted("population.served", pop.served);
-  const householdSize = accepted("population.householdSize", pop.householdSize);
-  const out = {
-    ...(pop.mode !== undefined ? { mode: pop.mode } : {}),
-    ...(served !== undefined ? { served } : {}),
-    ...(householdSize !== undefined ? { householdSize } : {}),
-  };
-  return Object.keys(out).length > 0 ? out : undefined;
-}
-
-/** The record's facts, as the screen's starting input. Facts the record does not hold stay unset: awaited. */
-export function seedD3Input(project: ModuleProject | undefined, view: D3View): D3Input {
-  const input: D3Input = { view, option: view === "ex-post" ? "metered" : "beneficiaries" };
-  const population = recordPopulation(project);
-  if (population !== undefined) input.population = population;
-  return input;
-}
-
-/**
- * The input with people served as the record now gives them (0.5.0). Every other value stays as it is. The record
- * is the one place people served are kept, so a count that leaves the record leaves the input too.
- */
-export function followRecord(input: D3Input, project: ModuleProject | undefined): D3Input {
-  const next = { ...input };
-  const population = recordPopulation(project);
-  if (population === undefined) delete next.population;
-  else next.population = population;
-  return next;
-}
+export { followRecord, recordPopulation, recordRefusals, seedD3Input } from "./recordInput.js";
 
 /**
  * What the record still lacks for a count by people served, in the words Calvin's record check uses. Empty when
@@ -334,6 +277,11 @@ const THIRD_FIGURE: Record<D3Option, D3ValueKey | null> = {
 };
 
 export interface D3ScreenProps {
+  /**
+   * HER STATE, FROM `useD3State` (J5). A site whose chat fills her screen calls the hook itself and passes it here. Then
+   * `project`, `record`, `view`, `lockView` and `onChange` go to the hook. Left out, the screen keeps its own state.
+   */
+  state?: D3State;
   project?: ModuleProject;
   /**
    * THE SHARED PROJECT RECORD (J3). When a site passes it, it takes the place of `project`: the screen opens on people
@@ -372,6 +320,7 @@ export interface D3ScreenProps {
 }
 
 export default function D3Screen({
+  state: givenState,
   project: given,
   record,
   view = "ex-ante",
@@ -385,30 +334,23 @@ export default function D3Screen({
   onExport,
   unpinFigureBlock = false,
 }: D3ScreenProps) {
-  const readOnly = useReadOnlySeat();
-  const project = record !== undefined ? violetProjectFromRecord(record) : given;
-  const [input, setInput] = useState<D3Input>(() => (record !== undefined ? d3InputFromRecord(record, lockView ?? view) : seedD3Input(project, lockView ?? view)));
-  const [error, setError] = useState<string | null>(null);
+  const own = useD3State(
+    givenState !== undefined
+      ? {}
+      : {
+          view,
+          ...(given !== undefined ? { project: given } : {}),
+          ...(record !== undefined ? { record } : {}),
+          ...(lockView !== undefined ? { lockView } : {}),
+          ...(place !== undefined ? { place } : {}),
+          ...(onChange !== undefined ? { onChange } : {}),
+        },
+  );
+  const { project, input, result, error, readOnly, refusals, update, choose, switchView } = givenState ?? own;
   const notesKind = notesAt(place);
   const [notes, setNotes] = useState<ValueNotes>(() => givenNotes ?? record?.agents.violet?.notes ?? {});
   const [printAt, setPrintAt] = useState<string | null>(null);
   const sliders = exAnteSliders ?? place !== "paid-site";
-
-  // PEOPLE SERVED FOLLOW THE RECORD (0.5.0), as in Calvin. When the record's count arrives or changes after the
-  // screen opens, the screen takes it. The record is the one place it is kept: this screen has no box for it.
-  // With the shared record (J3), the access level and the water before the project follow it too, when it holds them.
-  const fromRecord = record !== undefined ? d3InputFromRecord(record, input.view) : undefined;
-  const recordKey = JSON.stringify([recordPopulation(project) ?? null, fromRecord?.accessLevel ?? null, fromRecord?.withoutProjectM3PerYear ?? null]);
-  const lastRecordKey = useRef(recordKey);
-  useEffect(() => {
-    if (lastRecordKey.current === recordKey) return;
-    lastRecordKey.current = recordKey;
-    const next = followRecord(input, project);
-    if (fromRecord?.accessLevel !== undefined) next.accessLevel = fromRecord.accessLevel;
-    if (fromRecord?.withoutProjectM3PerYear !== undefined) next.withoutProjectM3PerYear = fromRecord.withoutProjectM3PerYear;
-    update(next);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [recordKey]);
 
   // THE EXPORT PRINTS HER REPORT ALONE (J5). The page is marked while it prints, so her stylesheet shows only her
   // report, and the mark is taken off after.
@@ -424,32 +366,7 @@ export default function D3Screen({
     window.print();
   }, [printAt]);
 
-  // `update` only keeps an input the engine accepts, so this always succeeds.
-  const result: D3Result = computeD3(input);
-
-  /** Switching view keeps the project facts and clears what belongs to one view: sliders or monitoring data. */
-  function switchView(v: D3View) {
-    const facts = { ...input };
-    delete facts.meteredM3PerYear;
-    delete facts.operatingHoursPerYear;
-    delete facts.daysOfAccessPerYear;
-    delete facts.litresPerPersonPerDay;
-    update({ ...facts, view: v, option: v === "ex-ante" && input.option === "metered" ? "beneficiaries" : input.option });
-  }
-
-  function update(next: D3Input) {
-    try {
-      const r = computeD3(next);
-      setError(null);
-      setInput(next);
-      onChange?.(next, r);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
-    }
-  }
-
   const box = (range: D3NumberKey): BoxProps => ({ range, disabled: readOnly, input, restore: update });
-  const refusals = recordRefusals(project, record);
 
   function setNote(key: string, text: string, label: string) {
     if (readOnly || notesKind !== "person") return;
@@ -535,7 +452,7 @@ export default function D3Screen({
       <Fold name="facts" title="Project facts">
         <div role="group" aria-label="How the volume is worked out">
           {options.map((o) => (
-            <button key={o} type="button" aria-pressed={input.option === o} disabled={readOnly} onClick={() => update({ ...input, option: o })}>
+            <button key={o} type="button" aria-pressed={input.option === o} disabled={readOnly} onClick={() => choose(o)}>
               {OPTION_LABEL[o]}
             </button>
           ))}

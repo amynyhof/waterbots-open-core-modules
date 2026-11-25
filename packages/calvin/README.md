@@ -86,8 +86,18 @@ A site tells the screens where Calvin is working with `place` (`"free-site"`, `"
 The build bundles the entry into one file, `dist/agent.js`. `@waterbots/core` stays outside it.
 `scripts/check-screen-entry.mjs` loads it from the packed files and runs his tool there.
 
-## Changes in the next release
+## Changes in 0.7.0 (not released yet)
 
+Calvin accepts any `@waterbots/core` in the 0.3 series, so he can be released on his own.
+
+- **His chat (J5).** `@waterbots/calvin/agent` gives what a site needs to run it:
+  - `CALVIN_OPENED`, the turn that opens it, so he speaks first; `CALVIN_CHAT`, the model and how long a reply may be.
+  - `calvinAsks`: what is still missing, in order, project facts only. `calvinKept`: the values at their default or their
+    assumed start. Both are also on the seat, as `calc.asks` and `calc.kept`.
+  - `CALVIN_ANSWER_SCHEMA` and `readCalvinAnswer`: the shape of his answer, and its reader. `calc.fill(answer)` fills the
+    seat; a number outside its range is refused with its message. Project facts go to the record (`addCalvinFacts`).
+  - `calvinChatContext`: the block for one turn. It says what to do when his part is done at each place.
+- **His files ship:** `@waterbots/calvin/prompt.md`, `knowledge.md` and `config.yaml`.
 - **Value ranges (ruled 2026-11-23).** A number outside a value's range is refused where it is typed, with a message that
   names the value and the range. It is never used: the value in force goes back to what it was. A number from the
   record or an older save that is outside its range is shown with its message, and no figures show until it is put
@@ -101,7 +111,9 @@ The build bundles the entry into one file, `dist/agent.js`. `@waterbots/core` st
   on the first digit.
 - No sum changed.
 
-**What a site should change.** A site that calls his tools itself passes `technology`.
+**What a site should change.** A site that calls his tools itself passes `technology`. A site with its own chat for him
+puts together core's agent rules, his three files and `calvinChatContext`, makes the call with its own key, and hands the
+answer to `readCalvinAnswer`, the record and `calc.fill`. Messages for refused numbers go in `refused` on the next turn.
 
 ## Changes in 0.6.0
 

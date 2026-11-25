@@ -17,7 +17,7 @@ import type { Door, Place } from "./places.js";
 import { type AgentId, type ProjectFacts, type ProjectRecord, type Reading, AGENTS, emptyRecord, recordTechnology } from "./record.js";
 
 /** The map's version. A record notes the version it was last mapped with. */
-export const AGENT_MAP_VERSION = 1 as const;
+export const AGENT_MAP_VERSION = 2 as const;
 
 /** The four funding pathways, the four standards `core` lists. */
 export const PATHWAYS = ["carbon", "vwba", "wqba", "wash-ba"] as const satisfies readonly StandardId[];
@@ -133,13 +133,19 @@ export interface MapInput {
   opened?: AgentId;
   /** The agents the user has already met. */
   met?: readonly AgentId[];
-  /** Paid site: the project is saved, so the user is familiar and nobody is introduced again. */
+  /**
+   * Paid site: the project is saved, so the user is familiar and nobody is introduced again. The walk is over, so no
+   * agent waits for another: a saved project's calculators stay open.
+   */
   saved?: boolean;
+  /** The agents this site has. One it does not have is never called and nobody waits for it. Left out, all five. */
+  crew?: readonly AgentId[];
 }
 
 /** Why an agent is not called. */
 export type NotCalled =
   | "not at this place"
+  | "waiting for the agent before"
   | "waiting for basic facts"
   | "every pathway has a reading"
   | "no pathway in play yet"
@@ -148,6 +154,23 @@ export type NotCalled =
   | "no pathway forward";
 
 export type AgentCall = { agent: AgentId; called: true; introduce: boolean } | { agent: AgentId; called: false; because: NotCalled };
+
+/** The steps of a project's walk, in order. Calvin and Violet share the last, and neither waits for the other. */
+export const STEPS = [
+  { id: "eligibility", name: "Eligibility", agents: ["phoebe"] },
+  { id: "partners", name: "Partners", agents: ["bridget"] },
+  { id: "quantify", name: "Quantify", agents: ["calvin", "violet"] },
+] as const satisfies readonly { id: string; name: string; agents: readonly AgentId[] }[];
+export type StepId = (typeof STEPS)[number]["id"];
+
+/** One step of this project's walk: its number, how many steps the project has, and the agents who work it. */
+export interface Step {
+  id: StepId;
+  name: string;
+  number: number;
+  of: number;
+  agents: AgentId[];
+}
 
 export interface PathwayPlan {
   pathway: StandardId;
@@ -191,10 +214,17 @@ export interface AgentMap {
   place: Place;
   /** Every agent, in the same order each time, called or not. */
   agents: AgentCall[];
+  /** The steps this project has on this site, in order. Empty where one agent works alone, and in the lobby chat. */
+  steps: Step[];
   pathways: PathwayPlan[];
   tellVisitor: TellVisitor[];
   /** The one next step, for Wellington on the sites, or for the one agent working alone. */
   next: NextStep;
+}
+
+/** An agent's step on this project's walk, or null when it has none (Wellington, who leads them all). */
+export function stepOf(map: AgentMap, agent: AgentId): Step | null {
+  return map.steps.find((x) => x.agents.includes(agent)) ?? null;
 }
 
 // ── The map ──────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -223,6 +253,7 @@ function lobbyChat(input: MapInput): AgentMap {
     mapVersion: AGENT_MAP_VERSION,
     place: "lobby-chat",
     agents: AGENTS.map((a) => (a === "wellington" ? { agent: a, called: true, introduce: !met.includes(a) } : notHere(a))),
+    steps: [],
     pathways: [],
     tellVisitor: [],
     next: { step: "answer questions", doors: [...LOBBY_DOORS] },
@@ -252,6 +283,7 @@ function alone(input: MapInput, place: "agent-commons" | "mcp"): AgentMap {
     place,
     // In the Agent Commons an agent introduces itself; a tool called through MCP does not.
     agents: AGENTS.map((a) => (a === opened ? { agent: a, called: true, introduce: place === "agent-commons" } : notHere(a))),
+    steps: [],
     pathways,
     tellVisitor: [],
     next: opened === undefined ? { step: "choose an agent" } : { step: "work alone", agent: opened },
@@ -298,21 +330,41 @@ function site(input: MapInput, place: "free-site" | "paid-site"): AgentMap {
   const noPathwayForward = everyRead && !anyInPlay;
   const introduce = (a: AgentId): boolean => !(place === "paid-site" && input.saved === true) && !met.includes(a);
 
+  // A LATER AGENT IS CALLED ONLY WHEN THE AGENT BEFORE IT HAS FINISHED (ruled 2026-11-24). Phoebe has finished when every
+  // pathway the site reads has a reading, unless the record says she is still at work. Bridget has finished when the
+  // record says so. On a saved project the walk is over, so nobody waits.
+  const here = (a: AgentId): boolean => input.crew === undefined || input.crew.includes(a);
+  const walking = !(place === "paid-site" && input.saved === true);
+  const phoebeDone = everyRead && record.agents.phoebe?.done !== false;
+  const finished = (a: "phoebe" | "bridget"): boolean => !walking || !here(a) || (a === "phoebe" ? phoebeDone : record.agents.bridget?.done === true);
+
   const call = (agent: AgentId): AgentCall => {
     const yes = (): AgentCall => ({ agent, called: true, introduce: introduce(agent) });
     const no = (because: NotCalled): AgentCall => ({ agent, called: false, because });
     if (agent === "wellington") return yes();
+    if (!here(agent)) return no("not at this place");
     if (agent === "phoebe") {
       if (missing.length > 0) return no("waiting for basic facts");
-      return everyRead ? no("every pathway has a reading") : yes();
+      return everyRead && (!walking || phoebeDone) ? no("every pathway has a reading") : yes();
     }
-    if (noPathwayForward) return no("no pathway forward");
-    if (agent === "bridget") return anyInPlay ? yes() : no("no pathway in play yet");
+    if (noPathwayForward && finished("phoebe")) return no("no pathway forward");
+    if (agent === "bridget") return !anyInPlay ? no("no pathway in play yet") : finished("phoebe") ? yes() : no("waiting for the agent before");
     const own = pathways.filter((p) => p.agent === agent);
-    if (own.some((p) => p.inPlay)) return yes();
+    if (own.some((p) => p.inPlay)) return finished("phoebe") && finished("bridget") ? yes() : no("waiting for the agent before");
     return own.some((p) => p.reading === "unlikely") ? no("pathway unlikely") : no("pathway not in play yet");
   };
   const agents = AGENTS.map(call);
+
+  // THE STEPS THIS PROJECT HAS. A step with nobody to work it is not one of them: a site without the agent, a project with
+  // no pathway forward, or a pathway read as unlikely.
+  const works = (a: AgentId): boolean => {
+    if (!here(a)) return false;
+    if (a === "phoebe") return true;
+    if (noPathwayForward && finished("phoebe")) return false;
+    return a === "bridget" || pathways.some((p) => p.agent === a && p.reading !== "unlikely");
+  };
+  const open = STEPS.map((x) => ({ ...x, agents: x.agents.filter(works) })).filter((x) => x.agents.length > 0);
+  const steps: Step[] = open.map((x, i) => ({ id: x.id, name: x.name, number: i + 1, of: open.length, agents: [...x.agents] }));
 
   const tellVisitor: TellVisitor[] = reads.flatMap((p) => {
     const read = record.pathways[p];
@@ -334,5 +386,5 @@ function site(input: MapInput, place: "free-site" | "paid-site"): AgentMap {
             ? { step: "call", agent: nextAgent }
             : { step: "report or sign-up" };
 
-  return { mapVersion: AGENT_MAP_VERSION, place, agents, pathways, tellVisitor, next };
+  return { mapVersion: AGENT_MAP_VERSION, place, agents, steps, pathways, tellVisitor, next };
 }

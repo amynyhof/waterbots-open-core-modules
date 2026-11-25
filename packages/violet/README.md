@@ -30,14 +30,30 @@ VWBA is a way to count the water a project gives back.
 The water and carbon calculators sit side by side. They are never added together. Whether one project may claim
 both is an open question (N14 in `BUILD_PLAN.md`).
 
-## Changes in the next release
+## Changes in 0.7.0 (not released yet)
 
+Violet accepts any `@waterbots/core` in the 0.3 series, so she can be released on her own.
+
+- **Her chat (J5).** The package gives what a site needs to run it:
+  - `VIOLET_OPENED`, the turn that opens it, so she speaks first; `VIOLET_CHAT`, the model and how long a reply may be.
+  - `violetAsks`: what is still missing, in order, project facts only. `violetKept`: the values at their default or their
+    assumed start.
+  - `VIOLET_ANSWER_SCHEMA` and `readVioletAnswer`: the shape of her answer, and its reader.
+  - `violetChatContext`: the block for one turn. It says what to do when her part is done at each place.
+- **Filling her screen from an answer.** `useD3State` (`@waterbots/violet/screen`) holds her state, as Calvin's hook does.
+  A site calls it, passes it to `D3Screen` as `state`, and calls `state.fill(answer)`: her way of counting, days, litres,
+  flow and hours. A number outside its range is refused with its message. Without it, her screen works as before.
+- **What she can see of her screen:** `state.pageContext()`, or `violetPageContext`.
+- **Her files ship:** `@waterbots/violet/prompt.md`, `knowledge.md` and `config.yaml`.
 - **Value ranges (ruled 2026-11-23).** A number outside a value's range is refused where it is typed, with a message that
   names the value and the range. After the project runs, 400 days gets the message and no figure; before, the sum used
   365. Her tool refuses the same numbers in the same words, and `d3Refusals` lists them for a host. Her engine still holds
   days and hours at a year's end, as a last guard; nothing in this package sends it such a number.
 - **On a phone** her tile stays at the top of the screen. The parts inside a fold have space between them.
 - No sum changed.
+
+**What a site should change.** Install core 0.3 with it. A site that shows her when its own rule says so can read her call on
+core's map instead: she is called once Bridget has finished.
 
 ## Changes in 0.6.0
 

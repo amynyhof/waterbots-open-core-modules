@@ -10,7 +10,9 @@ import { ReadOnlySeat } from "./readOnly";
 const at = "2026-11-23T10:00:00.000Z";
 
 describe("the person's notes live on the record, in the agent's own part", () => {
-  it("sets, changes and removes a note, and leaves the record handed in as it was", () => {
+  // SWITCHED OFF 2026-11-24, never deleted: it expects a note that does not name its writer. A note names its writer now (agreed 2026-11-23).
+  // `core030.test.tsx` holds the new tests.
+  it.skip("sets, changes and removes a note, and leaves the record handed in as it was", () => {
     const r0 = emptyRecord();
     const r1 = setValueNote(r0, "violet", "peopleServed", "  Counted at a site visit.  ", at);
     expect(valueNotes(r1, "violet")).toEqual({ peopleServed: { text: "Counted at a site visit.", changed: at } });
@@ -25,7 +27,9 @@ describe("the person's notes live on the record, in the agent's own part", () =>
     expect(JSON.parse(JSON.stringify(r))).toEqual(r);
   });
 
-  it("withNote changes only the notes it returns", () => {
+  // SWITCHED OFF 2026-11-24, never deleted: it expects a note that does not name its writer. A note names its writer now (agreed 2026-11-23).
+  // `core030.test.tsx` holds the new tests.
+  it.skip("withNote changes only the notes it returns", () => {
     const notes = { a: { text: "x", changed: at } };
     expect(withNote(notes, "b", "y", at)).toEqual({ a: { text: "x", changed: at }, b: { text: "y", changed: at } });
     expect(notes).toEqual({ a: { text: "x", changed: at } });

@@ -16,3 +16,11 @@ What D-3 is, in our own words, with where to look:
 
 The guidebook: Volumetric Water Benefit Accounting 2.0, World Resources Institute, 2025,
 https://doi.org/10.46830/wrigb.23.00112 (CC BY 4.0).
+
+What is at its default or its assumed start, and why:
+
+- The litres per person a day are the method's default, picked by full or limited access
+  (VWBA 2.0, Appendix D, Table D3.3, p.46).
+- With full access the days start at the whole year: assumed (VWBA 2.0, Appendix D, D-3, p.46). Limited access has no
+  starting value, so it is asked.
+- The hours a system runs start at 12 hours a day: assumed, with no source yet.

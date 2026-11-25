@@ -7,9 +7,12 @@
 # a RECORD, not a credential (kept in the pack's evals/ folder). Status is draft so the repo claims
 # nothing the maintainer has not signed. Calvin stays live on the Paid site; status has no runtime effect.
 agent: calvin
-version: 0.7.0 # 2026-11-22 (J3, J9): reads and adds to the shared project record, and his prompt names each needed fact; 0.6.0 2026-10-23 ([#257]): his tool takes a device flow rate and devices per household, asked for only with a flow rate; 0.5.0 required the project facts; 0.4.0 was the shared/paid split
+version: 0.8.0 # 2026-11-24 (J5): his chat and its settings; 0.7.0 2026-11-22 (J3, J9): reads and adds to the shared project record, and his prompt names each needed fact; 0.6.0 2026-10-23 ([#257]): his tool takes a device flow rate and devices per household, asked for only with a flow rate; 0.5.0 required the project facts; 0.4.0 was the shared/paid split
 persona: calvin
 model: claude-sonnet-5
+effort: medium
+max_output_tokens: 16000 # for one answer, the model's own thinking included; it is not the length of the reply
+reply: { sentences: 4, characters: 400 } # agent rule 2: two or three short sentences, and one question
 role_prompt: prompt.md
 base_rules: "@waterbots/core/agent-rules.md" # the foundational agent rules, rules 1 to 21 of AGENT_RULES.md
 knowledge: knowledge.md

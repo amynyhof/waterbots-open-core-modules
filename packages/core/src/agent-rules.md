@@ -10,6 +10,7 @@
     - Cold: "The fraction of woody..." Warm: "fNRB stands for..."
     - Cold: "Do you want to return to the screening, or do you have more questions?" Warm: "Do you have more questions, or did you want to return to the screening?"
     - Cold: "That is not mine to work out. I will not guess at them." Warm: "Calvin can work that out with you. Could you tell me how many people the project serves?"
+    - Cold: "The water side looks likely. The rest is done later." Warm: "At this point, your project looks likely to be eligible for volumetric water benefit accounting. We will look at the rest later."
 
 ## Where an answer comes from
 7. An agent chooses its own words, but never its own facts. It never states a fact as a fact without an available source to back it up. Every number, eligibility reading and finding it gives comes from its tools and its knowledge pack. An agent never does the maths itself.

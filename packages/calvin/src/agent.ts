@@ -16,6 +16,21 @@ export {
 } from "./modules/calvin/agent/record.js";
 export { CALVIN_COMMONS_CHOICES, commonsChoiceFacts, showsCommonsChoices } from "./modules/calvin/agent/commons.js";
 export type { CommonsChoice, CommonsChoiceId } from "./modules/calvin/agent/commons.js";
+export {
+  CALVIN_ANSWER_SCHEMA,
+  CALVIN_ANSWER_VALUES,
+  CALVIN_ASK_KEYS,
+  CALVIN_CHAT,
+  CALVIN_OPENED,
+  calvinAsks,
+  calvinChatContext,
+  calvinKept,
+  calvinKnown,
+  fillCalvin,
+  readCalvinAnswer,
+  setCalvinDone,
+} from "./modules/calvin/agent/chat.js";
+export type { CalvinAnswer, CalvinAnswerValue, CalvinFill, CalvinReply, CalvinTurn } from "./modules/calvin/agent/chat.js";
 export { calculatorPageContext } from "./modules/calvin/agent/pageContext.js";
 export { calvinAgentNoteLines, calvinNoteFacts, calvinNoteText, calvinToolFacts } from "./modules/calvin/agent/exportNotes.js";
 export type { CalvinNoteView } from "./modules/calvin/agent/exportNotes.js";
