@@ -62,7 +62,9 @@ describe("a slider row", () => {
     expect(litres).toContain("More water per person means more credits.");
     expect(litres).toContain("Water Consumption Field Test, up to the 5.50-liter cap (V2.0 SDWS 29, p.65; Annex 2, p.89)");
   });
-  it("shows the cap note, the sensor note and the corrective-action note", () => {
+  // SWITCHED OFF 2026-11-24, never deleted: it expects a number outside its range to be held. Such a number is now refused
+  // (value ranges, ruled 2026-11-23). `valueRanges.test.tsx` holds the new tests.
+  it.skip("shows the cap note, the sensor note and the corrective-action note", () => {
     const s = move(move(seedCalcState(invented("CWS")), "days", 400), "testsPass", 70);
     expect(row(s, "days")).toContain("The credit is capped at 365 d");
     expect(row(s, "days")).toContain("Over 347 days requires an operation sensor (V2.0 SDWS 32; V1.0 SDWS 27).");

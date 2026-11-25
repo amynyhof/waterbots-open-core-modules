@@ -44,6 +44,10 @@ export interface PageContextInput {
    * before. In the Agent Commons and at MCP there is no record: the person gives each fact.
    */
   place?: Place;
+  /** Numbers the screen holds that are outside their range, each with its message: no figures (ruled 2026-11-23). */
+  outOfRange?: string[];
+  /** The project's technology label, when it is not covered yet (ruled 2026-11-23). */
+  notCoveredYet?: string;
   /** Counts on the record that the fact check refuses, such as people served below zero (W1). */
   recordProblems?: Array<Extract<EntryCheck, { ok: false }>>;
 }
@@ -62,9 +66,18 @@ export function calculatorPageContext({
   paaResult,
   waterfall,
   place,
+  outOfRange = [],
+  notCoveredYet,
   recordProblems = [],
 }: PageContextInput): string {
   const withRecord = place === undefined || hasProjectRecord(place);
+  // A TECHNOLOGY THAT IS NOT COVERED YET IS SAID, NOT ASKED FOR AGAIN.
+  if (notCoveredYet !== undefined && missingFacts?.some((f) => f.key === "technology")) {
+    return (
+      `The user is on the GS Safe Water calculator for project "${projectName}". Its technology is "${notCoveredYet}", which is not covered yet: the experts are being asked. ` +
+      "There are NO figures on this screen, and neither tool counts it."
+    );
+  }
   // A MISSING PROJECT FACT IS ASKED FOR, NEVER ASSUMED. Calvin is told which
   // ones, so he can ask the person for each — and told not to fill any of them in himself.
   if (missingFacts && missingFacts.length > 0) {
@@ -77,6 +90,12 @@ export function calculatorPageContext({
       (withRecord
         ? "Once the facts are on the project record, the calculator runs."
         : "There is no project record here: the person gives each fact, and then the calculator runs.")
+    );
+  }
+  if (outOfRange.length > 0) {
+    return (
+      `The user is on the GS Safe Water calculator for project "${projectName}", and it holds a number outside its range, so it shows no result. ` +
+      `${outOfRange.join(" ")} There are NO figures on this screen until it is put right.`
     );
   }
   if (activityAsk) {

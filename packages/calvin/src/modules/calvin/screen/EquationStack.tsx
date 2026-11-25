@@ -1,20 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
 
 import { useReadOnlySeat } from "../../core/readOnly";
 import { RowNote } from "@waterbots/core/notes";
+import { RangeMessage, useRangedNumber } from "@waterbots/core/rangedNumber";
 import {
   PRESETS, DEFAULT_STOVE_ETA, STOVE_SHARE_KEYS, STOVE_CLASS_LABEL, FUEL_SHARE_KEYS, FUEL_LABEL, FUEL_FACTOR_NOTE,
-  presetShares, defaultCharcoalConvention, validDevicesPerPremises, DEVICES_PER_PREMISES_RULE, type CharcoalConvention,
+  presetShares, defaultCharcoalConvention, type CharcoalConvention,
   type LegacyErOutput, type PaaErOutput, type ScenarioResult, type SiteTables,
 } from "../engine";
 import { peopleServed, projectFacts, type CalcState } from "./state";
-import { fmt, fmtExp, parseNumericInput } from "./format";
+import { fmt, fmtExp } from "./format";
 import HelpTip from "./HelpTip";
 import { sdwsRef, citeShort, dafSteps, fnrbTableLabel, FNRB_ORIGIN, type Basis } from "./citations";
 import { creditedValue, shownValue, sliderLabel, sliderSpecs, type SliderKey } from "./exAnte";
 import { enterMonitoring, monitoringSource } from "./monitoring";
+import { METERED, countWords, daysWords, refuseIn } from "./valueRanges";
 
 /*
  * Derivation view — structured by the GS methodology's NATIVE sections (Baseline emissions →
@@ -388,17 +390,21 @@ function VarRow({ label, value, unit, state, tip, baselineSdws, monitor }: { lab
  * `InRowNum` every other row uses is the control now, so the whole derivation reads one way.
  *
  * ⚠ THE BOUNDS DID NOT GO WITH THE TRACK. A slider could not be dragged past its ends; a box can
- * be typed past them, so `min`/`max` are enforced on change instead. An out-of-range entry is
- * CLAMPED rather than refused — refusing silently would leave the box showing a number the engine
- * is not using, which is the blank-but-used defect wearing a different hat.
+ * be typed past them. An out-of-range entry is REFUSED, with a message that gives the range (value
+ * ranges, ruled 2026-11-23; it used to be held at the nearest end). The box goes back to the value
+ * in force when the person leaves it, so it never rests on a number the engine is not using.
  *
  * Tagged ENTERED once somebody types; before that it takes its RESTING tag, which is *default* for
  * most rows and *assumed* for the ones the rulebook gives no value for (C_b is the standing
  * example: its zero is the seat's starting point, not the methodology's).
  */
-function Param({ label, sdwsRef, value, onChange, min, max, step, unit, baseline, tip, changed, baselineSdws, monitor, resting = "default", note }: {
+function Param({ label, sdwsRef, value, onChange, refuse, range, step, unit, baseline, tip, changed, baselineSdws, monitor, resting = "default", note }: {
   label: string; sdwsRef: string; value: number; onChange: (v: number) => void;
-  min: number; max: number; step: number; unit: string; baseline: string; tip?: string; changed: boolean;
+  /** The message when a number is outside the value's range, or null (`valueRanges.ts`). */
+  refuse: (v: number) => string | null;
+  /** The range in words, for the pencil's note. */
+  range: string;
+  step: number; unit: string; baseline: string; tip?: string; changed: boolean;
   /** Set when a project's BASELINE SURVEY is the real source of this value — see `BaselineChip`. */
   baselineSdws?: string;
   /** Set when MONITORING DATA is the real source of this value — see `MonitoringChip`. */
@@ -417,12 +423,12 @@ function Param({ label, sdwsRef, value, onChange, min, max, step, unit, baseline
           <span className="t-mono shrink-0 rounded-sm px-1" style={{ fontSize: 8, letterSpacing: "0.06em", color: "var(--fg-1)", background: "color-mix(in oklab, var(--tide) 12%, transparent)", boxShadow: "inset 0 0 0 1px color-mix(in oklab, var(--tide) 40%, transparent)" }}>{sdwsRef}</span>
           <StateBadge state={changed ? "entered" : resting} tip={tip} mark={rowMark(baselineSdws, monitor)} />
           {/* The pencil removes itself on a read-only seat — see `EditGlyph` ([#97]). */}
-          <EditGlyph title={`Type a value between ${min} and ${max}`} />
+          <EditGlyph title={range} />
           <InRowNum
             value={Number.isFinite(value) ? value : undefined}
-            onChange={(v) => onChange(Math.min(max, Math.max(min, v)))}
+            onChange={onChange}
+            refuse={refuse}
             step={step}
-            min={min}
             width={72}
           />
           {unit ? <span className="t-mono shrink-0 text-fg-4" style={{ fontSize: 10, minWidth: 18 }}>{unit}</span> : null}
@@ -435,34 +441,49 @@ function Param({ label, sdwsRef, value, onChange, min, max, step, unit, baseline
   );
 }
 
+/** The seat a number box edits, so a refused number can put it back as it was. */
+export const CalcEditContext = createContext<{ state: CalcState; patch: (p: Partial<CalcState>) => void } | null>(null);
+
+/** The change that takes the seat back to how it was. */
+export function changesBack(now: CalcState, was: CalcState): Partial<CalcState> {
+  const keys = new Set([...Object.keys(now), ...Object.keys(was)]) as Set<keyof CalcState>;
+  const out: Record<string, unknown> = {};
+  for (const k of keys) if (now[k] !== was[k]) out[k] = was[k];
+  return out as Partial<CalcState>;
+}
+
 /**
  * Compact in-row number input with the rail field's hold/clear semantics (empty is a state,
  * never NaN): required → empty holds the last value; optional → empty clears (onClear). Used
  * for the values that live inside their governing equation row (population, metered volume).
  */
-export function InRowNum({ value, onChange, onClear, optional = false, step = 1, min = 0, width = 90 }: {
+export function InRowNum({ value, onChange, onClear, optional = false, step = 1, min = 0, width = 90, refuse, settle = false, showMessage = true }: {
   value: number | null | undefined; onChange: (v: number) => void; onClear?: () => void;
   optional?: boolean; step?: number; min?: number; width?: number;
+  /** The message when a number is outside the value's range, or null. The refused number is never set. */
+  refuse?: (v: number) => string | null;
+  /** True in a panel that closes once its value is given (`useRangedNumber`). */
+  settle?: boolean;
+  /** False where the row around the box already shows the message. */
+  showMessage?: boolean;
 }) {
   const readOnlySeat = useReadOnlySeat();
-  const asText = (v: number | null | undefined) =>
-    v === null || v === undefined || !Number.isFinite(v) ? "" : String(v);
-  const [raw, setRaw] = useState<string>(() => asText(value));
-  useEffect(() => {
-    const parsed = raw.trim() === "" ? undefined : Number(raw);
-    const finite = value === null || value === undefined || !Number.isFinite(value) ? undefined : value;
-    if (finite !== parsed) setRaw(finite === undefined ? "" : String(finite));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value]);
-  function handle(e: React.ChangeEvent<HTMLInputElement>) {
-    setRaw(e.target.value);
-    const res = parseNumericInput(e.target.value, optional);
-    if (res.action === "set") onChange(res.value);
-    else if (res.action === "clear") onClear?.();
-  }
+  const edit = useContext(CalcEditContext);
+  const box = useRangedNumber<CalcState>({
+    value,
+    onSet: onChange,
+    onClear: optional ? onClear : undefined,
+    refuse,
+    // A refused number puts the seat back as it was when the person came to the box, its "entered" marks included.
+    ...(edit ? { snapshot: () => edit.state, restore: (was: CalcState) => edit.patch(changesBack(edit.state, was)) } : {}),
+    settle,
+  });
   return (
+    <>
     <input
-      type="number" inputMode="decimal" value={raw} min={min} step={step} onChange={handle}
+      type="number" inputMode="decimal" value={box.raw} min={min} step={step}
+      onChange={box.onChange} onFocus={box.onFocus} onBlur={box.onBlur} onKeyDown={box.onKeyDown}
+      aria-invalid={box.message !== null ? true : undefined}
       // `readOnly` rather than `disabled`: the VALUE still has to be legible and selectable —
       // a contributor's whole allowance is reading and exporting, and a disabled number input
       // greys its own text. This blocks the edit without dimming the fact.
@@ -470,6 +491,8 @@ export function InRowNum({ value, onChange, onClear, optional = false, step = 1,
       className="t-mono shrink-0 rounded-sm border border-line bg-card text-right text-fg-1 outline-none focus:border-tide focus:ring-2 focus:ring-tide"
       style={{ fontSize: 11, width, padding: "1px 6px" }}
     />
+    {showMessage ? <RangeMessage message={box.message} /> : null}
+    </>
   );
 }
 
@@ -565,9 +588,6 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
   const [open, setOpen] = useState<Set<string>>(() =>
     new Set([...(state.method === 2 ? ["ef_b", "q_y", "q_pop", "qpw_hh"] : ["ef_b", "q_y"]), ...initialOpen]),
   );
-  // DN_p typed as something the engine refuses (0, negative, a decimal, blank): the box keeps what
-  // was typed, the row says why, and the engine keeps the last value that was allowed.
-  const [dnRefused, setDnRefused] = useState(false);
   const toggle = (id: string) => setOpen((prev) => { const n = new Set(prev); if (n.has(id)) n.delete(id); else n.add(id); return n; });
 
   const basis: Basis = state.version;
@@ -639,7 +659,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
 
   const etaParam = (
     <Param label="η — baseline stove efficiency" sdwsRef={sdwsRef(basis, "eta")} value={etaPct} changed={changed.eta}
-      onChange={(pct) => patch({ etaOverride: pct / 100 })} min={5} max={40} step={1} unit="%"
+      onChange={(pct) => patch({ etaOverride: pct / 100 })} refuse={refuseIn("stoveEfficiency", 100)} range="Type a value more than 0% and no more than 100%" step={1} unit="%"
       baseline={v2 ? "15% (three-stone, V2.0 SDWS 11 p.52)" : "10% (three-stone, V1.0 SDWS 11 p.24)"}
       tip="Weighted stove efficiency — three-stone fire ≈ V1 10% / V2 15%, improved cookstove 30%. From a Water Boiling Test." />
   );
@@ -659,7 +679,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
         state={sliderLabel(state, key)} tip="Set on the anticipated-performance sliders above the equations. This is the value the engine credits." />
     );
   };
-  const mqParam = slider("testsPass") ?? <Param monitor={mon("Mq", "water-quality tests")} label="M_q,y — water-quality modifier" sdwsRef={sdwsRef(basis, "Mq")} value={state.waterQualityFactor} changed={changed.mq} onChange={(v) => patch(enterMonitoring("testsPass", v))} min={0} max={1} step={0.01} unit="" resting="assumed" note={monitoringSource(state, "testsPass")} baseline="1.0 (all samples pass at point of use)" tip="Fraction of water-quality samples that pass at the point of use. 0 = all failing → no credits." />;
+  const mqParam = slider("testsPass") ?? <Param monitor={mon("Mq", "water-quality tests")} label="M_q,y — water-quality modifier" sdwsRef={sdwsRef(basis, "Mq")} value={state.waterQualityFactor} changed={changed.mq} onChange={(v) => patch(enterMonitoring("testsPass", v))} refuse={refuseIn("testsPass")} range="Type a value between 0 and 1" step={0.01} unit="" resting="assumed" note={monitoringSource(state, "testsPass")} baseline="1.0 (all samples pass at point of use)" tip="Fraction of water-quality samples that pass at the point of use. 0 = all failing → no credits." />;
   // C_b ON THE SCREENING VIEW (the maintainer's walk of the open site, 2026-11-16, item 13). V2.0 sets no default for
   // it: SDWS 12 (p.53) leaves it to the activity, from a baseline survey or published sources. So the screening view
   // shows the 0% it uses, locked, and says plainly that 0% is the most generous value. The value is unchanged.
@@ -675,8 +695,8 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
     </div>
   );
   const activityRow = <ActivityRow result={result} state={state} patch={patch} />;
-  const cbParam = screening ? cbScreening : <Param resting="assumed" label="C_b — already-safe share" sdwsRef={sdwsRef(basis, "Cb")} baselineSdws="V2.0 SDWS 12" value={state.cBaseline} changed={changed.cb} onChange={(v) => patch({ cBaseline: v })} min={0} max={1} step={0.01} unit="" baseline="0% — your baseline survey replaces this" tip="Share of end-users already using a safe supply that didn't require boiling. 1 = everyone → no credits. Assumed 0% until your baseline survey (V2.0 SDWS 12) replaces it." />;
-  const xcbParam = <Param monitor={mon("X", "usage survey")} label="X_cleanboil,y — still boiling the safe water" sdwsRef={sdwsRef(basis, "X")} value={state.xCleanboil} changed={changed.xcb} onChange={(v) => patch(enterMonitoring("cleanBoil", v))} min={0} max={1} step={0.01} unit="" resting="assumed" note={monitoringSource(state, "cleanBoil")} baseline="0 (not yet surveyed)" tip="Share of end-users who still boil the project's safe water after it arrives — that boiling still burns fuel. 1 = everyone → no credits." />;
+  const cbParam = screening ? cbScreening : <Param resting="assumed" label="C_b — already-safe share" sdwsRef={sdwsRef(basis, "Cb")} baselineSdws="V2.0 SDWS 12" value={state.cBaseline} changed={changed.cb} onChange={(v) => patch({ cBaseline: v })} refuse={refuseIn("alreadySafe")} range="Type a value between 0 and 1" step={0.01} unit="" baseline="0% — your baseline survey replaces this" tip="Share of end-users already using a safe supply that didn't require boiling. 1 = everyone → no credits. Assumed 0% until your baseline survey (V2.0 SDWS 12) replaces it." />;
+  const xcbParam = <Param monitor={mon("X", "usage survey")} label="X_cleanboil,y — still boiling the safe water" sdwsRef={sdwsRef(basis, "X")} value={state.xCleanboil} changed={changed.xcb} onChange={(v) => patch(enterMonitoring("cleanBoil", v))} refuse={refuseIn("stillBoiling")} range="Type a value between 0 and 1" step={0.01} unit="" resting="assumed" note={monitoringSource(state, "cleanBoil")} baseline="0 (not yet surveyed)" tip="Share of end-users who still boil the project's safe water after it arrives — that boiling still burns fuel. 1 = everyone → no credits." />;
 
   // ── shared quantity inputs (reused by the Method-1 Eq.5 row and the Method-2 Eq.6/7 rows) ──
   // PEOPLE SERVED IS ENTERED NOW AND PROVEN LATER (item 10): monitoring shows how many people really use the
@@ -700,7 +720,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
         <span className="inline-flex min-w-0 flex-wrap items-baseline gap-2">
         <StateBadge state="entered" tip="The figure on the project record. Change it here only to record a surveyed figure for this analysis — an override; the record stays untouched." mark={peopleMark} />
         <EditGlyph title="Enter a surveyed figure to override the record" />
-        <InRowNum value={state.populationCount} onChange={(v) => patch({ populationCount: v })} width={92} />
+        <InRowNum value={state.populationCount} onChange={(v) => patch({ populationCount: v })} refuse={refuseIn("population.served", 1, countWords(state))} width={92} />
         </span>
       </div>
       <div className="t-caption text-fg-4" style={{ fontSize: 10 }}>
@@ -737,7 +757,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
             <span className="inline-flex min-w-0 flex-wrap items-baseline gap-2">
             <StateBadge mark={{ kind: "baseline", sdws: "V2.0 SDWS 30" }} state={state.householdSizeOverride != null ? "entered" : "default"} tip="The cited country average until this project's own surveyed figure is entered here." />
             <EditGlyph title="Enter a surveyed household size to override the country average" />
-            <InRowNum value={state.householdSizeOverride ?? result.householdSizeUsed} onChange={(v) => patch({ householdSizeOverride: v })} onClear={() => patch({ householdSizeOverride: undefined })} optional step={0.01} width={92} />
+            <InRowNum value={state.householdSizeOverride ?? result.householdSizeUsed} onChange={(v) => patch({ householdSizeOverride: v })} refuse={refuseIn("population.householdSize")} onClear={() => patch({ householdSizeOverride: undefined })} optional step={0.01} width={92} />
             </span>
           </div>
           <ProveLater entered={state.householdSizeOverride != null} mark={{ kind: "baseline", sdws: "V2.0 SDWS 30" }} />
@@ -786,7 +806,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
     const sums = Math.abs(sum - 1) < 0.005;
     /** Write one share; the engine only sees the split once all three sum to 1. */
     const setShare = (key: "under5" | "age5_18" | "adult19plus", percent: number) => {
-      const next = { ...shown, [key]: Math.max(0, percent) / 100 };
+      const next = { ...shown, [key]: percent / 100 };
       patch({ ageSharesEntered: next });
     };
     const field = (key: "under5" | "age5_18" | "adult19plus", label: string) => (
@@ -794,7 +814,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
         <span className="t-caption text-fg-4" style={{ fontSize: 10 }}>{label}</span>
         {/* 68px, not 54: a share prints as four characters (two digits, a point, one digit) and the narrower field clipped
             the last glyph on the walk — measured, scrollWidth 55 against a 54px box. */}
-        <InRowNum value={pct(shown[key])} onChange={(v) => setShare(key, v)} step={0.1} width={68} />
+        <InRowNum value={pct(shown[key])} onChange={(v) => setShare(key, v)} refuse={refuseIn("eachShare", 100)} step={0.1} width={68} />
       </span>
     );
     return (
@@ -883,7 +903,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
     const box = (value: number, onChange: (v: number) => void, label: string, aside?: string) => (
       <span className="flex items-baseline gap-1">
         <span className="t-caption text-fg-4" style={{ fontSize: 10 }}>{label}</span>
-        <InRowNum value={pct(value)} onChange={onChange} step={0.1} width={68} />
+        <InRowNum value={pct(value)} onChange={onChange} refuse={refuseIn("eachShare", 100)} step={0.1} width={68} />
         {aside ? <span className="t-mono text-fg-4" style={{ fontSize: 9 }}>{aside}</span> : null}
       </span>
     );
@@ -916,7 +936,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
             {STOVE_SHARE_KEYS.map((k) =>
               <span key={k}>{box(
                 stove[k],
-                (v) => patch({ stoveSharesEntered: { ...stove, [k]: Math.max(0, v) / 100 } }),
+                (v) => patch({ stoveSharesEntered: { ...stove, [k]: v / 100 } }),
                 STOVE_CLASS_LABEL[k],
                 k === "fossil" ? undefined : `η ${fmt(DEFAULT_STOVE_ETA[state.version][k] * 100, 0)}%`,
               )}</span>,
@@ -928,7 +948,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
                 fossil fuel system η, % — manufacturer specification or a Water Boiling Test; the methodology gives no default ({sdwsRef(basis, "eta")})
               </span>
               <StateBadge state={state.fossilStoveEta != null ? "entered" : "assumed"} tip="No default exists for this class (SDWS 11), so the stove shares are not used until it is entered." />
-              <InRowNum value={state.fossilStoveEta != null ? pct(state.fossilStoveEta) : undefined} onChange={(v) => patch({ fossilStoveEta: Math.max(0, v) / 100 })} onClear={() => patch({ fossilStoveEta: undefined })} optional step={1} width={68} />
+              <InRowNum value={state.fossilStoveEta != null ? pct(state.fossilStoveEta) : undefined} onChange={(v) => patch({ fossilStoveEta: v / 100 })} refuse={refuseIn("fossilStoveEfficiency", 100)} onClear={() => patch({ fossilStoveEta: undefined })} optional step={1} width={68} />
             </div>
           ) : null}
           {countryStove && result.baselineMix.stove === "country-default" ? (
@@ -957,7 +977,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
           <ProveLater entered={tagFor(result.baselineMix.fuel) === "entered"} mark={{ kind: "baseline", sdws: "V2.0 SDWS 8" }} />
           <div className="mt-1 flex flex-wrap items-baseline gap-3">
             {FUEL_SHARE_KEYS.map((k) =>
-              <span key={k}>{box(fuel[k], (v) => patch({ fuelSharesEntered: { ...fuel, [k]: Math.max(0, v) / 100 } }), FUEL_LABEL[k])}</span>,
+              <span key={k}>{box(fuel[k], (v) => patch({ fuelSharesEntered: { ...fuel, [k]: v / 100 } }), FUEL_LABEL[k])}</span>,
             )}
           </div>
           {/* THE FACTOR LABELS (rulings 3 and 4, 2026-09-26): a fuel whose factor is not a
@@ -1007,7 +1027,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
   const qpwParam = (
     <>
       {qpwSlider ?? <Param label="QPW_p — litres / person / day" sdwsRef={sdwsRef(basis, "QPW")} value={state.litresPerPersonPerDay} changed={changed.qpw || state.qpwEntered}
-        onChange={(v) => patch({ litresPerPersonPerDay: v, qpwEntered: true })} min={0} max={20} step={0.1} unit="L"
+        onChange={(v) => patch({ litresPerPersonPerDay: v, qpwEntered: true })} refuse={refuseIn("lpcd")} range="Type a value of 0 or more" step={0.1} unit="L"
         // ⚠ ON A TABLE 9 RUN THE SLIDER IS NOT THE CREDITED NUMBER, AND THE CAPTION NOW SAYS SO.
         // The slider sits at the ADULT tier default (4.0) while the engine credits the age-weighted
         // figure — two numbers for one parameter, which is exactly what [#215] was logged for. The
@@ -1031,7 +1051,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
   );
   const doParam = slider("days") ?? (
     <Param label={`${m2 ? "DP" : "DO"} — operational days / yr`} sdwsRef={sdwsRef(basis, m2 ? "DP" : "DO")} value={state.operationalDays} changed={changed.do}
-      onChange={(v) => patch(enterMonitoring("days", v))} min={0} max={365} step={1} unit="d"
+      onChange={(v) => patch(enterMonitoring("days", v))} refuse={refuseIn("daysOfOperation", 1, daysWords(state))} range="Type a value between 0 and 365" step={1} unit="d"
       resting="assumed" note={monitoringSource(state, "days")} baseline="365 (full year)" tip="Days per year the system serves water." />
   );
   // N_p premises input — Method 2 (HWT/IWT) only. ProjectContext-driven: seeded from the record's
@@ -1044,7 +1064,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
         <span className="inline-flex min-w-0 flex-wrap items-baseline gap-2">
         <StateBadge mark={{ kind: "monitoring", sdws: sdwsRef(basis, "Np"), instrument: "sales or distribution records" }} state={state.premises != null || npFromRecord ? "entered" : "calculated"} tip="The households with a treatment device. It comes from the project record — the household count itself, or the people count divided by the household size. Type a figure to record a different count for this analysis." />
         <EditGlyph title="Enter the households served (N_p)" />
-        <InRowNum value={state.premises ?? result.premises} onChange={(v) => patch({ premises: v })} onClear={() => patch({ premises: undefined })} optional width={92} />
+        <InRowNum value={state.premises ?? result.premises} onChange={(v) => patch({ premises: v })} refuse={refuseIn("householdsServed")} onClear={() => patch({ premises: undefined })} optional width={92} />
         </span>
       </div>
       <ProveLater entered={state.premises != null || npFromRecord} mark={{ kind: "monitoring", sdws: sdwsRef(basis, "Np"), instrument: "sales or distribution records" }} />
@@ -1081,7 +1101,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
             : `Nothing entered, so no device limit is assumed — Eq.7's MIN is not evaluated and QPW_hh is HN_p × QPW_p. The figure comes from the manufacturer's specification (${sdwsRef(basis, "qi")}).`}
         />
         <EditGlyph title="Enter the device capacity (q_i)" />
-        <InRowNum value={state.deviceCapacityLPerHour} onChange={(v) => patch({ deviceCapacityLPerHour: v })} onClear={() => patch({ deviceCapacityLPerHour: undefined })} optional width={92} />
+        <InRowNum value={state.deviceCapacityLPerHour} onChange={(v) => patch({ deviceCapacityLPerHour: v })} refuse={refuseIn("deviceFlow")} onClear={() => patch({ deviceCapacityLPerHour: undefined })} optional width={92} />
         </span>
       </div>
       <div className="calvin-row flex items-baseline gap-2">
@@ -1090,7 +1110,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
         <span className="inline-flex min-w-0 flex-wrap items-baseline gap-2">
         <StateBadge mark={{ kind: "monitoring", sdws: sdwsRef(basis, "tp"), instrument: "usage survey" }} state={state.usageHoursPerDay != null ? "entered" : "default"} tip={`Hours a day the device is used (${sdwsRef(basis, "tp")}). Default 5 h (Option 1).`} />
         <EditGlyph title="Enter usage hours (t_p)" />
-        <InRowNum value={state.usageHoursPerDay ?? 5} onChange={(v) => patch({ usageHoursPerDay: v })} onClear={() => patch({ usageHoursPerDay: undefined })} optional width={92} />
+        <InRowNum value={state.usageHoursPerDay ?? 5} onChange={(v) => patch({ usageHoursPerDay: v })} refuse={refuseIn("hoursUsed")} onClear={() => patch({ usageHoursPerDay: undefined })} optional width={92} />
         </span>
       </div>
       <ProveLater entered={state.usageHoursPerDay != null} mark={{ kind: "monitoring", sdws: sdwsRef(basis, "tp"), instrument: "usage survey" }} />
@@ -1109,14 +1129,8 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
             <EditGlyph title="Enter devices per household (DN_p)" />
             <InRowNum
               value={state.devicesPerPremises ?? 1}
-              onChange={(v) => {
-                if (validDevicesPerPremises(v)) {
-                  setDnRefused(false);
-                  patch({ devicesPerPremises: v });
-                } else setDnRefused(true);
-              }}
-              onClear={() => setDnRefused(true)}
-              optional
+              onChange={(v) => patch({ devicesPerPremises: v })}
+              refuse={refuseIn("devicesPerHousehold")}
               min={1}
               width={92}
             />
@@ -1124,11 +1138,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
           </div>
           <ProveLater entered={state.devicesPerPremises != null} mark={{ kind: "monitoring", sdws: sdwsRef(basis, "DN"), instrument: "sales or distribution records" }} />
           <div className="t-caption text-fg-4" style={{ fontSize: 10 }}>
-            {dnRefused
-              ? `${DEVICES_PER_PREMISES_RULE} The calculator keeps ${state.devicesPerPremises ?? 1} until then.`
-              : state.devicesPerPremises != null
-                ? "entered"
-                : "assumed — lowest, safest; enter your own"}
+            {state.devicesPerPremises != null ? "entered" : "assumed — lowest, safest; enter your own"}
           </div>
         </div>
       ) : null}
@@ -1177,7 +1187,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
             U_p (usage rate) is not in Eq.6 under V2.0 — it is applied in Eq.8 (Q_adj), where it is entered.
           </p>
         ) : slider("usage") ?? (
-          <Param monitor={mon("Up", "usage survey")} label="U_p,y — usage rate" sdwsRef={sdwsRef(basis, "Up")} value={state.usageRate} changed={state.usageRateEntered} onChange={(v) => patch(enterMonitoring("usage", v))} min={0} max={1} step={0.01} unit="" resting="assumed" note={monitoringSource(state, "usage")} baseline="1.0 (full use)" tip="Under V1.0, U_p is folded into Eq.6 (Q_pop). Fraction of the time the device is actually used." />
+          <Param monitor={mon("Up", "usage survey")} label="U_p,y — usage rate" sdwsRef={sdwsRef(basis, "Up")} value={state.usageRate} changed={state.usageRateEntered} onChange={(v) => patch(enterMonitoring("usage", v))} refuse={refuseIn("usageRate")} range="Type a value between 0 and 1" step={0.01} unit="" resting="assumed" note={monitoringSource(state, "usage")} baseline="1.0 (full use)" tip="Under V1.0, U_p is folded into Eq.6 (Q_pop). Fraction of the time the device is actually used." />
         )}
         {doParam}
         <LiveRow><span className="text-fg-1">{result.premises != null ? fmt(result.premises, 0) : fmt(result.people, 0)}</span>{v2 ? "" : ` · U_p ${fmt(state.usageRate, 2)}`} · QPW_hh · DP_p <span className="text-fg-1">{fmt(state.operationalDays, 0)}</span> = <span style={{ color: "var(--tide)" }}>{ML(result.Q_pop)}/yr</span></LiveRow>
@@ -1186,6 +1196,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
   );
 
   return (
+    <CalcEditContext.Provider value={{ state, patch }}>
     <section className="rounded-lg border border-line bg-card" style={{ padding: "14px 20px 8px" }}>
       <div className="flex items-baseline justify-between gap-3 pb-1">
         <span className="eyebrow">{v2 ? "PAA v2.0" : "Legacy V1.0"} · derivation</span>
@@ -1283,6 +1294,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
             <InRowNum
               value={fnrbField ?? result.fNRB}
               onChange={(v) => patch(isLegacyV ? { fnrbFiledV1: v } : { fnrbOverride: v })}
+              refuse={refuseIn("fnrb")}
               onClear={() => patch(isLegacyV ? { fnrbFiledV1: null } : { fnrbOverride: null })}
               optional step={0.001} width={80}
             />
@@ -1351,7 +1363,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
               <StateBadge state="entered" tip={state.mode === "ex-post" ? "Metered volume, entered for this project." : "Planned production, entered for this project."} />
             ) : null}
             <EditGlyph title={state.mode === "ex-post" ? "Enter the metered volume" : "Enter the planned production"} />
-            <InRowNum value={state.meteredVolumeL} onChange={(v) => patch({ meteredVolumeL: v })} onClear={() => patch({ meteredVolumeL: null })} optional width={108} />
+            <InRowNum value={state.meteredVolumeL} onChange={(v) => patch({ meteredVolumeL: v })} refuse={refuseIn("waterProduced", 1, state.mode === "ex-post" ? METERED : {})} onClear={() => patch({ meteredVolumeL: null })} optional width={108} />
             <span className="t-mono shrink-0 text-fg-4" style={{ fontSize: 10 }}>L/yr</span>
             </span>
           </div>
@@ -1375,6 +1387,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
         <VarRow label="LE — leakage" value={fmt(result.result.LE, 1)} unit="tCO₂e" state="calculated" tip="Leakage section." />
       </EqRow>
     </section>
+    </CalcEditContext.Provider>
   );
 }
 
@@ -1403,7 +1416,7 @@ function ActivityRow({ result, state, patch }: { result: ScenarioResult; state: 
           tip={entered ? "Entered for this project: the pump's yearly emissions." : "Zero: nothing is burned to run the system."}
         />
         <EditGlyph title="Enter the pump's yearly emissions" />
-        <InRowNum value={entered ? state.activityEmissions : result.result.PE} onChange={(v) => patch({ activityEmissions: v })}
+        <InRowNum value={entered ? state.activityEmissions : result.result.PE} onChange={(v) => patch({ activityEmissions: v })} refuse={refuseIn("pumpEmissions")}
           onClear={() => patch({ activityEmissions: null })} optional step={0.1} width={80} />
         <span className="t-mono shrink-0 text-fg-4" style={{ fontSize: 10 }}>tCO₂e</span>
         </span>
@@ -1495,7 +1508,7 @@ function paaTail(result: ScenarioResult, open: Set<string>, toggle: Toggle, xcbP
         {xcbParam}
         {mqParam}
         {state.method === 2 ? usageSlider ?? (
-          <Param monitor={{ sdws: sdwsRef("paa", "Up"), instrument: "usage survey" }} label="U_p,y — usage rate" sdwsRef={sdwsRef("paa", "Up")} value={state.usageRate} changed={state.usageRateEntered} onChange={(v) => patch(enterMonitoring("usage", v))} min={0} max={1} step={0.01} unit="" resting="assumed" note={monitoringSource(state, "usage")} baseline="1.0 (full use)" tip="Fraction of the time the technology is actually used (Method 2). 0 = never → no credits." />
+          <Param monitor={{ sdws: sdwsRef("paa", "Up"), instrument: "usage survey" }} label="U_p,y — usage rate" sdwsRef={sdwsRef("paa", "Up")} value={state.usageRate} changed={state.usageRateEntered} onChange={(v) => patch(enterMonitoring("usage", v))} refuse={refuseIn("usageRate")} range="Type a value between 0 and 1" step={0.01} unit="" resting="assumed" note={monitoringSource(state, "usage")} baseline="1.0 (full use)" tip="Fraction of the time the technology is actually used (Method 2). 0 = never → no credits." />
         ) : (
           <VarRow label="U_p — usage rate (Method 1)" value="1.0" state="default" tip="Usage rate is fixed at 1.0 for Method 1 (CWS/CWT)." />
         )}

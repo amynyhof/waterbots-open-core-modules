@@ -30,6 +30,15 @@ VWBA is a way to count the water a project gives back.
 The water and carbon calculators sit side by side. They are never added together. Whether one project may claim
 both is an open question (N14 in `BUILD_PLAN.md`).
 
+## Changes in the next release
+
+- **Value ranges (ruled 2026-11-23).** A number outside a value's range is refused where it is typed, with a message that
+  names the value and the range. After the project runs, 400 days gets the message and no figure; before, the sum used
+  365. Her tool refuses the same numbers in the same words, and `d3Refusals` lists them for a host. Her engine still holds
+  days and hours at a year's end, as a last guard; nothing in this package sends it such a number.
+- **On a phone** her tile stays at the top of the screen. The parts inside a fold have space between them.
+- No sum changed.
+
 ## Changes in 0.6.0
 
 From 0.6.0 Calvin and Violet each have their own release. Violet needs `@waterbots/core` 0.2.0.

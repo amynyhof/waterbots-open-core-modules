@@ -7,18 +7,30 @@
  * turned into `other` by guess. `other` is for a project the person says is neither a community water supply nor
  * household water treatment.
  *
- * Still missing: the free site's full list of labels and the paid site's. They arrive as carries; until then the
- * list holds only the labels this repo knows.
+ * NOT COVERED YET (ruled by the maintainer on 2026-11-23). Community level treatment, institutional treatment, and a
+ * new well logged as an alternative water supply get no code until the experts answer. They are known labels, so
+ * nobody is asked to fill in a technology they already gave: the agent says it is not covered yet.
+ *
+ * The labels come from the open site's list, carried on 2026-11-23, and from the site walk of 2026-11-21.
  */
 import type { Technology } from "./project";
+
+/** A drinking-water class, as both sites name the four: its id in the sites' own lists. */
+export const TECHNOLOGY_CLASSES = ["HWT", "IWT", "CWT", "CWS"] as const;
+export type TechnologyClass = (typeof TECHNOLOGY_CLASSES)[number];
 
 export interface TechnologyLabel {
   /** The site's label, word for word. */
   label: string;
-  code: Exclude<Technology, "other">;
-  /** Where the label comes from, and why it gets this code. */
+  /** The record's code. Left out: not covered yet. */
+  code?: Exclude<Technology, "other">;
+  /** The drinking-water class the label names, when it names one. */
+  classId?: TechnologyClass;
+  /** Where the label comes from, and why it gets this code, or none. */
   why: string;
 }
+
+const WAITS = "Not covered yet: it gets no code until the experts answer (ruled 2026-11-23).";
 
 export const TECHNOLOGY_LABELS: readonly TechnologyLabel[] = [
   {
@@ -32,19 +44,71 @@ export const TECHNOLOGY_LABELS: readonly TechnologyLabel[] = [
     why: "The code's own name. The carbon method counts it by Method 2.",
   },
   {
+    label: "Household water treatment technologies",
+    code: "HWT",
+    classId: "HWT",
+    why: "The open site's full class name.",
+  },
+  {
+    label: "Institutional water treatment technologies",
+    classId: "IWT",
+    why: `The open site's full class name. ${WAITS}`,
+  },
+  {
     label: "Community level water treatment technologies",
+    classId: "CWT",
+    why: `The open site's full class name. ${WAITS}`,
+  },
+  {
+    label: "Community water supply technologies",
     code: "CWS",
-    why:
-      "A site's label, from the site walk of 2026-11-21 (W3). Community water treatment counts with community supply " +
-      "under Method 1 (CWS/CWT), as Calvin's tool says.",
+    classId: "CWS",
+    why: "The open site's full class name.",
+  },
+  {
+    label: "New or alternative water supply",
+    why: `The open site's project type C-11, which a new well can be logged as. ${WAITS}`,
+  },
+  {
+    label: "A new water source a community collects from",
+    code: "CWS",
+    why: "The open site's Agent Commons form.",
+  },
+  {
+    label: "Water made safe in the home",
+    code: "HWT",
+    why: "The open site's Agent Commons form.",
   },
 ];
 
 /** Upper or lower case, and runs of spaces, do not matter. */
 const normal = (s: string): string => s.trim().replace(/\s+/g, " ").toLowerCase();
 
-/** The record's code for a site's label, or undefined when the list does not know the label. */
-export function technologyCode(label: string): Exclude<Technology, "other"> | undefined {
+function find(label: string): TechnologyLabel | undefined {
   const wanted = normal(label);
-  return TECHNOLOGY_LABELS.find((t) => normal(t.label) === wanted)?.code;
+  return TECHNOLOGY_LABELS.find((t) => normal(t.label) === wanted);
+}
+
+/** The record's code for a site's label, or undefined when the list does not know the label or does not cover it yet. */
+export function technologyCode(label: string): Exclude<Technology, "other"> | undefined {
+  return find(label)?.code;
+}
+
+/** Whether a label has a code, is known and not covered yet, or is not on the list. */
+export type Coverage = "covered" | "not covered yet" | "not known";
+
+export function technologyCoverage(label: string): Coverage {
+  const t = find(label);
+  if (t === undefined) return "not known";
+  return t.code === undefined ? "not covered yet" : "covered";
+}
+
+/** The label for a drinking-water class's id, so a site that keeps the id can read the list by it. */
+export function technologyOfClass(classId: TechnologyClass): TechnologyLabel {
+  return TECHNOLOGY_LABELS.find((t) => t.classId === classId)!;
+}
+
+/** The words for a technology that is not covered yet. The label is the site's own. */
+export function notCoveredYet(label: string): string {
+  return `“${label}” is not covered yet.`;
 }

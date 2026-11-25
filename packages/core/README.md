@@ -17,7 +17,13 @@ What is in `src/`:
   of the seed.
 - `noteFacts.ts`: the shapes behind those notes, with no React. A calculator tool can return the values a run left
   blank or assumed (`blankOrAssumed`), as facts, for a place with no export (MCP). Not part of the seed.
-- `technologyLabels.ts`: the one list that turns each site's technology label into the record's code. Not part of the seed.
+- `ranges.ts`: the range of each value a person can enter, with one check and one message (ruled 2026-11-23). The record's
+  fact check, the calculator screens and the agents' tools all use it. A method cap is not a range. Not part of the seed.
+- `rangedNumber.tsx`: the typed number box every calculator screen uses. It refuses a number outside its range where it
+  is typed, and puts the value in force back as it was. Not part of the seed.
+- `technologyLabels.ts`: the one list that turns each site's technology label into the record's code. A label that is
+  not covered yet has no code: community level treatment, institutional treatment, and a new or alternative water
+  supply. Not part of the seed.
 - `places.ts`: the four doors of agent rule 21, and the lobby chat, which is not a door. Not part of the seed.
 - `agentMap.ts`: the agent map (J4). It reads the record and the place, and says which agents are called, which method applies and the one next step. It gives codes, never words, and does no sums. Not part of the seed.
 - `agent-rules.md`: the foundational agent rules, rules 1 to 21 of `AGENT_RULES.md` at the root of this repo, word for word. Every agent reads them before its own files. A host reads them as `@waterbots/core/agent-rules.md`. A test keeps them the same as the page. Not part of the seed.
@@ -25,6 +31,6 @@ What is in `src/`:
 
 Since the seed landed, this repo is its home. Changes are made here, by pull request. `scripts/check-seed.mjs` proves what arrived against the commit where the seed landed, so later changes are allowed.
 
-- React is an optional peer. Only `SaveNotice.tsx`, `readOnly.tsx` and `notes.tsx` use it.
+- React is an optional peer. Only `SaveNotice.tsx`, `readOnly.tsx`, `notes.tsx` and `rangedNumber.tsx` use it.
 - Version 0.2.0: it adds the shared project record and its fact check, the label list, the places, the agent map, and notes on values. `base.css` adds `--agent`, the colour of the agent whose screen it is. Nothing is removed. 0.1.2 shipped `agent-rules.md`, the agent rules file. Not published. Nothing in this repo goes to npm yet; the package is marked `private`.
 - Apache License 2.0. See `LICENSE` and `NOTICE` in this folder.

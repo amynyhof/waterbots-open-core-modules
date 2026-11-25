@@ -1,6 +1,7 @@
 "use client";
 
 import type { ScenarioResult } from "../engine";
+import { CalcEditContext } from "./EquationStack";
 import SliderRow from "./SliderRow";
 import { sliderSpecs } from "./exAnte";
 import { fmt } from "./format";
@@ -18,7 +19,8 @@ export default function ExAntePanel({ state, result, patch }: {
   patch: (p: Partial<CalcState>) => void;
 }) {
   return (
-    // IT CAN COLLAPSE (0.5.0). The title row is the toggle, and it keeps the headline in view when closed. It starts open.
+    <CalcEditContext.Provider value={{ state, patch }}>
+    {/* IT CAN COLLAPSE (0.5.0). The title row is the toggle, and it keeps the headline in view when closed. It starts open. */}
     <details open className="calvin-fold rounded-lg border border-line bg-card" style={{ padding: "12px 20px" }} aria-label="Anticipated performance" data-fold="sliders">
       <summary className="calvin-fold-title flex flex-wrap items-baseline gap-x-3 gap-y-1">
         <span className="eyebrow" style={{ fontSize: 11 }}>Anticipated performance</span>
@@ -38,5 +40,6 @@ export default function ExAntePanel({ state, result, patch }: {
         ))}
       </div>
     </details>
+    </CalcEditContext.Provider>
   );
 }

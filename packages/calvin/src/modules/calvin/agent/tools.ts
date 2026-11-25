@@ -9,6 +9,8 @@
  */
 import type { AgentTool } from "../../core/agent";
 import { makeCalculatorTool } from "../../core/calculatorTool";
+import { requireInRange } from "@waterbots/core/ranges";
+import { TECHNOLOGY_CLASSES, notCoveredYet, technologyOfClass, type TechnologyClass } from "@waterbots/core/technologyLabels";
 import {
   DEVICES_PER_PREMISES_RULE,
   GS4GG_CALCULATOR_VERSION,
@@ -30,24 +32,33 @@ type TransitionWaterfall = ReturnType<typeof computeTransitionWaterfall>;
  */
 export { GS4GG_CALCULATOR_VERSION };
 
+/** The baseline presets the tool offers. The institutional one waits with institutional treatment (ruled 2026-11-23). */
+const OFFERED_PRESETS = Object.keys(PRESETS).filter((id) => id !== "institutional-wood-iwt");
+
 /** Minimal JSON Schema for the model — the core inputs plus the common overrides. */
 const SCENARIO_INPUT_SCHEMA: Record<string, unknown> = {
   type: "object",
   additionalProperties: false,
-  required: ["version", "method", "countryIso", "populationMode", "populationCount", "litresPerPersonPerDay", "operationalDays"],
+  required: ["version", "technology", "countryIso", "populationMode", "populationCount", "litresPerPersonPerDay", "operationalDays"],
   properties: {
     version: { type: "string", enum: ["legacy", "paa"], description: "Methodology: legacy = SDWS V1.0; paa = PAA v2.0." },
-    method: { type: "number", enum: [1, 2], description: "A PROJECT FACT, from the project's technology: 1 = CWS/CWT (community supply); 2 = HWT/IWT (household treatment)." },
+    technology: {
+      type: "string",
+      enum: [...TECHNOLOGY_CLASSES],
+      description:
+        "A PROJECT FACT: CWS = a community water supply (a new or restored source); HWT = household water treatment. CWT (community level treatment) and IWT (institutional treatment) are not covered yet: the tool refuses them, so say so and work out nothing.",
+    },
+    method: { type: "number", enum: [1, 2], description: "Leave it out: it follows the technology (CWS is 1, HWT is 2)." },
     mode: { type: "string", enum: ["ex-ante", "ex-post"], description: "Defaults to ex-ante." },
     countryIso: { type: "string", description: "A PROJECT FACT: the project's country, as an ISO code (alpha-2 or alpha-3); drives the fNRB/DAF lookups." },
     populationMode: { type: "string", enum: ["people", "households"], description: "A PROJECT FACT: whether populationCount counts people or households." },
-    populationCount: { type: "number", description: "A PROJECT FACT: people served, or households served (per populationMode)." },
-    litresPerPersonPerDay: { type: "number", description: "Design or measured L/person/day (the engine caps at 5.5)." },
-    operationalDays: { type: "number", description: "Operational days in the year." },
+    populationCount: { type: "number", minimum: 1, description: "A PROJECT FACT: people served, or households served (per populationMode)." },
+    litresPerPersonPerDay: { type: "number", minimum: 0, description: "Design or measured L/person/day (the engine caps at 5.5)." },
+    operationalDays: { type: "number", minimum: 0, maximum: 365, description: "Operational days in the year." },
     meteredVolumeL: { type: ["number", "null"], description: "Metered annual volume (L), if available." },
     deviceCapacityLPerHour: { type: "number", description: "Method 2 only: a device's flow rate in litres per hour, from the manufacturer's specification. Pass it only if the person gives it." },
     devicesPerPremises: { type: "integer", minimum: 1, description: "A PROJECT FACT that matters only when a device flow rate is given: devices per household, a whole number, 1 or more. Left out, the calculator uses 1, the lowest." },
-    preset: { type: "string", enum: Object.keys(PRESETS), description: "Methodology-default baseline preset id (optional)." },
+    preset: { type: "string", enum: OFFERED_PRESETS, description: "Methodology-default baseline preset id (optional)." },
     fnrbOverride: { type: ["number", "null"], description: "PAA fNRB override (fraction 0–1)." },
     fnrbFiledV1: { type: ["number", "null"], description: "Legacy path: the project's filed V1-era fNRB (fraction 0–1)." },
     etaOverride: { type: "number", description: "Override stove efficiency η (fraction)." },
@@ -75,12 +86,18 @@ function parseScenarioInput(raw: unknown): ScenarioInput {
   // PROJECT FACTS ARE REQUIRED, NEVER DEFAULTED: the method (from the
   // technology) and whether the count is people or households join the country and the count. A
   // missing one is refused in words that tell the model to ask, not to guess.
-  if (o.method !== 1 && o.method !== 2) throw new Error("method is a project fact (1 = CWS/CWT, 2 = HWT/IWT, from the project's technology), and it is missing.");
+  const technology = TECHNOLOGY_CLASSES.find((t): t is TechnologyClass => t === o.technology);
+  if (technology === undefined) throw new Error('technology is a project fact ("CWS", a community water supply, or "HWT", household water treatment), and it is missing.');
+  // COMMUNITY LEVEL AND INSTITUTIONAL TREATMENT ARE NOT COUNTED until the experts answer (ruled 2026-11-24).
+  const { code, label } = technologyOfClass(technology);
+  if (code === undefined) throw new Error(notCoveredYet(label));
+  const method = code === "CWS" ? 1 : 2;
+  if (o.method !== undefined && o.method !== method) throw new Error(`method follows the technology: it is ${method} for ${code}. Leave it out.`);
   if (o.populationMode !== "people" && o.populationMode !== "households") throw new Error('populationMode is a project fact ("people" or "households": how people served were counted), and it is missing.');
 
   const input: ScenarioInput = {
     version,
-    method: o.method,
+    method,
     countryIso: countryIso.toUpperCase(),
     populationMode: o.populationMode,
     populationCount: num("populationCount"),
@@ -88,13 +105,22 @@ function parseScenarioInput(raw: unknown): ScenarioInput {
     operationalDays: num("operationalDays"),
   };
 
+  // EVERY NUMBER IN ITS RANGE (ruled 2026-11-23), with the same check and the same words as the screen. A refused number
+  // never reaches the engine.
+  requireInRange("population.served", input.populationCount, o.populationMode === "households" ? { name: "Households served" } : {});
+  requireInRange("lpcd", input.litresPerPersonPerDay);
+  requireInRange("daysOfOperation", input.operationalDays, method === 2 ? { name: "Days the device is in the home" } : {});
+  const optional = [["meteredVolumeL", "waterProduced"], ["deviceCapacityLPerHour", "deviceFlow"], ["fnrbOverride", "fnrb"], ["fnrbFiledV1", "fnrb"], ["etaOverride", "stoveEfficiency"], ["C_b", "alreadySafe"], ["DAF", "daf"]] as const;
+  for (const [field, range] of optional) if (o[field] !== undefined && o[field] !== null) requireInRange(range, o[field]);
+
   // Optional pass-throughs (only when present + well-typed).
   if (o.mode === "ex-ante" || o.mode === "ex-post") input.mode = o.mode;
   if (typeof o.preset === "string") {
     // The tool boundary, not the engine, names the valid ids: an unknown one (including a preset that
     // has been removed) is refused in plain words rather than crashing inside the engine.
+    if (o.preset === "institutional-wood-iwt") throw new Error(notCoveredYet(technologyOfClass("IWT").label));
     if (!Object.prototype.hasOwnProperty.call(PRESETS, o.preset)) {
-      throw new Error(`preset "${o.preset}" is not one of the baseline presets (${Object.keys(PRESETS).join(", ")}). Omit it to use the default, or enter the project's own baseline shares.`);
+      throw new Error(`preset "${o.preset}" is not one of the baseline presets (${OFFERED_PRESETS.join(", ")}). Omit it to use the default, or enter the project's own baseline shares.`);
     }
     input.preset = o.preset as ScenarioInput["preset"];
   }

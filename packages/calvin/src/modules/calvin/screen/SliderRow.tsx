@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-
 import { useReadOnlySeat } from "../../core/readOnly";
 import type { ScenarioResult } from "../engine";
 import { EditGlyph, InfoIcon, InRowNum, ProveLater, StateBadge, type Mark } from "./EquationStack";
@@ -34,7 +32,6 @@ export default function SliderRow({ spec, state, result, patch }: {
   patch: (p: Partial<CalcState>) => void;
 }) {
   const readOnly = useReadOnlySeat();
-  const [refused, setRefused] = useState<string | null>(null);
   const label = sliderLabel(state, spec.key);
   const credited = creditedIfDifferent(state, result, spec);
   const cap = capNote(state, spec);
@@ -44,10 +41,13 @@ export default function SliderRow({ spec, state, result, patch }: {
 
   function change(display: number) {
     const c = applySlider(state, spec, display);
-    if (!c.ok) return setRefused(c.reason);
-    setRefused(null);
-    patch(c.patch);
+    if (c.ok) patch(c.patch);
   }
+  /** The message when a typed number is outside the range. The box shows it where it is typed. */
+  const refuse = (display: number) => {
+    const c = applySlider(state, spec, display);
+    return c.ok ? null : c.reason;
+  };
 
   return (
     <div className="py-2" data-slider={spec.key}>
@@ -62,7 +62,7 @@ export default function SliderRow({ spec, state, result, patch }: {
         </HelpTip>
         <StateBadge state={label} tip={TIP[label]} mark={mark} />
         <EditGlyph title={`Type an exact value, from ${shownValue(spec, spec.floor.value)} to ${shownValue(spec, spec.ceiling.value)}.`} />
-        <InRowNum value={value} onChange={change} step={spec.step} min={0} width={64} />
+        <InRowNum value={value} onChange={change} refuse={refuse} step={spec.step} min={0} width={64} />
         <span className="t-mono shrink-0 text-fg-4" style={{ fontSize: 10, minWidth: 18 }}>{spec.unit}</span>
         </span>
       </div>
@@ -99,7 +99,6 @@ export default function SliderRow({ spec, state, result, patch }: {
       {notes.map((n) => (
         <p key={n} className="t-caption" data-note="" style={{ fontSize: 10, color: "var(--amber)" }}>{n}</p>
       ))}
-      {refused ? <p className="t-caption" role="alert" style={{ fontSize: 10, color: "var(--amber)" }}>{refused}</p> : null}
     </div>
   );
 }

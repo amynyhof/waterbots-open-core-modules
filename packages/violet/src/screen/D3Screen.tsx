@@ -18,28 +18,45 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useReadOnlySeat } from "@waterbots/core/readOnly";
 import type { ModuleProject } from "@waterbots/core/project";
 import type { Place } from "@waterbots/core/places";
-import { withNote, type ProjectRecord, type ValueNotes } from "@waterbots/core/record";
+import { checkEntry, entryMessage, withNote, type ProjectRecord, type ValueNotes } from "@waterbots/core/record";
+import { RangeMessage, useRangedNumber } from "@waterbots/core/rangedNumber";
 import { exportNoteLines, notesAt, personNoteLines, RowNote, ValueNotesProvider, type NoteLine } from "@waterbots/core/notes";
-import { d3InputFromRecord, violetProjectFromRecord } from "../record.js";
+import { d3InputFromRecord, violetProjectFromRecord, violetRecordProblems } from "../record.js";
+import { refuseD3, type D3NumberKey } from "../ranges.js";
 import { violetAgentNoteLines } from "../exportNotes.js";
 import { computeD3 } from "../d3/compute.js";
 import { AWAITING, D3_STATUS, type D3Input, type D3Option, type D3Result, type D3Slider, type D3Value, type D3ValueKey, type D3View } from "../d3/types.js";
 import D3Report from "./D3Report.js";
 
-/** A count the record holds, or nothing. Zero is an empty field written as a number, not a fact (as in Calvin). */
-function positive(n: number | undefined): number | undefined {
-  return typeof n === "number" && n > 0 ? n : undefined;
+/**
+ * A count the record holds and the fact check accepts, or nothing. Zero is an empty field written as a number, not a
+ * fact (as in Calvin).
+ */
+function accepted(fact: "population.served" | "population.householdSize", n: number | undefined): number | undefined {
+  return n !== undefined && checkEntry(fact, n).ok ? n : undefined;
+}
+
+/** The messages for numbers on the record that the fact check refuses. They are never used (ruled 2026-11-23). */
+export function recordRefusals(project: ModuleProject | undefined, record?: ProjectRecord): string[] {
+  const mode = project?.population?.mode;
+  if (record !== undefined) return violetRecordProblems(record).filter((p) => p.problem !== "zero").map((p) => entryMessage(p.fact, mode));
+  return (["served", "householdSize"] as const).flatMap((k) => {
+    const v = project?.population?.[k];
+    const c = v === undefined || v === 0 ? null : checkEntry(`population.${k}`, v);
+    return c === null || c.ok ? [] : [entryMessage(c.fact, mode)];
+  });
 }
 
 /**
  * People served, from the project record, the way Calvin takes it (0.5.0): only a count above zero counts, with
- * whether it counts people or households, and people per household when the record has them. Nothing is guessed.
+ * whether it counts people or households, and people per household when the record has them. Nothing is guessed. A
+ * number the fact check refuses is left out, and `recordRefusals` gives its message.
  */
 export function recordPopulation(project: ModuleProject | undefined): D3Input["population"] {
   const pop = project?.population;
   if (pop === undefined) return undefined;
-  const served = positive(pop.served);
-  const householdSize = positive(pop.householdSize);
+  const served = accepted("population.served", pop.served);
+  const householdSize = accepted("population.householdSize", pop.householdSize);
   const out = {
     ...(pop.mode !== undefined ? { mode: pop.mode } : {}),
     ...(served !== undefined ? { served } : {}),
@@ -142,7 +159,22 @@ function ValueRow({ v, notes }: { v: D3Value; notes: boolean }) {
   );
 }
 
-function SliderRow({ s, disabled, set }: { s: D3Slider; disabled: boolean; set: (n: number) => void }) {
+/** What a number box needs of the screen: her input, and a way to put it back as it was. */
+interface BoxProps {
+  range: D3NumberKey;
+  disabled: boolean;
+  input: D3Input;
+  restore: (was: D3Input) => void;
+}
+
+/** A box that refuses a number outside its range, with the message under it (value ranges, ruled 2026-11-23). */
+function useBox({ range, input, restore }: BoxProps, value: number | null | undefined, set: (n: number) => void, clear?: () => void) {
+  return useRangedNumber<D3Input>({ value, onSet: set, onClear: clear, refuse: (v) => refuseD3(range, v), snapshot: () => input, restore });
+}
+
+function SliderRow({ s, set, ...box }: { s: D3Slider; set: (n: number) => void } & BoxProps) {
+  const { disabled } = box;
+  const b = useBox(box, s.start, set);
   return (
     <div data-slider={s.key}>
       <label>
@@ -164,10 +196,15 @@ function SliderRow({ s, disabled, set }: { s: D3Slider; disabled: boolean; set: 
         title={`Type an exact value, from ${s.floor} to ${s.ceiling}.`}
         min={s.floor}
         max={s.ceiling}
-        value={s.start ?? ""}
+        value={b.raw}
         disabled={disabled}
-        onChange={(e) => e.target.value !== "" && set(Number(e.target.value))}
+        aria-invalid={b.message !== null ? true : undefined}
+        onChange={b.onChange}
+        onFocus={b.onFocus}
+        onBlur={b.onBlur}
+        onKeyDown={b.onKeyDown}
       />
+      <RangeMessage message={b.message} />
       <small>
         From {s.floor} ({s.floorSource}) to {s.ceiling} ({s.ceilingSource}). Starts at: {s.startSource}.
       </small>
@@ -180,7 +217,9 @@ function SliderRow({ s, disabled, set }: { s: D3Slider; disabled: boolean; set: 
  * anticipated value is a typed box with its tag. Before anything is typed it shows the assumed value the engine
  * uses, tagged "assumed"; typing sets it.
  */
-function SliderAsBox({ s, entered, disabled, set }: { s: D3Slider; entered: boolean; disabled: boolean; set: (n: number | undefined) => void }) {
+function SliderAsBox({ s, entered, set, ...box }: { s: D3Slider; entered: boolean; set: (n: number | undefined) => void } & BoxProps) {
+  const { disabled } = box;
+  const b = useBox(box, s.start, set, () => set(undefined));
   return (
     <div data-slider-box={s.key}>
       <label>
@@ -190,12 +229,17 @@ function SliderAsBox({ s, entered, disabled, set }: { s: D3Slider; entered: bool
           aria-label={`${s.label}, exact value`}
           min={s.floor}
           max={s.ceiling}
-          value={s.start ?? ""}
+          value={b.raw}
           disabled={disabled}
-          onChange={(e) => set(e.target.value === "" ? undefined : Number(e.target.value))}
+          aria-invalid={b.message !== null ? true : undefined}
+          onChange={b.onChange}
+          onFocus={b.onFocus}
+          onBlur={b.onBlur}
+          onKeyDown={b.onKeyDown}
         />
         <span data-unit="">{s.unit}</span>
       </label>
+      <RangeMessage message={b.message} />
       <small>
         From {s.floor} ({s.floorSource}) to {s.ceiling} ({s.ceilingSource}). Starts at: {s.startSource}.
       </small>
@@ -203,17 +247,24 @@ function SliderAsBox({ s, entered, disabled, set }: { s: D3Slider; entered: bool
   );
 }
 
-function NumberBox({ label, value, disabled, set }: { label: string; value: number | undefined; disabled: boolean; set: (n: number | undefined) => void }) {
+function NumberBox({ label, value, set, ...box }: { label: string; value: number | undefined; set: (n: number | undefined) => void } & BoxProps) {
+  const { disabled } = box;
+  const b = useBox(box, value, set, () => set(undefined));
   return (
     <label>
       {label}
       <input
         type="number"
         min={0}
-        value={value ?? ""}
+        value={b.raw}
         disabled={disabled}
-        onChange={(e) => set(e.target.value === "" ? undefined : Number(e.target.value))}
+        aria-invalid={b.message !== null ? true : undefined}
+        onChange={b.onChange}
+        onFocus={b.onFocus}
+        onBlur={b.onBlur}
+        onKeyDown={b.onKeyDown}
       />
+      <RangeMessage message={b.message} />
     </label>
   );
 }
@@ -397,6 +448,9 @@ export default function D3Screen({
     }
   }
 
+  const box = (range: D3NumberKey): BoxProps => ({ range, disabled: readOnly, input, restore: update });
+  const refusals = recordRefusals(project, record);
+
   function setNote(key: string, text: string, label: string) {
     if (readOnly || notesKind !== "person") return;
     const next = withNote(notes, key, text, new Date().toISOString(), label);
@@ -486,9 +540,9 @@ export default function D3Screen({
             </button>
           ))}
         </div>
-        <NumberBox label="Water this supply gave before the project (m³ a year)" value={input.withoutProjectM3PerYear} disabled={readOnly} set={(n) => update(patchNumber(input, "withoutProjectM3PerYear", n))} />
+        <NumberBox label="Water this supply gave before the project (m³ a year)" value={input.withoutProjectM3PerYear} {...box("withoutProjectM3PerYear")} set={(n) => update(patchNumber(input, "withoutProjectM3PerYear", n))} />
         {input.option === "capacity" ? (
-          <NumberBox label="Flow of the system (m³ an hour)" value={input.flowM3PerHour} disabled={readOnly} set={(n) => update(patchNumber(input, "flowM3PerHour", n))} />
+          <NumberBox label="Flow of the system (m³ an hour)" value={input.flowM3PerHour} {...box("flowM3PerHour")} set={(n) => update(patchNumber(input, "flowM3PerHour", n))} />
         ) : null}
         {input.option === "beneficiaries" ? (
           <div role="group" aria-label="Full or limited access">
@@ -500,6 +554,9 @@ export default function D3Screen({
           </div>
         ) : null}
         {input.option === "beneficiaries" ? <PeopleFromRecord input={input} /> : null}
+        {refusals.map((m) => (
+          <RangeMessage key={m} message={m} />
+        ))}
       </Fold>
 
       {input.view === "ex-ante" ? (
@@ -508,9 +565,9 @@ export default function D3Screen({
             <p data-caption="">{sliders ? SCREEN_WORDS.sliders : SCREEN_WORDS.boxes}</p>
             {result.sliders.map((s) =>
               sliders ? (
-                <SliderRow key={s.key} s={s} disabled={readOnly} set={(n) => update(patchNumber(input, s.key, n))} />
+                <SliderRow key={s.key} s={s} {...box(s.key)} set={(n) => update(patchNumber(input, s.key, n))} />
               ) : (
-                <SliderAsBox key={s.key} s={s} entered={input[s.key] !== undefined} disabled={readOnly} set={(n) => update(patchNumber(input, s.key, n))} />
+                <SliderAsBox key={s.key} s={s} entered={input[s.key] !== undefined} {...box(s.key)} set={(n) => update(patchNumber(input, s.key, n))} />
               ),
             )}
           </Fold>
@@ -518,13 +575,13 @@ export default function D3Screen({
       ) : (
         <Fold name="monitoring" title="Monitoring data" headline={headline}>
           {input.option === "metered" ? (
-            <NumberBox label="Metered water for the year (m³)" value={input.meteredM3PerYear} disabled={readOnly} set={(n) => update(patchNumber(input, "meteredM3PerYear", n))} />
+            <NumberBox label="Metered water for the year (m³)" value={input.meteredM3PerYear} {...box("meteredM3PerYear")} set={(n) => update(patchNumber(input, "meteredM3PerYear", n))} />
           ) : null}
           {input.option === "capacity" ? (
-            <NumberBox label="Hours the system ran in the year" value={input.operatingHoursPerYear} disabled={readOnly} set={(n) => update(patchNumber(input, "operatingHoursPerYear", n))} />
+            <NumberBox label="Hours the system ran in the year" value={input.operatingHoursPerYear} {...box("operatingHoursPerYear")} set={(n) => update(patchNumber(input, "operatingHoursPerYear", n))} />
           ) : null}
           {input.option === "beneficiaries" ? (
-            <NumberBox label="Days of access in the year" value={input.daysOfAccessPerYear} disabled={readOnly} set={(n) => update(patchNumber(input, "daysOfAccessPerYear", n))} />
+            <NumberBox label="Days of access in the year" value={input.daysOfAccessPerYear} {...box("daysOfAccessPerYear")} set={(n) => update(patchNumber(input, "daysOfAccessPerYear", n))} />
           ) : null}
         </Fold>
       )}

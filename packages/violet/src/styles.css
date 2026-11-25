@@ -86,13 +86,15 @@
 .violet-d3 [data-under] { margin: 0; color: var(--fg-3); font-size: 11px; }
 
 /* The parts that fold: the title is the toggle, with a small arrow that turns when it opens. */
-.violet-d3 [data-fold] { display: flex; flex-direction: column; gap: 10px; min-width: 0; padding: 12px 16px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--card); }
+.violet-d3 [data-fold] { display: block; min-width: 0; padding: 12px 16px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--card); }
 .violet-d3 [data-fold] > summary { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; list-style: none; cursor: pointer; }
 .violet-d3 [data-fold] > summary::-webkit-details-marker { display: none; }
 .violet-d3 [data-fold] > summary::before { content: ""; display: inline-block; width: 0.45em; height: 0.45em; margin-right: 2px; border-right: 1.5px solid var(--fg-4); border-bottom: 1.5px solid var(--fg-4); transform: rotate(-45deg); transition: transform var(--duration-base) var(--ease-out); }
 .violet-d3 [data-fold][open] > summary::before { transform: rotate(45deg); }
 .violet-d3 [data-fold] > summary:focus-visible { outline: 2px solid var(--agent); outline-offset: 2px; border-radius: var(--radius-sm); }
-.violet-d3 [data-fold][open] > summary { margin-bottom: 8px; }
+.violet-d3 [data-fold][open] > summary { margin-bottom: 10px; }
+/* The space between the parts inside a fold. A browser does not keep `gap` inside a <details>, so each part has its own. */
+.violet-d3 [data-fold] > :not(summary) ~ :not(summary) { margin-top: 10px; }
 .violet-d3 [data-eyebrow] { color: var(--fg-3); font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
 .violet-d3 [data-headline] { margin-left: auto; color: var(--fg-3); font-size: 11px; }
 .violet-d3 [data-headline] b { margin: 0 2px; color: var(--fg-1); font-family: var(--font-mono); font-size: 17px; font-weight: 600; }
@@ -127,7 +129,8 @@
 
 /* On a phone only the tile stays at the top, so the header never fills the screen. */
 @media (max-width: 639px) {
-  .violet-d3 [data-pinned-header] { position: static; padding: 0; border-top: 0; background: none; box-shadow: none; }
+  /* `contents`, as Calvin's: the tile then sticks to the whole screen, not only to its own short header. */
+  .violet-d3 [data-pinned-header] { display: contents; }
   .violet-d3 [data-pinned-main] { position: sticky; top: var(--wb-pin-top); z-index: 10; padding: 6px; border-top: 3px solid var(--agent); border-radius: var(--radius-lg) var(--radius-lg) 0 0; background: linear-gradient(180deg, color-mix(in oklab, var(--agent) 7%, var(--card)) 0, var(--card) 64px); box-shadow: 0 1px 0 var(--line); }
   .violet-d3 [data-figure-numbers] { padding: 10px 12px; }
   .violet-d3 [data-fold] { padding: 10px 12px; }
