@@ -65,7 +65,7 @@ sites pin that file by its fingerprint. The first pinned version includes the sl
 | # | Family | Step | Waits on | Done when |
 |---|---|---|---|---|
 | V5 | v1 proof and grading | [~] (Released 2026-11-05: tag `calvin-v0.1.0` on commit `3020ee7`, recorded in `SEEDS.md`. Still to come: both sites pin it, and the private side reports pass or fail.) The first GitHub release: the packed packages (`calvin` and the `core` it needs) and their fingerprints, with both views: the ex-ante view with sliders, and the full ex-post view. A site mounts them through `@waterbots/calvin/screen`; the open site locks to ex-ante. Replaces the npm publish in M2.2. It does not wait for the simple view. | The maintainer's approval; the tag rule (M1.4). | The release holds the files and their fingerprints. Both sites pin it. The private side reports pass or fail on both carbon filings. |
-| J1 to J9 | Agent orchestration | What family 1 left open (closed 2026-11-26). See "Family 1: what is left" below. | See each item. | See each item. |
+| J1 to J9 | Agent orchestration | What family 1 left open (closed 2026-11-26). See "Family 1: what is left" below. J7 is now under family 2. | See each item. | See each item. |
 | V8 | Experts and partners | [x] (Merged, pull request #18. Still to come: the outside expert's check, and N14 and N15 for the outside expert group. The D-3 input list is ready; the email to the outside expert waits for the maintainer's word.) D-3, the water-supply module, inside Violet (M8.1). | It does not wait for the activity-type signature or N6: D-3 is a prototype the outside expert checks later. | Violet's D-3 tests are hand-worked cases, with every step cited to the guidebook (cited, not copied). The VWBA spec is written alongside the build, in `docs/`, and the maintainer reviews it then. An outside expert checks the module once the prototype is up. |
 | V14 | v1 proof and grading | The same-numbers check: a project saved by the screening, read back the way the paid site reads it, gives the same numbers, or a list of what changed and why. | J3, J4, J5. | A test passes here on invented projects. The private side runs it on both real filings with the pinned release and reports pass. |
 | V15 | v1 proof and grading | The v1 release: a GitHub release that both sites pin. | V8, V14; the maintainer's approval. | Both sites run the same pinned file. The maintainer confirms the whole journey on the live sites, and the average question count is reported. |
@@ -127,8 +127,9 @@ left is below. `[!]` waits on the maintainer.
       when the map asked for them. Core's guard on facts now decides that.
 - [ ] **F1.9** When a fact changes, Phoebe's settled rows stay settled. She can settle the technology class on her
       worksheet while the record stays blank.
+- [ ] **F1.10** If the place names no country, the map never calls Phoebe. Found, not chased.
 
-**Still to come from J1 to J9:**
+**Still to come from J1 to J9** (J7 is now under family 2):
 
 - [!] **J2.** Calvin's two choices in the Agent Commons: their wording and his opening line wait on the maintainer's
       ruling.
@@ -141,8 +142,8 @@ left is below. `[!]` waits on the maintainer.
       One calculator screen: each site passes the place, the Paid site saves the notes, and later calculator agents
       follow the same screen.
   - [!] Phoebe's, Wellington's and Bridget's rulings.
-- [!] **J7.** The maintainer signs off the first water-benefit activity type (safe drinking water supply). No building.
-- [ ] **J8.** Reword the 30 lines the seed checks catch on the paid site. The paid site's work.
+- [ ] **J8.** Reword the 30 lines the seed checks catch on the paid site. The paid site's work. Moving to the sites'
+      plans in round 3.
 - [!] **J9.** The consulting page's address, kept in one shared file in `core` (rule 13). Two values stand in for a
       blank in Calvin: see F2.4 below.
 
@@ -172,6 +173,8 @@ the maintainer.
 
 **Family 2, Calculators and methods**
 
+- [!] **J7.** The maintainer signs off the first water-benefit activity type (safe drinking water supply). No building.
+      Moved from family 1 (round 2 of the plan sync).
 - [ ] **F2.1** Two of Calvin's shares can add up to more than 1 under V1.0. Found, not chased.
 - [ ] **F2.2** The 2019 VWBA paper that the second VWBA reference points to is not held.
 - [ ] **F2.3 (after v1, parked)** A candidate for the next project type: utility water loss, VWBA D-2. Not the next
@@ -315,7 +318,8 @@ Phoebe's and Bridget's first releases are J5. What is left here comes after v1.
 
 - **M9.2** *Family: Agent orchestration.* Bridget (the map), beyond her first release
   - [ ] **(V1)** *Family: Console and surfaces.* The map's + and - buttons are big enough to tap on a phone. Done when a test checks their tap size
-        and the maintainer checks them on a phone.
+        and the maintainer checks them on a phone. The sites' work: core has no map screen. Moving to the sites' plans
+        in round 3.
 
 ## M10 — Agent and module source sweep (V2)
 
@@ -404,6 +408,7 @@ Each finding from the family 1 sprint that is not family 1's own. Family 1's are
 
 - [ ] *Family: Console and surfaces.* **F4.2 Wellington on the paid site.** The paid site could not use his package,
       because he answers in a different shape there. The paid site's work (its #314); nothing to build here.
+      Moving to the sites' plans in round 3.
 - [ ] *Family: Console and surfaces.* **F4.3 The Agent Commons does not read the installed packages.** It shows its own
       typed list. Calvin's and Violet's release notes ask for Commons changes that were not made. Both sites' work, the
       shared page first; core's part is J2.
