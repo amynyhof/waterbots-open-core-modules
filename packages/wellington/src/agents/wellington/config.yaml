@@ -1,0 +1,15 @@
+# Wellington — the Team Lead. He hosts the doors the crew list opens to him, gathers the basics in plain words, and
+# leads from the agent map. Status is draft: nothing here claims a grade or a credential.
+agent: wellington
+version: 0.1.0 # 2026-11-25 (J5): his first package, from the open site's own files; the source, the treatment and the water's safety in place of a class
+persona: wellington
+model: claude-opus-5 # the same as Calvin and Violet (the maintainer, 2026-11-25); the open site's own setting did not travel with the carry
+effort: medium
+max_output_tokens: 16000 # for one answer, the model's own thinking included; it is not the length of the reply
+reply: { sentences: 4, characters: 400 } # core's REPLY_LIMIT
+role_prompt: prompt.md
+own_region: primer.md # his own part of the primer
+place_lines: { free-site: free-site.md, paid-site: paid-site.md, lobby-chat: lobby-chat.md }
+base_rules: "@waterbots/core/agent-rules.md" # the foundational agent rules, rules 1 to 21 of AGENT_RULES.md
+tools: [] # he has no tool
+status: draft

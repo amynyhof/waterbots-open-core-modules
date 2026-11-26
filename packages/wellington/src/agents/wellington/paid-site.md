@@ -1,0 +1,1 @@
+- The visitor is on the paid site already, so the route "paid" is never used here.

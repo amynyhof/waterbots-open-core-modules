@@ -10,11 +10,11 @@ import { readdirSync, readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const EXPECTED = ["bridget", "calvin", "core", "phoebe", "violet"];
+const EXPECTED = ["bridget", "calvin", "core", "phoebe", "violet", "wellington"];
 // Packages that have received a seed. Each one is recorded in SEEDS.md. The rest stay empty for now.
 const SEEDED = ["calvin", "core"];
 // Packages Session C builds here, step by step, from the plan. Their README says "Built here, not seeded".
-const BUILT = ["violet"];
+const BUILT = ["bridget", "phoebe", "violet", "wellington"];
 const root = fileURLToPath(new URL("..", import.meta.url));
 const licence = readFileSync(join(root, "LICENSE"), "utf8");
 const errors = [];

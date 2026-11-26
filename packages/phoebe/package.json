@@ -1,8 +1,8 @@
 {
   "name": "@waterbots/phoebe",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
-  "description": "WaterBots open core module: phoebe (eligibility). Empty for now. Not published.",
+  "description": "WaterBots open core module: phoebe (the eligibility and feasibility agent). Her instructions, the shape of her answer, the checks on it, her eligibility worksheet and her cards. Not published.",
   "license": "Apache-2.0",
   "type": "module",
   "repository": {
@@ -15,7 +15,13 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
-    }
+    },
+    "./screen": {
+      "types": "./dist/screen.d.ts",
+      "default": "./dist/screen.js"
+    },
+    "./prompt.md": "./dist/prompt.md",
+    "./config.yaml": "./dist/config.yaml"
   },
   "files": [
     "dist",
@@ -25,6 +31,19 @@
   "scripts": {
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
-    "build": "tsc -p tsconfig.build.json"
+    "build": "tsc -p tsconfig.build.json && npm run build:agent-files",
+    "build:agent-files": "node -e \"for (const f of ['prompt.md', 'config.yaml']) require('node:fs').copyFileSync('src/agents/phoebe/' + f, 'dist/' + f)\"",
+    "generate": "vitest run src/generated.test.ts -u"
+  },
+  "dependencies": {
+    "@waterbots/core": "0.4.x"
+  },
+  "peerDependencies": {
+    "react": "19.3.1"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
   }
 }

@@ -1,8 +1,8 @@
 {
   "name": "@waterbots/bridget",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
-  "description": "WaterBots open core module: bridget (the map). Empty for now. Not published.",
+  "description": "WaterBots open core module: bridget (the basin map). Her instructions, the checks on her answer and on the pin, and reading GPS numbers. The map and its data wait for the rights check. Not published.",
   "license": "Apache-2.0",
   "type": "module",
   "repository": {
@@ -15,7 +15,9 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
-    }
+    },
+    "./prompt.md": "./dist/prompt.md",
+    "./config.yaml": "./dist/config.yaml"
   },
   "files": [
     "dist",
@@ -25,6 +27,10 @@
   "scripts": {
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
-    "build": "tsc -p tsconfig.build.json"
+    "build": "tsc -p tsconfig.build.json && npm run build:agent-files",
+    "build:agent-files": "node -e \"for (const f of ['prompt.md', 'config.yaml']) require('node:fs').copyFileSync('src/agents/bridget/' + f, 'dist/' + f)\""
+  },
+  "dependencies": {
+    "@waterbots/core": "0.4.x"
   }
 }
