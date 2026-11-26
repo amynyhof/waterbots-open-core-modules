@@ -66,7 +66,7 @@ sites pin that file by its fingerprint. The first pinned version includes the sl
 | V15 | v1 proof and grading | The v1 release: a GitHub release that both sites pin. | V8, V14; the maintainer's approval. | Both sites run the same pinned file. The maintainer confirms the whole journey on the live sites, and the average question count is reported. |
 | V20 | Agent orchestration | [x] (Released: tag `calvin-violet-v0.5.0` on commit `1bce514`. The sites install it through 0.5.1, J1.) Calvin and Violet 0.5.0, one release for both sites. Calvin: the main credit tiles (tCO₂e a year) are a pinned header, whether or not a site sets `unpinFigureBlock`; the smaller figures sit right under them; the sliders and the calculation collapse. The controls panel holds only the site's own top and Calvin's buttons, the work surface ends with the calculation, and the report's note on how the figures were produced is one sentence shorter. A phone pass: rows wrap instead of squeezing. Violet: people served come from the project record, as Calvin takes them, and "Draft — pending expert review" shows on the screen and on every result. No sum changes. | V8. | Session C packs all three packages, runs the release check and makes the tag. One release holds all three files. After "release it", Session C pushes the tag and publishes the release. Both sites install it. |
 
-**Where things stand (2026-11-25):** The latest release is core 0.3.0, Calvin 0.7.0 and Violet 0.7.0, one tag each (`core-v0.3.0`, `calvin-v0.7.0`, `violet-v0.7.0`) on commit `d59a385`. It holds value ranges (#56) and the J5 core step (#57). Both sites still install it, all three in one step. Family 1, Agent orchestration, is open: its v1 scope is J1 to J9. This repo's parts for Calvin and Violet (#46, #49, #52, #54, #56, #57) are released. Finished steps are in the build log.
+**Where things stand (2026-11-26):** The latest release is core 0.4.0, Calvin 0.8.0, Violet 0.8.0, Phoebe 0.1.0, Wellington 0.1.0 and Bridget 0.1.0, one tag each on commit `f517709`. It holds the kinds of project (#61) and the first packages of Phoebe, Wellington and Bridget (#63). Both sites installed all six on 2026-11-26 and walked them with the real model. Open pull request #64: a fact is filled only when the person gave it, each door's plain facts, and the walk's fixes. The open site's install waits for its release. From now on a package's number moves only when that package changes. Family 1, Agent orchestration, is open: its v1 scope is J1 to J9. Finished steps are in the build log.
 
 **Sources still to find:** in the source sweep, M10.4.
 
@@ -86,6 +86,8 @@ sites pin that file by its fingerprint. The first pinned version includes the sl
 - *Family: Security and hygiene.* SP6, the human engineer review. It runs alongside and blocks nothing.
 - *Family: Console and surfaces.* A view on Calvin's screen that shows the V1.0 figure on its own, for a project only the
   2021 version counts. Until then his tool gives that figure (the maintainer, 2026-11-25).
+- *Family: Console and surfaces.* Wellington's package on the paid site, where he answers in a different shape. The
+  paid site could not use it on its walk of 2026-11-26. Not changed now.
 
 ## Family 1: the v1 scope (Agent orchestration)
 
@@ -107,7 +109,9 @@ their tasks, collect what they need, and report back to him. He helps with the n
     A batch went out on 2026-11-23, before the close: `core-v0.2.0`, `calvin-v0.6.0` and `violet-v0.6.0`, all on
     commit `9336e92`. Both sites install the three together: Calvin and Violet each need exactly core 0.2.0.
     A second batch went out on 2026-11-25: `core-v0.3.0`, `calvin-v0.7.0` and `violet-v0.7.0`, all on commit `d59a385`.
-    Calvin and Violet each take any core 0.3 version from here.
+    Calvin and Violet each take any core 0.3 version from here. A third went out on 2026-11-26: all six packages, one
+    tag each on commit `f517709`. From then on a package's number moves only when that package changes, so Calvin and
+    Violet no longer move together (the maintainer, 2026-11-26).
 - [ ] **J2.** Doors. Each host tells each agent which door it is at: Free site, Paid site, Agent Commons or MCP (agent
       rule 21). An agent working alone asks for what it needs itself. This covers how Calvin opens in the Agent
       Commons.
@@ -198,6 +202,10 @@ their tasks, collect what they need, and report back to him. He helps with the n
     data, then Bridget's map after the rights check. Each is its own pull request.
   - Step 1, core: the crew list, the checks on a reply, the rest of the open site's facts, Phoebe's rows, and Calvin's and
     Violet's own files, settings and chats. Released 2026-11-25 (#57).
+  - Steps 2 to 4: Phoebe, Wellington and Bridget without map data, each a package. Released 2026-11-26 (#63).
+  - Found on both sites' walks of 2026-11-26: an agent filled facts nobody gave, and a door did not say what Save does
+    or that a site passes its own values. A fact is now filled only when the person gave it, and each door's plain
+    facts reach every agent. Open pull request (#64).
   - Waits on: Phoebe's and Bridget's rulings; the rights check on every one of Bridget's data files; a ruling on the
     shared map key.
   - One calculator screen (ruled by the maintainer on 2026-11-23).
