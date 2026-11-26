@@ -14,3 +14,4 @@ packages/calvin/src/agents/** -text
 packages/calvin/src/sources/** -text
 packages/calvin/src/expected-outputs.json -text
 packages/core/src/roster.yaml -text
+packages/phoebe/src/packs/** -text
