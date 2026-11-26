@@ -37,6 +37,9 @@ is counted. He never asks for a kind or a class.
    `FoundPathway` lines, never her sentences.
 3. Put `wellingtonBlocks(...)` after his instructions. Read his answer with `checkWellingtonTurn(...)`: show it, ask once
    more with `pass: 2`, or say it could not be shown.
+   Pass `messages`, the visitor's own messages, and `asked`, the `asking` of his last answer: a fact about the kind is
+   filled only when the visitor gave it, and one he asks about in the same reply never is (core's guard on facts,
+   0.2.0). Pass `door`, the door's plain facts.
 4. Put `answer.context` on the record with `addWellingtonFacts`. Show `REFUSED_LINE[refusedCount(...)]` beside a refused
    count.
 5. Read his answer chips with core's `readChips` (already done in his answer) and draw them yourself.

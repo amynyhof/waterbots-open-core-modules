@@ -197,7 +197,7 @@ function WorkSurface({ calc, project, appVersion, tab, otherTab, report }: Calcu
    * missing and where it is filled in, in the same words the paid site's record check uses. This
    * comes first because every figure, on every tab, depends on these facts.
    */
-  const factsPrompt = missingFactsPrompt(missingFacts, project.technology, project.notCoveredYet, project.answer);
+  const factsPrompt = missingFactsPrompt(missingFacts, project.technology, project.notCoveredYet, project.answer, project.recordPage !== false);
   /** False where nothing is missing: no figure can show for this project as it stands. */
   const factsAsked = project.answer === undefined ? project.notCoveredYet === undefined : project.answer.says === "ask" || project.answer.says === "counted";
   if (factsPrompt) {
@@ -486,7 +486,7 @@ function WorkSurface({ calc, project, appVersion, tab, otherTab, report }: Calcu
             </summary>
             <div className="flex flex-col gap-3">
               <TagLegend />
-              <EquationStack result={result} state={state} patch={patch} canonPopulation={project.population?.served} seed={seed} sliders={calc.sliders} tables={calc.tables} screening={calc.exAnteOnly} />
+              <EquationStack result={result} state={state} patch={patch} canonPopulation={project.population?.served} seed={seed} sliders={calc.sliders} tables={calc.tables} screening={calc.exAnteOnly} recordPage={project.recordPage !== false} />
             </div>
           </details>
         </>,

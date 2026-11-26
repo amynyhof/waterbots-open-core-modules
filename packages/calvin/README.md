@@ -83,8 +83,28 @@ The build bundles the entry into one file, `dist/screen.js`. React and `@waterbo
 A site tells the screens where Calvin is working with `place` (`"free-site"`, `"paid-site"`, `"agent-commons"` or
 `"mcp"`, from `@waterbots/core/places`). Left out, it is a site with a project record, as before.
 
-The build bundles the entry into one file, `dist/agent.js`. `@waterbots/core` stays outside it.
+The build bundles the entry into `dist/agent.js`, beside the screen. The two share one copy of the engine and its data, in `dist/chunks/`. `@waterbots/core` stays outside them.
 `scripts/check-screen-entry.mjs` loads it from the packed files and runs his tool there.
+
+## Changes in 0.9.0
+
+Calvin needs `@waterbots/core` in the 0.5 series.
+
+- **A fact is filled only when the visitor gave it (2026-11-26).** `guardCalvinReply` now checks his facts as well as his
+  numbers, with core's guard on facts: the source, the treatment, the yes-or-no facts, home use, the country, the unit of
+  the count and what powers the pump. A fact he asks about in the same reply is refused. One that fails is taken out and
+  stays blank, so no figure rests on it. His answer has two new fields: `asking`, the key of the one thing the reply asks
+  for, and `heard`, the visitor's own words for each fact he fills.
+- **The door's plain facts** reach his chat (`door` on `calvinChatContext`). A site's own values are read instead of his.
+  `talkedBefore` says whether the visitor has talked with him before in this visit.
+- **A site with no Project Record page** passes `recordPage: false` on his project. The screen then never points to one.
+- **One copy of the engine's data.** The agent and the screen are built together and share one copy of the engine and
+  its data (`dist/chunks/`). A site that uses his screen and his record reader loads the data once. The engine entry is
+  still one file of its own.
+- No sum changed.
+
+**What a site should change.** Pass `asked` to `guardCalvinReply` as the `asking` of his last answer, and `facts` as the
+record's facts. Pass `door` and `talkedBefore` to `calvinChatContext`, and `recordPage` on his project.
 
 ## Changes in 0.8.0
 

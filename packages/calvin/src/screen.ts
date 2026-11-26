@@ -1,7 +1,8 @@
 // The screen entry: `@waterbots/calvin/screen`. Added by this repo, not part of the seed.
 //
 // It passes on what a site needs to mount Calvin's screens, and nothing else. Re-exports only; this file computes
-// nothing. The build bundles it into one file, `dist/screen.js`, so it loads under any module rules. React and
+// nothing. The build bundles it into `dist/screen.js`, so it loads under any module rules, beside the agent: the two
+// share one copy of the engine and its data, in `dist/chunks/` (2026-11-26). React and
 // `@waterbots/core` stay outside the bundle: the site installs them, and there is only ever one copy of each.
 //
 // What a site mounts:

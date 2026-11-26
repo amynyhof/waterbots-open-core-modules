@@ -2,7 +2,8 @@
 //
 // What a host needs to run Calvin as an agent, at any of the four doors, with no React: his tools, the way he reads
 // and writes the shared project record, his two choices in the Agent Commons, and what he can see of his screen.
-// Re-exports only; this file computes nothing. The build bundles it into one file, `dist/agent.js`.
+// Re-exports only; this file computes nothing. The build bundles it into `dist/agent.js`, beside the screen: the two
+// share one copy of the engine and its data, in `dist/chunks/` (2026-11-26).
 // `@waterbots/core` stays outside the bundle: the site installs it, and there is only ever one copy.
 export { computeScenarioTool, transitionWaterfallTool, GS4GG_CARBON_TOOLS, GS4GG_CALCULATOR_VERSION, calvinToolsFor } from "./modules/calvin/agent/tools.js";
 export {

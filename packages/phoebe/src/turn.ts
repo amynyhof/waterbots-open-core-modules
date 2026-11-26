@@ -15,6 +15,7 @@
  * Her output is checked, not trusted. It calls no model.
  */
 import { readChips } from "@waterbots/core/chips";
+import { doorBlock, type DoorFacts } from "@waterbots/core/places";
 import { knownKindFacts } from "@waterbots/core/projectKinds";
 import { classWords, stageWords, typeWords } from "@waterbots/core/projectWords";
 import { BECAUSE_LIMIT, underTodaysRules, type ProjectRecord } from "@waterbots/core/record";
@@ -102,8 +103,13 @@ export function recordBlock(record: Pick<ProjectRecord, "facts" | "place">): str
 }
 
 /** The visit notes after the record, or null when neither applies. */
-export function phoebeNotesBlock(notes: { opened?: boolean; introduced?: boolean; eligibilityDone?: boolean }): string | null {
+export function phoebeNotesBlock(notes: { opened?: boolean; introduced?: boolean; eligibilityDone?: boolean; factsChanged?: boolean }): string | null {
   const extra: string[] = [];
+  if (notes.factsChanged && !notes.opened) {
+    extra.push(
+      "A fact your readings rest on has changed since you worked them out, such as the source or the treatment. Each pathway's read is off the record. Work out every row and each pathway's read again from the facts as they stand.",
+    );
+  }
   if (notes.opened) {
     extra.push(
       notes.introduced
@@ -186,8 +192,10 @@ export function allMet(sheet: Sheet, gsClass: string): boolean {
 
 export interface PhoebeTurnInput {
   door: PhoebeDoor;
-  /** The shared record. None in the Agent Commons or at MCP. */
-  record?: Pick<ProjectRecord, "facts" | "place"> | null;
+  /** The shared record. None in the Agent Commons or at MCP. Its `agents` say when a fact her readings rest on changed. */
+  record?: (Pick<ProjectRecord, "facts" | "place"> & Partial<Pick<ProjectRecord, "agents">>) | null;
+  /** The door's plain facts, from the site. */
+  doorFacts?: DoorFacts;
   /** Her worksheet as it stands. */
   sheet: Sheet;
   /** Sets the visit has already been given. */
@@ -223,11 +231,11 @@ export function phoebeTurn(input: PhoebeTurnInput): PhoebeTurn {
       ? [...input.sets]
       : setsFor({ pathways, loaded: input.loaded ?? [], allMet: allMet(input.sheet, gsClass), running: record?.facts.stage?.value === "running" });
   const opened = input.opened === true;
-  const notes = phoebeNotesBlock({ opened, introduced: opened && input.introduced === true, eligibilityDone: input.eligibilityDone === true });
+  const notes = phoebeNotesBlock({ opened, introduced: opened && input.introduced === true, eligibilityDone: input.eligibilityDone === true, factsChanged: record?.agents?.phoebe?.factsChanged === true });
   const recordText = record ? recordBlock(record) : null;
   // Not on her first turn: the sheet is empty then, and it pulls against message 1.
   const sheetText = !opened && Object.keys(input.sheet.rows).length + Object.keys(input.sheet.sorts).length > 0 ? worksheetBlock(input.sheet, gsClass) : null;
-  const blocks = [cardsBlock(sets), phoebeDoorBlock(input.door), recordText, sheetText, notes, input.again ? FINISH_NOTE : null].filter((b): b is string => b !== null);
+  const blocks = [cardsBlock(sets), phoebeDoorBlock(input.door), doorBlock(input.door, input.doorFacts, "# This door's facts"), recordText, sheetText, notes, input.again ? FINISH_NOTE : null].filter((b): b is string => b !== null);
   return { sets, blocks, pathways };
 }
 

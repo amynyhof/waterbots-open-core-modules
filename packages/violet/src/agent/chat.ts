@@ -3,11 +3,12 @@
 // (`@waterbots/core/chat`). Nothing here does a sum or calls a model: every figure is the engine's.
 
 import { ANSWER_FIELDS, CHAT_REPLY, chatContext, openAsks, openedTurn, readLeft, type Ask, type ChatSettings, type Kept } from "@waterbots/core/chat";
+import { checkAnswerFacts, factFields, factsReturnedToAgent, factsTakenOut, joinGuards, readAsking, readHeard, type AnswerFact, type Heard } from "@waterbots/core/factGuard";
 import { askedOutOfRange, checkAnswerNumbers, returnToAgent, takenOut, type AnswerNumber } from "@waterbots/core/numberGuard";
-import { KIND_ASKS, KIND_FACTS, KIND_FACT_SCHEMA, NO_CALCULATOR_YET, askFor, knownKindFacts, FACT_LABEL } from "@waterbots/core/projectKinds";
+import { KIND_ASKS, KIND_FACTS, KIND_FACT_SCHEMA, NO_CALCULATOR_YET, YES_NO_FACTS, askFor, kindFactsOf, knownKindFacts, FACT_LABEL } from "@waterbots/core/projectKinds";
 import { RANGES, rangeRefusal, type RangeKey, type RangeWords } from "@waterbots/core/ranges";
 import { readHandBack, type HandBack } from "@waterbots/core/reply";
-import { hasProjectRecord, type Place } from "@waterbots/core/places";
+import { hasProjectRecord, type DoorFacts, type Place } from "@waterbots/core/places";
 import { HOME_USES, addGivenFacts, needsHomeUse, setAgentResults, underTodaysRules, waterAnswer, type AddedFacts, type GivenFacts, type ProjectFacts, type ProjectRecord } from "@waterbots/core/record";
 import { computeD3 } from "../d3/compute.js";
 import { D3_STATUS, type AccessLevel, type D3Input, type D3Option, type D3Result, type D3Value } from "../d3/types.js";
@@ -216,6 +217,13 @@ export function fillViolet(input: D3Input, answer: VioletAnswer): VioletFill {
   return { input: next, filled, refused };
 }
 
+/** The facts her answer may fill, by the key of the question that asks for each, with what each is, as a visitor reads it. */
+export const VIOLET_FACTS: Record<string, string> = {
+  ...FACT_LABEL,
+  "population.mode": "Whether the count is of people or of households",
+  accessLevel: "Whether people have full or limited access to the water",
+};
+
 /** The shape her answer takes, for the site's call to the model. */
 export const VIOLET_ANSWER_SCHEMA: Record<string, unknown> = {
   type: "object",
@@ -223,6 +231,7 @@ export const VIOLET_ANSWER_SCHEMA: Record<string, unknown> = {
   required: ["reply", "handBack"],
   properties: {
     ...ANSWER_FIELDS,
+    ...factFields(Object.keys(VIOLET_FACTS)),
     facts: {
       type: "object",
       additionalProperties: false,
@@ -263,19 +272,27 @@ export interface VioletReply {
   /** The source, the treatment, the facts about them and home use, for the record (`addVioletFacts`). In the Agent Commons, for her temporary record. */
   facts: GivenFacts;
   values: VioletAnswer;
+  /** The key of the one thing this reply asks for. The site passes it back as `asked` on the next turn. */
+  asking?: string;
+  /** The visitor's own words each fact she fills rests on. */
+  heard?: Heard[];
 }
 
 /** Reads her answer as the model gave it. Null when there is no reply. The numbers are checked by `fillViolet`. */
 export function readVioletAnswer(raw: unknown): VioletReply | null {
   if (typeof raw !== "object" || raw === null) return null;
-  const o = raw as { reply?: unknown; handBack?: unknown; leftForNow?: unknown; facts?: unknown; values?: unknown };
+  const o = raw as { reply?: unknown; handBack?: unknown; leftForNow?: unknown; facts?: unknown; values?: unknown; asking?: unknown; heard?: unknown };
   if (typeof o.reply !== "string" || o.reply.trim() === "") return null;
+  const asking = readAsking(o.asking, VIOLET_ASK_KEYS);
+  const heard = readHeard(o.heard, Object.keys(VIOLET_FACTS));
   return {
     reply: o.reply.trim(),
     handBack: readHandBack(o.handBack),
     leftForNow: readLeft(o.leftForNow, VIOLET_ASK_KEYS),
     facts: readKind(o.facts),
     values: typeof o.values === "object" && o.values !== null ? (o.values as VioletAnswer) : {},
+    ...(asking !== undefined ? { asking } : {}),
+    ...(heard.length > 0 ? { heard } : {}),
   };
 }
 
@@ -300,12 +317,14 @@ export interface VioletGuardInput {
   input: D3Input;
   /** The visitor's own messages in this chat, oldest first. */
   messages: readonly string[];
-  /** The key of the question just asked. */
+  /** The key of the question just asked: her last reply's `asking`. */
   asked?: string;
+  /** The project's facts on the record now. In the Agent Commons, her temporary record's. */
+  facts?: ProjectFacts;
 }
 
 export interface GuardedVioletReply {
-  /** Her answer, with every number that did not pass taken out. */
+  /** Her answer, with every number and every fact that did not pass taken out. */
   reply: VioletReply;
   /** Send this back to her once, in the same turn. Null: nothing to send. On the second answer, show `told` instead. */
   returned: string | null;
@@ -315,8 +334,31 @@ export interface GuardedVioletReply {
   outOfRange: string | null;
 }
 
-/** Core's guards on her answer. The site calls it on each answer, and sends `returned` back once. */
-export function guardVioletReply(reply: VioletReply, { input, messages, asked }: VioletGuardInput): GuardedVioletReply {
+/** Her facts, as core's guard on facts reads them. A yes-or-no fact and home use are taken only as an answer. */
+function answerFacts(reply: VioletReply, input: D3Input, facts?: ProjectFacts): AnswerFact[] {
+  const held: Record<string, string | boolean | undefined> = {
+    ...(facts !== undefined ? kindFactsOf(facts) : {}),
+    homeUse: facts?.homeUse?.value,
+    "population.mode": input.population?.mode,
+    accessLevel: input.accessLevel,
+  };
+  const out: AnswerFact[] = [];
+  const add = (key: string, value: string | boolean | undefined): void => {
+    if (value === undefined) return;
+    out.push({ key, name: VIOLET_FACTS[key] ?? key, value, held: held[key], ...((YES_NO_FACTS as readonly string[]).includes(key) || key === "homeUse" ? { onlyAsAnswer: true } : {}) });
+  };
+  for (const key of KIND_FACTS) add(key, reply.facts[key]);
+  add("homeUse", reply.facts.homeUse);
+  add("population.mode", reply.values.population?.mode);
+  add("accessLevel", reply.values.accessLevel);
+  return out;
+}
+
+/**
+ * Core's guards on her answer: on her numbers, and on every other fact she fills (2026-11-26). A fact the visitor did not
+ * give is refused, and stays blank. The site calls it on each answer, and sends `returned` back once.
+ */
+export function guardVioletReply(reply: VioletReply, { input, messages, asked, facts: onRecord }: VioletGuardInput): GuardedVioletReply {
   const households: RangeWords = (reply.values.population?.mode ?? input.population?.mode) === "households" ? { name: "Households served" } : {};
   const ranges: Record<string, { key: RangeKey; words?: RangeWords; value: number | null | undefined; held: number | undefined }> = {
     ...Object.fromEntries((Object.keys(D3_RANGES) as D3NumberKey[]).map((k) => [k, { key: D3_RANGES[k], value: reply.values[k], held: input[k] }])),
@@ -339,11 +381,21 @@ export function guardVioletReply(reply: VioletReply, { input, messages, asked }:
     if (Object.keys(population).length > 0) values.population = population;
     else delete values.population;
   }
+  const factCheck = checkAnswerFacts(answerFacts(reply, input, onRecord), { messages, asked, asking: reply.asking, heard: reply.heard });
+  const refused = new Set(factCheck.refused.map((r) => r.fact.key));
+  const facts: GivenFacts = { ...reply.facts };
+  for (const key of refused) delete (facts as Record<string, unknown>)[key];
+  if (refused.has("accessLevel")) delete values.accessLevel;
+  if (refused.has("population.mode") && values.population !== undefined) {
+    const { mode: _mode, ...population } = values.population;
+    if (Object.keys(population).length > 0) values.population = population;
+    else delete values.population;
+  }
   const target = asked === undefined ? undefined : ranges[asked];
   return {
-    reply: { ...reply, values },
-    returned: returnToAgent(faults),
-    told: takenOut(faults),
+    reply: { ...reply, facts, values },
+    returned: joinGuards(returnToAgent(faults), factsReturnedToAgent(factCheck.refused)),
+    told: joinGuards(takenOut(faults), factsTakenOut(factCheck.refused)),
     outOfRange: target === undefined ? null : askedOutOfRange(target.key, messages.at(-1) ?? "", target.words ?? {}),
   };
 }
@@ -419,6 +471,10 @@ export interface VioletTurn extends VioletScreen {
   leftForNow?: readonly string[];
   /** Messages for numbers the visitor gave that were refused since the last turn. */
   refused?: readonly string[];
+  /** The door's plain facts, from the site. Its own values are read instead of hers. */
+  door?: DoorFacts;
+  /** The visitor has talked with her before in this visit. */
+  talkedBefore?: boolean;
 }
 
 /** The block a site adds after her instructions, for one turn. */
@@ -429,6 +485,8 @@ export function violetChatContext(t: VioletTurn): string {
     ...(t.saved !== undefined ? { saved: t.saved } : {}),
     ...(t.opened !== undefined ? { opened: t.opened } : {}),
     ...(t.introduce !== undefined ? { introduce: t.introduce } : {}),
+    ...(t.door !== undefined ? { door: t.door } : {}),
+    ...(t.talkedBefore !== undefined ? { talkedBefore: t.talkedBefore } : {}),
     known: violetKnown(t.input, t.facts),
     asks: openAsks(violetAsks(t.input, t.chosen, t.facts), t.leftForNow),
     kept: stopped ? [] : violetKept(t.result),

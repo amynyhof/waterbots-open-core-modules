@@ -164,8 +164,11 @@ describe("the guards on her numbers", () => {
   const guard = (values: VioletReply["values"], messages: string[], asked?: string, input: D3Input = { view: "ex-ante", option: "beneficiaries" }) =>
     guardVioletReply(reply(values), { input, messages, ...(asked !== undefined ? { asked } : {}) });
   it("a number the visitor gave stays; one they did not give comes back, then is taken out and said", () => {
-    const g = guard({ population: { served: 900, mode: "people" }, flowM3PerHour: 4, litresPerPersonPerDay: { value: 25, source: "local" } }, ["It serves nine hundred people."]);
+    const values: VioletReply["values"] = { population: { served: 900, mode: "people" }, flowM3PerHour: 4, litresPerPersonPerDay: { value: 25, source: "local" } };
+    const g = guardVioletReply({ ...reply(values), heard: [{ fact: "population.mode", words: "nine hundred people" }] }, { input: { view: "ex-ante", option: "beneficiaries" }, messages: ["It serves nine hundred people."] });
     expect(g.reply.values).toEqual({ population: { served: 900, mode: "people" } });
+    // With no words of theirs for it, the unit is not filled: "people" is never filled in on its own (J6).
+    expect(guard({ population: { served: 900, mode: "people" } }, ["It serves nine hundred people."]).reply.values).toEqual({ population: { served: 900 } });
     expect(g.returned).toMatch(/Flow of the system 4; Litres per person a day 25/);
     expect(g.told).toContain("Flow of the system and Litres per person a day: not filled in");
   });
@@ -190,4 +193,19 @@ it("the stop, and the words for it", () => {
   expect(d3Stop(kindFacts({ waterSource: "new", treatment: "none" }))).toEqual({ because: "home use not given" });
   expect(d3Stop(kindFacts(NEW))).toBeNull();
   expect(d3StopMessage({ because: "fact not given", fact: "treatment" })).toBe("The calculator can't run for this project yet.");
+});
+
+
+describe("the guard on her facts (2026-11-26): a fact is filled only when the visitor gave it", () => {
+  const input: D3Input = { view: "ex-ante", option: "beneficiaries" };
+  it("home use nobody said, and a fact she asks in the same reply, are refused; the source in their words is kept", () => {
+    const answer = readVioletAnswer({ reply: "Thanks. Do people drink this water at home?", handBack: "none", facts: { waterSource: "existing", homeUse: "yes", sourceSafe: true }, asking: "homeUse", heard: [{ fact: "waterSource", words: "already use the river water" }] })!;
+    const g = guardVioletReply(answer, { input, messages: ["People already use the river water."], asked: "waterSource" });
+    expect(g.reply.facts).toEqual({ waterSource: "existing" });
+    expect(g.returned).toMatch(/whether people use the water at home \(you are asking for it in this same reply\)/);
+  });
+  it("her answer to the question she asked last is kept", () => {
+    const g = guardVioletReply({ reply: "Thanks.", handBack: "none", leftForNow: [], facts: { homeUse: "yes" }, values: {} }, { input, messages: ["Yes, they drink it at home."], asked: "homeUse" });
+    expect([g.reply.facts, g.returned]).toEqual([{ homeUse: "yes" }, null]);
+  });
 });

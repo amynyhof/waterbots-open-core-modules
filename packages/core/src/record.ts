@@ -186,6 +186,11 @@ export interface AgentPart {
   /** The agent has done its task and reported back to Wellington. */
   done?: boolean;
   /**
+   * A fact its readings rest on changed after it worked them out (2026-11-26): it works every reading out again from the
+   * facts as they stand. Cleared when its part is done again.
+   */
+  factsChanged?: boolean;
+  /**
    * The person's notes on the agent's values, by the value's key (J5, one calculator screen). Written on the Paid
    * site, to give context to a number. An agent never writes here.
    */
@@ -800,6 +805,11 @@ export interface ChangedFacts extends AddedFacts {
   newScreening: KindFact[];
   /** The agents whose figure no longer fits. It is off the record, and their part is not done. */
   figuresOff: AgentId[];
+  /**
+   * True when every pathway's reading came off, because a fact it rests on changed (2026-11-26). The eligibility agent
+   * is called again, and works every reading out again from the facts as they stand.
+   */
+  readingsOff: boolean;
 }
 
 /** What each calculator would work with, to see whether its figure still fits. */
@@ -862,11 +872,21 @@ export function changeFacts(record: ProjectRecord, agent: AgentId, given: GivenF
   }
   // The water the source gave before the project was said about the other source, so it is asked again.
   if (changed.includes("waterSource") && given.withoutProjectM3PerYear === undefined) delete start.facts.withoutProjectM3PerYear;
+  // What the project does was said about the source and the treatment as they were, so it comes off with them. A new
+  // line in the same answer takes its place.
+  if (!owner && (changed.includes("waterSource") || changed.includes("treatment"))) delete start.facts.does;
+  // EVERY READING IS WORKED OUT AGAIN when a fact changes (the rulings page, section 4): each pathway's reading comes off,
+  // and the eligibility agent is called again, with the rows it set kept for it to check.
+  const readingsOff = changed.length > 0 && Object.keys(start.pathways).length + Object.keys(start.eligibility ?? {}).length > 0;
+  if (readingsOff) {
+    start.pathways = {};
+    start.agents.phoebe = { ...start.agents.phoebe, done: false, factsChanged: true };
+  }
   const rest: GivenFacts = { ...given };
   for (const key of [...onRecordPage, ...later]) delete rest[key];
   const out = addGivenFacts(start, agent, rest);
   const touched = changed.length > 0 || out.added.some((k) => TOUCHED.includes(k));
-  return { ...out, changed, onRecordPage, newScreening: later, figuresOff: touched ? takeOff(record, out.record) : [] };
+  return { ...out, changed, onRecordPage, newScreening: later, figuresOff: touched ? takeOff(record, out.record) : [], readingsOff };
 }
 
 // ── The save ticket (2026-11-25) ─────────────────────────────────────────────────────────────────────────────────
@@ -912,6 +932,7 @@ export function setAgentResults(record: ProjectRecord, agent: AgentId, results: 
   if (results.estimate === null) delete part.estimate;
   else if (results.estimate !== undefined) part.estimate = { ...results.estimate };
   if (results.done !== undefined) part.done = results.done;
+  if (results.done === true) delete part.factsChanged;
   out.agents[agent] = part;
   return out;
 }

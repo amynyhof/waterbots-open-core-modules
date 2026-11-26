@@ -51,6 +51,11 @@ export type CalvinProject = ModuleProject<SavedAnalysis> & {
    * shows V2.0 on its own, and says what the V1.0 side waits for.
    */
   answerV1?: Answer;
+  /**
+   * WHETHER THE SITE HAS A PROJECT RECORD PAGE (a door's facts, 2026-11-26). `false`: the screen never points to one, and
+   * the person gives each fact in the chat. Left out: the site has one, as before.
+   */
+  recordPage?: boolean;
 };
 
 /** What powers the water system's pump. */
@@ -266,7 +271,7 @@ const listFacts = (labels: string[]) =>
  * does not know the host's pages. A technology the calculator does not cover gets its own sentence:
  * it is not missing, so asking for it would be a dead end.
  */
-export function missingFactsPrompt(missing: ProjectFact[], technology?: string, uncovered?: string, answer?: Answer): string | null {
+export function missingFactsPrompt(missing: ProjectFact[], technology?: string, uncovered?: string, answer?: Answer, recordPage = true): string | null {
   if (missing.length === 0) return null;
   const noTechnology = missing.some((f) => f.key === "technology");
   // HELD FOR NOW, NOT SET UP YET, OR A LABEL THAT IS NOT COVERED YET: nothing is missing, so nothing is asked for again.
@@ -278,7 +283,9 @@ export function missingFactsPrompt(missing: ProjectFact[], technology?: string, 
     return "The calculator can't run for this project — it covers community water supply and household water treatment, and this project's technology is recorded as other.";
   }
   const it = missing.length === 1 ? "it" : "them";
-  return `The calculator can't run yet — this project's record is missing ${listFacts(missing.map((f) => (f.key === "technology" && answer?.says === "ask" ? FACT_LABEL[answer.fact] : f.label)))}. Fill ${it} in on the project record and the numbers will appear here.`;
+  const missingWords = `The calculator can't run yet — this project's record is missing ${listFacts(missing.map((f) => (f.key === "technology" && answer?.says === "ask" ? FACT_LABEL[answer.fact] : f.label)))}.`;
+  // A site with no Project Record page is never pointed to one: the sentence that sends the person there is left out.
+  return recordPage ? `${missingWords} Fill ${it} in on the project record and the numbers will appear here.` : missingWords;
 }
 
 function positiveOrNull(n: number | undefined): number | null {

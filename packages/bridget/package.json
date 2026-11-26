@@ -1,6 +1,6 @@
 {
   "name": "@waterbots/bridget",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "WaterBots open core module: bridget (the basin map). Her instructions, the checks on her answer and on the pin, and reading GPS numbers. The map and its data wait for the rights check. Not published.",
   "license": "Apache-2.0",
@@ -31,6 +31,6 @@
     "build:agent-files": "node -e \"for (const f of ['prompt.md', 'config.yaml']) require('node:fs').copyFileSync('src/agents/bridget/' + f, 'dist/' + f)\""
   },
   "dependencies": {
-    "@waterbots/core": "0.4.x"
+    "@waterbots/core": "0.5.x"
   }
 }

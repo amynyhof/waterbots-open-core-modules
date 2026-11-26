@@ -15,7 +15,7 @@ import type { StandardId } from "./standards.js";
 import type { Door, Place } from "./places.js";
 // The ".js" lets the built file load in plain Node, such as a host serving an agent's tool through MCP.
 import type { Ask } from "./chat";
-import { KIND_ASKS } from "./projectKinds.js";
+import { KIND_ASKS, NO_CALCULATOR_YET } from "./projectKinds.js";
 import { type AgentId, type ProjectFacts, type ProjectRecord, type Reading, type WaterSupply, AGENTS, DRINKING_WATER_TYPE, NEW_SUPPLY_TYPE, emptyRecord, needsHomeUse, projectExists, recordCarbon, recordWaterSupply } from "./record.js";
 
 /** The map's version. A record notes the version it was last mapped with. */
@@ -200,6 +200,15 @@ export type NotCalled =
   | "another kind of project";
 
 export type AgentCall = { agent: AgentId; called: true; introduce: boolean } | { agent: AgentId; called: false; because: NotCalled };
+
+/**
+ * What a visitor reads for a calculator agent that is in play and has no figure here (2026-11-26): the one sentence the
+ * agent's own desk shows (the maintainer's words, 2026-11-25), so the crew list and the desk give the same answer.
+ * Null for every other reason: those are steps of the walk, not an answer about the project.
+ */
+export function noFigureWords(because: NotCalled): string | null {
+  return because === "not covered yet" || because === "not set up yet" || because === "another kind of project" ? NO_CALCULATOR_YET : null;
+}
 
 /** The steps of a project's walk, in order. Calvin and Violet share the last, and neither waits for the other. */
 export const STEPS = [

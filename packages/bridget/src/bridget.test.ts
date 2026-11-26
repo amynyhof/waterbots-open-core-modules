@@ -237,8 +237,12 @@ describe("her instructions", () => {
     expect(paid).not.toContain("You have no memory");
     expect(paid).not.toContain("by itself");
   });
-  test("her own text restates no agent rule, holds no line for her to say, and leaves the map data's lines for its own step", () => {
-    expect(prompt).not.toMatch(/two or three short sentences|work out numbers yourself|Never ask its name|in your own words|I'm still being built|\bK[1-6]\b/);
+  test("the maintainer's words of 31 October are back, as the meaning she keeps when asked what else she does (2026-11-26)", () => {
+    expect(prompt).toContain(`keeping this meaning: "I'm still being built, so today I can only help you pin your project and tell you about the water stress in that area. Soon I'll also help you find other projects and funders where you work."`);
+    expect(prompt.split("still being built")).toHaveLength(2);
+  });
+  test("her own text restates no agent rule, holds no other line for her to say, and leaves the map data's lines for its own step", () => {
+    expect(prompt).not.toMatch(/two or three short sentences|work out numbers yourself|Never ask its name|in your own words|\bK[1-6]\b/);
     expect(prompt).not.toMatch(/derived|Free site|thirty messages/i);
     expect(prompt).not.toContain("## How an agent talks");
   });

@@ -155,7 +155,7 @@ describe("her chat opens first", () => {
   const turn = { projectName: "Invented", input, result: computeD3(input), chosen: true } as const;
   it("on a site: she speaks first, asks the one question, and does not introduce herself", () => {
     const block = violetChatContext({ ...turn, place: "free-site", opened: true });
-    expect(block).toContain("has already met you. Speak first");
+    expect(block).toContain("this is your first turn with them: you have not talked before. Speak first");
     expect(block).toContain("- People served: 1,200");
     expect(block).toContain("The one thing to ask now: whether people have full access");
     expect(VIOLET_OPENED).toBe("(The visitor opened Violet's chat.)");
