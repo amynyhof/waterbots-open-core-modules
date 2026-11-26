@@ -14,7 +14,7 @@
   "scripts": {
     "typecheck": "npm run build -w @waterbots/core && npm run typecheck:built",
     "test": "npm run build -w @waterbots/core && npm run build -w @waterbots/calvin && npm run test:built",
-    "build": "npm run build -w @waterbots/core && npm run build -w @waterbots/calvin -w @waterbots/phoebe -w @waterbots/bridget -w @waterbots/violet",
+    "build": "npm run build -w @waterbots/core && npm run build -w @waterbots/calvin -w @waterbots/phoebe -w @waterbots/wellington -w @waterbots/bridget -w @waterbots/violet",
     "check": "npm run build && npm run typecheck:built && npm run test:built",
     "typecheck:built": "npm run typecheck --workspaces",
     "test:built": "node scripts/check-packages.mjs && node --test .github/lanes/lane-rule.test.mjs scripts/check-names.test.mjs scripts/check-paid-code.test.mjs scripts/check-seed.test.mjs scripts/check-engine-entry.test.mjs scripts/check-screen-entry.test.mjs scripts/check-agent-rules.test.mjs scripts/check-core-series.test.mjs scripts/check-crew-list.test.mjs && node scripts/check-seed.mjs && node scripts/check-engine-entry.mjs --built && node scripts/check-screen-entry.mjs --built && node scripts/check-paid-code.mjs packages && npm run test --workspaces"

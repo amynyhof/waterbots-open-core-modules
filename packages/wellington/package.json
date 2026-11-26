@@ -1,0 +1,41 @@
+{
+  "name": "@waterbots/wellington",
+  "version": "0.1.0",
+  "private": true,
+  "description": "WaterBots open core module: wellington (the Team Lead). His instructions, the project types, the checks on what he heard, and his reading of the agent map. Not published.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "directory": "packages/wellington"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./prompt.md": "./dist/prompt.md",
+    "./primer.md": "./dist/primer.md",
+    "./free-site.md": "./dist/free-site.md",
+    "./paid-site.md": "./dist/paid-site.md",
+    "./lobby-chat.md": "./dist/lobby-chat.md",
+    "./config.yaml": "./dist/config.yaml"
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "NOTICE"
+  ],
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "build": "tsc -p tsconfig.build.json && npm run build:agent-files",
+    "build:text": "node -e \"const fs=require('node:fs');const t={};for(const [k,f] of [['PROMPT_MD','prompt'],['PRIMER_MD','primer'],['FREE_SITE_MD','free-site'],['PAID_SITE_MD','paid-site'],['LOBBY_CHAT_MD','lobby-chat']])t[k]=fs.readFileSync('src/agents/wellington/'+f+'.md','utf8').split(String.fromCharCode(13)).join('');fs.writeFileSync('src/ownText.generated.ts',['// MADE BY npm run build:text FROM src/agents/wellington/*.md. Change those files, then run it.',...Object.entries(t).map(([k,v])=>'export const '+k+': string = '+JSON.stringify(v)+';'),''].join(String.fromCharCode(10)))\"",
+    "build:agent-files": "node -e \"for (const f of ['prompt.md', 'primer.md', 'free-site.md', 'paid-site.md', 'lobby-chat.md', 'config.yaml']) require('node:fs').copyFileSync('src/agents/wellington/' + f, 'dist/' + f)\""
+  },
+  "dependencies": {
+    "@waterbots/core": "0.4.x"
+  }
+}
