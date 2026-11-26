@@ -19,22 +19,22 @@ Benchmarks and pass rates are v2. No water-benefit filing match is needed for v1
 ---
 
 Each step is one coherent, testable thing the maintainer can check in one sitting and undo in one motion. Each step holds items:
-the pull requests or checks inside it. Each step belongs to one of the nine families below. "Family" means only those
-nine. `[x]` done (merged), `[~]` open pull request, `[ ]` not started,
+the pull requests or checks inside it. Each step belongs to one of the ten families below. "Family" means only those
+ten. `[x]` done (merged), `[~]` open pull request, `[ ]` not started,
 `[!]` blocked until the maintainer acts. **(V1)** marks an item inside a step that v1 needs, even where the rest of its step
 comes after v1. **(V2)** marks an item planned for v2.
 
 All of M1 to M10 is `Grant: open`. Edits to this plan and the build log are `Grant: neither`.
 
-## The nine families
+## The ten families
 
-One set of nine families, the same for all three repos. Every open step, item and open question
+One set of ten families, the same for all three repos. Every open step, item and open question
 carries one family label, written *Family: name.* In the Road to v1 table it is the Family column. A step's label is its
 main family. An item inside it that belongs to another family carries its own label.
 
 | Family | What belongs here |
 |---|---|
-| 1. Agent orchestration | how agents plug into both sites; the one shared project record; what each agent reads and writes; which pathway and method a project is on and which are unlikely; hand-offs between agents; installing core releases. |
+| 1. Agent orchestration | during a visit: how agents read the project's facts, write them, and talk about them while the person is there; how agents plug into both sites; the one shared project record; what each agent reads and writes; which pathway and method a project is on and which are unlikely; hand-offs between agents; installing core releases. |
 | 2. Calculators and methods | the maths, method values, defaults, labels and where each value comes from. |
 | 3. Knowledge | what the agents are allowed to know: cards, packs, hosted copies. |
 | 4. Console and surfaces | what a visitor sees and clicks, the same on both sites: layout, navigation, header, Save, words, phone, design, report. |
@@ -43,6 +43,11 @@ main family. An item inside it that belongs to another family carries its own la
 | 7. Paid platform | paid-only structure: roles, organizations, programs, documents. |
 | 8. Security and hygiene | secrets, names to block, alerts, repo settings, speed and weight, stale rules and docs, close-outs. |
 | 9. Experts and partners | what outside experts review, what we owe partners, and what we send them. |
+| 10. Project data and evidence | after Save: what is kept, what comes across from a screening, versions and evidence. |
+
+**The line between families 1 and 10** (the maintainer, 2026-11-26): during a visit is family 1, Agent orchestration:
+how agents read the project's facts, write them, and talk about them while the person is there. After Save is family
+10, Project data and evidence: what is kept, what comes across from a screening, versions and evidence.
 
 **Needs a family:** nothing today.
 
@@ -60,13 +65,12 @@ sites pin that file by its fingerprint. The first pinned version includes the sl
 | # | Family | Step | Waits on | Done when |
 |---|---|---|---|---|
 | V5 | v1 proof and grading | [~] (Released 2026-11-05: tag `calvin-v0.1.0` on commit `3020ee7`, recorded in `SEEDS.md`. Still to come: both sites pin it, and the private side reports pass or fail.) The first GitHub release: the packed packages (`calvin` and the `core` it needs) and their fingerprints, with both views: the ex-ante view with sliders, and the full ex-post view. A site mounts them through `@waterbots/calvin/screen`; the open site locks to ex-ante. Replaces the npm publish in M2.2. It does not wait for the simple view. | The maintainer's approval; the tag rule (M1.4). | The release holds the files and their fingerprints. Both sites pin it. The private side reports pass or fail on both carbon filings. |
-| J1 to J9 | Agent orchestration | The v1 scope of family 1. See "Family 1: the v1 scope" below. | See each job. | See each job. |
+| J1 to J9 | Agent orchestration | What family 1 left open (closed 2026-11-26). See "Family 1: what is left" below. | See each item. | See each item. |
 | V8 | Experts and partners | [x] (Merged, pull request #18. Still to come: the outside expert's check, and N14 and N15 for the outside expert group.) D-3, the water-supply module, inside Violet (M8.1). | It does not wait for the activity-type signature or N6: D-3 is a prototype the outside expert checks later. | Violet's D-3 tests are hand-worked cases, with every step cited to the guidebook (cited, not copied). The VWBA spec is written alongside the build, in `docs/`, and the maintainer reviews it then. An outside expert checks the module once the prototype is up. |
 | V14 | v1 proof and grading | The same-numbers check: a project saved by the screening, read back the way the paid site reads it, gives the same numbers, or a list of what changed and why. | J3, J4, J5. | A test passes here on invented projects. The private side runs it on both real filings with the pinned release and reports pass. |
 | V15 | v1 proof and grading | The v1 release: a GitHub release that both sites pin. | V8, V14; the maintainer's approval. | Both sites run the same pinned file. The maintainer confirms the whole journey on the live sites, and the average question count is reported. |
-| V20 | Agent orchestration | [x] (Released: tag `calvin-violet-v0.5.0` on commit `1bce514`. The sites install it through 0.5.1, J1.) Calvin and Violet 0.5.0, one release for both sites. Calvin: the main credit tiles (tCO₂e a year) are a pinned header, whether or not a site sets `unpinFigureBlock`; the smaller figures sit right under them; the sliders and the calculation collapse. The controls panel holds only the site's own top and Calvin's buttons, the work surface ends with the calculation, and the report's note on how the figures were produced is one sentence shorter. A phone pass: rows wrap instead of squeezing. Violet: people served come from the project record, as Calvin takes them, and "Draft — pending expert review" shows on the screen and on every result. No sum changes. | V8. | Session C packs all three packages, runs the release check and makes the tag. One release holds all three files. After "release it", Session C pushes the tag and publishes the release. Both sites install it. |
 
-**Where things stand (2026-11-26):** The latest release is core 0.4.0, Calvin 0.8.0, Violet 0.8.0, Phoebe 0.1.0, Wellington 0.1.0 and Bridget 0.1.0, one tag each on commit `f517709`. It holds the kinds of project (#61) and the first packages of Phoebe, Wellington and Bridget (#63). Both sites installed all six on 2026-11-26 and walked them with the real model. Open pull request #64: a fact is filled only when the person gave it, each door's plain facts, and the walk's fixes. The open site's install waits for its release. From now on a package's number moves only when that package changes. Family 1, Agent orchestration, is open: its v1 scope is J1 to J9. Finished steps are in the build log.
+**Where things stand (2026-11-26):** Family 1, Agent orchestration, closed on 2026-11-26. The latest release is core 0.5.0, Calvin 0.9.0, Violet 0.9.0, Phoebe 0.2.0, Wellington 0.2.0 and Bridget 0.2.0, one tag each on commit `56ddd21` (#64). Both sites installed it and walked the river case with the real model, and no fact was guessed on either. A package's number moves only when that package changes. What family 1 left open is in "Family 1: what is left". Finished steps are in the build log.
 
 **Sources still to find:** in the source sweep, M10.4.
 
@@ -86,165 +90,67 @@ sites pin that file by its fingerprint. The first pinned version includes the sl
 - *Family: Security and hygiene.* SP6, the human engineer review. It runs alongside and blocks nothing.
 - *Family: Console and surfaces.* A view on Calvin's screen that shows the V1.0 figure on its own, for a project only the
   2021 version counts. Until then his tool gives that figure (the maintainer, 2026-11-25).
-- *Family: Console and surfaces.* Wellington's package on the paid site, where he answers in a different shape. The
-  paid site could not use it on its walk of 2026-11-26. Not changed now.
 
-## Family 1: the v1 scope (Agent orchestration)
+## Family 1: what is left (Agent orchestration, closed 2026-11-26)
 
-*Family: Agent orchestration.*
-
-Ruled by the maintainer on 2026-11-22. All three repos use these words for these jobs. Everything else in family 1
-stays after v1 and is not part of this sprint. The agent map's design is approved (2026-11-22).
+*Family: Agent orchestration.* During a visit: how agents read the project's facts, write them, and talk about them
+while the person is there.
 
 **Guiding line:** Wellington manages the team to gather what the project needs and keep it moving. The other agents do
 their tasks, collect what they need, and report back to him. He helps with the next steps.
 
-- [ ] **J1.** Release Calvin and Violet 0.5.1 as one joined release. After it, each agent gets its own release, so one
-      agent can be updated without the other. Both sites install the same release in the same batch.
-  - Released 2026-11-22: tag `calvin-violet-v0.5.1` on commit `b29c124`, with Calvin 0.5.1, Violet 0.5.1 and core
-    0.1.2. Its notes list everything since 0.5.0.
-  - Still to come: both sites install it in the same batch, and take the steps in Calvin's and Violet's READMEs,
-    "Changes in 0.5.0" and "Changes in 0.5.1". It takes the place of installing 0.5.0 (was C5.5).
-  - After 0.5.1: one tag and one GitHub release for each package, all going out in one batch at the family close.
-    A batch went out on 2026-11-23, before the close: `core-v0.2.0`, `calvin-v0.6.0` and `violet-v0.6.0`, all on
-    commit `9336e92`. Both sites install the three together: Calvin and Violet each need exactly core 0.2.0.
-    A second batch went out on 2026-11-25: `core-v0.3.0`, `calvin-v0.7.0` and `violet-v0.7.0`, all on commit `d59a385`.
-    Calvin and Violet each take any core 0.3 version from here. A third went out on 2026-11-26: all six packages, one
-    tag each on commit `f517709`. From then on a package's number moves only when that package changes, so Calvin and
-    Violet no longer move together (the maintainer, 2026-11-26).
-- [ ] **J2.** Doors. Each host tells each agent which door it is at: Free site, Paid site, Agent Commons or MCP (agent
-      rule 21). An agent working alone asks for what it needs itself. This covers how Calvin opens in the Agent
-      Commons.
-  - In this repo: one list of places in `core`. It holds the four doors, and the lobby chat, which is not a door.
-    Calvin and Violet take their door from the host. Violet's own `doors.ts` gives way to core's. Today it hands
-    back to no one in the Agent Commons and always shows water.
-  - Calvin in the Agent Commons (was V17): he opens with two choices. "New project estimate" sets `creditedUnderV1`
-    to `false`. "Compare old and new rules" sets it to `true`, and still asks for the filed V1.0 fNRB before any
-    comparison. The choices' wording, what each sets and his opening line live in the open core. The Commons host
-    only draws the buttons. On the sites, the record sets `creditedUnderV1`, and no choice is shown.
-    - [!] Waits on the maintainer's ruling on the wording.
-  - Calvin's agent tools are exported from his package, as Violet's are, or retired with his Commons choices.
-  - Released 2026-11-23 (#46, #49): the places in `core`; Calvin and Violet take their place from the host;
-    Violet's doors give way to the map, and her old names still work; Calvin's tools, record helpers and two Commons
-    choices are exported from `@waterbots/calvin/agent`. Each choice sets `creditedUnderV1`, and the comparison still
-    needs the filed V1.0 fNRB. Still to come: the choices' wording and his opening line.
-- [ ] **J3.** The shared project record. Every agent adds its facts and results to one record, and the paid site reads
-      it (agent rule 10). It holds each pathway's reading (likely, more to learn, unlikely) with its reason and what
-      would change it. It refuses a count below zero where it is entered. One shared list turns each site's
-      technology label into the record's code.
-  - In this repo: the record's shape, its fact check and the label list go in `core`. The proposal is
-    `docs/proposals/shared-project-record.md`. Then Calvin and Violet add their facts and results to it. Today Calvin
-    saves only his inputs, and Violet saves nothing.
-  - Was W1: a count of people served below zero got no message. Done when the record refuses it where it is entered,
-    and Calvin and Violet each say the record's count is below zero.
-  - Was W3: the label "Community level water treatment technologies" was read as `other`, so Calvin would not run.
-    Done when one list in `core` turns the sites' labels into the record's codes, and a test covers this label.
-  - Was V9 and V12, and stays v1, because the v1 finish line counts the questions on each walk: each agent writes how
-    many questions it asked on that walk. A fact read from the record is not a question. Done when a test takes a
-    made-up project through every agent's part, saves it, reads it back unchanged, and gives each agent's question
-    count.
-  - Waits on: nothing more. The free site's labels, Wellington's fields and the paid site's save format came as carries
-    on 2026-11-23.
-  - Released 2026-11-23 (#46, #49): the record's shape, its fact check and the label list in `core` (W3 done).
-    Calvin and Violet read the record first, ask only for what it lacks, and add their facts, results and question
-    counts. A test takes a made-up project through Calvin's part and Violet's part, saves it, and reads it back
-    unchanged. Still to come: the parts of Wellington, Phoebe and Bridget (J5).
-  - W3 is changed by the maintainer's ruling of 2026-11-23: community level treatment is not counted. Core's label list
-    gives no technology code to it, to institutional treatment, or to a new well logged as an alternative water supply,
-    until the experts answer (N17). Each says it is not covered yet. Core 0.2.0 gave community level treatment a code;
-    core 0.3.0 takes it away.
-  - Decided by the maintainer on 2026-11-25: a project's kind is worked out in core from a few plain facts, and nobody is asked
-    for it. One table in core says what Calvin and Violet do with each. Community level treatment is counted for carbon
-    again, treatment only included; institutional treatment is not set up yet. An update never changes a screening: one
-    that already exists keeps its answers, and working a project out again is a new screening beside it. Core also holds
-    the guards on an agent's numbers. Merged (#61).
-  - Value ranges, ruled by the maintainer on 2026-11-23. Each value a person can enter has a range. A number outside it
-    is refused where it is typed, with a message that names the value and the range. One list, one check and one message
-    in `core`; the record's fact check, both screens and both tools use them. A method cap is not a range. This gives
-    the screens their words for a count below zero (W1). Released 2026-11-25 (#56).
-- [ ] **J4.** The agent map. ONE map, kept in the core, reads the project's facts and the door, and says which agents
-      are in play, which method applies, and what comes next. It is worked out from facts, so the same project always
-      gets the same agents. Wellington leads from it on both sites. It replaces one-off rules. It must cover at least:
-      - on "likely" or "more to learn", a pathway's calculator agent is called and shows;
-      - on "unlikely", it is not called, and the visitor is told what would change it;
-      - with no pathway forward, Bridget is not called and Wellington points to the WaterBots team;
-      - a transitioning project also sees the legacy calculator (today it does not);
-      - one entry for each carbon method.
-  - In this repo: the map is one function and one table in `core`, with a test for each rule on made-up projects. It
-    also knows the lobby chat: there, only Wellington is called, there is no record, nothing is calculated, and his
-    one next step is to point the visitor to a door.
-  - Was V6 and M3, the method registry: the map's table holds one entry for each carbon method (V1.0, V2.0 and the
-    transition).
-  - Was W2: a pathway read as unlikely still got a water figure. Done when the host does not call the calculator agent
-    of an unlikely pathway.
-  - Released 2026-11-23 (#46): the map and its table in `core`, with a test for each rule. Violet follows it
-    (#49), so an unlikely water pathway no longer gets her calculator (W2).
-  - Found on the open site's install: the map asked about four pathways, and that site reads two, so it never reached
-    "no pathway forward". A site now names the pathways it reads, and the map asks only about those.
-  - Ruled by the maintainer on 2026-11-24: a later agent is called only when the agent before it has finished, and the
-    map gives each agent its step and how many steps the project has. Calvin and Violet share the Quantify step, and
-    neither waits for the other.
-  - Ruled by the maintainer on 2026-11-24: the map calls Violet for the kinds of project that give people water, starting
-    with the kinds the guidebook lists for D-3 by name (VWBA 2.0, Appendix C, Table C-1, pp.37 to 39; Appendix D, D-3,
-    pp.44 to 46). Treatment is not covered yet (N18). For any other kind the pathway stays in play with no calculator
-    agent. A new or alternative water supply is covered for water only where people use the water at home, and that is
-    asked first. Violet's tool refuses treatment in the Agent Commons and at MCP too,
-    as Calvin's do. Rainwater harvesting stays for later (M8.4). Released 2026-11-25 (#57).
-  - [!] Four rules that say which project facts point to which pathway have no source yet. They are listed in the
-    record proposal. Until the maintainer rules them, the map uses only the eligibility readings and the two rules this
-    repo can cite.
-- [ ] **J5.** Finalize all five current agents in v1: Wellington, Phoebe, Bridget, Calvin and Violet, each as an
-      installable package in the core. Bridget's map data needs a rights check before it goes into a public repo.
-      Violet becomes her own crew member on both sites, through the shared spec.
-  - In this repo: Phoebe (was V10 and M9.1) and Bridget (was V11 and M9.2) reach their first release, and Wellington
-    gets a package. Each agent's files come as a carry from the site that holds them.
-  - The plan, approved by the maintainer on 2026-11-23, in this order: core, Phoebe, Wellington, Bridget without map
-    data, then Bridget's map after the rights check. Each is its own pull request.
-  - Step 1, core: the crew list, the checks on a reply, the rest of the open site's facts, Phoebe's rows, and Calvin's and
-    Violet's own files, settings and chats. Released 2026-11-25 (#57).
-  - Steps 2 to 4: Phoebe, Wellington and Bridget without map data, each a package. Released 2026-11-26 (#63).
-  - Found on both sites' walks of 2026-11-26: an agent filled facts nobody gave, and a door did not say what Save does
-    or that a site passes its own values. A fact is now filled only when the person gave it, and each door's plain
-    facts reach every agent. Open pull request (#64).
-  - Waits on: Phoebe's and Bridget's rulings; the rights check on every one of Bridget's data files; a ruling on the
-    shared map key.
-  - One calculator screen (ruled by the maintainer on 2026-11-23).
-    - One calculator screen for every calculator agent. What is done for Violet is done for Calvin, and the other
-      way round.
-    - Violet's screen gets header rows and hero numbers like Calvin's, where it makes sense: the same height, the
-      same format, collapsible formulas, and sliders where they make sense.
-    - A place to write notes on a value. Both calculators get it, and the notes make it into the export.
-    - Subtle colour grades on each calculator to match its agent: Calvin's colour for Calvin, Orchid for Violet. It
-      helps keep the tools apart.
-    - The same rule holds on the Free site and the Paid site, where the screens are slightly different. Violet's
-      paid screen matches Calvin's paid screen, and her free screen matches his free screen.
-    - Released 2026-11-23 (#52, #54): all of the above, for Calvin and Violet. Violet has a report like Calvin's.
-      Calvin's colour is Tide until Reef ships.
-    - The notes, as the maintainer answered on 2026-11-23. The Paid site's export carries the person's notes and the
-      agent's, each labelled. The Free site's and the Agent Commons' exports carry the agent's. MCP has no export: the
-      tool returns which values are blank or assumed, as facts, and the visitor's own AI says it.
-    - Still to come: each site passes the place, the Paid site saves the notes, and later calculator agents follow the
-      same screen.
-- [ ] **J6.** Saving a screening into the paid site: the count of people served crosses over correctly, and the paid
-      record never shows "people" as a unit nobody chose.
-  - In this repo: the record keeps people served the way it was entered, as people or as households. It never fills in
-    a unit on its own. The paid site's save does the rest.
-- [ ] **J7.** The maintainer signs off the first water-benefit activity type (safe drinking water supply). No building.
-- [ ] **J8.** Reword the 30 lines the seed checks catch on the paid site, before the next agent moves into the core.
-  - The paid site's work. Files carried here for J5 pass this repo's checks.
-- [ ] **J9.** Close the gaps against the agent rules: agents never talk about their own limits (rule 6); a build rule for
-      a needed fact left blank (rule 11); no repeat introductions (rule 17); the link to the WaterBots team and the
-      consulting page (rule 13; the address waits on the maintainer).
-  - In this repo:
-    - Calvin's and Violet's words are checked for any talk of their own limits.
-    - The record lists each needed fact that is still blank, and which agent needs it.
-    - The map says when an agent still needs an introduction.
-    - The consulting page's address is kept in one shared file in `core`.
-  - Released 2026-11-23 (#46, #49): Calvin's and Violet's words checked; Violet's prompt no longer frames her
-    method's standing as her own limits. Both prompts say what each needed fact is for and where it usually comes
-    from, and the record lists each needed fact still blank. The map says when an agent still needs an introduction.
-    Still to come: the consulting page's address.
-  - [!] Two values stand in for a blank in Calvin. See "A value stands in for a missing one" below.
+The v1 scope was J1 to J9, ruled by the maintainer on 2026-11-22. Everything released is in the build log. What is
+left is below. `[!]` waits on the maintainer.
+
+**Left open, marked v1** (the maintainer: it must be fixed before v1):
+
+- [ ] **(V1)** An agent may tell the visitor it wrote a fact down when the guard refused it. Seen on the open site's
+      first walk on 2026-11-26.
+
+**Left open, for the maintainer to mark:**
+
+- [ ] A project core answers "held for now" is still filed by the map under "not covered yet", so the sites show the
+      "no calculator yet" sentence.
+- [ ] Phoebe is not called by herself when a fact changes. Her readings run again only when the visitor next writes
+      to her.
+- [ ] Phoebe can say more than her worksheet holds: she said both paths look likely while one row was still "more to
+      learn".
+- [ ] The door's choices for when a change is kept lack the open site's true answer: nothing is kept after the visit
+      unless the visitor chooses Save and sign up. The open site had to choose "on save".
+- [ ] Calvin's list of missing facts still names "technology", which no site asks for any more.
+- [ ] A stray "(ref)" showed twice in Calvin's reply on the open site.
+- [ ] Stale wording in code this sprint touched, left for the next pull request in these files: Wellington's
+      `answer.ts` still says, in its header and beside `HIS_KIND_FACTS`, that the other yes-or-no facts are kept only
+      when the map asked for them. Core's guard on facts now decides that.
+
+**Still to come from J1 to J9:**
+
+- [!] **J2.** Calvin's two choices in the Agent Commons: their wording and his opening line wait on the maintainer's
+      ruling.
+- [ ] **(V1) J3.** A test takes a made-up project through every agent's part, saves it, reads it back unchanged, and
+      gives each agent's question count. Today it covers Calvin's part and Violet's part.
+- [!] **J4.** Four rules that say which project facts point to which pathway have no source yet. They are listed in
+      the record proposal. Until the maintainer rules them, the map uses only the eligibility readings and the two
+      rules this repo can cite.
+- [ ] **J5.** Bridget's map, after the rights check on every one of her data files, and a ruling on the shared map key.
+      One calculator screen: each site passes the place, the Paid site saves the notes, and later calculator agents
+      follow the same screen.
+  - [!] Phoebe's, Wellington's and Bridget's rulings.
+- [!] **J7.** The maintainer signs off the first water-benefit activity type (safe drinking water supply). No building.
+- [ ] **J8.** Reword the 30 lines the seed checks catch on the paid site. The paid site's work.
+- [!] **J9.** The consulting page's address, kept in one shared file in `core` (rule 13). Two values stand in for a
+      blank in Calvin: see "A value stands in for a missing one" below.
+
+## Family 10: Project data and evidence
+
+*Family: Project data and evidence.* After Save: what is kept, what comes across from a screening, versions and
+evidence.
+
+- From J3: An update never changes a screening: one that already exists keeps its answers, and working a project out
+  again is a new screening beside it. (Decided by the maintainer on 2026-11-25; built in `core`, #61.)
+- [ ] From J6: Saving a screening into the paid site: the count of people served crosses over correctly, and the paid
+      record never shows "people" as a unit nobody chose. In this repo the record keeps people served the way it was
+      entered, and never fills in a unit on its own. The paid site's save does the rest.
 
 ---
 
@@ -416,7 +322,8 @@ the maintainer.
 - [ ] *Family: Security and hygiene.* **`referenceCaseCount`**, a name in Calvin's screen code (`CalculatorWork.tsx`),
       still says "reference case" for the made-up test cases. Left as it is: a name in code.
 - [!] *Family: Security and hygiene.* **No copied-text check.** `RULINGS.md` section 1 says every release is checked for
-      copied text. This repo's release check has none. A new check needs the maintainer's yes.
+      copied text. This repo's release check has none. A new check needs the maintainer's yes. Seen again at the
+      family 1 close: two releases went out on 2026-11-26 without one.
 - [!] *Family: Security and hygiene.* **Merged branches stay on GitHub** (23 besides `main`). GitHub's setting to
       delete a branch when its pull request merges would stop new ones.
 - [!] *Family: Security and hygiene.* **Three rules wait in `CLAUDE.md`** ("Waiting for the maintainer"): the Grant
@@ -425,6 +332,16 @@ the maintainer.
       when they are not entered, with a warning. `RULINGS.md` section 2 says a missing fact never counts as zero.
       Devices per household is 1 when not given, as Calvin's own rulings say. Changing either changes a sum. Goes with
       J9 (rule 11).
+
+## Found in the Agent orchestration sprint (closed 2026-11-26)
+
+Each finding from the family 1 sprint that is not family 1's own. Family 1's are in "Family 1: what is left".
+
+- [ ] *Family: Console and surfaces.* **Wellington on the paid site.** The paid site could not use his package, because
+      he answers in a different shape there.
+- [ ] *Family: Console and surfaces.* **The Agent Commons does not read the installed packages.** Calvin's and Violet's
+      release notes ask for Commons changes that were not made.
+- *Family: Security and hygiene.* The missing copied-text check is listed under the Security and hygiene sprint above.
 
 ---
 

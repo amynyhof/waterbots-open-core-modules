@@ -5,6 +5,10 @@ history keeps everything older and every longer entry.
 
 ---
 
+- 2026-11-26 — **Family 1, Agent orchestration, closed.** Its v1 scope was J1 to J9. What it left is in the build plan.
+- 2026-11-26 — **Release** `core-v0.5.0`, `calvin-v0.9.0`, `violet-v0.9.0`, `phoebe-v0.2.0`, `wellington-v0.2.0` and `bridget-v0.2.0` on `56ddd21`, one tag each (#64). **Carry:** packed to the handoff folder.
+- 2026-11-26 — A fact is filled only when the person gave it, each door's plain facts, and the walk's fixes (#64).
+- 2026-11-26 — Plan and log: six packages released (#65).
 - 2026-11-26 — **Carry:** Bridget's words of 31 October, taken again from `carry-B-to-C-2026-11-25` (3 of 3 files checked match its packing list; name scan 0), for #64.
 - 2026-11-26 — **Release** `core-v0.4.0`, `calvin-v0.8.0`, `violet-v0.8.0`, `phoebe-v0.1.0`, `wellington-v0.1.0` and `bridget-v0.1.0` on `f517709`, one tag each (#61, #63). **Carry:** packed to the handoff folder.
 - 2026-11-26 — Phoebe, Wellington and Bridget: their first packages, with core's look-up fix, answer chips and project words (#63).
