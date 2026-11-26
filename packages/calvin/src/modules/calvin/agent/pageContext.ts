@@ -51,8 +51,8 @@ export interface PageContextInput {
   notCoveredYet?: string;
   /** What the one table says for the project (2026-11-25). Left out for a project that already exists. */
   answer?: Answer;
-  /** A project that already exists, where a newer way would answer differently. */
-  newerWay?: boolean;
+  /** A project credited under V1.0: what the one table says under the 2021 version. Each version's figure stands on its own. */
+  answerV1?: Answer;
   /** Counts on the record that the fact check refuses, such as people served below zero (W1). */
   recordProblems?: Array<Extract<EntryCheck, { ok: false }>>;
 }
@@ -74,7 +74,7 @@ export function calculatorPageContext({
   outOfRange = [],
   notCoveredYet,
   answer,
-  newerWay = false,
+  answerV1,
   recordProblems = [],
 }: PageContextInput): string {
   const withRecord = place === undefined || hasProjectRecord(place);
@@ -86,7 +86,6 @@ export function calculatorPageContext({
   if (notCoveredYet !== undefined && missingFacts?.some((f) => f.key === "technology")) {
     return (
       `The user is on the GS Safe Water calculator for project "${projectName}". Its technology is "${notCoveredYet}", which is not covered yet. ` +
-      (newerWay ? "A newer way to work it out exists. The project keeps its answer, and its owner can choose to redo it on this screen. " : "") +
       "There are NO figures on this screen, and neither tool counts it."
     );
   }
@@ -98,6 +97,7 @@ export function calculatorPageContext({
     return (
       `The user is on the GS Safe Water calculator for project "${projectName}", and it is asking for project facts rather than showing a result. ` +
       `Missing project facts: ${missingFacts.map((f) => (f.key === "technology" && answer?.says === "ask" ? FACT_LABEL[answer.fact] : f.label)).join("; ")}. There are NO figures on this screen. ` +
+      (answer?.says === "ask" && missingFacts.some((f) => f.key === "technology") ? `${answerForAgent(answer)} ` : "") +
       (refused.length > 0 ? `Of these, ${refused.join("; ")}. It is put right where the record is kept. ` : "") +
       (withRecord
         ? "Once the facts are on the project record, the calculator runs."
@@ -159,8 +159,11 @@ export function calculatorPageContext({
             : ` (all of it the methodology transition; no filed V1.0 fNRB on the record, so the fNRB rule update is not shown). `)
         );
       })()
-    : `Current view: PAA v2.0 only, Method ${state.method}, basis ${state.mode}. This is a new project, not credited under V1.0, so the screen shows no V1.0 figure and no transition; do not offer either. ` +
-      `Live calculator result (from the deterministic engine): PAA ER ${pr.result.ER.toFixed(0)} tCO₂e. `;
+    : answerV1 !== undefined && answerV1.says !== "counted"
+      ? `Current view: PAA v2.0 only, Method ${state.method}, basis ${state.mode}. The project was credited under V1.0, and each version's figure stands on its own conditions. The V2.0 figure shows. The V1.0 figure and the transition do not, yet: ${answerForAgent(answerV1)} ` +
+        `Live calculator result (from the deterministic engine): PAA ER ${pr.result.ER.toFixed(0)} tCO₂e. `
+      : `Current view: PAA v2.0 only, Method ${state.method}, basis ${state.mode}. This is a new project, not credited under V1.0, so the screen shows no V1.0 figure and no transition; do not offer either. ` +
+        `Live calculator result (from the deterministic engine): PAA ER ${pr.result.ER.toFixed(0)} tCO₂e. `;
   return (
     `The user is on the GS Safe Water calculator for project "${projectName}". ` +
     figures +

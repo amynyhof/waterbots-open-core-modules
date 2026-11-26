@@ -8,7 +8,7 @@ import {
   householdSizeNeeded,
   type CharcoalConvention, type FuelShares, type ScenarioInput, type SiteTables, type StoveShares,
 } from "../engine";
-import { FACT_LABEL, NO_CALCULATOR_YET, SHORTFALL_WORDS, type Answer } from "@waterbots/core/projectKinds";
+import { CONDITION_LABEL, FACT_LABEL, NO_CALCULATOR_YET, type Answer } from "@waterbots/core/projectKinds";
 import type { SavedAnalysis } from "./analysis";
 import { technologyToMethod } from "./method";
 import { readMonitoringFlags } from "./monitoring";
@@ -45,8 +45,12 @@ export type CalvinProject = ModuleProject<SavedAnalysis> & {
    * `technology` is set only where the table counts it. Left out: a project that already exists, as before.
    */
   answer?: Answer;
-  /** A project that already exists and that today's rules would answer differently (core's `newerWay`). Its screen says so. */
-  newerWay?: boolean;
+  /**
+   * A PROJECT CREDITED UNDER V1.0: what the one table says under the 2021 version (core's `carbonAnswer`). Each version's
+   * figure stands on its own conditions (the maintainer, 2026-11-25). While this one does not count the project, the seat
+   * shows V2.0 on its own, and says what the V1.0 side waits for.
+   */
+  answerV1?: Answer;
 };
 
 /** What powers the water system's pump. */
@@ -58,9 +62,12 @@ export function activityEmissionsAsk(s: Pick<CalcState, "pumpPower" | "activityE
   return null;
 }
 
-/** True when the seat shows the transition: only for a project the site says was credited under V1.0. */
-export function showsTransition(project: Pick<CalvinProject, "creditedUnderV1">): boolean {
-  return project.creditedUnderV1 === true;
+/**
+ * True when the seat shows the transition: only for a project the site says was credited under V1.0, and only while the
+ * 2021 version counts it. Otherwise V2.0 shows on its own conditions.
+ */
+export function showsTransition(project: Pick<CalvinProject, "creditedUnderV1" | "answerV1">): boolean {
+  return project.creditedUnderV1 === true && (project.answerV1 === undefined || project.answerV1.says === "counted");
 }
 
 /** A change to the seat's inputs, kept to V2.0 for a project with no transition: a change of version is dropped. */
@@ -259,14 +266,13 @@ const listFacts = (labels: string[]) =>
  * does not know the host's pages. A technology the calculator does not cover gets its own sentence:
  * it is not missing, so asking for it would be a dead end.
  */
-export function missingFactsPrompt(missing: ProjectFact[], technology?: string, uncovered?: string, answer?: Answer, newerWay = false): string | null {
+export function missingFactsPrompt(missing: ProjectFact[], technology?: string, uncovered?: string, answer?: Answer): string | null {
   if (missing.length === 0) return null;
   const noTechnology = missing.some((f) => f.key === "technology");
   // HELD FOR NOW, NOT SET UP YET, OR A LABEL THAT IS NOT COVERED YET: nothing is missing, so nothing is asked for again.
-  // One sentence for the visitor in every case (the maintainer's words, 2026-11-25).
-  if (noTechnology && answer?.says === "falls short") return SHORTFALL_WORDS[answer.because];
-  // A project that already exists, where a newer way would count it: the note above says so.
-  if (noTechnology && newerWay) return "The calculator can't run for this project yet.";
+  // One sentence for the visitor in every case (the maintainer's words, 2026-11-25). A condition of the method that is not
+  // met has a short label: Calvin explains the condition, from its source.
+  if (noTechnology && answer?.says === "falls short") return CONDITION_LABEL[answer.because];
   if (noTechnology && (answer === undefined ? uncovered !== undefined : answer.says !== "ask")) return NO_CALCULATOR_YET;
   if (technology === "other" && missing.some((f) => f.key === "technology")) {
     return "The calculator can't run for this project — it covers community water supply and household water treatment, and this project's technology is recorded as other.";

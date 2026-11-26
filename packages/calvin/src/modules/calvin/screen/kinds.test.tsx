@@ -3,8 +3,8 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
-import { NO_CALCULATOR_YET, PROJECT_RULES, SHORTFALL_WORDS, type GivenKindFacts } from "@waterbots/core/projectKinds";
-import { NEWER_WAY_NOTE, addGivenFacts, emptyRecord, newProjectRecord, redoUnderTodaysRules, type ProjectRecord } from "@waterbots/core/record";
+import { CONDITION_LABEL, FACT_LABEL, METHOD_CONDITIONS, NO_CALCULATOR_YET, PROJECT_RULES, type GivenKindFacts } from "@waterbots/core/projectKinds";
+import { addGivenFacts, emptyRecord, newProjectRecord, newScreening, type ProjectRecord } from "@waterbots/core/record";
 import { computeScenario } from "../engine";
 import { CALVIN_ANSWER_SCHEMA, CALVIN_ASK_KEYS, calvinAsks, calvinChatContext, calvinKnown, guardCalvinReply, readCalvinAnswer, type CalvinReply } from "../agent/chat";
 import { addCalvinFacts, calvinNeeds, calvinProjectFromRecord } from "../agent/record";
@@ -63,7 +63,7 @@ describe("community level treatment is counted again, treatment only included", 
   it("a project saved with its code has its figure, with no new question", () => {
     const { calc, html } = mount(existing("Community level water treatment technologies", "CWS"));
     expect(calc.paaResult?.result.ER).toBeGreaterThan(0);
-    expect(html).not.toContain(NEWER_WAY_NOTE);
+    expect(html).not.toMatch(/newer way|Redo it/i);
     expect(calc.asks.map((a) => a.key)).toEqual(["pumpPower", "meteredVolumeL"]);
   });
 });
@@ -73,10 +73,10 @@ describe("where no figure shows", () => {
     [{ waterSource: "existing", treatment: "institution" }, NO_CALCULATOR_YET, /not set up yet/],
     [{ waterSource: "new", treatment: "homes" }, NO_CALCULATOR_YET, /not set up yet/],
     [{ waterSource: "existing", treatment: "none" }, NO_CALCULATOR_YET, /held for now/],
-    [{ waterSource: "existing", treatment: "central", publicPiped: true, pipedShownUnsafe: false }, SHORTFALL_WORDS["public piped water"], /falls short/],
-    [{ waterSource: "restored", treatment: "none", outThreeMonths: false }, SHORTFALL_WORDS["restored source, 2026 version"], /falls short/],
+    [{ waterSource: "existing", treatment: "central", publicPiped: true, pipedShownUnsafe: false }, CONDITION_LABEL["public piped water"], /condition of the method is not met/],
+    [{ waterSource: "restored", treatment: "none", outThreeMonths: false }, CONDITION_LABEL["restored source, 2026 version"], /condition of the method is not met/],
   ];
-  it.each(cases)("%j: the sentence, no figure and nothing asked", (f, words, standing) => {
+  it.each(cases)("%j: the sentence or the label, no figure and nothing asked", (f, words, standing) => {
     const { calc, html } = mount(record(f));
     expect(html).toContain(text(words));
     expect(html).not.toContain("Project facts needed");
@@ -87,12 +87,12 @@ describe("where no figure shows", () => {
   });
   it("one blank fact: the sentence names it, and it is his one question", () => {
     for (const [f, key, words] of [
-      [{}, "waterSource", "whether the source is new, restored or already in use"],
-      [{ waterSource: "new" }, "treatment", "where the water is treated, if it is treated"],
-      [{ waterSource: "new", treatment: "none" }, "sourceSafe", "whether the water at the source is safe to drink"],
-      [{ waterSource: "new", treatment: "none", sourceSafe: false }, "treatment", "where the water is treated, if it is treated"],
-      [{ waterSource: "existing", treatment: "central" }, "publicPiped", "whether the supply is public piped water"],
-      [{ waterSource: "restored", treatment: "none" }, "outThreeMonths", "out of action for at least three months"],
+      [{}, "waterSource", FACT_LABEL.waterSource],
+      [{ waterSource: "new" }, "treatment", FACT_LABEL.treatment],
+      [{ waterSource: "new", treatment: "none" }, "sourceSafe", FACT_LABEL.sourceSafe],
+      [{ waterSource: "new", treatment: "none", sourceSafe: false }, "treatment", FACT_LABEL.treatment],
+      [{ waterSource: "existing", treatment: "central" }, "publicPiped", FACT_LABEL.publicPiped],
+      [{ waterSource: "restored", treatment: "none" }, "outThreeMonths", FACT_LABEL.outThreeMonths],
     ] as [GivenKindFacts, string, string][]) {
       const { calc, html } = mount(record(f));
       expect(html).toContain(words);
@@ -105,6 +105,48 @@ describe("where no figure shows", () => {
     const { calc } = mount(record({ waterSource: "restored", treatment: "none", outThreeMonths: true, repairPlanned: false, sourceSafe: true }));
     expect(calc.paaResult?.result.ER).toBeGreaterThan(0);
   });
+  it("he is told the method's condition as a fact with its source, never a line to say", () => {
+    const { calc } = mount(record({ waterSource: "restored", treatment: "none" }));
+    expect(calc.pageContext()).toContain(METHOD_CONDITIONS["restored source, 2026 version"].source);
+    const short = mount(record({ waterSource: "restored", treatment: "none", outThreeMonths: false }));
+    expect(short.calc.pageContext()).toContain(METHOD_CONDITIONS["restored source, 2026 version"].fact);
+    expect(short.calc.pageContext()).not.toMatch(/visitor reads/i);
+  });
+});
+
+describe("a project credited under V1.0: each version's figure stands on its own conditions", () => {
+  const RESTORED_V2: GivenKindFacts = { waterSource: "restored", treatment: "none", outThreeMonths: true, repairPlanned: false, sourceSafe: true };
+  const credited = (f: GivenKindFacts): ProjectRecord => addGivenFacts(newProjectRecord(), "wellington", { ...base, ...f, creditedUnderV1: true }).record;
+  it("the V2.0 figure shows while the V1.0 side waits for its own fact, which is still asked", () => {
+    const { calc, html } = mount(credited(RESTORED_V2));
+    expect(calc.paaResult?.result.ER).toBeGreaterThan(0);
+    expect([calc.transition, calc.legacyResult]).toEqual([false, null]);
+    expect(html).toContain(`V1.0 figure: Still to be said: ${FACT_LABEL.noRepairThreeMonths}`);
+    expect(calc.asks.map((a) => a.key)).toContain("noRepairThreeMonths");
+    expect(calc.pageContext()).toMatch(/credited under V1\.0.*The V2\.0 figure shows/);
+    expect(calc.pageContext()).toContain(METHOD_CONDITIONS["restored source, 2021 version"].source);
+  });
+  it("with the V1.0 condition met too, the seat shows both versions", () => {
+    const { calc, html } = mount(credited({ ...RESTORED_V2, noRepairThreeMonths: true }));
+    expect(calc.transition).toBe(true);
+    expect(html).not.toContain("V1.0 figure:");
+  });
+  it("the V1.0 condition not met: V2.0 still shows, under a short label", () => {
+    const { calc, html } = mount(credited({ ...RESTORED_V2, noRepairThreeMonths: false }));
+    expect(calc.paaResult?.result.ER).toBeGreaterThan(0);
+    expect(html).toContain(`V1.0 figure: ${CONDITION_LABEL["restored source, 2021 version"]}`);
+    expect(calc.asks.map((a) => a.key)).not.toContain("noRepairThreeMonths");
+  });
+  it("the V2.0 condition not met: no V2.0 figure on the seat, and his tool gives the V1.0 figure on its own conditions", () => {
+    const r = credited({ waterSource: "restored", treatment: "none", outThreeMonths: false, noRepairThreeMonths: true, sourceSafe: true });
+    const { calc, html } = mount(r);
+    expect(calc.result).toBeNull();
+    expect(html).toContain(CONDITION_LABEL["restored source, 2026 version"]);
+    const [tool] = calvinToolsFor(r.facts);
+    const run = { countryIso: "KEN", populationMode: "people", populationCount: 1200, litresPerPersonPerDay: 4, operationalDays: 347, fnrbFiledV1: 0.8 };
+    expect(() => tool!.execute({ ...run, version: "paa" })).toThrow(/2026 version: a condition of the method is not met/);
+    expect(typeof tool!.execute({ ...run, version: "legacy" })).toBe("object");
+  });
 });
 
 describe("a project that already exists keeps its answer", () => {
@@ -115,24 +157,22 @@ describe("a project that already exists keeps its answer", () => {
     expect(calc.state.method).toBe(method);
     expect(calc.paaResult?.result.ER).toBeGreaterThan(0);
     expect(calc.asks.map((a) => a.key)).not.toContain("waterSource");
-    expect(html).not.toContain(NEWER_WAY_NOTE);
+    expect(html).not.toMatch(/newer way|Redo it/i);
   });
-  it("with no figure before, it says there is a newer way and offers to redo it", () => {
+  it("with no figure before, it is as it was: no notice, no button and no new question", () => {
     const r = existing("Community level water treatment technologies");
-    const { calc, html } = mount(r, { onRedo: () => {} });
-    expect(calc.result).toBeNull();
-    expect(html).toContain(text(NEWER_WAY_NOTE));
-    expect(html).toContain("Redo it");
-    // Nothing on the screen says there is no calculator for it, or asks for a fact.
-    expect(html).not.toMatch(/We do not have a calculator|Project facts needed/);
-    expect(calc.pageContext()).toContain("A newer way to work it out exists.");
-    expect(mount(r, { onRedo: () => {}, readOnly: true }).html).not.toContain("Redo it");
-    // Redone, the agent asks for the first fact.
-    expect(mount(redoUnderTodaysRules(r)).calc.asks[0]?.key).toBe("waterSource");
+    const { calc, html } = mount(r);
+    expect([calc.result, calc.asks]).toEqual([null, []]);
+    expect(html).toContain(text(NO_CALCULATOR_YET));
+    expect(html + calc.pageContext()).not.toMatch(/newer way|Redo it|Project facts needed/i);
+    // Worked out again, it is a new screening, and the agent asks for the first fact. The earlier one is unchanged.
+    const again = newScreening(r, { date: "2026-11-25", agents: [{ agent: "calvin", package: "@waterbots/calvin", version: "0.8.0" }], core: "0.4.0" });
+    expect(mount(again).calc.asks[0]?.key).toBe("waterSource");
+    expect(mount(r).calc.asks).toEqual([]);
   });
   it("nothing he is told in his chat changes its kind", () => {
     const r = existing("Community water supply", "CWS");
-    expect(addCalvinFacts(r, { waterSource: "existing", treatment: "homes" })).toMatchObject({ added: [], onRecordPage: ["waterSource", "treatment"] });
+    expect(addCalvinFacts(r, { waterSource: "existing", treatment: "homes" })).toMatchObject({ added: [], onRecordPage: [], newScreening: ["waterSource", "treatment"] });
   });
 });
 
@@ -181,7 +221,7 @@ describe("his tools", () => {
       [{ waterSource: "new", treatment: "none", sourceSafe: false }, /needs treatment/],
       [{ waterSource: "existing", treatment: "institution" }, /^Not set up yet\..*hello@waterbots\.ai/],
       [{ waterSource: "existing", treatment: "none" }, /^Held for now\./],
-      [{ waterSource: "existing", treatment: "central", publicPiped: true, pipedShownUnsafe: false }, /falls short/],
+      [{ waterSource: "existing", treatment: "central", publicPiped: true, pipedShownUnsafe: false }, /a condition of the method is not met\. Treatment of water from a public distribution network/],
     ] as const) {
       for (const tool of [computeScenarioTool, transitionWaterfallTool]) expect(() => tool.execute({ ...input, ...f })).toThrow(message);
     }

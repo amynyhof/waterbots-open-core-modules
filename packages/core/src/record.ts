@@ -274,6 +274,56 @@ export interface ProjectRecord {
   eligibility?: Record<string, EligibilitySheet>;
   /** The version of the agent map last run on this record. */
   mapVersion?: number;
+  /** Which screening this is (section 1b). A record with none is a project's first screening. */
+  screening?: Screening;
+}
+
+// ── Screenings (the maintainer, 2026-11-25: an update never changes a screening) ────────────────────────────────
+
+/** An agent, and the package and version it ran from. */
+export interface AgentVersion {
+  agent: AgentId;
+  /** The package's name, such as "@waterbots/calvin". */
+  package: string;
+  version: string;
+}
+
+/**
+ * A screening's own stamp. A screening that exists stays exactly as it was. Working a project out again makes a NEW
+ * screening, with its own number, date and versions, and the earlier one stays beside it. The site keeps both.
+ */
+export interface Screening {
+  /** 1 for a project's first screening. */
+  number: number;
+  /** The day it was made, as YYYY-MM-DD. */
+  date: string;
+  /** The rules it was made under (`PROJECT_RULES`). */
+  rules: number;
+  /** The agents used for the estimate, with their packages and versions. */
+  agents: AgentVersion[];
+  /** Core's package version. */
+  core: string;
+  /** The number of the screening it was worked out again from. */
+  from?: number;
+}
+
+/**
+ * Starts a new screening of a project that already has one. The earlier record is not changed: the site keeps it as it
+ * is, and saves this one beside it. The new one keeps the project's own facts and place, comes under today's rules, and
+ * starts with no reading, no agent part and no figure. The agents ask for what today's rules need.
+ */
+export function newScreening(earlier: ProjectRecord, stamp: { date: string; agents: readonly AgentVersion[]; core: string }): ProjectRecord {
+  const from = earlier.screening?.number ?? 1;
+  const facts = structuredClone(earlier.facts);
+  facts.rules = PROJECT_RULES;
+  return {
+    recordVersion: RECORD_VERSION,
+    facts,
+    pathways: {},
+    place: structuredClone(earlier.place),
+    agents: {},
+    screening: { number: from + 1, date: stamp.date, rules: PROJECT_RULES, agents: stamp.agents.map((a) => ({ ...a })), core: stamp.core, from },
+  };
 }
 
 // ── New projects and projects that already exist (2026-11-25) ────────────────────────────────────────────────────
@@ -284,9 +334,9 @@ export function underTodaysRules(facts: ProjectFacts): boolean {
 }
 
 /**
- * True for a project that already exists: made before these rules, with a technology, a type or a figure on its record. It
- * keeps its old answers until its owner changes a fact the rules touch, or chooses to redo it. A site does nothing to
- * say so: it hands back the record as it was saved, with no `facts.rules`.
+ * True for a screening that already exists: made before these rules, with a technology, a type or a figure on its record.
+ * It keeps its old answers and gets no new question (section 1b). A site does nothing to say so: it hands back the record
+ * as it was saved, with no `facts.rules`. Working it out again is a new screening (`newScreening`).
  */
 export function projectExists(record: Pick<ProjectRecord, "facts" | "agents">): boolean {
   const { rules, technology, type, technologyClass } = record.facts;
@@ -310,14 +360,19 @@ function drinkingWater(facts: ProjectFacts, askHomeUse: boolean): Answer | null 
 }
 
 /**
- * What Calvin does with a project under today's rules, read from the one table. A restored source's conditions are those of
- * the version in use: `versions` names them, and left out they follow the record.
+ * What Calvin does with a project under today's rules, under one version of the method, read from the one table: 2026
+ * unless another is named. A restored source's conditions are that version's own.
  */
-export function carbonAnswer(facts: ProjectFacts, versions: readonly CarbonVersion[] = carbonVersions(facts)): Answer {
+export function carbonAnswer(facts: ProjectFacts, version: CarbonVersion = "2026"): Answer {
   const scope = drinkingWater(facts, false);
   if (scope?.says === "another kind of project") return scope;
-  const a = carbonAnswerFor(kindFactsOf(facts), versions);
+  const a = carbonAnswerFor(kindFactsOf(facts), version);
   return a.says === "counted" && scope !== null ? scope : a;
+}
+
+/** The answer under each version in use. A project credited under V1.0 has two, and each figure stands on its own. */
+export function carbonAnswers(facts: ProjectFacts): Partial<Record<CarbonVersion, Answer>> {
+  return Object.fromEntries(carbonVersions(facts).map((v) => [v, carbonAnswer(facts, v)]));
 }
 
 /** What Violet does with a project under today's rules, read from the one table. */
@@ -329,38 +384,14 @@ export function waterAnswer(facts: ProjectFacts): Answer {
 }
 
 /**
- * True when today's rules would give a project that already exists a different answer. It keeps its old one; its screen
- * shows a plain note that a newer way exists, with a choice to redo it (`redoUnderTodaysRules`).
- */
-export function newerWay(record: Pick<ProjectRecord, "facts" | "agents">, pathway: StandardId): boolean {
-  if (underTodaysRules(record.facts) || !projectExists(record)) return false;
-  const { technology, type, technologyClass, homeUse } = record.facts;
-  const label = technology?.label ?? technologyOfFacts(type?.value, technologyClass?.value)?.label;
-  const kinds = TECHNOLOGY_LABELS.find((t) => label !== undefined && t.label.toLowerCase() === label.trim().toLowerCase())?.kinds ?? [];
-  if (kinds.length === 0 || homeUse?.value === "no") return false;
-  // Only carbon's answers changed with version 1 of the rules.
-  return pathway === "carbon" && recordTechnology(record) === undefined && kinds.every((k) => kindRow(k).carbon.code !== null);
-}
-
-/** The plain note on a project that already exists, where `newerWay` is true. */
-export const NEWER_WAY_NOTE = "There is now a newer way to work this out. Your project keeps its answer unless you choose to redo it.";
-
-/** The choice to redo it: the project moves to today's rules. Its facts stay, and the agents ask for what is missing. */
-export function redoUnderTodaysRules(record: ProjectRecord): ProjectRecord {
-  const out = structuredClone(record);
-  out.facts.rules = PROJECT_RULES;
-  return out;
-}
-
-/**
  * The technology code an agent may work with. Under today's rules it is worked out from the project facts, and a label
- * cannot change it. A project that already exists keeps the code it was saved with; a label that is not covered yet has
- * none.
+ * cannot change it: it is the code of the first version in use that counts the project. A project that already exists
+ * keeps the code it was saved with; a label that is not covered yet has none.
  */
 export function recordTechnology(record: Pick<ProjectRecord, "facts">): Technology | undefined {
   if (underTodaysRules(record.facts)) {
-    const a = carbonAnswer(record.facts);
-    return a.says === "counted" ? a.code : undefined;
+    const a = Object.values(carbonAnswers(record.facts)).find((x) => x.says === "counted");
+    return a?.says === "counted" ? a.code : undefined;
   }
   const t = record.facts.technology;
   return t === undefined || technologyCoverage(t.label) === "not covered yet" ? undefined : t.code;
@@ -396,6 +427,7 @@ function supplyOf(a: Answer): WaterSupply {
  */
 export function recordCarbon(facts: ProjectFacts): WaterSupply | "not set up yet" {
   if (!underTodaysRules(facts)) return "covered";
+  if (Object.values(carbonAnswers(facts)).some((x) => x.says === "counted")) return "covered";
   const a = carbonAnswer(facts);
   if (a.says === "ask") return (a.fact === "waterSource" || a.fact === "treatment") && a.fix !== true ? "not known" : "covered";
   if (a.says === "counted" || a.says === "falls short") return "covered";
@@ -764,13 +796,16 @@ export interface ChangedFacts extends AddedFacts {
   changed: (KindFact | "homeUse")[];
   /** A saved project: kind facts the visitor changed in a chat. They stay as they are; the owner changes them on the Project Record page. */
   onRecordPage: (KindFact | "homeUse")[];
+  /** A screening made before these rules: kind facts it was given. It stays as it was, and takes them only in a new screening (`newScreening`). */
+  newScreening: KindFact[];
   /** The agents whose figure no longer fits. It is off the record, and their part is not done. */
   figuresOff: AgentId[];
 }
 
 /** What each calculator would work with, to see whether its figure still fits. */
 function fits(record: ProjectRecord): { calvin: string; violet: string } {
-  return { calvin: recordTechnology(record) ?? "", violet: recordWaterSupply(record.facts) === "covered" ? (record.facts.waterSource?.value ?? "covered") : "" };
+  const calvin = Object.values(carbonAnswers(record.facts)).map((a) => (a.says === "counted" ? a.code : "")).join(",");
+  return { calvin: /[A-Z]/.test(calvin) ? calvin : "", violet: recordWaterSupply(record.facts) === "covered" ? (record.facts.waterSource?.value ?? "covered") : "" };
 }
 
 /** Takes off a figure that no longer fits the facts. The inputs stay, so nothing a person typed is lost. */
@@ -795,8 +830,9 @@ const TOUCHED: readonly FactKey[] = [...KIND_FACTS, "type", "technology", "techn
 /**
  * THE VISITOR CHANGES A FACT (2026-11-25). In a screening, what they say in any agent's chat changes the record, the kind is
  * worked out again, and a figure that no longer fits comes off. On a saved project only the owner changes it, on the
- * Project Record page: there the site passes `by: "owner"`, which also moves a project made before these rules to them.
- * Facts that are not about the kind are added as ever, only where blank. Returns a new record.
+ * Project Record page: there the site passes `by: "owner"`. A screening made before these rules takes no kind fact at
+ * all: it stays as it was, and the facts are listed in `newScreening`. Facts that are not about the kind are added as
+ * ever, only where blank. Returns a new record.
  */
 export function changeFacts(record: ProjectRecord, agent: AgentId, given: GivenFacts, options: { saved?: boolean; by?: "agent" | "owner" } = {}): ChangedFacts {
   const owner = options.by === "owner";
@@ -805,11 +841,11 @@ export function changeFacts(record: ProjectRecord, agent: AgentId, given: GivenF
   const onRecordPage: ChangedFacts["onRecordPage"] = [];
   const changed: ChangedFacts["changed"] = [];
   const differs = KIND_FACTS.filter((k) => wanted[k] !== undefined && start.facts[k]?.value !== wanted[k]);
-  if (owner && differs.length > 0) start.facts.rules = PROJECT_RULES;
   const old = projectExists(start);
-  for (const key of differs) {
+  const later: KindFact[] = old ? differs : [];
+  for (const key of old ? [] : differs) {
     const onRecord = start.facts[key] !== undefined;
-    if (!owner && (old || (options.saved === true && onRecord))) onRecordPage.push(key);
+    if (!owner && options.saved === true && onRecord) onRecordPage.push(key);
     else if (onRecord) {
       setKindFact(start.facts, key, wanted[key]!, { by: "person", note: owner ? "changed on the Project Record page" : `changed in ${agent}'s chat` });
       changed.push(key);
@@ -827,10 +863,10 @@ export function changeFacts(record: ProjectRecord, agent: AgentId, given: GivenF
   // The water the source gave before the project was said about the other source, so it is asked again.
   if (changed.includes("waterSource") && given.withoutProjectM3PerYear === undefined) delete start.facts.withoutProjectM3PerYear;
   const rest: GivenFacts = { ...given };
-  for (const key of onRecordPage) delete rest[key];
+  for (const key of [...onRecordPage, ...later]) delete rest[key];
   const out = addGivenFacts(start, agent, rest);
   const touched = changed.length > 0 || out.added.some((k) => TOUCHED.includes(k));
-  return { ...out, changed, onRecordPage, figuresOff: touched ? takeOff(record, out.record) : [] };
+  return { ...out, changed, onRecordPage, newScreening: later, figuresOff: touched ? takeOff(record, out.record) : [] };
 }
 
 // ── The save ticket (2026-11-25) ─────────────────────────────────────────────────────────────────────────────────

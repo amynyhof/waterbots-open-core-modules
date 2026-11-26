@@ -3,7 +3,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
-import { NO_CALCULATOR_YET, type GivenKindFacts } from "@waterbots/core/projectKinds";
+import { FACT_LABEL, NO_CALCULATOR_YET, type GivenKindFacts } from "@waterbots/core/projectKinds";
 import { addGivenFacts, newProjectRecord, type HomeUse, type ProjectRecord } from "@waterbots/core/record";
 import { VIOLET_ANSWER_SCHEMA, VIOLET_ASK_KEYS, addVioletAnswer, fillViolet, guardVioletReply, readVioletAnswer, violetChatContext, violetPageContext, type VioletReply } from "./agent/chat.js";
 import { computeD3Tool, parseD3Input, violetToolsFor } from "./agent/tools.js";
@@ -115,7 +115,7 @@ describe("her chat", () => {
   });
   it("what she sees, for each reason", () => {
     const see = (k: Kind): string => violetPageContext({ projectName: "Invented project", input: people, result: computeD3(people), facts: record(k).facts });
-    expect(see({})).toContain("whether the source is new, restored or already in use");
+    expect(see({})).toContain(FACT_LABEL.waterSource);
     expect(see({ waterSource: "new", treatment: "none" })).toContain("whether people use the water at home");
     expect(see(NEW)).toContain("8,760");
   });

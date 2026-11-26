@@ -16,7 +16,7 @@ import { enterMonitoring, isEntered, monitoringSource, monitoringValues, MONITOR
 import type { CalculatorState } from "./useCalculatorState";
 import { monitoringRange, refuseIn, type OutOfRange } from "./valueRanges";
 import { RangeMessage } from "@waterbots/core/rangedNumber";
-import { NewerWay } from "@waterbots/core/newerWay";
+import { answerLabel } from "@waterbots/core/projectKinds";
 
 /**
  * CalculatorWork — the calculator's WORK SURFACE (OPEN #72 step 2).
@@ -146,12 +146,18 @@ interface CalculatorWorkProps {
   report?: ReportSlots;
 }
 
-/** The work surface, under the plain note where a newer way exists for a project that already exists (2026-11-25). */
+/**
+ * The work surface. A project credited under V1.0 whose V1.0 side waits on a fact or a condition of the 2021 version shows
+ * V2.0 on its own, under a short label for the V1.0 side (2026-11-25: each version's figure stands on its own conditions).
+ */
 export default function CalculatorWork(props: CalculatorWorkProps) {
-  const { calc, project } = props;
-  return project.newerWay === true ? (
+  const { project } = props;
+  const v1 = project.creditedUnderV1 === true && project.answerV1 !== undefined ? answerLabel(project.answerV1) : null;
+  return v1 !== null ? (
     <>
-      <NewerWay readOnly={calc.readOnly} {...(calc.onRedo !== undefined ? { onRedo: calc.onRedo } : {})} />
+      <p className="t-caption text-fg-3" role="status" data-v1-waits="" style={{ fontSize: 12 }}>
+        V1.0 figure: {v1}
+      </p>
       <WorkSurface {...props} />
     </>
   ) : (
@@ -191,7 +197,7 @@ function WorkSurface({ calc, project, appVersion, tab, otherTab, report }: Calcu
    * missing and where it is filled in, in the same words the paid site's record check uses. This
    * comes first because every figure, on every tab, depends on these facts.
    */
-  const factsPrompt = missingFactsPrompt(missingFacts, project.technology, project.notCoveredYet, project.answer, project.newerWay);
+  const factsPrompt = missingFactsPrompt(missingFacts, project.technology, project.notCoveredYet, project.answer);
   /** False where nothing is missing: no figure can show for this project as it stands. */
   const factsAsked = project.answer === undefined ? project.notCoveredYet === undefined : project.answer.says === "ask" || project.answer.says === "counted";
   if (factsPrompt) {

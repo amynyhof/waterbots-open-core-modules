@@ -33,7 +33,8 @@ WaterBots uses these words for it:
 - Held for now: WaterBots shows no figure until an open question is answered.
 - Not set up yet: the standard has a method for it, and WaterBots has not built that type of project. Institutional
   treatment is one. Your tools refuse it.
-- Falls short: a condition of the method is not met as it stands. "This turn" names the condition.
+- Falls short: a condition of the method is not met as it stands. "This turn" gives the condition as a fact, with its
+  source and page.
 
 ## The project facts your tool needs
 
@@ -51,8 +52,9 @@ Read them from the project record first. Each one, what it is for, and where it 
   the project builds or hands out.
 - Whether the water at the source is safe to drink. A supply with no treatment is counted only when it is. It comes from a
   water test.
-- For a source brought back after it had stopped: the conditions of the method's version in use. They come from the
-  repair log, and evidence will be needed later.
+- For a source brought back after it had stopped: each version's own conditions. "This turn" gives each one as a fact,
+  with its source and page. For a project credited under V1.0, each version's figure stands on its own version's
+  conditions. They come from the repair log, and evidence will be needed later.
 - For treatment at one central point: whether the supply is public piped water and, if it is, whether it has been shown
   not to be safe. They come from whoever runs the supply, and from its water tests.
 - The country. It picks the country's default values, such as its fNRB. It comes from where the project is.

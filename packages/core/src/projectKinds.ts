@@ -240,14 +240,14 @@ export type Answer =
   /** Not a drinking-water project. */
   | { says: "another kind of project" };
 
-/** The carbon method's versions. A new project gets 2026 only; one already credited under V1.0 gets both. */
+/** The carbon method's versions. A new project gets 2026 only; one already credited under V1.0 gets both, each on its own. */
 export type CarbonVersion = "2021" | "2026";
 
 export interface KindRow {
   kind: Kind;
   from: string;
   /** What Calvin does. The safe-water carbon method: 2021 version (V1.0), 2026 version (V2.0). */
-  carbon: { answer: (f: GivenKindFacts, versions: readonly CarbonVersion[]) => Answer; code: "CWS" | "HWT" | null; source: string };
+  carbon: { answer: (f: GivenKindFacts, version: CarbonVersion) => Answer; code: "CWS" | "HWT" | null; source: string };
   /** What Violet does. VWBA 2.0, D-3. */
   water: { answer: Answer; source: string };
 }
@@ -263,16 +263,18 @@ function combined(f: GivenKindFacts): Answer {
   return f.treatment === "none" || f.treatment === undefined ? { says: "ask", fact: "treatment", ...(f.treatment === "none" ? { fix: true as const } : {}) } : NOT_SET_UP;
 }
 
-/** A restored source: each version's own conditions, then whether the water is safe. */
-function restored(f: GivenKindFacts, versions: readonly CarbonVersion[]): Answer {
+/**
+ * A restored source: the conditions of the one version asked about, then whether the water is safe. Each version's figure
+ * stands on its own version's conditions (the maintainer, 2026-11-25): one is never held for the other's.
+ */
+function restored(f: GivenKindFacts, version: CarbonVersion): Answer {
   if (f.treatment !== "none" && f.treatment !== "central") return combined(f);
-  if (versions.includes("2026")) {
+  if (version === "2026") {
     if (f.outThreeMonths === undefined) return { says: "ask", fact: "outThreeMonths" };
     if (!f.outThreeMonths) return { says: "falls short", because: "restored source, 2026 version" };
     if (f.repairPlanned === undefined) return { says: "ask", fact: "repairPlanned" };
     if (f.repairPlanned) return { says: "falls short", because: "restored source, 2026 version" };
-  }
-  if (versions.includes("2021")) {
+  } else {
     if (f.noRepairThreeMonths === undefined) return { says: "ask", fact: "noRepairThreeMonths" };
     if (!f.noRepairThreeMonths) return { says: "falls short", because: "restored source, 2021 version" };
   }
@@ -338,10 +340,13 @@ export function carbonVersions(facts: Pick<ProjectFacts, "creditedUnderV1">): re
   return facts.creditedUnderV1?.value === true ? ["2026", "2021"] : ["2026"];
 }
 
-/** What Calvin does with these kind facts. Improving a source that still works is held: the method does not say. */
-export function carbonAnswerFor(f: GivenKindFacts, versions: readonly CarbonVersion[]): Answer {
+/**
+ * What Calvin does with these kind facts, under one version of the method: 2026 unless another is named. Improving a
+ * source that still works is held: the method does not say.
+ */
+export function carbonAnswerFor(f: GivenKindFacts, version: CarbonVersion = "2026"): Answer {
   const k = workOutKind(f);
-  if (k.kind !== null) return kindRow(k.kind).carbon.answer(f, versions);
+  if (k.kind !== null) return kindRow(k.kind).carbon.answer(f, version);
   if ("missing" in k) return { says: "ask", fact: k.missing };
   return k.none === "two kinds" ? NOT_SET_UP : HELD;
 }
@@ -363,42 +368,106 @@ export function waterAnswerFor(f: GivenKindFacts): Answer {
 export const NO_CALCULATOR_YET =
   "We do not have a calculator for this kind of project yet. To ask for it to be added, contact WaterBots at hello@waterbots.ai.";
 
-/** What a visitor reads when the project falls short of the method as it stands. */
-export const SHORTFALL_WORDS: Record<Shortfall, string> = {
-  "restored source, 2026 version": "The method counts a restored source only if it was out of action for at least three months before the work, and there was no plan to bring it back.",
-  "restored source, 2021 version": "The older version of the method counts a restored source only if no maintenance or repair was planned for at least three months after it stopped.",
-  "public piped water": "The method counts treatment of public piped water only if that water has been shown not to be safe to drink.",
+/**
+ * THE METHOD'S CONDITIONS, AS FACTS (the maintainer, 2026-11-25: no scripts). Each is a fact with its source and page,
+ * in our own words, never the standard's text. Calvin reads them and explains them in his own words. No sentence here is
+ * for him to say, and none is shown to a visitor.
+ */
+export type Condition = Shortfall | "safe water";
+
+export interface MethodCondition {
+  /** The condition, as a fact. */
+  fact: string;
+  /** Where it is in the method: the version, the section or table, and the page. */
+  source: string;
+  /** What evidence the method asks for, where it asks for any. */
+  evidence?: string;
+}
+
+export const METHOD_CONDITIONS: Record<Condition, MethodCondition> = {
+  "restored source, 2026 version": {
+    fact: "Under the 2026 version, a restored source counts only if it was out of action for at least three months before the work, and no maintenance or repair plan was in place.",
+    source: "The safe-water carbon method, 2026 version: Table 2, the definition of rehabilitation, p.7; section 3.2.6.1, p.11",
+    evidence: "Verifiable evidence of both (section 3.2.6.1, p.11).",
+  },
+  "restored source, 2021 version": {
+    fact: "Under the 2021 version, a restored source counts only if it was out of action and no maintenance or repair was planned for at least three months after it stopped.",
+    source: "The safe-water carbon method, 2021 version: section 2.2.1 d, p.5",
+    evidence: "Evidence of both (section 2.2.1 d, p.5).",
+  },
+  "public piped water": {
+    fact: "Treatment of water from a public distribution network counts only where that water has been shown not to meet the method's definition of safe drinking water.",
+    source: "The safe-water carbon method, 2026 version: Table 2, the definition of a public distribution network, p.7",
+  },
+  "safe water": {
+    fact: "A supply with no treatment counts only when the water at the supply point is safe to drink. Where it is not, the supply is combined with treatment.",
+    source: "The safe-water carbon method, 2026 version: Table 2, p.6; 2021 version: section 1 b, p.3",
+  },
 };
 
-/** The fact, lower case, so it drops into a sentence on a screen. */
+/** The condition each fact is asked for. */
+export const CONDITION_OF: Partial<Record<KindFact, Condition>> = {
+  sourceSafe: "safe water",
+  outThreeMonths: "restored source, 2026 version",
+  repairPlanned: "restored source, 2026 version",
+  noRepairThreeMonths: "restored source, 2021 version",
+  publicPiped: "public piped water",
+  pipedShownUnsafe: "public piped water",
+};
+
+/** A condition as one line an agent reads: the fact, its evidence and its source. */
+export function conditionForAgent(c: Condition): string {
+  const m = METHOD_CONDITIONS[c];
+  return `${m.fact}${m.evidence !== undefined ? ` ${m.evidence}` : ""} (${m.source}.)`;
+}
+
+/** A short label on a screen where a condition of the method is not met. */
+export const CONDITION_LABEL: Record<Shortfall, string> = {
+  "restored source, 2026 version": "Condition not met: a restored source, V2.0",
+  "restored source, 2021 version": "Condition not met: a restored source, V1.0",
+  "public piped water": "Condition not met: public piped water",
+};
+
+/** The fact, lower case and short, so it drops into a label or a list on a screen. */
 export const FACT_LABEL: Record<KindFact | "homeUse", string> = {
-  waterSource: "whether the source is new, restored or already in use",
-  treatment: "where the water is treated, if it is treated",
-  sourceSafe: "whether the water at the source is safe to drink",
-  outThreeMonths: "whether the source was out of action for at least three months before the work",
-  repairPlanned: "whether there was already a plan to bring the source back",
-  noRepairThreeMonths: "whether no repair was planned for at least three months after the source stopped",
-  publicPiped: "whether the supply is public piped water",
-  pipedShownUnsafe: "whether the public piped water has been shown not to be safe to drink",
+  waterSource: "the source: new, restored or in use",
+  treatment: "where the water is treated",
+  sourceSafe: "whether the source water is safe",
+  outThreeMonths: "whether it was out of action three months",
+  repairPlanned: "whether a repair was planned",
+  noRepairThreeMonths: "whether repair was planned within 3 months",
+  publicPiped: "whether it is public piped water",
+  pipedShownUnsafe: "whether the piped water was shown unsafe",
   homeUse: "whether people use the water at home",
 };
 
-/** What an agent is told when no figure shows. Facts, in our own words: "held for now" and "not set up yet" are ours. */
+/** A short label for an answer that gives no figure yet: the fact still to be said, or the condition not met. */
+export function answerLabel(a: Answer): string | null {
+  if (a.says === "ask") return `Still to be said: ${a.fix ? FACT_LABEL.treatment : FACT_LABEL[a.fact]}`;
+  return a.says === "falls short" ? CONDITION_LABEL[a.because] : null;
+}
+
+/**
+ * What an agent is told when no figure shows, as facts: "held for now" and "not set up yet" are our own words, and a
+ * condition of the method comes with its source. Nothing here is a sentence for the agent to say.
+ */
 export function answerForAgent(a: Answer): string {
+  const screen = `The screen says: "${NO_CALCULATOR_YET}"`;
   switch (a.says) {
     case "counted":
       return "It is counted.";
-    case "ask":
-      return a.fix
-        ? "The water is not safe to drink, so the project needs treatment, and where the water is treated has not been said."
-        : `Still to be said: ${FACT_LABEL[a.fact]}.`;
+    case "ask": {
+      if (a.fix) return `The water at the source is not safe to drink, and where the water is treated has not been said. The method: ${conditionForAgent("safe water")}`;
+      const c = a.fact === "homeUse" ? undefined : CONDITION_OF[a.fact];
+      return `Still to be said: ${FACT_LABEL[a.fact]}.${c !== undefined ? ` The method: ${conditionForAgent(c)}` : ""}`;
+    }
     case "held for now":
-      return `It is held for now: WaterBots shows no figure until an open question is answered. The visitor reads: "${NO_CALCULATOR_YET}"`;
+      return `It is held for now: WaterBots shows no figure until an open question is answered. ${screen}`;
     case "not set up yet":
-      return `It is not set up yet: the standard has a method for it, and WaterBots has not built that type of project. The visitor reads: "${NO_CALCULATOR_YET}"`;
+      return `It is not set up yet: the standard has a method for it, and WaterBots has not built that type of project. ${screen}`;
     case "falls short":
-      return `As it stands, it falls short. The visitor reads: "${SHORTFALL_WORDS[a.because]}"`;
+      return `As the record stands, a condition of the method is not met, so no figure shows. The method: ${conditionForAgent(a.because)}`;
     case "another kind of project":
-      return `It is another kind of project, not drinking water. The visitor reads: "${NO_CALCULATOR_YET}"`;
+      return `It is another kind of project, not drinking water. ${screen}`;
   }
 }

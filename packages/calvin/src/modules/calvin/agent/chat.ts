@@ -76,8 +76,10 @@ export const CALVIN_ASK_KEYS: readonly string[] = [...KIND_FACTS, "homeUse", ...
  * already credited under V1.0, which alone is asked for its filing. `answer` is what the one table says: while one fact
  * decides it, that fact comes first, and where no figure can show he asks for nothing. `notCoveredYet` is the label of a
  * project that already exists and is not covered yet: then he asks for nothing too. Nobody is asked for a kind.
+ * `answerV1` is what the table says under the 2021 version, for a project credited under V1.0: a fact it still needs is
+ * asked where the V1.0 filing is, and never holds back the V2.0 figure.
  */
-export function calvinAsks(state: CalcState, options: { tables?: SiteTables; transition?: boolean; notCoveredYet?: string; answer?: Answer } = {}): Ask[] {
+export function calvinAsks(state: CalcState, options: { tables?: SiteTables; transition?: boolean; notCoveredYet?: string; answer?: Answer; answerV1?: Answer } = {}): Ask[] {
   const { answer } = options;
   if (options.notCoveredYet !== undefined || (answer !== undefined && answer.says !== "counted" && answer.says !== "ask")) return [];
   const out: Ask[] = [];
@@ -88,6 +90,7 @@ export function calvinAsks(state: CalcState, options: { tables?: SiteTables; tra
   if (missing.has("peopleServed") ? state.populationMode == null : missing.has("countedAs")) out.push(ASKS.mode);
   if (missing.has("householdSize")) out.push(ASKS.householdSize);
   if (activityEmissionsAsk(state)) out.push(ASKS.pumpEmissions);
+  if (options.answerV1?.says === "ask" && !(answer?.says === "ask" && answer.fact === options.answerV1.fact)) out.push(askFor(options.answerV1));
   if (options.transition && state.fnrbFiledV1 == null) out.push(ASKS.filedFnrb);
   for (const m of missingMonitoring(state)) {
     out.push({ key: MONITORING_FIELD[m.key].value, about: m.label, why: `every figure depends on it after the project runs (${m.sdws})`, from: m.record, needed: true });
@@ -359,6 +362,8 @@ export interface CalvinTurn {
   notCoveredYet?: string;
   /** What the one table says (`CalvinProject.answer`). */
   answer?: Answer;
+  /** For a project credited under V1.0, what it says under the 2021 version (`CalvinProject.answerV1`). */
+  answerV1?: Answer;
   /** The project's facts. In the Agent Commons, his temporary record's. */
   facts?: ProjectFacts;
   tables?: SiteTables;
@@ -374,7 +379,7 @@ export function calvinChatContext(t: CalvinTurn): string {
     opened: t.opened ?? false,
     introduce: t.introduce ?? false,
     known: calvinKnown(t.state, t.facts),
-    asks: openAsks(calvinAsks(t.state, { tables: t.tables, transition: t.transition, notCoveredYet: t.notCoveredYet, answer: t.answer }), t.leftForNow),
+    asks: openAsks(calvinAsks(t.state, { tables: t.tables, transition: t.transition, notCoveredYet: t.notCoveredYet, answer: t.answer, ...(t.answerV1 !== undefined ? { answerV1: t.answerV1 } : {}) }), t.leftForNow),
     kept: calvinKept(t.state, { sliders: t.sliders, result: t.result }),
     figureShows: t.result != null,
     refused: t.refused ?? [],

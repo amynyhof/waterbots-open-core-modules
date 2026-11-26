@@ -10,7 +10,7 @@
 import type { AgentTool } from "../../core/agent";
 import { makeCalculatorTool } from "../../core/calculatorTool";
 import { requireInRange } from "@waterbots/core/ranges";
-import { FACT_LABEL, KIND_FACT_SCHEMA, NO_CALCULATOR_YET, SHORTFALL_WORDS, factsWithKind, readKindFacts, type CarbonVersion } from "@waterbots/core/projectKinds";
+import { FACT_LABEL, KIND_FACT_SCHEMA, NO_CALCULATOR_YET, conditionForAgent, factsWithKind, readKindFacts, type CarbonVersion } from "@waterbots/core/projectKinds";
 import { carbonAnswer, recordTechnology, underTodaysRules, type ProjectFacts } from "@waterbots/core/record";
 import {
   DEVICES_PER_PREMISES_RULE,
@@ -72,11 +72,12 @@ function scenarioSchema(withRecord: boolean): Record<string, unknown> {
 }
 
 /** What the visitor's AI, or the agent, is told when no figure can be worked out. */
-const NOT_COUNTED = `No figure can be worked out for this project. The visitor reads: "${NO_CALCULATOR_YET}"`;
+const NOT_COUNTED = `No figure can be worked out for this project. WaterBots says: "${NO_CALCULATOR_YET}"`;
 
 /**
- * The method's way of counting, from the project's facts (2026-11-25). No label and no agent can change it. Throws, in words
- * that say which fact to ask for, when there is none.
+ * The method's way of counting, from the project's facts (2026-11-25). No label and no agent can change it. Each version
+ * asked for is checked on its own conditions, and every one must count the project. Throws, in words that say which fact
+ * to ask for or which condition is not met, when one does not.
  */
 function codeFor(facts: ProjectFacts, versions: readonly CarbonVersion[]): "CWS" | "HWT" {
   if (!underTodaysRules(facts)) {
@@ -84,7 +85,13 @@ function codeFor(facts: ProjectFacts, versions: readonly CarbonVersion[]): "CWS"
     if (code === "CWS" || code === "HWT") return code;
     throw new Error(NOT_COUNTED);
   }
-  const a = carbonAnswer(facts, versions);
+  let code: "CWS" | "HWT" = "CWS";
+  for (const v of versions) code = codeUnder(facts, v);
+  return code;
+}
+
+function codeUnder(facts: ProjectFacts, version: CarbonVersion): "CWS" | "HWT" {
+  const a = carbonAnswer(facts, version);
   switch (a.says) {
     case "counted":
       return a.code!;
@@ -95,7 +102,7 @@ function codeFor(facts: ProjectFacts, versions: readonly CarbonVersion[]): "CWS"
           : `${a.fact} is a project fact (${FACT_LABEL[a.fact]}), and it is missing.`,
       );
     case "falls short":
-      throw new Error(`As it stands, the project falls short. ${SHORTFALL_WORDS[a.because]}`);
+      throw new Error(`No figure under the ${version} version: a condition of the method is not met. ${conditionForAgent(a.because)}`);
     case "held for now":
       throw new Error(`Held for now. ${NOT_COUNTED}`);
     case "not set up yet":

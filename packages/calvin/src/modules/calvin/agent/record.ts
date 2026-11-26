@@ -16,7 +16,6 @@ import {
   changeFacts,
   checkEntry,
   entryMessage,
-  newerWay,
   projectExists,
   recordTechnology,
   setAgentResults,
@@ -54,13 +53,19 @@ export function calvinProjectFromRecord(record: ProjectRecord): CalvinProject {
     return reading !== undefined && reading !== "unlikely";
   });
   const project: CalvinProject = { name: facts.name ?? "", standards };
-  // Under today's rules the one table decides, and the seat says what it says (2026-11-25). A project that already exists
-  // keeps its code; one whose label had none is still not covered, and is told that a newer way exists.
+  // Under today's rules the one table decides, and the seat says what it says (2026-11-25). The seat's figure is V2.0's,
+  // so its code is set only where the 2026 version counts the project. A project credited under V1.0 also gets the 2021
+  // version's answer: each version's figure stands on its own conditions. A project that already exists keeps its code;
+  // one whose label had none is still not covered.
   const technology = recordTechnology(record);
-  if (technology !== undefined) project.technology = technology;
-  if (!projectExists(record)) project.answer = carbonAnswer(facts);
-  else if (technology === undefined && facts.technology !== undefined && technologyCoverage(facts.technology.label) !== "not known") project.notCoveredYet = facts.technology.label;
-  if (newerWay(record, "carbon")) project.newerWay = true;
+  if (!projectExists(record)) {
+    project.answer = carbonAnswer(facts);
+    if (project.answer.says === "counted" && technology !== undefined) project.technology = technology;
+    if (facts.creditedUnderV1?.value === true) project.answerV1 = carbonAnswer(facts, "2021");
+  } else {
+    if (technology !== undefined) project.technology = technology;
+    else if (facts.technology !== undefined && technologyCoverage(facts.technology.label) !== "not known") project.notCoveredYet = facts.technology.label;
+  }
   if (place.country !== undefined) project.country = place.country.value;
   if (place.region !== undefined) project.region = place.region.value;
   if (facts.population !== undefined) project.population = { ...facts.population.value };

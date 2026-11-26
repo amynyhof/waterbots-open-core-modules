@@ -1,21 +1,21 @@
 // The kinds of drinking-water project and the one table (decided by the maintainer on 2026-11-25). Every project is made up.
 import { describe, expect, test } from "vitest";
-import { renderToStaticMarkup } from "react-dom/server";
-import { createElement } from "react";
 import { agentMap, noMethodFor, type MapInput } from "./agentMap";
-import { NewerWay } from "./newerWay";
 import {
   KIND_ASKS,
   KIND_FACTS,
   KIND_FACT_SCHEMA,
   KIND_TABLE,
   NO_CALCULATOR_YET,
+  METHOD_CONDITIONS,
+  CONDITION_LABEL,
+  CONDITION_OF,
   PROJECT_RULES,
-  SHORTFALL_WORDS,
   TREATMENTS,
   WATER_SOURCES,
   YES_NO_FACTS,
   answerForAgent,
+  answerLabel,
   askFor,
   carbonAnswerFor,
   factsWithKind,
@@ -27,21 +27,20 @@ import {
   type GivenKindFacts,
 } from "./projectKinds";
 import {
-  NEWER_WAY_NOTE,
   addGivenFacts,
   addKindTicket,
   carbonAnswer,
+  carbonAnswers,
   changeFacts,
   emptyRecord,
   kindTicket,
   needsHomeUse,
   newProjectRecord,
-  newerWay,
+  newScreening,
   projectExists,
   recordCarbon,
   recordTechnology,
   recordWaterSupply,
-  redoUnderTodaysRules,
   setAgentResults,
   underTodaysRules,
   waterAnswer,
@@ -54,7 +53,7 @@ import { TECHNOLOGY_LABELS, technologyCode } from "./technologyLabels";
 
 const by = { by: "person", note: "made up for a test" } as const;
 const kind = (f: GivenKindFacts) => workOutKind(f).kind;
-const carbon = (f: GivenKindFacts, v: readonly ("2021" | "2026")[] = ["2026"]): Answer => carbonAnswerFor(f, v);
+const carbon = (f: GivenKindFacts, v: "2021" | "2026" = "2026"): Answer => carbonAnswerFor(f, v);
 const ask = (fact: string) => ({ says: "ask", fact });
 const NEW: GivenKindFacts = { waterSource: "new" };
 const RESTORED: GivenKindFacts = { waterSource: "restored" };
@@ -121,10 +120,12 @@ describe("section 2: what Calvin does", () => {
     expect(carbon({ ...f, ...DOWN, sourceSafe: false })).toMatchObject({ says: "ask", fact: "treatment", fix: true });
     for (const bad of [{ outThreeMonths: false }, { outThreeMonths: true, repairPlanned: true }]) expect(carbon({ ...f, ...bad, sourceSafe: true })).toEqual({ says: "falls short", because: "restored source, 2026 version" });
     // Each version's own conditions.
-    expect(carbon(f, ["2021"])).toEqual(ask("noRepairThreeMonths"));
-    expect(carbon({ ...f, noRepairThreeMonths: true, sourceSafe: true }, ["2021"])).toMatchObject({ says: "counted" });
-    expect(carbon({ ...f, noRepairThreeMonths: false, sourceSafe: true }, ["2021"])).toEqual({ says: "falls short", because: "restored source, 2021 version" });
-    expect(carbon({ ...f, ...DOWN, sourceSafe: true }, ["2026", "2021"])).toEqual(ask("noRepairThreeMonths"));
+    expect(carbon(f, "2021")).toEqual(ask("noRepairThreeMonths"));
+    expect(carbon({ ...f, noRepairThreeMonths: true, sourceSafe: true }, "2021")).toMatchObject({ says: "counted" });
+    expect(carbon({ ...f, noRepairThreeMonths: false, sourceSafe: true }, "2021")).toEqual({ says: "falls short", because: "restored source, 2021 version" });
+    // One version never waits on the other's conditions (the maintainer, 2026-11-25).
+    expect(carbon({ ...f, ...DOWN, sourceSafe: true }, "2026")).toMatchObject({ says: "counted" });
+    expect(carbon({ ...f, noRepairThreeMonths: true, outThreeMonths: false, sourceSafe: true }, "2021")).toMatchObject({ says: "counted" });
   });
   test("K3 with treatment: at one central point counted, with the same questions; elsewhere not set up yet", () => {
     expect(carbon({ ...RESTORED, treatment: "central", ...DOWN })).toEqual(ask("sourceSafe"));
@@ -200,10 +201,18 @@ describe("a project's own record", () => {
     const { facts } = project({}, { type: "C-12" });
     expect([carbonAnswer(facts).says, waterAnswer(facts).says]).toEqual(["another kind of project", "another kind of project"]);
   });
-  test("a project credited under V1.0 is asked for both versions' conditions", () => {
+  test("a project credited under V1.0: each version's figure stands on its own version's conditions", () => {
     const r = project({ ...RESTORED, treatment: "none", ...DOWN, sourceSafe: true }, { creditedUnderV1: true });
-    expect(carbonAnswer(r.facts)).toEqual(ask("noRepairThreeMonths"));
-    expect(carbonAnswer(r.facts, ["2026"])).toMatchObject({ says: "counted" });
+    expect(carbonAnswer(r.facts)).toMatchObject({ says: "counted" });
+    expect(carbonAnswer(r.facts, "2021")).toEqual(ask("noRepairThreeMonths"));
+    expect(carbonAnswers(r.facts)).toEqual({ "2026": { says: "counted", code: "CWS", as: "CWS" }, "2021": ask("noRepairThreeMonths") });
+    expect([recordTechnology(r), recordCarbon(r.facts)]).toEqual(["CWS", "covered"]);
+    // The other way round: the 2021 version counts it and the 2026 version does not.
+    const v1 = project({ ...RESTORED, treatment: "none", outThreeMonths: false, noRepairThreeMonths: true, sourceSafe: true }, { creditedUnderV1: true });
+    expect(carbonAnswers(v1.facts)).toEqual({ "2026": { says: "falls short", because: "restored source, 2026 version" }, "2021": { says: "counted", code: "CWS", as: "CWS" } });
+    expect([recordTechnology(v1), recordCarbon(v1.facts)]).toEqual(["CWS", "covered"]);
+    // A new project has the 2026 version only.
+    expect(Object.keys(carbonAnswers(project({ ...RESTORED, treatment: "none" }).facts))).toEqual(["2026"]);
   });
   test("the record notes where evidence will be needed", () => {
     const r = project({ ...RESTORED, ...DOWN, sourceSafe: true });
@@ -274,32 +283,35 @@ describe("section 1b: an update never interrupts a project that already exists",
     expect(recordTechnology(old("Community level water treatment technologies", "CWS"))).toBe("CWS");
     expect(recordTechnology(old("Community level water treatment technologies"))).toBeUndefined();
   });
-  test("nothing said in a chat changes its kind; its owner does, on the Project Record page", () => {
+  test("no fact about its kind changes it, in a chat or on the Project Record page: that is a new screening", () => {
     const r = setAgentResults(old("Community water supply", "CWS"), "calvin", { estimate: { figure: 1, unit: "t", method: "carbon-v2.0", engineVersion: "0" } });
-    const chat = changeFacts(r, "calvin", { waterSource: "existing", treatment: "homes" });
-    expect([chat.onRecordPage, chat.changed, chat.figuresOff, chat.added]).toEqual([["waterSource", "treatment"], [], [], []]);
-    expect(chat.record).toEqual(r);
+    for (const options of [{}, { saved: true, by: "owner" as const }]) {
+      const out = changeFacts(r, "calvin", { waterSource: "existing", treatment: "homes" }, options);
+      expect([out.newScreening, out.onRecordPage, out.changed, out.figuresOff, out.added]).toEqual([["waterSource", "treatment"], [], [], [], []]);
+      expect(out.record).toEqual(r);
+    }
     expect(addGivenFacts(r, "calvin", { waterSource: "new" }).dropped).toEqual(["waterSource"]);
-    const owner = changeFacts(r, "wellington", { waterSource: "existing", treatment: "homes" }, { saved: true, by: "owner" });
-    expect([recordTechnology(owner.record), owner.record.facts.rules, owner.figuresOff]).toEqual(["HWT", PROJECT_RULES, ["calvin"]]);
   });
   test("adding any other fact changes none of its answers", () => {
     const r = setAgentResults(old("A label nobody has sent yet"), "calvin", { estimate: { figure: 1, unit: "t", method: "carbon-v2.0", engineVersion: "0" } });
     const out = changeFacts(r, "violet", { homeUse: "yes", population: { served: 40 } });
     expect([out.figuresOff, out.record.agents.calvin?.estimate?.figure, out.record.facts.rules]).toEqual([[], 1, undefined]);
   });
-  test("where today's rules would answer differently, a plain note and a choice to redo it", () => {
-    const r = old("Community level water treatment technologies");
-    expect([newerWay(r, "carbon"), newerWay(r, "vwba")]).toEqual([true, false]);
-    for (const same of [old("Community water supply", "CWS"), old("Household water treatment", "HWT"), old("Institutional water treatment technologies"), newProjectRecord(), emptyRecord()]) expect(newerWay(same, "carbon")).toBe(false);
-    const redone = redoUnderTodaysRules(r);
-    expect([newerWay(redone, "carbon"), carbonAnswer(redone.facts)]).toEqual([false, ask("waterSource")]);
-    expect(r.facts.rules).toBeUndefined();
-    const html = renderToStaticMarkup(createElement(NewerWay, { onRedo: () => {} }));
-    expect(html).toContain(NEWER_WAY_NOTE);
-    expect(html).toContain("<button");
-    expect(renderToStaticMarkup(createElement(NewerWay, { onRedo: () => {}, readOnly: true }))).not.toContain("<button");
-    expect(renderToStaticMarkup(createElement(NewerWay, {}))).not.toContain("<button");
+  test("working it out again is a new screening: numbered, dated, with its agents and versions, and the earlier one unchanged", () => {
+    const r = setAgentResults(old("Community level water treatment technologies"), "calvin", { inputs: { a: 1 } });
+    r.place.country = { value: "XKX", source: by };
+    r.pathways.carbon = { reading: "likely", reason: "made up", wouldChange: "nothing", source: by };
+    const before = structuredClone(r);
+    const agents = [{ agent: "calvin" as const, package: "@waterbots/calvin", version: "0.8.0" }];
+    const second = newScreening(r, { date: "2026-11-25", agents, core: "0.4.0" });
+    expect(r).toEqual(before);
+    expect(second.screening).toEqual({ number: 2, date: "2026-11-25", rules: PROJECT_RULES, agents, core: "0.4.0", from: 1 });
+    expect([second.facts.technology?.label, second.place.country?.value, second.pathways, second.agents]).toEqual(["Community level water treatment technologies", "XKX", {}, {}]);
+    expect([underTodaysRules(second.facts), projectExists(second), carbonAnswer(second.facts)]).toEqual([true, false, ask("waterSource")]);
+    agents[0]!.version = "9";
+    expect(second.screening?.agents[0]?.version).toBe("0.8.0");
+    const third = newScreening(second, { date: "2026-12-01", agents: [], core: "0.4.0" });
+    expect([third.screening?.number, third.screening?.from, second.screening?.number]).toEqual([3, 2, 2]);
   });
   test("a blank record comes under today's rules with the first fact about its source, its type or its technology", () => {
     for (const given of [{ waterSource: "new" }, { type: "C-19" }, { technology: { label: "Community water supply" } }] as const) expect(addGivenFacts(emptyRecord(), "wellington", given).record.facts.rules).toBe(PROJECT_RULES);
@@ -387,16 +399,31 @@ describe("the words", () => {
     { says: "another kind of project" },
     ...[...KIND_FACTS, "homeUse" as const].map((fact) => ({ says: "ask" as const, fact })),
     { says: "ask", fact: "treatment", fix: true },
-    ...(Object.keys(SHORTFALL_WORDS) as (keyof typeof SHORTFALL_WORDS)[]).map((because) => ({ says: "falls short" as const, because })),
+    ...(Object.keys(CONDITION_LABEL) as (keyof typeof CONDITION_LABEL)[]).map((because) => ({ says: "falls short" as const, because })),
   ];
   test("no visitor or agent sees one of our own labels, and nothing is ruled out or said not to exist", () => {
-    const words = [...every.map(answerForAgent), ...Object.values(KIND_ASKS).flatMap((a) => [a.about, a.why, a.from]), JSON.stringify(KIND_FACT_SCHEMA), ...Object.values(SHORTFALL_WORDS), NEWER_WAY_NOTE, ...knownKindFacts(factsWithKind({ waterSource: "new", treatment: "more than one", ...Object.fromEntries(YES_NO_FACTS.map((k) => [k, true])) }))];
+    const words = [...every.map(answerForAgent), ...Object.values(KIND_ASKS).flatMap((a) => [a.about, a.why, a.from]), JSON.stringify(KIND_FACT_SCHEMA), ...Object.values(CONDITION_LABEL), ...Object.values(METHOD_CONDITIONS).map((c) => c.fact), ...knownKindFacts(factsWithKind({ waterSource: "new", treatment: "more than one", ...Object.fromEntries(YES_NO_FACTS.map((k) => [k, true])) }))];
     for (const w of words) expect(w).not.toMatch(/\bK[1-6]\b|ruled out|no calculator exists|experts|new or restored/i);
   });
   test("held for now and not set up yet, each with its own meaning, and one sentence for the visitor", () => {
     expect(answerForAgent({ says: "held for now" })).toMatch(/until an open question is answered/);
     expect(answerForAgent({ says: "not set up yet" })).toMatch(/has a method for it, and WaterBots has not built/);
     for (const says of ["held for now", "not set up yet", "another kind of project"] as const) expect(answerForAgent({ says })).toContain(NO_CALCULATOR_YET);
+  });
+  test("the method's conditions are facts with their source and page, for the agent; the screen has short labels", () => {
+    for (const c of Object.values(METHOD_CONDITIONS)) expect(c.source).toMatch(/^The safe-water carbon method, 20(21|26) version: .*p\.\d/);
+    for (const fact of Object.keys(CONDITION_OF) as (keyof typeof CONDITION_OF)[]) {
+      const told = answerForAgent({ says: "ask", fact });
+      expect(told).toContain(METHOD_CONDITIONS[CONDITION_OF[fact]!].source);
+    }
+    for (const because of Object.keys(CONDITION_LABEL) as (keyof typeof CONDITION_LABEL)[]) {
+      expect(answerForAgent({ says: "falls short", because })).toContain(METHOD_CONDITIONS[because].source);
+      expect(answerLabel({ says: "falls short", because })).toBe(CONDITION_LABEL[because]);
+    }
+    // Nothing is a line for the agent to say.
+    for (const a of every) expect(answerForAgent(a)).not.toMatch(/visitor reads|say this|tell them/i);
+    for (const a of every) expect((answerLabel(a) ?? "").length).toBeLessThanOrEqual(60);
+    expect([answerLabel({ says: "counted" }), answerLabel({ says: "held for now" })]).toEqual([null, null]);
   });
   test("every question says what it is for and where the answer comes from, and asks for one fact", () => {
     for (const [k, a] of Object.entries(KIND_ASKS)) expect([a.key, a.about !== "", a.why !== "", a.from !== "", a.needed]).toEqual([k, true, true, true, true]);
