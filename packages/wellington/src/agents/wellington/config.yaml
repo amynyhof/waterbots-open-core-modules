@@ -3,7 +3,9 @@
 agent: wellington
 version: 0.1.0 # 2026-11-25 (J5): his first package, from the open site's own files; the source, the treatment and the water's safety in place of a class
 persona: wellington
-# The model, its effort and its output tokens are the site's: the carry held his instructions, not his call's settings.
+model: claude-opus-5 # the same as Calvin and Violet (the maintainer, 2026-11-25); the open site's own setting did not travel with the carry
+effort: medium
+max_output_tokens: 16000 # for one answer, the model's own thinking included; it is not the length of the reply
 reply: { sentences: 4, characters: 400 } # core's REPLY_LIMIT
 role_prompt: prompt.md
 own_region: primer.md # his own part of the primer

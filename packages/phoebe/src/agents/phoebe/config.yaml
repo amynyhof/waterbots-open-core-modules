@@ -4,7 +4,7 @@
 agent: phoebe
 version: 0.1.0 # 2026-11-25 (J5): her first package, from the open site's agent at commit 0f16957
 persona: phoebe
-model: claude-opus-5 # the same as Calvin and Violet; the open site's own setting did not travel with the carry
+model: claude-opus-5 # the same as Calvin and Violet (the maintainer, 2026-11-25); the open site's own setting did not travel with the carry
 effort: medium
 max_output_tokens: 16000 # for one answer, the model's own thinking included; it is not the length of the reply
 max_passes: 3 # one question may go to the model three times at most before it ends in an answer (24 Nov 2026)

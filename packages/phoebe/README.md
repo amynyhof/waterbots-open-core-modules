@@ -52,7 +52,7 @@ markers. A site that wants one hands it in `siteLines`.
 
 ## Not in it
 
-- The call to the model, its key and its settings; the daily limits; the buttons; saving; the report; logging.
+- The call to the model and its key (the model and effort it runs on are in `config.yaml`); the daily limits; the buttons; saving; the report; logging.
 - Her rulings. The maintainer writes them.
 - The packs' grader notes and logs: they are notes to the maintainer.
 
