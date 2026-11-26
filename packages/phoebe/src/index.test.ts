@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import { moduleName } from "./index.js";
 
-test("phoebe is an empty stub that builds", () => {
+test("the package names itself phoebe", () => {
   expect(moduleName).toBe("phoebe");
 });

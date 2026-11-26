@@ -1,0 +1,899 @@
+# The eligibility worksheet — the carbon pathway's section.
+#
+# WHAT THIS FILE IS. The tool definition contract, ruled 24 Sep 2026: one file
+# per tool, holding the tool's rows, their states, what each takes, where a
+# value comes from, and citations by card id. The site's worksheet, Phoebe's
+# prompt generator, an outside Model Context Protocol (MCP) server and the
+# grading rig are all meant to read this one file rather than four copies of it.
+#
+# ONE TOOL, TWO SECTIONS, ONE FILE EACH. Ruling R3 of 22 Sep 2026 made the
+# eligibility worksheet one tool with a section per pack. This file is the
+# carbon pathway's section; the water pathway's is its own file beside its own
+# cards, `../../vwba-2.0/tool/eligibility-worksheet.yaml`. Both declare the same
+# `tool.id` and differ in `section`. A reader that opens both has the whole
+# tool; one that opens this has one pathway.
+#
+# NOTHING READS IT YET, and nothing in this pack is live. It is built ahead of
+# its readers so the shape is settled before anything is wired to it, and
+# `tool/README.md` stands as it is. Phoebe still says carbon eligibility is
+# coming and not live.
+#
+# EVERY ROW CITES A CARD, NEVER A SOURCE. This pack has cards, so a row names
+# the card that carries its words and the card file carries them: the tool file
+# names the card, it never copies it. A route is always a route card's id.
+#
+# WHICH ROWS EXIST FOR A PROJECT. Ruling R9 as amended 24 Sep 2026 gave a row
+# one optional ninth key, `applies`, read from the card's own "Applies to" line:
+# the technology class or the version a row exists for. Absent means every
+# project, which is how thirty of these thirty-six say it. The point is a
+# division of labour — the tool file says which rows this project has, the row
+# states say what is done and what is left, and the agent asks only what is
+# left. What the line says about WHEN a row is asked or re-run stays on the
+# card, because that is not the same question.
+#
+# THE GATE IS scripts/check-tool.mjs, which reads this file and the water one.
+#
+# YES AND NO ARE QUOTED. An outside reader may be a YAML 1.1 parser, which reads
+# a bare yes as a boolean. The values here are words from a card, not booleans.
+
+tool:
+  id: eligibility-worksheet
+  name: The eligibility worksheet
+  purpose: >-
+    Works out, one question at a time, whether a project can count a benefit on
+    a pathway — and where it cannot yet, what would change that.
+
+pack:
+  key: gs-paa-v2.0
+  # Equal to the pack README's own "**Version x.y.z.**" line; the gate holds the
+  # two together, and check-cards already holds that line to the CHANGELOG head.
+  version: 0.8.1
+
+section:
+  id: carbon
+  name: The carbon pathway
+  pathway: carbon
+
+# The documents the cards in this section cite, by short id, each one held equal
+# to its row of the pack README's cited-documents tables. The README also lists
+# documents no row of this section cites — the programme-of-activity rules, the
+# supplementary information, the legacy 2021 methodology, and the three WHO and
+# JMP standards the methodology hands conditions to — and those are not here,
+# because this key is the documents this file cites.
+sources:
+  - id: m400-12
+    document: Emission Reductions from Safe Drinking Water Supply, GS4GG PAA M400-12
+    version: Version 2.0, 9 July 2026 on the cover; the page headers and the publisher's page say 7 July 2026. In force ninety days after publication.
+    publisher: Gold Standard Foundation
+    link: https://globalgoals.goldstandard.org/429-ee-sws-emission-reductions-from-safe-drinking-water-supply/
+
+  - id: par-101
+    document: Principles & Requirements
+    version: Version 2.1, 31 January 2025, effective 5 December 2024
+    publisher: Gold Standard Foundation
+    link: https://globalgoals.goldstandard.org/101-par-principles-requirements/
+
+  - id: csar-201
+    document: Community Services Activity Requirements
+    version: Version 1.2, effective 24 October 2019
+    publisher: Gold Standard Foundation
+    link: https://globalgoals.goldstandard.org/201-ar-community-services-activity-requirements/
+
+  - id: safeguarding-103
+    document: Safeguarding Principles & Requirements
+    version: Version 2.1, 29 June 2023
+    publisher: Gold Standard Foundation
+    link: https://globalgoals.goldstandard.org/103-par-safeguarding-principles-requirements/
+
+  - id: additionality-447
+    document: Requirements for Additionality Demonstration
+    version: Version 1.0, 24 April 2025
+    publisher: Gold Standard Foundation
+    link: https://globalgoals.goldstandard.org/447-requirements-for-additionality-demonstration/
+
+  - id: vvs100-01
+    document: PAA Validation and Verification Requirements for Methodologies Update, VVS100-01 (its Annex 5 is the safe-water transition matrix)
+    version: Version 2.0, 10 July 2026
+    publisher: Gold Standard Foundation
+    link: https://globalgoals.goldstandard.org/120_paa-vvs100-01-paa-validation-and-verification-requirements-for-methodologies-update/
+
+  - id: consultation-102
+    document: Stakeholder Consultation and Engagement Requirements
+    version: Version 2.1, 14 June 2022
+    publisher: Gold Standard Foundation
+    link: https://globalgoals.goldstandard.org/102-par-stakeholder-consultation-requirements/
+
+  - id: product-501
+    document: GHG Emissions Reduction & Sequestration Product Requirements
+    version: Version 3.2, 12 December 2025
+    publisher: Gold Standard Foundation
+    link: https://globalgoals.goldstandard.org/501-pr-ghg-emissions-reductions-sequestration/
+
+  - id: pr100-01
+    document: Requirements for Paris Agreement Alignment, PR100-01
+    version: Version 1.1, 2 February 2026, effective 1 January 2026
+    publisher: Gold Standard Foundation
+    link: https://globalgoals.goldstandard.org/119_paa_pr_100-01
+
+  - id: monitoring-118
+    document: Requirements for Selection of Monitoring Indicators in the SDG Impact Tool
+    version: Version 1.0, 18 October 2025
+    publisher: Gold Standard Foundation
+    link: https://globalgoals.goldstandard.org/118_par_requirements-for-monitoring-indicator-selection/
+
+  - id: gender-104
+    document: Gender Equality Requirements & Guidelines
+    version: Version 2.0, 16 May 2023
+    publisher: Gold Standard Foundation
+    link: https://globalgoals.goldstandard.org/104-par-gender-equality-requirements-and-guidelines/
+
+
+# The project-context fields this tool reads BEFORE it asks anything. On this
+# site that is the record Wellington collects; on the paid site it is the
+# project context; through the MCP door it is whatever the caller already holds.
+# Provenance says how a field came to be filled, and is the visit's own list.
+record:
+  - field: does
+    asks: What the project does, in the visitor's own words.
+    takes: { kind: text }
+    provenance: [chat]
+    note: Never typed on a form; only heard. It often settles T1 to T3 without a question.
+
+  - field: name
+    asks: What the project is called.
+    takes: { kind: text }
+    provenance: [typed, chat]
+
+  - field: place
+    asks: Where the project is — a country or a named place.
+    takes: { kind: text }
+    provenance: [typed, chat, pin]
+    note: The host country decides several rows. The pin fills it only when the visitor has neither typed it nor said it.
+
+  - field: type
+    asks: Which of the cited project types this is.
+    takes: { kind: choice }
+    provenance: [chat]
+    note: >-
+      Ruled 23 Sep 2026 (item A16): a cited list of twenty-four types in
+      knowledge-packs/product-shared/project-types.md, confirmed then logged.
+      Not built. The live record still carries `kind`, which retires with it,
+      and the applies cards say `kind` is a hint from the visitor and never the
+      test's answer.
+
+  - field: stage
+    asks: How far along the project is.
+    takes: { kind: choice }
+    provenance: [chat]
+    note: Ruled 23 Sep 2026 (item A16). Not built. A planned project is normal.
+
+  - field: pin
+    asks: The one basin this visit is about.
+    takes: { kind: text }
+    provenance: [pin]
+    note: Bridget's tool writes it. This tool reads it and never sets it.
+
+# Every closed list of values this section uses, in one place. A row's
+# `takes.of` and an output's `takes.of` name one of them.
+states:
+  # The five of the guide-not-gate ruling, 23 Sep 2026 (item A18), the same five
+  # the water section uses. A miss is sorted before anything is ruled out, and
+  # only the cards say which rows can ever be Blocked.
+  row-state:
+    - id: unchecked
+      label: Not yet checked
+      carries: nothing
+      colour: --state-locked
+
+    - id: met
+      label: Met
+      carries: one sentence on what settled it
+      colour: --state-approved
+
+    - id: fixable
+      label: Fixable
+      carries: the route card's id, so the console draws the route with its citation; never prose alone
+      colour: --state-pending
+
+    - id: unknown
+      label: Unknown
+      carries: what to find out, in a sentence; and where the gap is a baseline or a survey, the save-and-design offer
+      colour: --state-pending
+
+    - id: blocked
+      label: Blocked
+      carries: the card's own reason, cited
+      # INTERIM, and recorded as one. The brand book's §2.5 has no "stopped"
+      # value that is not an error, and coral is refused here; the pending
+      # colour stands with the word "Blocked" until the maintainer rules on
+      # pixels. Her ruling of 24 Sep 2026: the colours stay as they are until
+      # build-order step 3.
+      colour: --state-pending
+
+  # Whether the pathway is in play at all. Never a verdict on the project and
+  # never a count — the applies cards say so themselves, and there is no
+  # "three of four".
+  pathway-state:
+    - id: unchecked
+      label: Not yet checked
+      carries: nothing
+      # NOT RULED, and left empty rather than invented: a colour is a thing the
+      # maintainer approves on pixels. Her ruling of 24 Sep 2026: empty until
+      # build-order step 3.
+      colour: null
+
+    - id: applies
+      label: Applies
+      carries: nothing
+      colour: null
+
+    - id: does-not-apply
+      label: Does not apply
+      carries: which kind of no it is — fixable with a cited route, unknown, or blocked — and that the other pathway is separate
+      colour: null
+
+  # Which version of the methodology the project is judged on. Card T4 sets it,
+  # and it changes what some rows ask for. Not a verdict and not a state of the
+  # project; a sorting.
+  version-flag:
+    - id: new
+      label: New project
+      carries: nothing
+      colour: null
+
+    - id: transitioning
+      label: Transitioning project
+      carries: where the Paris-alignment design change stands, and when the current crediting period ends
+      colour: null
+
+    - id: unknown
+      label: Not known yet
+      carries: the one fact that would settle it — a Gold Standard registration under the 2021 version — and that the project is treated as new meanwhile
+      colour: null
+
+  # Which projects a row exists for — the values a row's optional `applies` key
+  # may name, ruling R9 as amended 24 Sep 2026. It is not a state and is never
+  # drawn: it sorts rows before the conversation starts, so that the tool file
+  # says which rows this project has, the row states say what is done and what
+  # is left, and the agent asks only what is left.
+  #
+  # THE FOUR CLASSES ARE CARD T3'S, in the words that card uses. The version
+  # flags are card T4's. Every value is read from a card's "Applies to" line and
+  # the gate holds it there.
+  applies-to:
+    - id: all
+      label: Every project on this pathway
+      # NEVER WRITTEN ON A ROW. Leaving the key out is how a row says it, and
+      # two ways of saying one thing is what drifts. The gate refuses it.
+    - id: hwt
+      label: Household treatment
+    - id: iwt
+      label: Institutional treatment
+    - id: cwt
+      label: Community treatment
+    - id: cws
+      label: Community supply
+    - id: transitioning
+      label: A transitioning project
+      # DECLARED, NOT USED TODAY. No card limits a row to one version: where a
+      # card's line names a transitioning project it is saying when the row is
+      # re-run, which is the card's business. The value is here so that a card
+      # that does limit a row has somewhere to land.
+    - id: new
+      label: A new project
+
+  # The read for the pathway, drawn from the row states and never from prose.
+  # "Likely" is the honest word: nothing on this site verifies anything.
+  readiness-read:
+    - id: likely-eligible
+      label: Likely
+      carries: nothing beyond the rows it was drawn from
+      colour: null
+
+    - id: likely-not
+      label: Unlikely
+      carries: the blocked row's own reason
+      colour: null
+
+    - id: not-enough-known
+      label: More to learn
+      carries: the list of rows still open, each with its route or its question
+      colour: null
+
+# One entry per row, in the card files' own order: the four "does this apply"
+# questions, then the thirty-two eligibility cards — the methodology's own gate
+# (M1–M17), then the Paris-alignment framework (P1–P2), then the rules for every
+# Gold Standard project (G1–G13).
+#
+# `asked` is the phase on the navigation where the row is acted on, the
+# phase-tags ruling of 23 Sep 2026, read from each card's Phase line. On this
+# site Phoebe asks Eligibility rows only; every other row is shown once, grouped
+# by phase with the seat that helps there, and is never counted against a
+# planned project.
+#
+# `fixable` is the card's own "Can it be fixed?" line, first word. The four
+# applies cards carry no such line; they sort a no under "If the answer is no",
+# and their values are read from there. Every one of them names a Blocked case
+# or, for T4, no fail at all.
+#
+# `applies` is the optional ninth key, and only six rows carry one: M2, M3, M4,
+# M8, M9 and M16, the rows a class limits. Every other row exists for every
+# project and says so by carrying no key at all.
+#
+# `routes` names route cards by id, and only where the card itself names one.
+# Fourteen rows name none. Most of those describe a fix that is simply doing the
+# thing — draw the boundary, get the permit, name the goal — and need no route
+# card. Three describe a fix that a route card would carry and none does: T1's
+# change of pump, M2's change of drive, and M14's justified sub-national area.
+# Each of those three says so in a comment, because an empty list for a missing
+# route card and an empty list for "nothing to route" are different facts.
+rows:
+  - id: T1
+    title: Safe drinking water from a technology that gives off little or nothing
+    # Blocked only where the activity does not supply drinking water at all. The
+    # card names a fix for a pump on its own fossil-fuel engine, but no route card
+    # carries that fix, so this row names none: a route is a card id or nothing.
+    asked: eligibility
+    takes:
+      kind: state
+      of: pathway-state
+    from:
+      - record: does
+      - conversation
+      - documents: the project’s own description of what it supplies and how it is powered
+    fixable: "depends"
+    routes: []
+    cite:
+      card: applies/T1
+
+  - id: T2
+    title: Today, people boil, or go without
+    # No Fixable case: the card sorts a no into Blocked or Unknown only, so there is
+    # no route to name.
+    asked: eligibility
+    takes:
+      kind: state
+      of: pathway-state
+    from:
+      - record: does
+      - conversation
+      - documents: the baseline survey, or the household questionnaire on how people get and treat their water today
+    fixable: "depends"
+    routes: []
+    cite:
+      card: applies/T2
+
+  - id: T3
+    title: One of four kinds of technology
+    # The answer also sets the technology class that the eligibility cards’ "Applies
+    # to" lines read. That fact belongs to the card, which this row cites.
+    asked: eligibility
+    takes:
+      kind: state
+      of: pathway-state
+    from:
+      - record: does
+      - conversation
+      - documents: the project design document’s statement of where the water is treated or produced, and for whom
+    fixable: "depends"
+    routes: []
+    cite:
+      card: applies/T3
+
+  - id: T4
+    title: Which version the project is judged on
+    # Not yes-or-no: it sorts the project into a version. Nothing about it is ever
+    # Blocked — the card says "I don’t know" is Unknown and not a fail.
+    asked: eligibility
+    takes:
+      kind: choice
+      of: version-flag
+    from:
+      - conversation
+      - documents: the Gold Standard registration record for the project, and its certification documents where it has any
+    fixable: "yes"
+    routes: []
+    cite:
+      card: applies/T4
+
+  - id: M1
+    title: A technology the method names
+    asked: eligibility
+    takes:
+      kind: state
+      of: row-state
+    from:
+      - record: does
+      - conversation
+      - documents: the technology specification naming the treatment or supply technology used
+    fixable: "depends"
+    routes: [R-2]
+    cite:
+      card: eligibility/M1
+
+  - id: M2
+    title: No pump on its own fossil-fuel engine
+    # The card’s fix is a change of drive. No route card carries it, so none is named.
+    asked: eligibility
+    applies: [cws]
+    takes:
+      kind: state
+      of: row-state
+    from:
+      - record: does
+      - conversation
+      - documents: the pump specification, naming its drive
+    fixable: "depends"
+    routes: []
+    cite:
+      card: eligibility/M2
+
+  - id: M3
+    title: The treatment technology is shown to work
+    asked: plan
+    applies: [hwt, iwt]
+    takes:
+      kind: state
+      of: row-state
+    from:
+      - conversation
+      - documents: the product’s laboratory report, its listing under the WHO evaluation scheme, or the national notice
+    fixable: "yes"
+    routes: [R-2]
+    cite:
+      card: eligibility/M3
+
+  - id: M4
+    title: The water at the collection point is safe
+    asked: plan
+    applies: [cwt, cws]
+    takes:
+      kind: state
+      of: row-state
+    from:
+      - conversation
+      - documents: the water-quality test results for the collection point
+    fixable: "yes"
+    routes: [R-3]
+    cite:
+      card: eligibility/M4
+
+  - id: M5
+    title: The people served boil today, or go without
+    asked: eligibility
+    takes:
+      kind: state
+      of: row-state
+    from:
+      - record: does
+      - conversation
+      - documents: the baseline survey’s findings on how people get and treat their water today
+    fixable: "depends"
+    routes: [R-1, R-4]
+    cite:
+      card: eligibility/M5
+
+  - id: M6
+    title: Suppressed demand only for small and micro-scale projects
+    asked: eligibility
+    takes:
+      kind: state
+      of: row-state
+    from:
+      - conversation
+      - documents: the project design document’s statement of scale, and what it claims as suppressed demand
+    fixable: "depends"
+    routes: []
+    cite:
+      card: eligibility/M6
+
+  - id: M7
+    title: Suppressed demand comes with basic service
+    asked: plan
+    takes:
+      kind: state
+      of: row-state
+    from:
+      - conversation
+      - documents: the service-level evidence for the water supplied, and the network’s test results where there is a network
+    fixable: "yes"
+    routes: [R-4]
+    cite:
+      card: eligibility/M7
+
+  - id: M8
+    title: Collected water is within reach
+    asked: partners
+    applies: [cwt, cws]
+    takes:
+      kind: state
+      of: row-state
+    from:
+      - conversation
+      - documents: the service-area map, and the distance or time evidence for the people counted
+    fixable: "yes"
+    routes: [R-5]
+    cite:
+      card: eligibility/M8
+
+  - id: M9
+    title: A restored system was really out of action
+    asked: eligibility
+    applies: [cwt, cws]
+    takes:
+      kind: state
+      of: row-state
+    from:
+      - conversation
+      - documents: the outage history of the system being restored, with dates and evidence
+    fixable: "depends"
+    routes: [R-6]
+    cite:
+      card: eligibility/M9
+
+  - id: M10
+    title: The technology's life is known, and replacement is planned
+    asked: plan
+    takes:
+      kind: state
+      of: row-state
+    from:
+      - conversation
+      - documents: the technology’s specification or guarantee, and the replacement plan
+    fixable: "yes"
+    routes: [R-7]
+    cite:
+      card: eligibility/M10
+
+  - id: M11
+    title: Nothing is counted twice
+    asked: plan
+    takes:
+      kind: state
+      of: row-state
+    from:
+      - conversation
+      - documents: the unit database, the registry searches, and the double-counting declaration
+    fixable: "yes"
+    routes: [R-8]
+    cite:
+      card: eligibility/M11
+
+  - id: M12
+    title: No law already requires it, and the host country has not excluded it
+    # Blocked where the host country has excluded the activity type: only the country
+    # can change that.
+    asked: partners
+    takes:
+      kind: state
+      of: row-state
+    from:
+      - record: place
+      - conversation
+      - documents: the review of the host country’s law, and of its list of excluded activity types
+    fixable: "depends"
+    routes: [R-9]
+    cite:
+      card: eligibility/M12
+
+  - id: M13
+    title: Additional, by the positive list or by analysis
+    asked: eligibility
+    takes:
+      kind: state
+      of: row-state
+    from:
+      - conversation
+      - documents: "the additionality demonstration: the positive-list check, or the financial analysis"
+    fixable: "depends"
+    routes: [R-10, R-11]
+    cite:
+      card: eligibility/M13
+
+  - id: M14
+    title: Not yet common practice
+    # The card’s fix is a justified sub-national area or a change of design. No route
+    # card carries it, so none is named.
+    asked: quantify
+    takes:
+      kind: state
+      of: row-state
+    from:
+      - conversation
+      - documents: the common-practice analysis for the area claimed
+    fixable: "depends"
+    routes: []
+    cite:
+      card: eligibility/M14
+
+  - id: M15
+    title: No lock-in
+    asked: plan
+    takes:
+      kind: state
+      of: row-state
+    from:
+      - conversation
+      - documents: the lock-in assessment, or the maker’s evidence of the technology’s life
+    fixable: "yes"
+    routes: [R-12]
+    cite:
+      card: eligibility/M15
+
+  - id: M16
+    title: Groundwater is drawn within what the aquifer can give
+    asked: partners
+    applies: [cws]
+    takes:
+      kind: state
+      of: row-state
+    from:
+      - record: place
+      - conversation
+      - documents: the groundwater assessment, or the abstraction permit
+    fixable: "yes"
+    routes: [R-13]
+    cite:
+      card: eligibility/M16
+
+  - id: M17
+    title: The running rules are in the design
+    asked: to-remain-eligible
+    takes:
+      kind: state
+      of: row-state
+    from:
+      - conversation
+      - documents: the design’s regulatory summary, maintenance plan and awareness campaign
+    fixable: "yes"
+    routes: [R-6]
+    cite:
+      card: eligibility/M17
+
+  - id: P1
+    title: The right version of the method
+    asked: eligibility
+    takes:
+      kind: state
+      of: row-state
+    from:
+      - conversation
+      - documents: the project’s certification record, and the Paris-alignment design change where it is transitioning
+    fixable: "depends"
+    routes: [R-19]
+    cite:
+      card: eligibility/P1
+
+  - id: P2
+    title: A community-services activity
+    asked: eligibility
+    takes:
+      kind: state
+      of: row-state
+    from:
+      - record: does
+      - conversation
+      - documents: the project design document’s statement of who the water serves
+    fixable: "yes"
+    routes: []
+    cite:
+      card: eligibility/P2
+
+  - id: G1
+    title: A real activity on the ground, with a boundary
+    asked: partners
+    takes:
+      kind: state
+      of: row-state
+    from:
+      - conversation
+      - documents: the project boundary and the site descriptions
+    fixable: "yes"
+    routes: []
+    cite:
+      card: eligibility/G1
+
+  - id: G2
+    title: The project keeps the host country's law
+    asked: partners
+    takes:
+      kind: state
+      of: row-state
+    from:
+      - record: place
+      - conversation
+      - documents: the permits, and the review of which national rules touch safe-water supply
+    fixable: "yes"
+    routes: []
+    cite:
+      card: eligibility/G2
+
+  - id: G3
+    title: Everyone involved is named and in good standing
+    asked: partners
+    takes:
+      kind: state
+      of: row-state
+    from:
+      - conversation
+      - documents: the registration and good-standing documents for every party involved
+    fixable: "yes"
+    routes: []
+    cite:
+      card: eligibility/G3
+
+  - id: G4
+    title: Ownership of the credits is clear and agreed
+    asked: partners
+    takes:
+      kind: state
+      of: row-state
+    from:
+      - conversation
+      - documents: the ownership statement, the consent forms and the contracts
+    fixable: "yes"
+    routes: [R-8]
+    cite:
+      card: eligibility/G4
+
+  - id: G5
+    title: The other rights the project rests on are not in dispute
+    asked: partners
+    takes:
+      kind: state
+      of: row-state
+    from:
+      - conversation
+      - documents: the land, water and access rights the project rests on
+    fixable: "yes"
+    routes: []
+    cite:
+      card: eligibility/G5
+
+  - id: G6
+    title: Aid money is declared, and none of it buys the credits
+    # Blocked where aid is given on condition that the credits go to the donor country.
+    asked: partners
+    takes:
+      kind: state
+      of: row-state
+    from:
+      - record: place
+      - conversation
+      - documents: the funding agreements, and the conditions attached to any aid money
+    fixable: "depends"
+    routes: []
+    cite:
+      card: eligibility/G6
+
+  - id: G7
+    title: Three Sustainable Development Goals, one of them climate
+    asked: plan
+    takes:
+      kind: state
+      of: row-state
+    from:
+      - conversation
+      - documents: the project design document’s Sustainable Development Goal section and its indicators
+    fixable: "yes"
+    routes: []
+    cite:
+      card: eligibility/G7
+
+  - id: G8
+    title: The safeguarding assessment is done and answered
+    asked: plan
+    takes:
+      kind: state
+      of: row-state
+    from:
+      - conversation
+      - documents: the completed safeguarding assessment and its mitigation plan
+    fixable: "yes"
+    routes: [R-16]
+    cite:
+      card: eligibility/G8
+
+  - id: G9
+    title: The people affected were consulted, in two rounds, before the start
+    asked: partners
+    takes:
+      kind: state
+      of: row-state
+    from:
+      - conversation
+      - documents: the records of the two consultation rounds, with their dates
+    fixable: "yes"
+    routes: [R-14]
+    cite:
+      card: eligibility/G9
+
+  - id: G10
+    title: A way to raise a grievance, for the life of the project
+    asked: partners
+    takes:
+      kind: state
+      of: row-state
+    from:
+      - conversation
+      - documents: the grievance procedure agreed at the consultation meeting
+    fixable: "yes"
+    routes: [R-15]
+    cite:
+      card: eligibility/G10
+
+  - id: G11
+    title: Gender-sensitive by design
+    asked: plan
+    takes:
+      kind: state
+      of: row-state
+    from:
+      - conversation
+      - documents: the gender assessment, and the three steps it calls for
+    fixable: "yes"
+    routes: [R-17]
+    cite:
+      card: eligibility/G11
+
+  - id: G12
+    title: Submitted within a year of starting
+    # Blocked for a retroactive project submitted more than a year after it started:
+    # the standard reopens no year.
+    asked: eligibility
+    takes:
+      kind: state
+      of: row-state
+    from:
+      - conversation
+      - documents: the project start date and the submission date
+    fixable: "depends"
+    routes: [R-18]
+    cite:
+      card: eligibility/G12
+
+  - id: G13
+    title: A plan to monitor and report
+    asked: plan
+    takes:
+      kind: state
+      of: row-state
+    from:
+      - conversation
+      - documents: the monitoring and reporting plan written into the design
+    fixable: "yes"
+    routes: [R-6]
+    cite:
+      card: eligibility/G13
+
+# What this section posts to the project record. A pack's headline figure is
+# Calvin's tool's output and the pin is Bridget's; neither belongs to this one.
+# One verdict per pathway: a project may qualify here and not on the water
+# pathway, or the other way round, and the two are never merged.
+outputs:
+  - id: pathway
+    posts: Whether the carbon pathway is in play, from the applies rows.
+    takes:
+      kind: state
+      of: pathway-state
+
+  - id: version
+    posts: Which version of the methodology the project is judged on, from card T4.
+    takes:
+      kind: choice
+      of: version-flag
+
+  - id: rows
+    posts: Each requirement's state, with what that state must carry.
+    takes:
+      kind: state
+      of: row-state
+
+  - id: readiness
+    posts: >-
+      The readiness read for the carbon pathway: likely when every row
+      that applies is Met, unlikely when any row is Blocked, more to learn
+      yet for anything else.
+    takes:
+      kind: state
+      of: readiness-read

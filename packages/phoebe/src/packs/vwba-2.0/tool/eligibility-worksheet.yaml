@@ -1,0 +1,363 @@
+# The eligibility worksheet — the water pathway's section.
+#
+# WHAT THIS FILE IS. The tool definition contract, ruled 24 Sep 2026: one file
+# per tool, holding the tool's rows, their states, what each takes, where a
+# value comes from, and citations by card id. The site's worksheet, Phoebe's
+# prompt generator, an outside Model Context Protocol (MCP) server and the
+# grading rig are all meant to read this one file rather than four copies of it.
+#
+# ONE TOOL, TWO SECTIONS, ONE FILE EACH. Ruling R3 of 22 Sep 2026 made the
+# eligibility worksheet one tool with a section per pack. This file is the water
+# pathway's section; the carbon pack's section is its own file beside its own
+# cards, and is not written yet. A reader that opens both has the whole tool;
+# one that opens this has one pathway.
+#
+# NOTHING READS IT YET. It is built ahead of its readers, on the maintainer's
+# word, so the shape is settled before anything is wired to it. `tool/README.md`
+# still stands as it is, agent-facing region included, and that region is still
+# what reaches Phoebe's prompt. When the generator reads this file instead, the
+# region retires and the tool has one home.
+#
+# WHICH ROWS EXIST FOR A PROJECT. Ruling R9 as amended 24 Sep 2026 gave a row
+# one optional ninth key, `applies`, read from the card's own "Applies to" line:
+# the technology class or the version a row exists for. Absent means every
+# project. No row in this section carries it, because this pathway sorts no row
+# that way; see the `applies-to` list below, which says so in one place.
+#
+# EVERY ROW CITES A CARD, NEVER A SOURCE. This pack has cards, so a row names
+# the card that carries its words and the card file carries them: the tool file
+# names the card, it never copies it. A route is always a route card's id.
+#
+# THE GATE IS scripts/check-tool.mjs. It fails on a card id that is not in the
+# named set, a route id with no route card, a value off a closed list, a version
+# or a source that disagrees with the pack README, a row citing a source in a
+# pack that has cards, and a row count that does not mirror its card set.
+#
+# YES AND NO ARE QUOTED. An outside reader may be a YAML 1.1 parser, which reads
+# a bare yes as a boolean. The values here are words from a card, not booleans.
+
+tool:
+  id: eligibility-worksheet
+  name: The eligibility worksheet
+  purpose: >-
+    Works out, one question at a time, whether a project can count a benefit on
+    a pathway — and where it cannot yet, what would change that.
+
+pack:
+  key: vwba-2.0
+  # Equal to the pack README's own "**Version x.y.z.**" line; the gate holds the
+  # two together, and check-cards already holds that line to the CHANGELOG head.
+  version: 0.12.1
+
+section:
+  id: water
+  name: The water pathway
+  pathway: water
+
+# The documents this file cites, by short id. The same table the pack README
+# carries under "Cited document"; the gate holds them equal. The routes set also
+# cites one real published project, on the one card that uses it (R-8); a row
+# cites a card, so no row cites that report and it is not listed here.
+sources:
+  - id: vwba-2.0
+    document: Volumetric Water Benefit Accounting 2.0
+    version: Version 1, September 2025
+    publisher: World Resources Institute
+    link: https://doi.org/10.46830/wrigb.23.00112
+
+# The project-context fields this tool reads BEFORE it asks anything. On this
+# site that is the record Wellington collects; on the paid site it is the
+# project context; through the MCP door it is whatever the caller already holds.
+# Provenance says how a field came to be filled, and is the visit's own list.
+record:
+  - field: does
+    asks: What the project does, in the visitor's own words.
+    takes: { kind: text }
+    provenance: [chat]
+    note: Never typed on a form; only heard. It usually settles W1, and often W2.
+
+  - field: name
+    asks: What the project is called.
+    takes: { kind: text }
+    provenance: [typed, chat]
+
+  - field: place
+    asks: Where the project is — a country or a named place.
+    takes: { kind: text }
+    provenance: [typed, chat, pin]
+    note: The pin fills it only when the visitor has neither typed it nor said it.
+
+  - field: type
+    asks: Which of the cited project types this is.
+    takes: { kind: choice }
+    provenance: [chat]
+    note: >-
+      Ruled 23 Sep 2026 (item A16): a cited list of twenty-four types in
+      knowledge-packs/product-shared/project-types.md, confirmed then logged.
+      Not built. The live record still carries `kind`, which retires with it.
+
+  - field: stage
+    asks: How far along the project is.
+    takes: { kind: choice }
+    provenance: [chat]
+    note: Ruled 23 Sep 2026 (item A16). Not built. A planned project is normal.
+
+  - field: pin
+    asks: The one basin this visit is about.
+    takes: { kind: text }
+    provenance: [pin]
+    note: Bridget's tool writes it. This tool reads it and never sets it.
+
+# Every closed list of values this tool uses, in one place. A row's `takes.of`
+# and an output's `takes.of` name one of them.
+states:
+  # The five of the guide-not-gate ruling, 23 Sep 2026 (item A18). A miss is
+  # sorted before anything is ruled out, and only the cards say which rows can
+  # ever be Blocked.
+  row-state:
+    - id: unchecked
+      label: Not yet checked
+      carries: nothing
+      colour: --state-locked
+
+    - id: met
+      label: Met
+      carries: one sentence on what settled it
+      colour: --state-approved
+
+    - id: fixable
+      label: Fixable
+      carries: the route card's id, so the console draws the route with its citation; never prose alone
+      colour: --state-pending
+
+    - id: unknown
+      label: Unknown
+      carries: what to find out, in a sentence; and where the gap is a baseline or a survey, the save-and-design offer
+      colour: --state-pending
+
+    - id: blocked
+      label: Blocked
+      carries: the card's own reason, cited
+      # INTERIM, and recorded as one. The brand book's §2.5 has no "stopped"
+      # value that is not an error, and coral is refused here; the pending
+      # colour stands with the word "Blocked" until the maintainer rules on
+      # pixels. The raise is open.
+      colour: --state-pending
+
+  # Whether the pathway is in play at all. Never a verdict on the project and
+  # never a count — the applies cards say so themselves.
+  pathway-state:
+    - id: unchecked
+      label: Not yet checked
+      carries: nothing
+      # NOT RULED. The pathway state has never been drawn, and a colour is a
+      # thing the maintainer approves on pixels, not in prose. Left empty
+      # rather than invented.
+      colour: null
+
+    - id: applies
+      label: Applies
+      carries: nothing
+      colour: null
+
+    - id: does-not-apply
+      label: Does not apply
+      carries: which kind of no it is — fixable with a cited route, unknown, or blocked — and that the other pathway is separate
+      colour: null
+
+  # Which projects a row exists for — the values a row's optional `applies` key
+  # may name, ruling R9 as amended 24 Sep 2026. It is not a state and is never
+  # drawn: it sorts rows before the conversation starts, so that the tool file
+  # says which rows this project has, the row states say what is done and what
+  # is left, and the agent asks only what is left.
+  #
+  # THIS PATHWAY SORTS NO ROW. The guidebook's six criteria carry no "Applies
+  # to" line at all, and both applies cards say "every project asking about this
+  # pathway", so every row here exists for every project and not one of them
+  # carries the key. The list is written down anyway, with the one value it has,
+  # because an absent list and a list with nothing in it read the same and mean
+  # different things.
+  applies-to:
+    - id: all
+      label: Every project on this pathway
+      # NEVER WRITTEN ON A ROW. Leaving the key out is how a row says it, and
+      # two ways of saying one thing is what drifts. The gate refuses it.
+
+  # The read for the pathway, drawn from the row states and never from prose.
+  # "Likely" is the honest word: nothing on this site verifies anything.
+  readiness-read:
+    - id: likely-eligible
+      label: Likely
+      carries: nothing beyond the rows it was drawn from
+      colour: null
+
+    - id: likely-not
+      label: Unlikely
+      carries: the blocked row's own reason
+      colour: null
+
+    - id: not-enough-known
+      label: More to learn
+      carries: the list of rows still open, each with its route or its question
+      colour: null
+
+# One entry per row, in the order asked: the two "does this apply" questions
+# first, then the six criteria in the manual's order. Every row carries the
+# contract's eight keys; none carries the optional ninth, `applies`, because
+# every row here exists for every project on this pathway.
+#
+# `asked` is the phase on the navigation where the row is acted on, the
+# phase-tags ruling of 23 Sep 2026. On this site Phoebe asks Eligibility rows
+# only; every other row is shown once, grouped by phase with the seat that helps
+# there, and is never counted against a planned project.
+#
+# `fixable` is the card's own line. The six criteria carry "Can it be fixed?" in
+# so many words. The two applies cards carry the same sorting under "If the
+# answer is no", and their values are read from there: W1 depends, because it
+# names a Blocked case; W2 "yes", because it says never Blocked.
+rows:
+  - id: W1
+    title: A water stewardship activity with a volume behind it
+    # The applies cards carry no Phase line. The test is run at the door of the
+    # Eligibility step, by the cards' own account of how it is run.
+    asked: eligibility
+    takes:
+      kind: state
+      of: pathway-state
+    from:
+      - record: does
+      - conversation
+      - documents: the project's own description of what the activity does and which shared water challenge it takes on
+    fixable: "depends"
+    routes: [R-2, R-3, R-1]
+    cite:
+      card: applies/W1
+
+  - id: W2
+    title: A mapped route to counting it
+    asked: eligibility
+    takes:
+      kind: state
+      of: pathway-state
+    from:
+      - record: does
+      - conversation
+      - documents: the project design document's statement of the activity type and the method named for counting it
+    fixable: "yes"
+    routes: [R-3, R-8]
+    cite:
+      card: applies/W2
+
+  - id: 1
+    title: A working route to a countable benefit
+    asked: eligibility
+    takes:
+      kind: state
+      of: row-state
+    from:
+      - record: does
+      - conversation
+      - documents: the project design document's section on the indicator chosen and the method that counts it
+    fixable: "yes"
+    routes: [R-3, R-8, R-1]
+    cite:
+      card: eligibility/1
+
+  - id: 2
+    title: The problem is real in that specific place
+    asked: eligibility
+    takes:
+      kind: state
+      of: row-state
+    from:
+      - record: place
+      - record: does
+      - conversation
+      - documents: the catchment assessment, or the desktop study of the local water challenges
+    fixable: "yes"
+    routes: [R-2]
+    cite:
+      card: eligibility/2
+
+  - id: 3
+    title: Support from inside and from the neighbours
+    asked: partners
+    takes:
+      kind: state
+      of: row-state
+    from:
+      - conversation
+      - documents: the consultation record, and the reasoning behind the decision to back the project
+    fixable: "yes"
+    routes: [R-4, R-9]
+    cite:
+      card: eligibility/3
+
+  - id: 4
+    title: The benefit is genuinely additional
+    asked: eligibility
+    takes:
+      kind: state
+      of: row-state
+    from:
+      - conversation
+      - documents: the review of what the sponsor is legally obliged to do, and of what it funds beyond that
+    # The one water row that can end Blocked, and only on one fact: work the
+    # sponsor must do by law to comply. The card names two situations that sit
+    # outside that bar, and the route is for those.
+    fixable: "depends"
+    routes: [R-5]
+    cite:
+      card: eligibility/4
+
+  - id: 5
+    title: A route to keep checking the volumes
+    asked: plan
+    takes:
+      kind: state
+      of: row-state
+    from:
+      - conversation
+      - documents: the tracking and reporting plan drawn up with the implementer, and the money and people written into the agreement
+    fixable: "yes"
+    routes: [R-6, R-9]
+    cite:
+      card: eligibility/5
+
+  - id: 6
+    title: The downsides have been looked for and cut back
+    asked: partners
+    takes:
+      kind: state
+      of: row-state
+    from:
+      - conversation
+      - documents: the trade-off assessment made before the activity began, and what was done about what it found
+    fixable: "yes"
+    routes: [R-7]
+    cite:
+      card: eligibility/6
+
+# What this tool posts to the project record. A pack's headline figure is
+# Calvin's tool's output and the pin is Bridget's; neither belongs to this one.
+outputs:
+  - id: pathway
+    posts: Whether the water pathway is in play, from the two applies rows.
+    takes:
+      kind: state
+      of: pathway-state
+
+  - id: rows
+    posts: Each criterion's state, with what that state must carry.
+    takes:
+      kind: state
+      of: row-state
+
+  - id: readiness
+    posts: >-
+      The readiness read for the water pathway: likely when every row that
+      applies is Met, unlikely when any row is Blocked, more to learn for
+      anything else.
+    takes:
+      kind: state
+      of: readiness-read
