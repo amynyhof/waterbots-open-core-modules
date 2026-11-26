@@ -149,8 +149,9 @@ their tasks, collect what they need, and report back to him. He helps with the n
     core 0.3.0 takes it away.
   - Decided by the maintainer on 2026-11-25: a project's kind is worked out in core from a few plain facts, and nobody is asked
     for it. One table in core says what Calvin and Violet do with each. Community level treatment is counted for carbon
-    again, treatment only included; institutional treatment is not set up yet. A project that already exists keeps its
-    answers. Core also holds the guards on an agent's numbers. Open pull request.
+    again, treatment only included; institutional treatment is not set up yet. An update never changes a screening: one
+    that already exists keeps its answers, and working a project out again is a new screening beside it. Core also holds
+    the guards on an agent's numbers. Open pull request.
   - Value ranges, ruled by the maintainer on 2026-11-23. Each value a person can enter has a range. A number outside it
     is refused where it is typed, with a message that names the value and the range. One list, one check and one message
     in `core`; the record's fact check, both screens and both tools use them. A method cap is not a range. This gives
@@ -449,6 +450,9 @@ the maintainer.
   - Which method a supply combined with home or institution treatment uses.
   - Does the 2026 version's silence on where treated water comes from mean what we read it to mean? The 2021 version says it
     in words.
+  - A note on evidence for a restored source. In the maintainer's professional experience, proof that the source had stopped
+    working is submitted, usually with a letter from whoever installed or managed it saying there were no plans to fix it.
+    Its source for now is "the maintainer's professional experience". It needs a source line before an agent repeats it.
 - **N18 (V1):** *Family: Experts and partners.* still open on water benefits, for the methodology sprint.
   - How is treatment counted when people already collected the same water untreated, and which of D-3's two printed forms of
     the sum holds? The maintainer's own thought, not yet confirmed: treatment may be counted as unsafe water made safe, and
