@@ -3,7 +3,7 @@
 // (`@waterbots/core/chat`). Nothing here does a sum or calls a model: every figure is the engine's.
 
 import { ANSWER_FIELDS, CHAT_REPLY, chatContext, openAsks, openedTurn, readLeft, type Ask, type ChatSettings, type Kept } from "@waterbots/core/chat";
-import { checkAnswerFacts, factFields, factsReturnedToAgent, factsTakenOut, joinGuards, readAsking, readHeard, type AnswerFact, type Heard } from "@waterbots/core/factGuard";
+import { checkAnswerFacts, factFields, factsReturnedToAgent, joinGuards, readAsking, readHeard, type AnswerFact, type Heard } from "@waterbots/core/factGuard";
 import { askedOutOfRange, checkAnswerNumbers, returnToAgent, takenOut, type AnswerNumber } from "@waterbots/core/numberGuard";
 import { KIND_ASKS, KIND_FACTS, KIND_FACT_SCHEMA, NO_CALCULATOR_YET, YES_NO_FACTS, askFor, kindFactsOf, knownKindFacts, FACT_LABEL } from "@waterbots/core/projectKinds";
 import { RANGES, rangeRefusal, type RangeKey, type RangeWords } from "@waterbots/core/ranges";
@@ -356,7 +356,7 @@ function answerFacts(reply: VioletReply, input: D3Input, facts?: ProjectFacts): 
 
 /**
  * Core's guards on her answer: on her numbers, and on every other fact she fills (2026-11-26). A fact the visitor did not
- * give is refused, and stays blank. The site calls it on each answer, and sends `returned` back once.
+ * give is dropped quietly, and stays blank: `told` never names it, and she is told once, in `returned`, that it is blank. The site calls it on each answer, and sends `returned` back once.
  */
 export function guardVioletReply(reply: VioletReply, { input, messages, asked, facts: onRecord }: VioletGuardInput): GuardedVioletReply {
   const households: RangeWords = (reply.values.population?.mode ?? input.population?.mode) === "households" ? { name: "Households served" } : {};
@@ -395,7 +395,7 @@ export function guardVioletReply(reply: VioletReply, { input, messages, asked, f
   return {
     reply: { ...reply, facts, values },
     returned: joinGuards(returnToAgent(faults), factsReturnedToAgent(factCheck.refused)),
-    told: joinGuards(takenOut(faults), factsTakenOut(factCheck.refused)),
+    told: takenOut(faults),
     outOfRange: target === undefined ? null : askedOutOfRange(target.key, messages.at(-1) ?? "", target.words ?? {}),
   };
 }

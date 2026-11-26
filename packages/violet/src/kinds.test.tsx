@@ -203,6 +203,7 @@ describe("the guard on her facts (2026-11-26): a fact is filled only when the vi
     const g = guardVioletReply(answer, { input, messages: ["People already use the river water."], asked: "waterSource" });
     expect(g.reply.facts).toEqual({ waterSource: "existing" });
     expect(g.returned).toMatch(/whether people use the water at home \(you are asking for it in this same reply\)/);
+    expect(g.told).toBeNull();
   });
   it("her answer to the question she asked last is kept", () => {
     const g = guardVioletReply({ reply: "Thanks.", handBack: "none", leftForNow: [], facts: { homeUse: "yes" }, values: {} }, { input, messages: ["Yes, they drink it at home."], asked: "homeUse" });

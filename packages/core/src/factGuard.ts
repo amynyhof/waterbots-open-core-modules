@@ -11,8 +11,9 @@
  *   last message must be an answer, not a question, and not "not sure".
  * - Any other fact is taken only when the agent hands the visitor's own words for it, and those words are in the
  *   visitor's own messages.
- * - A fact that fails goes back to the agent once, in the same turn. The second time it is taken out. It stays blank,
- *   so no figure rests on it.
+ * - A fact that fails is dropped quietly. It stays blank, so no figure rests on it, and the visitor sees nothing about
+ *   it: an agent may never guess, so no line is needed (the maintainer, 2026-11-26). The agent is told once, in the same
+ *   turn, that the fact is still blank, so it asks for it in its own words, as for any blank fact.
  *
  * It reads words, and calls no model. The site makes the call, and passes what was asked.
  */
@@ -118,18 +119,13 @@ const WHY: Record<FactFault, string> = {
   "not in the visitor's words": "it is not in the visitor's messages",
 };
 
-/** What goes back to the agent, once, in the same turn. Facts and an instruction, never a line to say. Null: nothing to say. */
+/**
+ * What goes back to the agent, once, in the same turn: the facts that are still blank, and why. Facts and an
+ * instruction, never a line to say. Null: nothing to say. Nothing is ever shown to the visitor about a refused fact.
+ */
 export function factsReturnedToAgent(refused: FactCheck["refused"]): string | null {
   if (refused.length === 0) return null;
-  return `Not filled in, because the visitor has not given them: ${refused.map((r) => `${r.fact.name} (${WHY[r.why]})`).join("; ")}. A fact stays blank until the visitor gives it. Answer this turn again without them, and never say them as if they were known. Ask for one at a time, and put the visitor's own words for each fact you fill in heard.`;
-}
-
-/** What the visitor is told when a fact is taken out. Null: nothing was. */
-export function factsTakenOut(refused: FactCheck["refused"]): string | null {
-  if (refused.length === 0) return null;
-  const names = [...new Set(refused.map((r) => r.fact.name))];
-  const list = names.length === 1 ? names[0]! : `${names.slice(0, -1).join(", ")} and ${names.at(-1)!}`;
-  return `${list}: not filled in, because it is not in your messages.`;
+  return `Still blank, because the visitor has not given them: ${refused.map((r) => `${r.fact.name} (${WHY[r.why]})`).join("; ")}. Answer this turn again with them blank, and never say them as if they were known. Ask for one at a time, and put the visitor's own words for each fact you fill in heard.`;
 }
 
 /** Reads the key a reply asks for: one of the agent's own keys, or nothing. */

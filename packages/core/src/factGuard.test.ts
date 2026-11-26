@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
-import { checkAnswerFacts, factFields, factsReturnedToAgent, factsTakenOut, readAsking, readHeard, type AnswerFact } from "./factGuard.js";
+import * as guard from "./factGuard.js";
+import { checkAnswerFacts, factFields, factsReturnedToAgent, readAsking, readHeard, type AnswerFact } from "./factGuard.js";
 import { carbonAnswerFor, readKindFacts } from "./projectKinds.js";
 
 // Made-up chats. No real project is named.
@@ -79,12 +80,12 @@ describe("a fact is filled only when the person gave it", () => {
     expect(check.kept).toEqual(["country"]);
   });
 
-  test("what goes back to the agent names each fact and why, and the visitor is told which were not filled", () => {
+  test("what goes back to the agent names each fact as still blank, and why; the visitor is told nothing", () => {
     const { refused } = checkAnswerFacts([piped, home], { messages: ["The river."], asking: "publicPiped" });
-    expect(factsReturnedToAgent(refused)).toMatch(/^Not filled in, because the visitor has not given them: Public piped water \(you are asking for it in this same reply\); Used at home/);
-    expect(factsTakenOut(refused)).toBe("Public piped water and Used at home: not filled in, because it is not in your messages.");
+    expect(factsReturnedToAgent(refused)).toMatch(/^Still blank, because the visitor has not given them: Public piped water \(you are asking for it in this same reply\); Used at home/);
+    // A refused fill is dropped quietly (the maintainer, 2026-11-26): there is no line for the visitor.
+    expect(Object.keys(guard)).not.toContain("factsTakenOut");
     expect(factsReturnedToAgent([])).toBeNull();
-    expect(factsTakenOut([])).toBeNull();
   });
 
   test("the answer's two fields are read against the agent's own keys", () => {

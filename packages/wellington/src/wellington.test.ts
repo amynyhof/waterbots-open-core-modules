@@ -104,7 +104,7 @@ describe("his answer, checked (carried)", () => {
   test("home use: one of three, and only as the answer to the question his last reply asked", () => {
     const said = (homeUse: string, known: Record<string, unknown>) => validate({ reply: "Thank you.", route: "none", abstained: false, context: { homeUse } }, known);
     expect(said("not sure", { type: "C-11", asked: "homeUse", messages: ["Not sure yet."] })?.context?.homeUse).toBe("not sure");
-    expect(said("yes", { type: "C-11", messages: ["People already use the river water."] })).toMatchObject({ notGiven: ["homeUse"] });
+    expect(Object.keys(said("yes", { type: "C-11", messages: ["People already use the river water."] }) ?? {})).toEqual(["reply", "answers", "route", "abstained"]);
     expect(said("yes", { type: "C-11", messages: ["People already use the river water."] })?.context).toBeUndefined();
     expect(said("yes", { type: "C-19", messages: ["Yes."] })?.context).toBeUndefined();
     expect(said("maybe", { type: "C-11", asked: "homeUse", messages: ["Maybe."] })?.context).toBeUndefined();

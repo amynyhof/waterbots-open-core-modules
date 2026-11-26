@@ -6,7 +6,7 @@
  * Nothing here does a sum or calls a model: every figure is the engine's.
  */
 import { ANSWER_FIELDS, CHAT_REPLY, chatContext, openAsks, openedTurn, readLeft, type Ask, type ChatSettings, type Kept } from "@waterbots/core/chat";
-import { checkAnswerFacts, factFields, factsReturnedToAgent, factsTakenOut, joinGuards, readAsking, readHeard, type AnswerFact, type Heard } from "@waterbots/core/factGuard";
+import { checkAnswerFacts, factFields, factsReturnedToAgent, joinGuards, readAsking, readHeard, type AnswerFact, type Heard } from "@waterbots/core/factGuard";
 import type { DoorFacts, Place } from "@waterbots/core/places";
 import { askedOutOfRange, checkAnswerNumbers, isShare, returnToAgent, takenOut, type AnswerNumber } from "@waterbots/core/numberGuard";
 import { FACT_LABEL, KIND_ASKS, KIND_FACTS, KIND_FACT_SCHEMA, YES_NO_FACTS, askFor, kindFactsOf, knownKindFacts, readKindFacts, type Answer } from "@waterbots/core/projectKinds";
@@ -348,7 +348,7 @@ function withoutFacts(given: GivenFacts, refused: readonly string[]): GivenFacts
 
 /**
  * Core's guards on his answer: on his numbers, and on every other fact he fills (2026-11-26). A fact the visitor did not
- * give is refused, and stays blank. The site calls it on each answer, and sends `returned` back once.
+ * give is dropped quietly, and stays blank: `told` never names it, and he is told once, in `returned`, that it is blank. The site calls it on each answer, and sends `returned` back once.
  */
 export function guardCalvinReply(reply: CalvinReply, { state, messages, asked, facts: onRecord }: CalvinGuardInput): GuardedCalvinReply {
   const fields = new Map(stateValues(state).map((v) => [v.id, v]));
@@ -382,7 +382,7 @@ export function guardCalvinReply(reply: CalvinReply, { state, messages, asked, f
   return {
     reply: { ...reply, facts: withoutFacts(facts, factCheck.refused.map((r) => r.fact.key)), values },
     returned: joinGuards(returnToAgent(faults), factsReturnedToAgent(factCheck.refused)),
-    told: joinGuards(takenOut(faults), factsTakenOut(factCheck.refused)),
+    told: takenOut(faults),
     outOfRange: target === undefined ? null : askedOutOfRange(target.key, messages.at(-1) ?? "", target.words ?? {}),
   };
 }

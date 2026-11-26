@@ -303,8 +303,8 @@ describe("the guard on his facts (2026-11-26): a fact is filled only when the vi
     expect(answer.asking).toBe("publicPiped");
     const g = guardCalvinReply(answer, { state: calc.state, messages: ["We treat it at the tank. People already use the river water."], asked: "waterSource" });
     expect(g.reply.facts).toEqual({ waterSource: "existing" });
-    expect(g.returned).toMatch(/whether it is public piped water \(you are asking for it in this same reply\)/);
-    expect(g.told).toMatch(/not filled in, because it is not in your messages\.$/);
+    expect(g.returned).toMatch(/^Still blank, because the visitor has not given them: whether it is public piped water \(you are asking for it in this same reply\)/);
+    expect(g.told).toBeNull();
   });
   it("his answer to the question he asked last is kept", () => {
     const g = guardCalvinReply(reply({ publicPiped: false }), { state: calc.state, messages: ["No, it is not piped."], asked: "publicPiped" });

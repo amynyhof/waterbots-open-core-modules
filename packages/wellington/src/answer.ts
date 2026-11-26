@@ -13,7 +13,8 @@
  * A FACT IS FILLED ONLY WHEN THE VISITOR GAVE IT (2026-11-26): core's guard on facts (`@waterbots/core/factGuard`) reads
  * every kind fact and home use in his context against the visitor's own messages. A yes-or-no fact and home use are taken
  * only as the answer to the question his last reply asked; the source and the treatment only with the visitor's own words.
- * A fact he asks about in the same reply is never filled. One that fails is left out, and stays blank.
+ * A fact he asks about in the same reply is never filled. One that fails is dropped quietly, and stays blank: nothing in his
+ * answer names it, and the map asks for it again as for any blank fact.
  */
 import { ANSWERS_SCHEMA, readChips } from "@waterbots/core/chips";
 import { checkAnswerFacts, factFields, readAsking, readHeard, type AnswerFact } from "@waterbots/core/factGuard";
@@ -79,8 +80,6 @@ export interface WellingtonAnswer {
   reply: string;
   /** The key of the one fact this reply asks for. The site passes it back as `asked` on the next turn. */
   asking?: string;
-  /** Facts in his context that the visitor did not give: left out, and blank. */
-  notGiven?: string[];
   /** Chips that answer the question the reply ends with (core's `readChips`). */
   answers: string[];
   route: Route;
@@ -135,7 +134,6 @@ export function readWellingtonAnswer(value: unknown, known: Known = {}): Welling
   if (lobby || (known.place === "paid-site" && route === "paid")) route = "none";
 
   let context: Learned | undefined;
-  let notGiven: string[] | undefined;
   if (!lobby && typeof v.context === "object" && v.context !== null) {
     const c = v.context as Record<string, unknown>;
     const out: Learned = {};
@@ -169,7 +167,6 @@ export function readWellingtonAnswer(value: unknown, known: Known = {}): Welling
     });
     const check = checkAnswerFacts(facts, { messages: known.messages ?? [], asked: known.asked, asking: readAsking(v.asking, GUARDED), heard: readHeard(v.heard, GUARDED) });
     for (const r of check.refused) delete (out as Record<string, unknown>)[r.fact.key];
-    if (check.refused.length > 0) notGiven = check.refused.map((r) => r.fact.key);
     if (Object.keys(out).length > 0) context = out;
   }
 
@@ -183,7 +180,6 @@ export function readWellingtonAnswer(value: unknown, known: Known = {}): Welling
   return {
     reply: v.reply.trim(),
     ...(asking !== undefined ? { asking } : {}),
-    ...(notGiven !== undefined ? { notGiven } : {}),
     answers: readChips(v.answers, v.reply),
     route,
     ...(introduction ? { introduction } : {}),
