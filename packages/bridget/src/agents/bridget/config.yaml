@@ -1,0 +1,12 @@
+# Bridget — the basin map. Her chat runs on the Free site and the Paid site, beside the map.
+# Status is draft: nothing here claims a grade or a credential.
+agent: bridget
+version: 0.1.0 # 2026-11-25 (J5): her first release in this repo, without the map's data
+persona: bridget
+role_prompt: prompt.md
+base_rules: "@waterbots/core/agent-rules.md" # the foundational agent rules, rules 1 to 21 of AGENT_RULES.md
+places: [free-site, paid-site] # where her chat runs; none in the Agent Commons, at MCP or in the lobby
+reply: { sentences: 4, characters: 400 } # core's REPLY_LIMIT
+calls_per_turn: 2 # the look-up fix: the same question goes again once
+tools: [] # her tool is the map, and the site runs it; its data waits for the rights check
+status: draft
