@@ -84,6 +84,8 @@ sites pin that file by its fingerprint. The first pinned version includes the sl
 - *Family: Calculators and methods.* M8.2 the free site's water file.
 - *Family: Security and hygiene.* The two extra typing checks back on for `calvin`, and the restricted words in the seed's comments.
 - *Family: Security and hygiene.* SP6, the human engineer review. It runs alongside and blocks nothing.
+- *Family: Console and surfaces.* A view on Calvin's screen that shows the V1.0 figure on its own, for a project only the
+  2021 version counts. Until then his tool gives that figure (the maintainer, 2026-11-25).
 
 ## Family 1: the v1 scope (Agent orchestration)
 
@@ -151,7 +153,7 @@ their tasks, collect what they need, and report back to him. He helps with the n
     for it. One table in core says what Calvin and Violet do with each. Community level treatment is counted for carbon
     again, treatment only included; institutional treatment is not set up yet. An update never changes a screening: one
     that already exists keeps its answers, and working a project out again is a new screening beside it. Core also holds
-    the guards on an agent's numbers. Open pull request.
+    the guards on an agent's numbers. Merged (#61).
   - Value ranges, ruled by the maintainer on 2026-11-23. Each value a person can enter has a range. A number outside it
     is refused where it is typed, with a message that names the value and the range. One list, one check and one message
     in `core`; the record's fact check, both screens and both tools use them. A method cap is not a range. This gives
