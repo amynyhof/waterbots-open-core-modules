@@ -5,6 +5,7 @@ history keeps everything older and every longer entry.
 
 ---
 
+- 2026-11-25 — **Carry:** from the open site after its pull request 200 (`carry-B-to-C-2026-11-25`, 98 of 98 match, packing list matches; name scan 0), for Phoebe, Wellington and Bridget without map data. It replaces the carry of 23 November.
 - 2026-11-25 — **Release** `core-v0.3.0`, `calvin-v0.7.0` and `violet-v0.7.0` on `d59a385` (#56, #57). **Carry:** packed to the handoff folder.
 - 2026-11-25 — The J5 core step: both calculator chats, the map's order, and which projects call Violet (#57).
 - 2026-11-24 — Value ranges: a number outside its range is refused where it is typed (#56).
