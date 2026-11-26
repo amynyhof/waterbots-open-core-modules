@@ -44,6 +44,8 @@ data, and saving.
 
 ## Notes
 
+- Version 0.2.0: the maintainer's words of 31 October are back, as the meaning she keeps when asked what else she does.
+  `turnBlocks` takes the door's plain facts. It needs `@waterbots/core` in the 0.5 series.
 - Version 0.1.0: her first release in this repo. Not published. Nothing in this repo goes to npm yet; the package is marked
   `private`.
 - Her rulings are the maintainer's to write.

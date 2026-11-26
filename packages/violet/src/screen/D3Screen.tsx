@@ -217,13 +217,13 @@ function NumberBox({ label, value, set, ...box }: { label: string; value: number
  * People served, as the record gives them. Missing: the screen names what is missing and where it is filled in,
  * in Calvin's words, since the record is the one place it is kept.
  */
-function PeopleFromRecord({ input }: { input: D3Input }) {
+function PeopleFromRecord({ input, recordPage }: { input: D3Input; recordPage: boolean }) {
   const missing = missingPopulationFacts(input);
   if (missing.length > 0) {
     return (
       <p role="status" data-record-ask="">
         The water can&rsquo;t be worked out from the people served yet: this project&rsquo;s record is missing {missing.join(" and ")}.
-        Fill it in on the project record and the figures follow.
+        {recordPage ? " Fill it in on the project record and the figures follow." : null}
       </p>
     );
   }
@@ -318,6 +318,11 @@ export interface D3ScreenProps {
   onExport?: () => void;
   /** Lets the smaller figures scroll away with the page, as Calvin's `unpinFigureBlock`. The hero tile stays. */
   unpinFigureBlock?: boolean;
+  /**
+   * WHETHER THE SITE HAS A PROJECT RECORD PAGE (a door's facts, 2026-11-26). `false`: the screen never points to one, and
+   * the person gives each fact in the chat. Left out: the site has one, as before.
+   */
+  recordPage?: boolean;
 }
 
 export default function D3Screen({
@@ -334,6 +339,7 @@ export default function D3Screen({
   hideExportButton = false,
   onExport,
   unpinFigureBlock = false,
+  recordPage = true,
 }: D3ScreenProps) {
   const own = useD3State(
     givenState !== undefined
@@ -481,7 +487,7 @@ export default function D3Screen({
             ))}
           </div>
         ) : null}
-        {input.option === "beneficiaries" ? <PeopleFromRecord input={input} /> : null}
+        {input.option === "beneficiaries" ? <PeopleFromRecord input={input} recordPage={recordPage} /> : null}
         {refusals.map((m) => (
           <RangeMessage key={m} message={m} />
         ))}

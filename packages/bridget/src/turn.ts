@@ -9,6 +9,7 @@
  * It calls no model.
  */
 import { FINISH_NOTE } from "@waterbots/core/lookUp";
+import { doorBlock, type DoorFacts, type Place } from "@waterbots/core/places";
 import { knownKindFacts } from "@waterbots/core/projectKinds";
 import { stageWords, typeWords } from "@waterbots/core/projectWords";
 import type { Population, ProjectRecord } from "@waterbots/core/record";
@@ -110,7 +111,11 @@ export function bridgetRecordBlock(record: ProjectRecord): string | null {
   return [`# ${RECORD_HEADING}`, "", "These are the visitor’s own words about their project, from the shared record. They are known, so never ask for them.", "", ...lines].join("\n");
 }
 
-/** The blocks after her instructions, in order. `again` is true when the same question goes again (the look-up fix). */
-export function turnBlocks(visit: string, record: string | null, again = false): string[] {
-  return [visit, ...(record !== null ? [record] : []), ...(again ? [FINISH_NOTE] : [])];
+/**
+ * The blocks after her instructions, in order. `again` is true when the same question goes again (the look-up fix).
+ * `door` is where she is, with the door's plain facts from the site (2026-11-26).
+ */
+export function turnBlocks(visit: string, record: string | null, again = false, door?: { place: Place; facts?: DoorFacts }): string[] {
+  const facts = door === undefined ? null : doorBlock(door.place, door.facts);
+  return [visit, ...(facts !== null ? [facts] : []), ...(record !== null ? [record] : []), ...(again ? [FINISH_NOTE] : [])];
 }

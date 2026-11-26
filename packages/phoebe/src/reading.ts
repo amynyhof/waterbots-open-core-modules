@@ -121,7 +121,8 @@ export function pathwayReading(pack: string, sheet: Sheet, gsClass: string, herP
 /**
  * HER PART OF THE SHARED RECORD: each pathway's reading, her worksheet, whether the project was already credited under
  * V1.0, and whether her step is done. `handedOn` is true once she has handed the visitor on with a path done or closed,
- * so nobody is sent back to a step she has ended. Returns a new record.
+ * so nobody is sent back to a step she has ended. A site calls it after her turn: it also clears the mark that a fact her
+ * readings rest on changed. Returns a new record.
  */
 export function addPhoebeResults(record: ProjectRecord, sheet: Sheet, options: { handedOn?: boolean } = {}): ProjectRecord {
   const gsClass = classFor(record);
@@ -135,7 +136,10 @@ export function addPhoebeResults(record: ProjectRecord, sheet: Sheet, options: {
     if (pathway && read) out.pathways[pathway] = read;
   }
   out = withSheet(out, sheet);
-  return setAgentResults(out, "phoebe", {
+  out = setAgentResults(out, "phoebe", {
     done: READ_HERE.every((p) => out.pathways[p] !== undefined) && (options.handedOn === true || nothingLeftToAsk(sheet, gsClass)),
   });
+  // Her answer after a fact changed has worked the readings out again from the facts as they stand (2026-11-26).
+  delete out.agents.phoebe?.factsChanged;
+  return out;
 }

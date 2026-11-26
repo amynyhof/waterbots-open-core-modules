@@ -56,8 +56,15 @@ describe("one turn", () => {
   test("the blocks come in order: the cards, the door, the record, the worksheet, the notes; and a further call adds the note to answer now", () => {
     const sheet = applyUpdates(EMPTY_SHEET, { pathways: [{ pack: W, id: "W1", state: "applies" }] });
     const turn = phoebeTurn({ door: "free-site", record: BOREHOLE, sheet, eligibilityDone: true });
-    expect(turn.blocks.map((b) => b.split("\n")[0])).toEqual(["# The cards you have on this turn", "# Where you are", `# ${RECORD_HEADING}`, `# ${WORKSHEET_HEADING}`, "Every row you ask on this site has a verdict for this visit. Give the read for each pathway, show once the rows that are acted on at later phases, say Wellington will join with the next step, and set handBack to \"wellington\". Never send them back to him."]);
+    expect(turn.blocks.map((b) => b.split("\n")[0])).toEqual(["# The cards you have on this turn", "# Where you are", "# This door's facts", `# ${RECORD_HEADING}`, `# ${WORKSHEET_HEADING}`, "Every row you ask on this site has a verdict for this visit. Give the read for each pathway, show once the rows that are acted on at later phases, say Wellington will join with the next step, and set handBack to \"wellington\". Never send them back to him."]);
     expect(phoebeTurn({ door: "free-site", record: BOREHOLE, sheet, again: true, sets: [...CARD_SETS] }).blocks.at(-1)).toBe(FINISH_NOTE);
+    expect(phoebeTurn({ door: "free-site", record: BOREHOLE, sheet, doorFacts: { savedProject: false, changesKept: "never", recordPage: false } }).blocks[2]).toContain("has no Project Record page");
+  });
+  test("when a fact her readings rest on changes, she is told to work every reading out again (2026-11-26)", () => {
+    const sheet = applyUpdates(EMPTY_SHEET, { pathways: [{ pack: W, id: "W1", state: "applies" }] });
+    const changed = { ...BOREHOLE, agents: { phoebe: { done: false, factsChanged: true } } };
+    expect(phoebeTurn({ door: "free-site", record: changed, sheet }).blocks.at(-1)).toMatch(/has changed since you worked them out.*Work out every row and each pathway's read again/);
+    expect(phoebeTurn({ door: "free-site", record: BOREHOLE, sheet }).blocks.join(" ")).not.toContain("has changed since");
   });
   test("on the opened turn there is no worksheet block, and the line the model reads is never the visitor's", () => {
     const turn = phoebeTurn({ door: "free-site", record: BOREHOLE, sheet: EMPTY_SHEET, opened: true, introduced: true });
@@ -156,6 +163,9 @@ describe("her worksheet and her readings", () => {
     expect([out.pathways.vwba?.reading, out.pathways.carbon?.reading, out.agents.phoebe?.done, out.facts.creditedUnderV1?.value]).toEqual(["likely", "unlikely", true, false]);
     expect(out.facts.technology).toBeUndefined();
     expect(BOREHOLE.pathways).toEqual({});
+    // Her answer after a fact changed clears the mark, whether or not every row is done (2026-11-26).
+    const changed = { ...BOREHOLE, agents: { phoebe: { done: false, factsChanged: true } } };
+    expect(addPhoebeResults(changed, EMPTY_SHEET).agents.phoebe?.factsChanged).toBeUndefined();
   });
 });
 

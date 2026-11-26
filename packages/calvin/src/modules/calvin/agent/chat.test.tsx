@@ -131,7 +131,7 @@ describe("his chat opens first", () => {
   it("he speaks first, with the record in hand and one question", () => {
     const calc = mount(invented());
     const block = calvinChatContext({ place: "free-site", state: calc.state, screen: calc.pageContext(), result: calc.paaResult, opened: true });
-    expect(block).toContain("has already met you. Speak first");
+    expect(block).toContain("this is your first turn with them: you have not talked before. Speak first");
     expect(block).toContain("- Technology: a community water supply");
     expect(block).toContain("The one thing to ask now: what powers the pump");
     expect(block).toContain("It may be left blank, and the figure still shows.");

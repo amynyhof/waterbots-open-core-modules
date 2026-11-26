@@ -9,9 +9,16 @@
  * where the water comes from, whether it is treated and where, and whether the water at the source is safe to drink.
  * Core works out how the project is counted from them (`@waterbots/core/projectKinds`). Any other yes-or-no fact is kept
  * only when the agent map's one small question asked for it.
+ *
+ * A FACT IS FILLED ONLY WHEN THE VISITOR GAVE IT (2026-11-26): core's guard on facts (`@waterbots/core/factGuard`) reads
+ * every kind fact and home use in his context against the visitor's own messages. A yes-or-no fact and home use are taken
+ * only as the answer to the question his last reply asked; the source and the treatment only with the visitor's own words.
+ * A fact he asks about in the same reply is never filled. One that fails is dropped quietly, and stays blank: nothing in his
+ * answer names it, and the map asks for it again as for any blank fact.
  */
 import { ANSWERS_SCHEMA, readChips } from "@waterbots/core/chips";
-import { KIND_FACT_SCHEMA, YES_NO_FACTS, readKindFacts, type GivenKindFacts, type KindFact } from "@waterbots/core/projectKinds";
+import { checkAnswerFacts, factFields, readAsking, readHeard, type AnswerFact } from "@waterbots/core/factGuard";
+import { FACT_LABEL, KIND_FACTS, KIND_FACT_SCHEMA, YES_NO_FACTS, readKindFacts, type GivenKindFacts, type KindFact } from "@waterbots/core/projectKinds";
 import {
   DRINKING_WATER_TYPE,
   HOME_USES,
@@ -71,6 +78,8 @@ export interface Learned extends GivenKindFacts {
 
 export interface WellingtonAnswer {
   reply: string;
+  /** The key of the one fact this reply asks for. The site passes it back as `asked` on the next turn. */
+  asking?: string;
   /** Chips that answer the question the reply ends with (core's `readChips`). */
   answers: string[];
   route: Route;
@@ -90,9 +99,14 @@ export interface Known {
   type?: string;
   /** Where he is speaking. In the lobby chat there is no record: no context, and the route is "none". */
   place?: Place;
-  /** The fact the agent map's one small question asks for, if any (`AgentMap.ask.key`). */
+  /** The fact his last reply asked for: its `asking`. The visitor's last message answers it. */
   asked?: string;
+  /** The visitor's own messages in this chat, oldest first. Never his. Left out: no fact about the kind is filled. */
+  messages?: readonly string[];
 }
+
+/** The facts the guard reads in his context. */
+const GUARDED: readonly (KindFact | "homeUse")[] = [...KIND_FACTS, "homeUse"];
 
 /** The types whose project gives people water: the only ones the source, the treatment and people served are asked of. */
 const WATER_TYPES: readonly string[] = [NEW_SUPPLY_TYPE, DRINKING_WATER_TYPE];
@@ -147,6 +161,12 @@ export function readWellingtonAnswer(value: unknown, known: Known = {}): Welling
     // Home use: beside a new or alternative supply, or when the map asked for it.
     const homeUse = HOME_USES.find((h) => h === c.homeUse);
     if (homeUse && (typeInForce === NEW_SUPPLY_TYPE || known.asked === "homeUse")) out.homeUse = homeUse;
+    const facts: AnswerFact[] = GUARDED.flatMap((key) => {
+      const value = (out as Record<string, string | boolean | undefined>)[key];
+      return value === undefined ? [] : [{ key, name: FACT_LABEL[key], value, ...((YES_NO_FACTS as readonly string[]).includes(key) || key === "homeUse" ? { onlyAsAnswer: true } : {}) }];
+    });
+    const check = checkAnswerFacts(facts, { messages: known.messages ?? [], asked: known.asked, asking: readAsking(v.asking, GUARDED), heard: readHeard(v.heard, GUARDED) });
+    for (const r of check.refused) delete (out as Record<string, unknown>)[r.fact.key];
     if (Object.keys(out).length > 0) context = out;
   }
 
@@ -156,8 +176,10 @@ export function readWellingtonAnswer(value: unknown, known: Known = {}): Welling
   const intro = typeof v.introduction === "string" ? v.introduction.trim() : "";
   const introduction = route !== "none" && route !== "paid" && intro && intro.length <= MAX_INTRODUCTION_CHARS && !intro.includes("\n") ? intro : "";
 
+  const asking = readAsking(v.asking, GUARDED);
   return {
     reply: v.reply.trim(),
+    ...(asking !== undefined ? { asking } : {}),
     answers: readChips(v.answers, v.reply),
     route,
     ...(introduction ? { introduction } : {}),
@@ -263,6 +285,7 @@ export const WELLINGTON_RESPONSE_SCHEMA = {
       description:
         'On a handoff to Phoebe (route "eligibility"), Bridget ("map"), Calvin ("quantification") or Violet ("water"): one line Wellington says to that colleague at the top of their page, by name, summing up the project in one natural line — place, size, stage, as far as known — and, the first time, telling the visitor what that colleague will help them with. "" on every other turn.',
     },
+    ...factFields(GUARDED),
     abstained: { type: "boolean", description: "True only when the question falls outside every lane." },
     abstentionTopic: { type: "string", description: "A few words naming what was asked about, when abstaining." },
   },

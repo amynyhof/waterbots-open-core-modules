@@ -572,7 +572,7 @@ function EqRow({ eqNum, symbol, title, formula, value, oneLiner, binding, open, 
 
 // ── the stack ────────────────────────────────────────────────────────────────
 
-export default function EquationStack({ result, state, patch, canonPopulation, seed, sliders = false, tables, screening = false, initialOpen = [] }: { result: ScenarioResult; state: CalcState; patch: (p: Partial<CalcState>) => void; canonPopulation?: number; seed?: CalcState;
+export default function EquationStack({ result, state, patch, canonPopulation, seed, sliders = false, tables, screening = false, initialOpen = [], recordPage = true }: { result: ScenarioResult; state: CalcState; patch: (p: Partial<CalcState>) => void; canonPopulation?: number; seed?: CalcState; recordPage?: boolean;
   /** The screening view (`CalculatorOptions.exAnteOnly`): values only a baseline survey can give are shown, not typed. */
   screening?: boolean;
   /** Rows open at first, beside the ones that always start open (a site, or a test, can open more). */
@@ -725,7 +725,9 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
       </div>
       <div className="t-caption text-fg-4" style={{ fontSize: 10 }}>
         {canonPopulation === undefined
-          ? "Not on the project record — set it on Project Record."
+          ? recordPage
+            ? "Not on the project record — set it on Project Record."
+            : "Not on the project record."
           : popOverride
             ? `Entered here — record: ${canonPopulation.toLocaleString()} · this analysis: ${peopleServed(state).toLocaleString()} (survey).`
             : "From the project record."}

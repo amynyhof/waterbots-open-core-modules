@@ -197,7 +197,7 @@ describe("what he asks and what he adds", () => {
     const { calc } = mount(r);
     expect(calvinKnown(calc.state, r.facts)).toEqual(["The source: new", "Treatment: none", "Country: KEN", "People served: 1,200"]);
     const block = calvinChatContext({ place: "free-site", state: calc.state, screen: calc.pageContext(), answer: { says: "ask", fact: "sourceSafe" }, facts: r.facts });
-    expect(block).toContain("The one thing to ask now: whether the water at the source is safe to drink.");
+    expect(block).toContain('The one thing to ask now: whether the water at the source is safe to drink (its key: "sourceSafe").');
     expect(block).not.toContain("Your part is done");
   });
   it("his instructions say the two words and hold no old line", () => {
@@ -288,3 +288,44 @@ describe("the guards on his numbers", () => {
 });
 
 it("today's rules are on the record from the first fact", () => expect(record(SUPPLY).facts.rules).toBe(PROJECT_RULES));
+
+describe("the guard on his facts (2026-11-26): a fact is filled only when the visitor gave it", () => {
+  const { calc } = mount(record(SUPPLY));
+  const reply = (facts: CalvinReply["facts"], more: Partial<CalvinReply> = {}): CalvinReply => ({ reply: "Thanks.", handBack: "none", leftForNow: [], facts, values: {}, ...more });
+  it("the river case: he asks whether it is piped and fills it in the same reply, with home use and safety nobody said", () => {
+    const answer = readCalvinAnswer({
+      reply: "Thanks. Is the river water the public piped supply?",
+      handBack: "none",
+      facts: { waterSource: "existing", publicPiped: false, homeUse: "yes", pipedShownUnsafe: false },
+      asking: "publicPiped",
+      heard: [{ fact: "waterSource", words: "people already use the river water" }],
+    })!;
+    expect(answer.asking).toBe("publicPiped");
+    const g = guardCalvinReply(answer, { state: calc.state, messages: ["We treat it at the tank. People already use the river water."], asked: "waterSource" });
+    expect(g.reply.facts).toEqual({ waterSource: "existing" });
+    expect(g.returned).toMatch(/^Still blank, because the visitor has not given them: whether it is public piped water \(you are asking for it in this same reply\)/);
+    expect(g.told).toBeNull();
+  });
+  it("his answer to the question he asked last is kept", () => {
+    const g = guardCalvinReply(reply({ publicPiped: false }), { state: calc.state, messages: ["No, it is not piped."], asked: "publicPiped" });
+    expect([g.reply.facts, g.returned]).toEqual([{ publicPiped: false }, null]);
+  });
+  it("a country or a unit nobody said is refused, and one in their words is kept", () => {
+    const g = guardCalvinReply(reply({ country: "TZA", pumpPower: "solar" }, { heard: [{ fact: "pumpPower", words: "solar pump" }] }), { state: calc.state, messages: ["It has a solar pump."] });
+    expect(g.reply.facts).toEqual({ pumpPower: "solar" });
+  });
+  it("the schema carries the two fields, and names each fact he can fill", () => {
+    const props = (CALVIN_ANSWER_SCHEMA as { properties: Record<string, { items?: { properties: { fact: { enum: string[] } } } }> }).properties;
+    expect(props).toHaveProperty("asking");
+    expect(props.heard?.items?.properties.fact.enum).toEqual(expect.arrayContaining(["publicPiped", "homeUse", "country", "population.mode", "pumpPower"]));
+  });
+});
+
+describe("a door's facts on his screen (2026-11-26)", () => {
+  it("a site with no Project Record page is never pointed to one", async () => {
+    const { missingFactsPrompt } = await import("./state");
+    const missing = [{ key: "country", label: "the country" }] as Parameters<typeof missingFactsPrompt>[0];
+    expect(missingFactsPrompt(missing)).toContain("Fill it in on the project record");
+    expect(missingFactsPrompt(missing, undefined, undefined, undefined, false)).toBe("The calculator can't run yet — this project's record is missing the country.");
+  });
+});

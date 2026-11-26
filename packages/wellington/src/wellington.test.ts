@@ -101,26 +101,43 @@ describe("his answer, checked (carried)", () => {
     expect(validate({ reply: "  ", route: "none" })).toBeNull();
     expect(validate("text")).toBeNull();
   });
-  test("home use: one of three, only beside a new supply or when the map asked", () => {
-    expect(validate({ reply: "Thank you.", route: "none", abstained: false, context: { homeUse: "not sure" } }, { type: "C-11" })?.context?.homeUse).toBe("not sure");
-    expect(validate({ reply: "Thank you.", route: "none", abstained: false, context: { homeUse: "yes" } }, { type: "C-19" })?.context).toBeUndefined();
-    expect(validate({ reply: "Thank you.", route: "none", abstained: false, context: { homeUse: "maybe" } }, { type: "C-11" })?.context).toBeUndefined();
-    expect(validate({ reply: "Thank you.", route: "none", abstained: false, context: { homeUse: "yes" } }, { asked: "homeUse" })?.context?.homeUse).toBe("yes");
+  test("home use: one of three, and only as the answer to the question his last reply asked", () => {
+    const said = (homeUse: string, known: Record<string, unknown>) => validate({ reply: "Thank you.", route: "none", abstained: false, context: { homeUse } }, known);
+    expect(said("not sure", { type: "C-11", asked: "homeUse", messages: ["Not sure yet."] })?.context?.homeUse).toBe("not sure");
+    expect(Object.keys(said("yes", { type: "C-11", messages: ["People already use the river water."] }) ?? {})).toEqual(["reply", "answers", "route", "abstained"]);
+    expect(said("yes", { type: "C-11", messages: ["People already use the river water."] })?.context).toBeUndefined();
+    expect(said("yes", { type: "C-19", messages: ["Yes."] })?.context).toBeUndefined();
+    expect(said("maybe", { type: "C-11", asked: "homeUse", messages: ["Maybe."] })?.context).toBeUndefined();
+    expect(said("yes", { asked: "homeUse", messages: ["Yes, they drink it at home."] })?.context?.homeUse).toBe("yes");
   });
 });
 
 describe("the source, the treatment and the water's safety, as plain facts", () => {
-  const ctx = (context: Record<string, unknown>, known = {}) => validate({ reply: "Thank you for that.", route: "none", abstained: false, context }, known)?.context;
+  const ctx = (context: Record<string, unknown>, known = {}, more = {}) => validate({ reply: "Thank you for that.", route: "none", abstained: false, context, ...more }, known)?.context;
+  const well = { messages: ["We will drill a new well, with no treatment.", "Yes, it was tested and is safe to drink."] };
+  const words = { heard: [{ fact: "waterSource", words: "drill a new well" }, { fact: "treatment", words: "no treatment" }] };
   test("he returns them as core's facts; a class is never kept", () => {
-    expect(ctx({ waterSource: "new", treatment: "none", sourceSafe: true, gsClass: "CWS", technologyClass: "CWS" })).toEqual({ waterSource: "new", treatment: "none", sourceSafe: true });
+    expect(ctx({ waterSource: "new", treatment: "none", sourceSafe: true, gsClass: "CWS", technologyClass: "CWS" }, { ...well, asked: "sourceSafe" }, words)).toEqual({ waterSource: "new", treatment: "none", sourceSafe: true });
     expect(ctx({ waterSource: "well", treatment: "a filter" })).toBeUndefined();
     expect(HIS_KIND_FACTS).toEqual(["waterSource", "treatment", "sourceSafe"]);
   });
   test("they belong to a project that gives people water, and the rest only when the map asked", () => {
     expect(ctx({ waterSource: "new", type: "C-12" })).toEqual({ type: "C-12" });
     expect(ctx({ waterSource: "restored" }, { type: "C-12" })).toBeUndefined();
-    expect(ctx({ waterSource: "restored", outThreeMonths: true })).toEqual({ waterSource: "restored" });
-    expect(ctx({ outThreeMonths: true }, { asked: "outThreeMonths" })).toEqual({ outThreeMonths: true });
+    const fixed = { messages: ["We are fixing the old borehole that broke."] };
+    expect(ctx({ waterSource: "restored", outThreeMonths: true }, fixed, { heard: [{ fact: "waterSource", words: "fixing the old borehole" }] })).toEqual({ waterSource: "restored" });
+    expect(ctx({ outThreeMonths: true }, { asked: "outThreeMonths", messages: ["Yes, for half a year."] })).toEqual({ outThreeMonths: true });
+  });
+  test("a fact is filled only when the visitor gave it (2026-11-26): the river case, and no words of theirs", () => {
+    const river = { messages: ["We want to treat it at the tank. People already use the river water."], asked: "waterSource" };
+    const answer = validate(
+      { reply: "Thank you. Is it the public piped supply?", route: "none", abstained: false, asking: "publicPiped", context: { waterSource: "existing", publicPiped: false, homeUse: "yes", pipedShownUnsafe: false }, heard: [{ fact: "waterSource", words: "already use the river water" }] },
+      { ...river, type: "C-19" },
+    );
+    expect(answer?.context).toEqual({ waterSource: "existing" });
+    expect(answer?.asking).toBe("publicPiped");
+    expect(ctx({ waterSource: "new" }, { messages: ["Hello there."] })).toBeUndefined();
+    expect(ctx({ waterSource: "new" })).toBeUndefined();
   });
   test("his shape asks for them by core's own words, and for no class", () => {
     const c = WELLINGTON_RESPONSE_SCHEMA.properties.context.properties as Record<string, { description?: string }>;
@@ -232,8 +249,10 @@ describe("one turn", () => {
   test("the blocks come in the open site's order, and the second call is told to answer now", () => {
     const note = readMap({ next: "call", agent: "phoebe", agents: ["phoebe"] })!;
     const blocks = wellingtonBlocks({ place: "free-site", record, map: note, opened: { at: "open" }, pass: 2 });
-    expect(blocks.map((b) => b.split("\n")[0])).toEqual(["# What this visit already holds", "# What the agent map says", "# Where you are speaking", "# Answer now"]);
-    expect(blocks[3]).toBe(`${FINISH_NOTE} A step is still ahead, so never say the screening, or every step, is done.`);
+    expect(blocks.map((b) => b.split("\n")[0])).toEqual(["# What this visit already holds", "# This door", "# What the agent map says", "# Where you are speaking", "# Answer now"]);
+    expect(blocks[1]).toContain("Say neither.");
+    expect(wellingtonBlocks({ place: "free-site", record, door: { savedProject: false, changesKept: "never", recordPage: false } })[1]).toContain("has no Project Record page");
+    expect(blocks[4]).toBe(`${FINISH_NOTE} A step is still ahead, so never say the screening, or every step, is done.`);
     expect(openedLine({ handoff: "map" })).toBe("(The visitor has opened Bridget's page. Wellington introduces them there.)");
   });
   test("after his answer: the route is the map's, a look-up goes again once, and done too soon goes again", () => {

@@ -49,6 +49,11 @@ describe("people served, from the project record", () => {
     expect(html.replace(/\s+/g, " ")).toContain("this project&rsquo;s record is missing people served. Fill it in on the project record and the figures follow.".replace("&rsquo;", "’"));
     expect(html).not.toMatch(/aria-label="People served"|People served \(/);
   });
+  it("a site with no Project Record page is never pointed to one (2026-11-26)", () => {
+    const html = renderToStaticMarkup(<D3Screen project={project()} recordPage={false} />);
+    expect(html).toContain("data-record-ask");
+    expect(html).not.toContain("Fill it in on the project record");
+  });
 });
 
 describe("the draft label", () => {

@@ -30,6 +30,23 @@ VWBA is a way to count the water a project gives back.
 The water and carbon calculators sit side by side. They are never added together. Whether one project may claim
 both is an open question (N14 in `BUILD_PLAN.md`).
 
+## Changes in 0.9.0
+
+Violet needs `@waterbots/core` in the 0.5 series.
+
+- **A fact is filled only when the visitor gave it (2026-11-26).** `guardVioletReply` now checks her facts as well as her
+  numbers, with core's guard on facts: the source, the treatment, the yes-or-no facts, home use, the unit of the count
+  and the access level. A fact she asks about in the same reply is refused. One that fails is taken out and stays blank.
+  Her answer has two new fields, `asking` and `heard`.
+- **The door's plain facts** reach her chat (`door` on `violetChatContext`). A site's own values are read instead of hers.
+  `talkedBefore` says whether the visitor has talked with her before in this visit, so her first turn never greets
+  them as someone she has met.
+- **A site with no Project Record page** passes `recordPage={false}` to `D3Screen`. The screen then never points to one.
+- No sum changed.
+
+**What a site should change.** Pass `asked` to `guardVioletReply` as the `asking` of her last answer, and `facts` as the
+record's facts. Pass `door` and `talkedBefore` to `violetChatContext`, and `recordPage` to her screen.
+
 ## Changes in 0.8.0
 
 Violet accepts any `@waterbots/core` in the 0.4 series.

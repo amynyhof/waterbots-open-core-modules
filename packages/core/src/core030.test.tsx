@@ -114,12 +114,14 @@ describe("a calculator agent's chat", () => {
   const base = { place: "free-site", asks, kept: [{ key: "k", label: "Days", called: "assumed", shown: "347 d", source: "V2.0 SDWS 32" }], figureShows: false, screen: "THE SCREEN" } as const;
   test("it asks for one thing, says why and where from, and lists the rest for later", () => {
     const block = chatContext({ ...base, known: ["Country: LSO"], opened: true });
-    expect(block).toContain("The one thing to ask now: how many people it serves.");
+    expect(block).toContain('The one thing to ask now: how many people it serves (its key: "a").');
     expect(block).toContain("It is for: the water is worked out from it. It usually comes from: a count.");
     expect(block).toContain("Later, in this order: what powers the pump.");
     expect(block).toContain("Already on the project record\n- Country: LSO");
     expect(block).toContain('Days: 347 d, called "assumed" (V2.0 SDWS 32).');
-    expect(block).toContain("has already met you. Speak first");
+    expect(block).toContain("this is your first turn with them: you have not talked before. Speak first");
+    expect(chatContext({ ...base, opened: true, talkedBefore: true })).toContain("you have talked before in this visit");
+    expect(block).toContain("The site has not said when a change is kept, or whether it has a Project Record page. Say neither.");
     expect(block).not.toContain("Your part is done");
   });
   test("a fact left for now is not asked again; one that is needed keeps the part open", () => {

@@ -12,7 +12,7 @@
 import { FINISH_NOTE, leavesWaiting } from "@waterbots/core/lookUp";
 import { knownKindFacts } from "@waterbots/core/projectKinds";
 import { stageWords, typeWords } from "@waterbots/core/projectWords";
-import type { Place } from "@waterbots/core/places";
+import { doorBlock, type DoorFacts, type Place } from "@waterbots/core/places";
 import { isDegenerateReply } from "@waterbots/core/reply";
 import { DRINKING_WATER_TYPE, NEW_SUPPLY_TYPE, type ProjectRecord } from "@waterbots/core/record";
 import { readWellingtonAnswer, type Route, type WellingtonAnswer } from "./answer.js";
@@ -174,6 +174,12 @@ export interface TurnInput {
   replyingAt?: Joined;
   /** 1 for the first call, 2 when the same question goes again. */
   pass?: number;
+  /** The visitor's own messages in this chat, oldest first. Never his. A fact about the kind is filled only from them. */
+  messages?: readonly string[];
+  /** The fact his last reply asked for: that answer's `asking`. */
+  asked?: string;
+  /** The door's plain facts, from the site. */
+  door?: DoorFacts;
 }
 
 /** The blocks for this turn, in order, after his instructions. */
@@ -182,6 +188,8 @@ export function wellingtonBlocks(t: TurnInput): string[] {
   const lobby = t.place === "lobby-chat";
   const visit = lobby ? null : visitBlock(t.record);
   if (visit) out.push(visit);
+  const door = doorBlock(t.place, t.door);
+  if (door) out.push(door);
   const found = lobby ? null : phoebeFoundBlock(t.found);
   if (found) out.push(found);
   const map = lobby ? null : (t.map ?? null);
@@ -223,11 +231,12 @@ export function checkWellingtonTurn(parsed: unknown, t: TurnInput): TurnOutcome 
   const set: Route | null =
     handTo ??
     (map && at && at !== "open" ? stepEndRoute(at, map) : map && t.replyingAt ? (answersHomeUse ? afterHomeUse(map) : stepEndRoute(t.replyingAt, map)) : null);
-  const asked = map && asksHomeUse(map) ? "homeUse" : map?.facts[0];
+  // The question the visitor's last message answers is the one his last reply asked, never the one the map asks now.
   const checked = readWellingtonAnswer(set !== null && typeof parsed === "object" && parsed !== null ? { ...parsed, route: set } : parsed, {
     place: t.place,
     ...(t.record?.facts.type ? { type: t.record.facts.type.value } : {}),
-    ...(asked ? { asked } : {}),
+    ...(t.asked !== undefined ? { asked: t.asked } : {}),
+    messages: t.messages ?? [],
   });
   if (!checked) return { ok: false, fault: "empty" };
   const route = map ? guardRoute(checked.route, map) : checked.route;

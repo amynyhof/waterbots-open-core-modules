@@ -11,7 +11,7 @@
  * This file gives facts and instructions, never lines to say: each agent finds its own words (agent rule 6). It does
  * no sums, and calls no model. The site makes the call, with its own key and its own limits.
  */
-import { hasProjectRecord, type Place } from "./places.js";
+import { doorFactLines, hasProjectRecord, type DoorFacts, type Place } from "./places.js";
 import { REPLY_LIMIT, type ReplyLength } from "./reply.js";
 
 /** One thing an agent asks for. Always a project fact, or a monitored figure once the project runs. */
@@ -108,6 +108,10 @@ export interface ChatContextInput {
   opened?: boolean;
   /** Introduce yourself (the Agent Commons). On the sites Wellington has already done it (agent rule 17). */
   introduce?: boolean;
+  /** The visitor has talked with this agent before in this visit. Left out: this is the agent's first turn with them. */
+  talkedBefore?: boolean;
+  /** The door's plain facts, from the site (`places.ts`). Its own values replace the package's in "Values you do not ask for". */
+  door?: DoorFacts;
   /** What the record already holds, as lines. Left out where there is no record. */
   known?: readonly string[];
   /** The open asks, in order (`openAsks`). */
@@ -121,15 +125,26 @@ export interface ChatContextInput {
   screen: string;
 }
 
+/** The values an agent does not ask for, with the site's own value in place of the package's wherever the site passes one. */
+export function siteKept(kept: readonly Kept[], door?: DoorFacts): Kept[] {
+  const own = new Map((door?.siteValues ?? []).map((v) => [v.key, v]));
+  return kept.map((k) => {
+    const v = own.get(k.key);
+    return v === undefined ? k : { ...k, label: v.label, shown: v.shown, source: `this site's own value: ${v.source}` };
+  });
+}
+
 /** The block a site adds after the agent's instructions, worked out fresh for each turn. */
 export function chatContext(c: ChatContextInput): string {
   const [next, ...later] = c.asks;
-  const lines: string[] = ["# This turn", "", placeLine(c.place)];
+  const lines: string[] = ["# This turn", "", placeLine(c.place), ...doorFactLines(c.place, c.door)];
   if (c.opened) {
     lines.push(
       c.introduce
         ? "The visitor has just opened your chat, and has not met you. Speak first."
-        : "The visitor has just opened your chat, and has already met you. Speak first, from what you see on their record.",
+        : c.talkedBefore === true
+          ? "The visitor has just opened your chat again: you have talked before in this visit. Speak first, from what you see on their record."
+          : "The visitor has just opened your chat. Wellington has told them who you are, and this is your first turn with them: you have not talked before. Speak first, from what you see on their record.",
     );
   }
   if (hasProjectRecord(c.place)) {
@@ -142,18 +157,19 @@ export function chatContext(c: ChatContextInput): string {
   if (next === undefined) lines.push("Nothing is missing.");
   else {
     lines.push(
-      `The one thing to ask now: ${next.about}.`,
+      `The one thing to ask now: ${next.about} (its key: "${next.key}").`,
       `It is for: ${next.why}. It usually comes from: ${next.from}.`,
       next.needed ? "No figure can show without it." : "It may be left blank, and the figure still shows.",
     );
     if (later.length > 0) lines.push(`Later, in this order: ${later.map((a) => a.about).join("; ")}.`);
   }
-  if (c.kept.length > 0) {
+  const kept = siteKept(c.kept, c.door);
+  if (kept.length > 0) {
     lines.push(
       "",
       "## Values you do not ask for",
       "Each one keeps its value. Say that it is a default or assumed, and change it only if the visitor asks.",
-      ...c.kept.map((k) => `- ${k.label}: ${k.shown}, called "${k.called}" (${k.source}).`),
+      ...kept.map((k) => `- ${k.label}: ${k.shown}, called "${k.called}" (${k.source}).`),
     );
   }
   if (partIsDone(c.asks, c.figureShows)) lines.push("", "## Your part is done", whenDone(c.place, c.saved));

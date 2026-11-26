@@ -6,9 +6,10 @@
  * Nothing here does a sum or calls a model: every figure is the engine's.
  */
 import { ANSWER_FIELDS, CHAT_REPLY, chatContext, openAsks, openedTurn, readLeft, type Ask, type ChatSettings, type Kept } from "@waterbots/core/chat";
-import type { Place } from "@waterbots/core/places";
+import { checkAnswerFacts, factFields, factsReturnedToAgent, joinGuards, readAsking, readHeard, type AnswerFact, type Heard } from "@waterbots/core/factGuard";
+import type { DoorFacts, Place } from "@waterbots/core/places";
 import { askedOutOfRange, checkAnswerNumbers, isShare, returnToAgent, takenOut, type AnswerNumber } from "@waterbots/core/numberGuard";
-import { KIND_ASKS, KIND_FACTS, KIND_FACT_SCHEMA, askFor, knownKindFacts, readKindFacts, type Answer } from "@waterbots/core/projectKinds";
+import { FACT_LABEL, KIND_ASKS, KIND_FACTS, KIND_FACT_SCHEMA, YES_NO_FACTS, askFor, kindFactsOf, knownKindFacts, readKindFacts, type Answer } from "@waterbots/core/projectKinds";
 import { RANGES, checkRange } from "@waterbots/core/ranges";
 import { readHandBack, type HandBack } from "@waterbots/core/reply";
 import { HOME_USES, setAgentResults, underTodaysRules, type GivenFacts, type ProjectFacts, type ProjectRecord } from "@waterbots/core/record";
@@ -199,6 +200,14 @@ export function fillCalvin(state: CalcState, answer: CalvinAnswer): CalvinFill {
   return out;
 }
 
+/** The facts his answer may fill, by the key of the question that asks for each, with what each is, as a visitor reads it. */
+export const CALVIN_FACTS: Record<string, string> = {
+  ...FACT_LABEL,
+  country: "Which country the project is in",
+  "population.mode": "Whether the count is of people or of households",
+  pumpPower: "What powers the pump",
+};
+
 /** The shape his answer takes, for the site's call to the model. */
 export const CALVIN_ANSWER_SCHEMA: Record<string, unknown> = {
   type: "object",
@@ -206,6 +215,7 @@ export const CALVIN_ANSWER_SCHEMA: Record<string, unknown> = {
   required: ["reply", "handBack"],
   properties: {
     ...ANSWER_FIELDS,
+    ...factFields(Object.keys(CALVIN_FACTS)),
     facts: {
       type: "object",
       additionalProperties: false,
@@ -235,6 +245,10 @@ export interface CalvinReply extends CalvinAnswer {
   reply: string;
   handBack: HandBack;
   leftForNow: string[];
+  /** The key of the one thing this reply asks for. The site passes it back as `asked` on the next turn. */
+  asking?: string;
+  /** The visitor's own words each fact he fills rests on. */
+  heard?: Heard[];
 }
 
 const PUMPS = ["hand", "gravity", "solar", "diesel", "grid"] as const;
@@ -256,14 +270,18 @@ function readFacts(raw: unknown): GivenFacts {
 /** Reads his answer as the model gave it. Null when there is no reply. `fillCalvin` and the record check the numbers. */
 export function readCalvinAnswer(raw: unknown): CalvinReply | null {
   if (typeof raw !== "object" || raw === null) return null;
-  const o = raw as { reply?: unknown; handBack?: unknown; leftForNow?: unknown; facts?: unknown; values?: unknown };
+  const o = raw as { reply?: unknown; handBack?: unknown; leftForNow?: unknown; facts?: unknown; values?: unknown; asking?: unknown; heard?: unknown };
   if (typeof o.reply !== "string" || o.reply.trim() === "") return null;
+  const asking = readAsking(o.asking, CALVIN_ASK_KEYS);
+  const heard = readHeard(o.heard, Object.keys(CALVIN_FACTS));
   return {
     reply: o.reply.trim(),
     handBack: readHandBack(o.handBack),
     leftForNow: readLeft(o.leftForNow, CALVIN_ASK_KEYS),
     facts: readFacts(o.facts),
     values: typeof o.values === "object" && o.values !== null ? (o.values as NonNullable<CalvinAnswer["values"]>) : {},
+    ...(asking !== undefined ? { asking } : {}),
+    ...(heard.length > 0 ? { heard } : {}),
   };
 }
 
@@ -273,12 +291,14 @@ export interface CalvinGuardInput {
   state: CalcState;
   /** The visitor's own messages in this chat, oldest first. */
   messages: readonly string[];
-  /** The key of the question just asked. */
+  /** The key of the question just asked: his last reply's `asking`. */
   asked?: string;
+  /** The project's facts on the record now. In the Agent Commons, his temporary record's. */
+  facts?: ProjectFacts;
 }
 
 export interface GuardedCalvinReply {
-  /** His answer, with every number that did not pass taken out. */
+  /** His answer, with every number and every fact that did not pass taken out. */
   reply: CalvinReply;
   /** Send this back to him once, in the same turn. Null: nothing to send. On the second answer, show `told` instead. */
   returned: string | null;
@@ -291,8 +311,46 @@ export interface GuardedCalvinReply {
 /** The question a number on his screen answers. */
 const ASK_OF: Partial<Record<CalvinAnswerValue, string>> = { populationCount: "population.served", householdSizeOverride: "population.householdSize" };
 
-/** Core's guards on his answer. The site calls it on each answer, and sends `returned` back once. */
-export function guardCalvinReply(reply: CalvinReply, { state, messages, asked }: CalvinGuardInput): GuardedCalvinReply {
+/** His facts, as core's guard on facts reads them. A yes-or-no fact and home use are taken only as an answer. */
+function answerFacts(given: GivenFacts, state: CalcState, facts?: ProjectFacts): AnswerFact[] {
+  const held: Record<string, string | boolean | null | undefined> = {
+    ...(facts !== undefined ? kindFactsOf(facts) : {}),
+    homeUse: facts?.homeUse?.value,
+    country: state.countryIso,
+    "population.mode": state.populationMode,
+    pumpPower: state.pumpPower,
+  };
+  const out: AnswerFact[] = [];
+  const add = (key: string, value: string | boolean | undefined): void => {
+    if (value === undefined) return;
+    out.push({ key, name: CALVIN_FACTS[key] ?? key, value, held: held[key], ...((YES_NO_FACTS as readonly string[]).includes(key) || key === "homeUse" ? { onlyAsAnswer: true } : {}) });
+  };
+  for (const key of KIND_FACTS) add(key, given[key]);
+  add("homeUse", given.homeUse);
+  add("country", given.country);
+  add("population.mode", given.population?.mode);
+  add("pumpPower", given.pumpPower);
+  return out;
+}
+
+/** The facts with every one the guard refused taken out. */
+function withoutFacts(given: GivenFacts, refused: readonly string[]): GivenFacts {
+  const out: GivenFacts = { ...given };
+  for (const key of refused) {
+    if (key === "population.mode" && out.population !== undefined) {
+      const { mode: _mode, ...rest } = out.population;
+      if (Object.keys(rest).length > 0) out.population = rest;
+      else delete out.population;
+    } else delete (out as Record<string, unknown>)[key];
+  }
+  return out;
+}
+
+/**
+ * Core's guards on his answer: on his numbers, and on every other fact he fills (2026-11-26). A fact the visitor did not
+ * give is dropped quietly, and stays blank: `told` never names it, and he is told once, in `returned`, that it is blank. The site calls it on each answer, and sends `returned` back once.
+ */
+export function guardCalvinReply(reply: CalvinReply, { state, messages, asked, facts: onRecord }: CalvinGuardInput): GuardedCalvinReply {
   const fields = new Map(stateValues(state).map((v) => [v.id, v]));
   const nameOf = (id: string, fallback: string): string => {
     const v = fields.get(id);
@@ -319,10 +377,11 @@ export function guardCalvinReply(reply: CalvinReply, { state, messages, asked }:
     if (Object.keys(next).length > 0) facts.population = next;
     else delete facts.population;
   }
+  const factCheck = checkAnswerFacts(answerFacts(facts, state, onRecord), { messages, asked, asking: reply.asking, heard: reply.heard });
   const target = stateValues(state).find((v) => (ASK_OF[v.id as CalvinAnswerValue] ?? v.id) === asked);
   return {
-    reply: { ...reply, facts, values },
-    returned: returnToAgent(faults),
+    reply: { ...reply, facts: withoutFacts(facts, factCheck.refused.map((r) => r.fact.key)), values },
+    returned: joinGuards(returnToAgent(faults), factsReturnedToAgent(factCheck.refused)),
     told: takenOut(faults),
     outOfRange: target === undefined ? null : askedOutOfRange(target.key, messages.at(-1) ?? "", target.words ?? {}),
   };
@@ -369,6 +428,10 @@ export interface CalvinTurn {
   tables?: SiteTables;
   leftForNow?: readonly string[];
   refused?: readonly string[];
+  /** The door's plain facts, from the site. Its own values are read instead of his. */
+  door?: DoorFacts;
+  /** The visitor has talked with him before in this visit. */
+  talkedBefore?: boolean;
 }
 
 /** The block a site adds after his instructions, for one turn. */
@@ -378,6 +441,8 @@ export function calvinChatContext(t: CalvinTurn): string {
     saved: t.saved ?? false,
     opened: t.opened ?? false,
     introduce: t.introduce ?? false,
+    ...(t.door !== undefined ? { door: t.door } : {}),
+    ...(t.talkedBefore !== undefined ? { talkedBefore: t.talkedBefore } : {}),
     known: calvinKnown(t.state, t.facts),
     asks: openAsks(calvinAsks(t.state, { tables: t.tables, transition: t.transition, notCoveredYet: t.notCoveredYet, answer: t.answer, ...(t.answerV1 !== undefined ? { answerV1: t.answerV1 } : {}) }), t.leftForNow),
     kept: calvinKept(t.state, { sliders: t.sliders, result: t.result }),

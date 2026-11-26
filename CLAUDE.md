@@ -70,6 +70,9 @@ The lane label job picks each pull request's lane from its files. The rule is in
 4. Make the annotated tag locally. After "release it", push that one tag by name, never all tags. Then publish the
    GitHub release with the packed files and `SHA256SUMS.txt`.
 
+A package's version moves only when that package changes. Each agent is its own: Calvin and Violet no longer move
+together. Give a new number only to the packages a pull request changes (the maintainer, 26 Nov 2026).
+
 ## Waiting for the maintainer
 
 These rules are not on the rulings page. They stay here until the maintainer places or drops them.

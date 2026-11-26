@@ -58,6 +58,9 @@ markers. A site that wants one hands it in `siteLines`.
 
 ## Versions
 
+- 0.2.0: it needs `@waterbots/core` in the 0.5 series. When a fact her readings rest on changes, such as the source or
+  the treatment, core takes the readings off and calls her again, and her turn tells her to work every reading out
+  again. Pass the record with its `agents`. The door's plain facts reach her turn as `doorFacts`.
 - 0.1.0: her first package. It needs `@waterbots/core` in the 0.4 series.
 - Not published. Nothing in this repo goes to npm yet; the package is marked `private`.
 - Apache License 2.0. See `LICENSE` and `NOTICE` in this folder.
