@@ -66,7 +66,7 @@ sites pin that file by its fingerprint. The first pinned version includes the sl
 |---|---|---|---|---|
 | V5 | v1 proof and grading | [~] (Released 2026-11-05: tag `calvin-v0.1.0` on commit `3020ee7`, recorded in `SEEDS.md`. Still to come: both sites pin it, and the private side reports pass or fail.) The first GitHub release: the packed packages (`calvin` and the `core` it needs) and their fingerprints, with both views: the ex-ante view with sliders, and the full ex-post view. A site mounts them through `@waterbots/calvin/screen`; the open site locks to ex-ante. Replaces the npm publish in M2.2. It does not wait for the simple view. | The maintainer's approval; the tag rule (M1.4). | The release holds the files and their fingerprints. Both sites pin it. The private side reports pass or fail on both carbon filings. |
 | J1 to J9 | Agent orchestration | What family 1 left open (closed 2026-11-26). See "Family 1: what is left" below. | See each item. | See each item. |
-| V8 | Experts and partners | [x] (Merged, pull request #18. Still to come: the outside expert's check, and N14 and N15 for the outside expert group.) D-3, the water-supply module, inside Violet (M8.1). | It does not wait for the activity-type signature or N6: D-3 is a prototype the outside expert checks later. | Violet's D-3 tests are hand-worked cases, with every step cited to the guidebook (cited, not copied). The VWBA spec is written alongside the build, in `docs/`, and the maintainer reviews it then. An outside expert checks the module once the prototype is up. |
+| V8 | Experts and partners | [x] (Merged, pull request #18. Still to come: the outside expert's check, and N14 and N15 for the outside expert group. The D-3 input list is ready; the email to the outside expert waits for the maintainer's word.) D-3, the water-supply module, inside Violet (M8.1). | It does not wait for the activity-type signature or N6: D-3 is a prototype the outside expert checks later. | Violet's D-3 tests are hand-worked cases, with every step cited to the guidebook (cited, not copied). The VWBA spec is written alongside the build, in `docs/`, and the maintainer reviews it then. An outside expert checks the module once the prototype is up. |
 | V14 | v1 proof and grading | The same-numbers check: a project saved by the screening, read back the way the paid site reads it, gives the same numbers, or a list of what changed and why. | J3, J4, J5. | A test passes here on invented projects. The private side runs it on both real filings with the pinned release and reports pass. |
 | V15 | v1 proof and grading | The v1 release: a GitHub release that both sites pin. | V8, V14; the maintainer's approval. | Both sites run the same pinned file. The maintainer confirms the whole journey on the live sites, and the average question count is reported. |
 
@@ -104,24 +104,29 @@ left is below. `[!]` waits on the maintainer.
 
 **Left open, marked v1** (the maintainer: it must be fixed before v1):
 
-- [ ] **(V1)** An agent may tell the visitor it wrote a fact down when the guard refused it. Seen on the open site's
-      first walk on 2026-11-26.
+- [ ] **(V1) F1.1** An agent may tell the visitor it wrote a fact down when the guard refused it. Seen on the open
+      site's first walk on 2026-11-26. The visitor sees no line about the refusal; the agent asks again in its own
+      words.
 
-**Left open, for the maintainer to mark:**
+**Left open, for the maintainer to mark** (v1 mark: open):
 
-- [ ] A project core answers "held for now" is still filed by the map under "not covered yet", so the sites show the
-      "no calculator yet" sentence.
-- [ ] Phoebe is not called by herself when a fact changes. Her readings run again only when the visitor next writes
-      to her.
-- [ ] Phoebe can say more than her worksheet holds: she said both paths look likely while one row was still "more to
-      learn".
-- [ ] The door's choices for when a change is kept lack the open site's true answer: nothing is kept after the visit
-      unless the visitor chooses Save and sign up. The open site had to choose "on save".
-- [ ] Calvin's list of missing facts still names "technology", which no site asks for any more.
-- [ ] A stray "(ref)" showed twice in Calvin's reply on the open site.
-- [ ] Stale wording in code this sprint touched, left for the next pull request in these files: Wellington's
+- [ ] **F1.2** A project core answers "held for now" is still filed by the map under "not covered yet", so the sites
+      show the "no calculator yet" sentence.
+- [ ] **F1.3** Phoebe is not called by herself when a fact changes. Her readings run again only when the visitor next
+      writes to her. The open site's A34 is the same job. If core's map must say she is due, core releases first.
+- [ ] **F1.4** Phoebe can say more than her worksheet holds: she said both paths look likely while one row was still
+      "more to learn".
+- [ ] **F1.5** The door's choices for when a change is kept lack the open site's true answer: nothing is kept after the
+      visit unless the visitor chooses Save and sign up. The open site had to choose "on save".
+- [ ] **F1.6** Calvin's list of missing facts still names "technology", which no site asks for any more. The open
+      site's line "Still needed: technology. Tell Wellington." (S37) is the same job: core releases first, then the
+      open site.
+- [ ] **F1.7** A stray "(ref)" showed twice in Calvin's reply on the open site.
+- [ ] **F1.8** Stale wording in code this sprint touched, left for the next pull request in these files: Wellington's
       `answer.ts` still says, in its header and beside `HIS_KIND_FACTS`, that the other yes-or-no facts are kept only
       when the map asked for them. Core's guard on facts now decides that.
+- [ ] **F1.9** When a fact changes, Phoebe's settled rows stay settled. She can settle the technology class on her
+      worksheet while the record stays blank.
 
 **Still to come from J1 to J9:**
 
@@ -139,7 +144,7 @@ left is below. `[!]` waits on the maintainer.
 - [!] **J7.** The maintainer signs off the first water-benefit activity type (safe drinking water supply). No building.
 - [ ] **J8.** Reword the 30 lines the seed checks catch on the paid site. The paid site's work.
 - [!] **J9.** The consulting page's address, kept in one shared file in `core` (rule 13). Two values stand in for a
-      blank in Calvin: see "A value stands in for a missing one" below.
+      blank in Calvin: see F2.4 below.
 
 ## Family 10: Project data and evidence
 
@@ -147,10 +152,70 @@ left is below. `[!]` waits on the maintainer.
 evidence.
 
 - From J3: An update never changes a screening: one that already exists keeps its answers, and working a project out
-  again is a new screening beside it. (Decided by the maintainer on 2026-11-25; built in `core`, #61.)
-- [ ] From J6: Saving a screening into the paid site: the count of people served crosses over correctly, and the paid
-      record never shows "people" as a unit nobody chose. In this repo the record keeps people served the way it was
-      entered, and never fills in a unit on its own. The paid site's save does the rest.
+  again is a new screening beside it. (Decided by the maintainer on 2026-11-25; built in `core`, #61, released in core
+  0.4.0.) The paid site's part is its #317. v1 mark: open.
+- [ ] **(V1) F10.1** Calvin never sends a value nobody gave. 347 days is only where the free site's slider starts. A
+      walk found one of Calvin's tool calls on the paid site sent 347 days. Core's part: Calvin's knowledge
+      (`knowledge.md`) and his tools treat 347 as the slider's start only, never a value to send. Calvin's ruling
+      "Operating days start at 347 for every project" changes only on the maintainer's word. Core releases first; the
+      paid site's part is its #316 and #322 (no starting numbers on the paid site).
+- [ ] **(V1) J6** Saving a screening into the paid site: the count of people served crosses over correctly, and the
+      paid record never shows "people" as a unit nobody chose. In this repo the record keeps people served the way it
+      was entered, and never fills in a unit on its own. The paid site's save does the rest. Its carry-over test (#323)
+      checks every value, one by one; already known not to land: people served, its unit, household size and
+      "credited under V1.0". Core's part comes first if the record is missing any of them.
+
+## More open items, by family
+
+From the coach's list of 26 Nov 2026. Each is not chased yet. v1 mark: open, unless it says otherwise. `[!]` waits on
+the maintainer.
+
+**Family 2, Calculators and methods**
+
+- [ ] **F2.1** Two of Calvin's shares can add up to more than 1 under V1.0. Found, not chased.
+- [ ] **F2.2** The 2019 VWBA paper that the second VWBA reference points to is not held.
+- [ ] **F2.3 (after v1, parked)** A candidate for the next project type: utility water loss, VWBA D-2. Not the next
+      piece of anything.
+
+**Family 3, Knowledge** (the maintainer plans a Knowledge pack review sprint)
+
+Phoebe's cards are sealed. They change only on the maintainer's word.
+
+- [!] **F3.1** Copied-text review of Phoebe's cards: nine places, all cited (eight document titles, one short quote with
+      its page). The maintainer decides whether the copied-text check ignores a cited title. Older: a ten-word match in
+      her carbon cards and a nine-word match in the carbon grader notes.
+- [!] **F3.2** Sealed card fixes: two pointers to retired pages, and card T4's transition-module line. Core's cards come
+      first; Phoebe's nine site lines on the open site are the open site's part.
+- [!] **F3.3** Phoebe's cards: six "ruled out" lines; "not eligible" and "hard gate"; three lines that pull against the
+      agent rules.
+- [ ] **F3.4** Phoebe said a standards body covers carbon or water benefits. Carbon credits have one; water benefits do
+      not. This breaks agent rule 7.
+- [ ] **F3.5** Phoebe's additionality question cannot be answered by a newcomer. Her follow-up (will households pay,
+      and will that cover running costs) should come first. Her claim that it matters for "both funding paths" needs a
+      source.
+- [ ] **F3.6** Phoebe's "one more" habit, and her long closing list of step names and jargon.
+- [ ] **F3.7** Wellington said "still a maybe". Agent rule 14 allows only likely, more to learn, unlikely.
+- [ ] **F3.8** Agents say "the water side" and "the carbon side". Calvin asks about the pump again.
+- [ ] **(V1) F3.9** Wellington's sourced general facts, in his package. Core releases first; the paid site's part is its
+      #305. After v1: his helper-agent design (the paid site's #306).
+- [!] **F3.10** Are Bridget's "still being built" words the free site's alone? They sit in her instructions here, which
+      both sites read.
+
+**Family 4, Console and surfaces** (the shared page first; both sites together)
+
+- [ ] **F4.1** Phoebe's tally leaves the chat for the left rail, which holds the progress of the current work. The
+      shared page comes first and both sites build the rail. Core's part: Phoebe stops writing her tally in the chat
+      once the rail shows it. Core releases first.
+
+**Family 7, Paid platform**
+
+- [ ] **F7.1 (after v1)** Bridget's "who works where" is the paid site's. Each of its data sources gets a rights check
+      before it enters this repo, which is public.
+
+**Family 8, Security and hygiene**
+
+- [!] **F8.1** One command to update the block list everywhere it is kept: the local list each session reads, and each
+      repo's `NAMES_TO_BLOCK` secret. All three repos share it. It is a new tool, so it needs the maintainer's yes.
 
 ---
 
@@ -321,15 +386,15 @@ the maintainer.
       names the maintainer, the engineer and Session C.
 - [ ] *Family: Security and hygiene.* **`referenceCaseCount`**, a name in Calvin's screen code (`CalculatorWork.tsx`),
       still says "reference case" for the made-up test cases. Left as it is: a name in code.
-- [!] *Family: Security and hygiene.* **No copied-text check.** `RULINGS.md` section 1 says every release is checked for
+- [!] *Family: Security and hygiene.* **F8.2 No copied-text check.** `RULINGS.md` section 1 says every release is checked for
       copied text. This repo's release check has none. A new check needs the maintainer's yes. Seen again at the
       family 1 close: two releases went out on 2026-11-26 without one.
 - [!] *Family: Security and hygiene.* **Merged branches stay on GitHub** (23 besides `main`). GitHub's setting to
       delete a branch when its pull request merges would stop new ones.
 - [!] *Family: Security and hygiene.* **Three rules wait in `CLAUDE.md`** ("Waiting for the maintainer"): the Grant
       line, the engine does every sum, and the three kinds of value. The maintainer places or drops each.
-- [!] *Family: Calculators and methods.* **A value stands in for a missing one.** Calvin counts embodied emissions as 0
-      when they are not entered, with a warning. `RULINGS.md` section 2 says a missing fact never counts as zero.
+- [!] *Family: Calculators and methods.* **F2.4 A value stands in for a missing one.** Calvin counts embodied emissions
+      as 0 when they are not entered, with a warning. `RULINGS.md` section 2 says a missing fact never counts as zero.
       Devices per household is 1 when not given, as Calvin's own rulings say. Changing either changes a sum. Goes with
       J9 (rule 11).
 
@@ -337,10 +402,11 @@ the maintainer.
 
 Each finding from the family 1 sprint that is not family 1's own. Family 1's are in "Family 1: what is left".
 
-- [ ] *Family: Console and surfaces.* **Wellington on the paid site.** The paid site could not use his package, because
-      he answers in a different shape there.
-- [ ] *Family: Console and surfaces.* **The Agent Commons does not read the installed packages.** Calvin's and Violet's
-      release notes ask for Commons changes that were not made.
+- [ ] *Family: Console and surfaces.* **F4.2 Wellington on the paid site.** The paid site could not use his package,
+      because he answers in a different shape there. The paid site's work (its #314); nothing to build here.
+- [ ] *Family: Console and surfaces.* **F4.3 The Agent Commons does not read the installed packages.** It shows its own
+      typed list. Calvin's and Violet's release notes ask for Commons changes that were not made. Both sites' work, the
+      shared page first; core's part is J2.
 - *Family: Security and hygiene.* The missing copied-text check is listed under the Security and hygiene sprint above.
 
 ---
@@ -384,5 +450,8 @@ Each finding from the family 1 sprint that is not family 1's own. Family 1's are
   - How is treatment counted when people already collected the same water untreated, and which of D-3's two printed forms of
     the sum holds? The maintainer's own thought, not yet confirmed: treatment may be counted as unsafe water made safe, and
     the form of the sum that takes water off may work like the carbon method's value for people who already had safe water.
-    Both are questions for the experts.
+    Both are questions for the experts. The same question stands for carbon community systems.
+  - Which belong with Violet's method: household treatment, community-level treatment, treatment at a school or clinic,
+    water reuse and irrigation supply. The maintainer, after the 24 Nov walk: "Do not count it. I need to ask the
+    experts." Until then Calvin's tool and core's label list refuse community-level and institutional treatment.
   - Restoration: is "water before the project" enough, or are more checks needed?
