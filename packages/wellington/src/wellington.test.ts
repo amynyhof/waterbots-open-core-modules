@@ -19,7 +19,8 @@ import {
 import { crewRoles, firstLine, placeLines, rulesPart, wellingtonInstructions, type SharedTexts } from "./instructions";
 import { STEP_NAMES, afterHomeUse, asksHomeUse, guardRoute, mapBlock, mapNote, readMap, saysAllDone, stepEndNote, stepEndRoute } from "./map";
 import { FREE_SITE_MD, LOBBY_CHAT_MD, PAID_SITE_MD, PRIMER_MD, PROMPT_MD } from "./ownText.generated";
-import { PROJECT_TYPES, projectTypesText } from "./projectTypes";
+import { PROJECT_TYPE_WORDS } from "@waterbots/core/projectWords";
+import { projectTypesText } from "./projectTypes";
 import { checkWellingtonTurn, countryIsoFor, openedLine, phoebeFoundBlock, stillBlank, visitBlock, wellingtonBlocks } from "./turn";
 
 const own = (name: string): string => readFileSync(new URL(`./agents/wellington/${name}.md`, import.meta.url), "utf8").replace(/\r\n/g, "\n");
@@ -78,9 +79,9 @@ describe("his instructions, for his place", () => {
       "- Phoebe (Eligibility): Pathway eligibility and feasibility screening; What would change eligibility for a project already built and running.\n- Bridget (Partners): The project's place and basin on the map; Who the partners are and whose permission is needed.\n- Calvin (Carbon credits calculator): Emission reductions from the deterministic calculators; Methodology questions.\n- Violet (Volumetric water benefits calculator): The volumetric water benefit of a project that supplies water, from the deterministic calculator; Questions about the D-3 method.\n",
     );
   });
-  test("the project types are core's ids, each with its name and one plain sentence", () => {
-    expect(PROJECT_TYPES.map((t) => t.id)).toEqual([...PROJECT_TYPE_IDS]);
-    for (const t of PROJECT_TYPES) expect([t.name !== "", t.plain !== ""]).toEqual([true, true]);
+  test("the project types are core's words, each with its name and one plain sentence, and no class", () => {
+    expect(PROJECT_TYPE_WORDS.map((t) => t.id)).toEqual([...PROJECT_TYPE_IDS]);
+    expect(projectTypesText()).not.toMatch(/(HWT|IWT|CWT|CWS)|carbon classes/);
     expect(projectTypesText()).toMatch(/^## Water stewardship activity types — the VWBA guidebook\n\n- C-1 — /);
   });
 });

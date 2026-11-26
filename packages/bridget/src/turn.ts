@@ -10,7 +10,8 @@
  */
 import { FINISH_NOTE } from "@waterbots/core/lookUp";
 import { knownKindFacts } from "@waterbots/core/projectKinds";
-import type { Population, ProjectRecord, ProjectStage, ProjectTypeId } from "@waterbots/core/record";
+import { stageWords, typeWords } from "@waterbots/core/projectWords";
+import type { Population, ProjectRecord } from "@waterbots/core/record";
 import type { GpsOutcome, PinnedBasin } from "./pin.js";
 
 /** The turn the site sends when it opens her chat. Never shown as a bubble; her instructions name it. */
@@ -80,12 +81,6 @@ export function visitBlock(place: string, phone: boolean, pin: PinnedBasin | nul
 /** The heading of the record block, the same one Phoebe reads. */
 export const RECORD_HEADING = "What the visitor has already told Wellington";
 
-/** The words for a type or a stage, from the sites' shared list of project types. Core holds the ids only. */
-export interface RecordWords {
-  type?: (id: ProjectTypeId) => { name: string; plain: string } | undefined;
-  stage?: (id: ProjectStage) => { words: string; plain: string } | undefined;
-}
-
 /** "2,400 households": the count and the unit the visitor used, never converted. */
 export function servedWords(p: Population): string | null {
   if (p.served === undefined || p.mode === undefined) return null;
@@ -95,16 +90,17 @@ export function servedWords(p: Population): string | null {
 
 /**
  * The record block as she reads it: the facts on the shared record, the same record Phoebe reads, so she never asks for
- * what it holds. Null when the record holds none of them. Her one question stays the place.
+ * what it holds. Null when the record holds none of them. Her one question stays the place. The words for a type and a
+ * stage are core's one copy.
  */
-export function bridgetRecordBlock(record: ProjectRecord, words: RecordWords = {}): string | null {
+export function bridgetRecordBlock(record: ProjectRecord): string | null {
   const { facts, place } = record;
   const lines: string[] = [];
   if (facts.does?.value) lines.push(`- What it does: ${facts.does.value}`);
-  const type = facts.type ? words.type?.(facts.type.value) : undefined;
+  const type = facts.type ? typeWords(facts.type.value) : undefined;
   if (type) lines.push(`- What type: ${type.name} — ${type.plain}`);
   for (const line of knownKindFacts(facts)) lines.push(`- ${line}`);
-  const stage = facts.stage ? words.stage?.(facts.stage.value) : undefined;
+  const stage = facts.stage ? stageWords(facts.stage.value) : undefined;
   if (stage) lines.push(`- Stage: ${stage.words} — ${stage.plain}`);
   const served = facts.population ? servedWords(facts.population.value) : null;
   if (served) lines.push(`- People served: ${served}, as the visitor said it`);

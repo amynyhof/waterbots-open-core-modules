@@ -27,9 +27,9 @@ describe("where she is", () => {
 
 describe("the record, as she reads it", () => {
   test("only what was said, the source and the treatment as plain facts, and no verdict", () => {
-    const block = recordBlock(BOREHOLE, (id) => (id === "C-19" ? { name: "A made-up type name", plain: "A made-up plain sentence." } : undefined))!;
+    const block = recordBlock(BOREHOLE)!;
     expect(block.split("\n")[0]).toBe(`# ${RECORD_HEADING}`);
-    for (const line of ["- What it does: A new borehole with a hand pump for a village", "- What type: A made-up type name — A made-up plain sentence.", "- The source: new", "- Treatment: none", "- Stage: on paper — still a plan — nothing has been spent on building it yet", "- People served: 1,600 people, as the visitor said it", "- Where it is: A made-up district"]) {
+    for (const line of ["- What it does: A new borehole with a hand pump for a village", "- What type: Access to potable water supply — Giving households or a community access to water that is safe to drink.", "- The source: new", "- Treatment: none", "- Stage: on paper — still a plan — nothing has been spent on building it yet", "- People served: 1,600 people, as the visitor said it", "- Where it is: A made-up district"]) {
       expect(block).toContain(line);
     }
     expect(block).not.toMatch(/class|K[1-6]/);
@@ -39,7 +39,7 @@ describe("the record, as she reads it", () => {
     const old = emptyRecord();
     old.facts.type = { value: "C-19", source: { by: "person", note: "made up" } };
     old.facts.technologyClass = { value: "HWT", source: { by: "person", note: "made up" } };
-    expect(recordBlock(old)).toContain("- Which class of drinking-water project: HWT");
+    expect(recordBlock(old)).toContain("- Which class of drinking-water project: Household water treatment technologies — The water is made safe in the home");
     expect(classFor(old)).toBe("hwt");
   });
   test("the class that sorts her rows comes from the source and the treatment, and names none for a supply with treatment", () => {

@@ -14,8 +14,8 @@ colleague who helps next. He leads from core's agent map. He has no tool.
   names his real place, from core's `Place`. The site hands in rules 1 to 21 (core's `agent-rules.md`, whole), the
   roster part of the shared primer, the plain-words list and its examples, and the build status sheet. The colleagues
   he names come from core's crew list.
-- `projectTypes.ts`: the twenty water stewardship activity types and "none of these", each with its own name and one
-  plain sentence. The ids are core's.
+- `projectTypesText`: the twenty water stewardship activity types and "none of these", as he reads them. The words are
+  core's one copy (`@waterbots/core/projectWords`).
 - `readWellingtonAnswer` and `WELLINGTON_RESPONSE_SCHEMA`: his answer's shape and the checks on it. A route and what he
   heard are fields from closed lists; the site acts on them, never on his words. `addWellingtonFacts` puts what he heard
   on the record through core's `changeFacts`.

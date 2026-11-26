@@ -166,12 +166,11 @@ describe("her turn", () => {
   test("she reads the record Phoebe reads, and nothing when it holds nothing", () => {
     expect(bridgetRecordBlock(newProjectRecord())).toBeNull();
     const r = addGivenFacts(newProjectRecord(), "wellington", { name: "Made-up well", does: "A new borehole for a village", waterSource: "new", treatment: "none", type: "C-19", stage: "paper", population: { mode: "households", served: 2400 }, placeWords: "Kitui, Kenya" }).record;
-    const block = bridgetRecordBlock(r, { type: () => ({ name: "Drinking water", plain: "safe water to drink" }), stage: () => ({ words: "on paper", plain: "not built yet" }) })!;
+    const block = bridgetRecordBlock(r)!;
     expect(block.startsWith(`# ${RECORD_HEADING}`)).toBe(true);
-    for (const line of ["- What it does: A new borehole for a village", "- What type: Drinking water — safe water to drink", "- The source: new", "- Treatment: none", "- Stage: on paper — not built yet", "- People served: 2,400 households, as the visitor said it", "- Where it is: Kitui, Kenya", "- What it is called: Made-up well"]) {
+    for (const line of ["- What it does: A new borehole for a village", "- What type: Access to potable water supply — Giving households or a community access to water that is safe to drink.", "- The source: new", "- Treatment: none", "- Stage: on paper — still a plan — nothing has been spent on building it yet", "- People served: 2,400 households, as the visitor said it", "- Where it is: Kitui, Kenya", "- What it is called: Made-up well"]) {
       expect(block).toContain(line);
     }
-    expect(bridgetRecordBlock(r)).not.toContain("What type");
     expect([servedWords({ mode: "people", served: 1 }), servedWords({ served: 5 })]).toEqual(["1 person", null]);
   });
   test("the blocks come in order, and the same question asked again ends with the note", () => {

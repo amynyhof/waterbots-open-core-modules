@@ -11,12 +11,12 @@
  */
 import { FINISH_NOTE, leavesWaiting } from "@waterbots/core/lookUp";
 import { knownKindFacts } from "@waterbots/core/projectKinds";
+import { stageWords, typeWords } from "@waterbots/core/projectWords";
 import type { Place } from "@waterbots/core/places";
 import { isDegenerateReply } from "@waterbots/core/reply";
 import { DRINKING_WATER_TYPE, NEW_SUPPLY_TYPE, type ProjectRecord } from "@waterbots/core/record";
 import { readWellingtonAnswer, type Route, type WellingtonAnswer } from "./answer.js";
 import { afterHomeUse, asksHomeUse, guardRoute, mapBlock, saysAllDone, stepEndNote, stepEndRoute, type Joined, type MapNote } from "./map.js";
-import { PROJECT_STAGES, projectType } from "./projectTypes.js";
 
 // ── What the record already holds ───────────────────────────────────────────────────────────────────────────────
 
@@ -53,10 +53,10 @@ function recordLines(record: ProjectRecord): string[] {
   const { facts, place } = record;
   const lines: string[] = [];
   if (facts.does) lines.push(`- What it does: ${facts.does.value}`);
-  const type = facts.type ? projectType(facts.type.value) : undefined;
+  const type = facts.type ? typeWords(facts.type.value) : undefined;
   if (type) lines.push(`- What type: ${type.name} — ${type.plain}`);
   for (const line of knownKindFacts(facts)) lines.push(`- ${line}`);
-  const stage = facts.stage ? PROJECT_STAGES.find((s) => s.id === facts.stage!.value) : undefined;
+  const stage = facts.stage ? stageWords(facts.stage.value) : undefined;
   if (stage) lines.push(`- Stage: ${stage.words} — ${stage.plain}`);
   const pop = facts.population?.value;
   if (pop?.served !== undefined) {

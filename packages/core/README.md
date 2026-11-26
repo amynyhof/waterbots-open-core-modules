@@ -25,6 +25,9 @@ What is in `src/`:
   Calvin and Violet do with each (decided 2026-11-25). Nobody is asked for a kind, and no agent chooses one. It also holds
   the one question for each fact, the method's conditions as facts with their source and page, and the short labels for
   when no figure shows. Not part of the seed.
+- `projectWords.ts`: the words for a project's type and stage, one copy that both sites and every agent read. They are the
+  open site's own, with no word changed, except that C-19 no longer says a class is asked. The four classes' words are kept
+  only to read a screening made before today's rules. Not part of the seed.
 - `technologyLabels.ts`: the one list of each site's technology labels. It reads the table. A label never decides a new
   project's kind; it gives a project that already exists its code. Not part of the seed.
 - `numbers.ts` and `numberGuard.ts`: a reader of numbers as a person writes them, and the guards on the numbers in an

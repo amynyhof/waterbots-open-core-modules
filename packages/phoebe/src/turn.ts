@@ -16,6 +16,7 @@
  */
 import { readChips } from "@waterbots/core/chips";
 import { knownKindFacts } from "@waterbots/core/projectKinds";
+import { classWords, stageWords, typeWords } from "@waterbots/core/projectWords";
 import { BECAUSE_LIMIT, underTodaysRules, type ProjectRecord } from "@waterbots/core/record";
 import { readHandBack, type HandBack } from "@waterbots/core/reply";
 import { FINISH_NOTE } from "@waterbots/core/lookUp";
@@ -59,31 +60,22 @@ export function phoebeDoorBlock(door: PhoebeDoor): string {
 /** The heading her instructions name. */
 export const RECORD_HEADING = "What the visitor has already told Wellington";
 
-const STAGE_WORDS: Record<string, { words: string; plain: string }> = {
-  paper: { words: "on paper", plain: "still a plan — nothing has been spent on building it yet" },
-  building: { words: "being built", plain: "work has started and it is not running yet" },
-  running: { words: "already running", plain: "it is in use today" },
-};
-
-/** How a project type is named, when the site can say it: its name and its plain sentence. */
-export type TypeWords = (id: string) => { name: string; plain: string } | undefined;
-
-/** The record's field lines, only those that were said. */
-export function recordLines(record: Pick<ProjectRecord, "facts" | "place">, typeWords?: TypeWords): string[] {
+/** The record's field lines, only those that were said. The words for a type, a class and a stage are core's one copy. */
+export function recordLines(record: Pick<ProjectRecord, "facts" | "place">): string[] {
   const { facts, place } = record;
   const lines: string[] = [];
   if (facts.does) lines.push(`- What it does: ${facts.does.value}`);
   if (facts.type) {
-    const words = typeWords?.(facts.type.value);
+    const words = typeWords(facts.type.value);
     lines.push(`- What type: ${words ? `${words.name} — ${words.plain}` : facts.type.value}`);
   }
   // Under today's rules the source and the treatment are said as the facts they are; a screening made before them keeps its class.
   if (underTodaysRules(facts)) for (const line of knownKindFacts(facts)) lines.push(`- ${line}`);
   else if (facts.technologyClass) {
-    const words = typeWords?.(facts.technologyClass.value);
+    const words = classWords(facts.technologyClass.value);
     lines.push(`- Which class of drinking-water project: ${words ? `${words.name} — ${words.plain}` : facts.technologyClass.value}`);
   }
-  const stage = facts.stage ? STAGE_WORDS[facts.stage.value] : undefined;
+  const stage = facts.stage ? stageWords(facts.stage.value) : undefined;
   if (stage) lines.push(`- Stage: ${stage.words} — ${stage.plain}`);
   const served = facts.population?.value;
   if (served?.served !== undefined && served.mode !== undefined) {
@@ -97,8 +89,8 @@ export function recordLines(record: Pick<ProjectRecord, "facts" | "place">, type
 }
 
 /** The record block, or null when it holds nothing she reads. */
-export function recordBlock(record: Pick<ProjectRecord, "facts" | "place">, typeWords?: TypeWords): string | null {
-  const lines = recordLines(record, typeWords);
+export function recordBlock(record: Pick<ProjectRecord, "facts" | "place">): string | null {
+  const lines = recordLines(record);
   if (lines.length === 0) return null;
   return [
     `# ${RECORD_HEADING}`,
@@ -210,7 +202,6 @@ export interface PhoebeTurnInput {
   again?: boolean;
   /** The sets for a further call (`nextSets`). Left out, the turn's own. */
   sets?: readonly CardSet[];
-  typeWords?: TypeWords;
 }
 
 export interface PhoebeTurn {
@@ -233,7 +224,7 @@ export function phoebeTurn(input: PhoebeTurnInput): PhoebeTurn {
       : setsFor({ pathways, loaded: input.loaded ?? [], allMet: allMet(input.sheet, gsClass), running: record?.facts.stage?.value === "running" });
   const opened = input.opened === true;
   const notes = phoebeNotesBlock({ opened, introduced: opened && input.introduced === true, eligibilityDone: input.eligibilityDone === true });
-  const recordText = record ? recordBlock(record, input.typeWords) : null;
+  const recordText = record ? recordBlock(record) : null;
   // Not on her first turn: the sheet is empty then, and it pulls against message 1.
   const sheetText = !opened && Object.keys(input.sheet.rows).length + Object.keys(input.sheet.sorts).length > 0 ? worksheetBlock(input.sheet, gsClass) : null;
   const blocks = [cardsBlock(sets), phoebeDoorBlock(input.door), recordText, sheetText, notes, input.again ? FINISH_NOTE : null].filter((b): b is string => b !== null);
