@@ -2,7 +2,7 @@
 import { expect, test } from "vitest";
 import { agentMap } from "./agentMap";
 import { addGivenFacts, emptyRecord, recordTechnology } from "./record";
-import { TECHNOLOGY_CLASSES, TECHNOLOGY_LABELS, notCoveredYet, technologyCode, technologyCoverage, technologyOfClass } from "./technologyLabels";
+import { NO_CALCULATOR_YET, SAVED_WATER_FIGURE_STAYS, TECHNOLOGY_CLASSES, TECHNOLOGY_LABELS, notCoveredYet, technologyCode, technologyCoverage, technologyOfClass } from "./technologyLabels";
 
 // SWITCHED OFF 2026-11-24, never deleted: the maintainer ruled on 2026-11-23 that community level treatment is not
 // counted until the experts answer. The tests after it hold the new rule.
@@ -25,7 +25,8 @@ test("each label appears once, and says why it gets its code", () => {
 });
 
 // ── Not covered yet (ruled 2026-11-23) ──
-const WAITING = ["Community level water treatment technologies", "Institutional water treatment technologies", "New or alternative water supply"];
+// Community level treatment was the first of these until 2026-11-25: it is counted for carbon again, treatment only included.
+const WAITING = ["Institutional water treatment technologies", "New or alternative water supply"];
 
 test.each(WAITING)("%s gets no technology code, and is not covered yet", (label) => {
   expect(technologyCode(label)).toBeUndefined();
@@ -38,11 +39,16 @@ test("a label with a code is covered, and one the list does not know is neither"
   expect(technologyCoverage("A label nobody has sent yet")).toBe("not known");
 });
 
+test("the maintainer's words for a project no calculator covers, and for a saved treatment project", () => {
+  expect(NO_CALCULATOR_YET).toBe("We do not have a calculator for this kind of project yet. To ask for it to be added, contact WaterBots at hello@waterbots.ai.");
+  expect(SAVED_WATER_FIGURE_STAYS).toBe("Your saved water figure stays on your record. We do not have a calculator for this kind of project yet. To ask for it to be added, contact WaterBots at hello@waterbots.ai.");
+});
+
 test("the open site's four class names, word for word, each with its class", () => {
   expect(TECHNOLOGY_CLASSES.map((c) => [c, technologyOfClass(c).label, technologyOfClass(c).code ?? null])).toEqual([
     ["HWT", "Household water treatment technologies", "HWT"],
     ["IWT", "Institutional water treatment technologies", null],
-    ["CWT", "Community level water treatment technologies", null],
+    ["CWT", "Community level water treatment technologies", "CWS"],
     ["CWS", "Community water supply technologies", "CWS"],
   ]);
 });

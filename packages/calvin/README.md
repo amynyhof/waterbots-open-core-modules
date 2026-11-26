@@ -86,7 +86,31 @@ A site tells the screens where Calvin is working with `place` (`"free-site"`, `"
 The build bundles the entry into one file, `dist/agent.js`. `@waterbots/core` stays outside it.
 `scripts/check-screen-entry.mjs` loads it from the packed files and runs his tool there.
 
-## Changes in 0.7.0 (not released yet)
+## Changes in 0.8.0
+
+Calvin accepts any `@waterbots/core` in the 0.4 series.
+
+- **The kind of project is worked out from its facts (decided 2026-11-25).** Core's one table says what is counted. He asks for
+  one plain fact at a time, and nobody is asked for a kind. A project under today's rules has `answer` (core's
+  `carbonAnswer`); its `technology` is set only where the table counts it.
+- **Community level treatment is counted again, treatment only included.** Institutional treatment is not set up yet.
+- **A restored source** is counted once its version's conditions, and whether the water is safe, are on the record. A
+  project credited under V1.0 gets an answer under each version (`answer` and `answerV1`), and each figure stands on its
+  own version's conditions: while the V1.0 side waits, the seat shows V2.0 on its own, under a short label.
+- **The method's conditions are facts with their source and page.** He reads them and explains them in his own words. The
+  screen shows a short label where one is not met.
+- **A screening that already exists keeps its answer,** with no new question. An update never changes it.
+- **His tools take the project's facts, not a technology.** Where a site has a record, `calvinToolsFor(facts)`: the record
+  decides, never the model. `GS4GG_CARBON_TOOLS` are for a place with no record.
+- **The guards on his numbers:** `guardCalvinReply`. `addCalvinFacts` also changes a fact the visitor changes, and says which
+  figures came off.
+- No sum changed.
+
+**What a site should change.** Register `calvinToolsFor(record.facts)`. Build his project with `calvinProjectFromRecord`, in the
+Agent Commons too. Pass `facts`, `answer` and `answerV1` to `calvinChatContext`. Call `guardCalvinReply` on each answer; send
+`returned` back once, then show `told`.
+
+## Changes in 0.7.0
 
 Calvin accepts any `@waterbots/core` in the 0.3 series, so he can be released on his own.
 

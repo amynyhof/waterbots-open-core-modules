@@ -266,8 +266,12 @@ export default function ReportView({
   })();
 
   // Method is NEVER bare "Method 1" (could read as a version) — always technology-qualified.
-  const methodLabel = state.method === 1
-    ? "CWS — Method 1 (community water supply)"
+  // Treatment at one central point is Method 1 too, and the report names it for what it is (2026-11-25).
+  const as = project.answer?.says === "counted" ? project.answer.as : undefined;
+  const methodLabel =
+    as === "CWT" ? "CWT — Method 1 (community water treatment)"
+    : as === "CWS with CWT" ? "CWS with CWT — Method 1 (community water supply with treatment)"
+    : state.method === 1 ? "CWS — Method 1 (community water supply)"
     : "HWT — Method 2 (household water treatment)";
 
   // The baseline mix, NAMED (ruling (4), 2026-09-24) — read from the values the engine used.

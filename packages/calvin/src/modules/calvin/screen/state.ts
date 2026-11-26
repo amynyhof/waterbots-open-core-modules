@@ -8,7 +8,7 @@ import {
   householdSizeNeeded,
   type CharcoalConvention, type FuelShares, type ScenarioInput, type SiteTables, type StoveShares,
 } from "../engine";
-import { notCoveredYet } from "@waterbots/core/technologyLabels";
+import { CONDITION_LABEL, FACT_LABEL, NO_CALCULATOR_YET, type Answer } from "@waterbots/core/projectKinds";
 import type { SavedAnalysis } from "./analysis";
 import { technologyToMethod } from "./method";
 import { readMonitoringFlags } from "./monitoring";
@@ -40,6 +40,17 @@ export type CalvinProject = ModuleProject<SavedAnalysis> & {
    * then has no `technology`, and the seat says the label is not covered yet rather than asking for it.
    */
   notCoveredYet?: string;
+  /**
+   * WHAT THE ONE TABLE SAYS FOR THIS PROJECT (core's `carbonAnswer`, 2026-11-25). A project under today's rules has it, and its
+   * `technology` is set only where the table counts it. Left out: a project that already exists, as before.
+   */
+  answer?: Answer;
+  /**
+   * A PROJECT CREDITED UNDER V1.0: what the one table says under the 2021 version (core's `carbonAnswer`). Each version's
+   * figure stands on its own conditions (the maintainer, 2026-11-25). While this one does not count the project, the seat
+   * shows V2.0 on its own, and says what the V1.0 side waits for.
+   */
+  answerV1?: Answer;
 };
 
 /** What powers the water system's pump. */
@@ -51,9 +62,12 @@ export function activityEmissionsAsk(s: Pick<CalcState, "pumpPower" | "activityE
   return null;
 }
 
-/** True when the seat shows the transition: only for a project the site says was credited under V1.0. */
-export function showsTransition(project: Pick<CalvinProject, "creditedUnderV1">): boolean {
-  return project.creditedUnderV1 === true;
+/**
+ * True when the seat shows the transition: only for a project the site says was credited under V1.0, and only while the
+ * 2021 version counts it. Otherwise V2.0 shows on its own conditions.
+ */
+export function showsTransition(project: Pick<CalvinProject, "creditedUnderV1" | "answerV1">): boolean {
+  return project.creditedUnderV1 === true && (project.answerV1 === undefined || project.answerV1.says === "counted");
 }
 
 /** A change to the seat's inputs, kept to V2.0 for a project with no transition: a change of version is dropped. */
@@ -252,17 +266,19 @@ const listFacts = (labels: string[]) =>
  * does not know the host's pages. A technology the calculator does not cover gets its own sentence:
  * it is not missing, so asking for it would be a dead end.
  */
-export function missingFactsPrompt(missing: ProjectFact[], technology?: string, uncovered?: string): string | null {
+export function missingFactsPrompt(missing: ProjectFact[], technology?: string, uncovered?: string, answer?: Answer): string | null {
   if (missing.length === 0) return null;
-  // A LABEL THAT IS NOT COVERED YET IS NOT MISSING: asking for the technology again would be a dead end.
-  if (uncovered !== undefined && missing.some((f) => f.key === "technology")) {
-    return `The calculator can't run for this project yet. ${notCoveredYet(uncovered)}`;
-  }
+  const noTechnology = missing.some((f) => f.key === "technology");
+  // HELD FOR NOW, NOT SET UP YET, OR A LABEL THAT IS NOT COVERED YET: nothing is missing, so nothing is asked for again.
+  // One sentence for the visitor in every case (the maintainer's words, 2026-11-25). A condition of the method that is not
+  // met has a short label: Calvin explains the condition, from its source.
+  if (noTechnology && answer?.says === "falls short") return CONDITION_LABEL[answer.because];
+  if (noTechnology && (answer === undefined ? uncovered !== undefined : answer.says !== "ask")) return NO_CALCULATOR_YET;
   if (technology === "other" && missing.some((f) => f.key === "technology")) {
     return "The calculator can't run for this project — it covers community water supply and household water treatment, and this project's technology is recorded as other.";
   }
   const it = missing.length === 1 ? "it" : "them";
-  return `The calculator can't run yet — this project's record is missing ${listFacts(missing.map((f) => f.label))}. Fill ${it} in on the project record and the numbers will appear here.`;
+  return `The calculator can't run yet — this project's record is missing ${listFacts(missing.map((f) => (f.key === "technology" && answer?.says === "ask" ? FACT_LABEL[answer.fact] : f.label)))}. Fill ${it} in on the project record and the numbers will appear here.`;
 }
 
 function positiveOrNull(n: number | undefined): number | null {

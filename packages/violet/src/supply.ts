@@ -1,51 +1,59 @@
-// Which projects D-3 counts, for her tool, her chat and her screen. The answer is core's (`recordWaterSupply`), the same one
-// the agent map calls her by, so she refuses the same projects at every door (ruled by the maintainer on 2026-11-24).
+// Which projects D-3 counts, for her tool, her chat and her screen. The answer is core's, read from the one table
+// (`recordWaterSupply`, `waterAnswer`), the same one the agent map calls her by, so she refuses the same projects at every
+// door. A project's kind is worked out from its facts (decided by the maintainer on 2026-11-25). A project that already
+// exists keeps the answer its label gave it.
 
-import { HOME_USES, NEW_SUPPLY_TYPE, needsHomeUse, recordWaterSupply, technologyOfFacts, waterNotCovered, type GivenFacts, type HomeUse, type ProjectFacts } from "@waterbots/core/record";
-import { TECHNOLOGY_CLASSES, notCoveredYet, technologyOfClass } from "@waterbots/core/technologyLabels";
+import { HOME_USES, NEW_SUPPLY_TYPE, needsHomeUse, recordWaterSupply, technologyOfFacts, underTodaysRules, waterAnswer, waterNotCovered, type GivenFacts, type HomeUse, type ProjectFacts } from "@waterbots/core/record";
+import { NO_CALCULATOR_YET, factsWithKind, readKindFacts, type GivenKindFacts } from "@waterbots/core/projectKinds";
+import { TECHNOLOGY_CLASSES, technologyOfClass } from "@waterbots/core/technologyLabels";
 
-/** The kinds of project her tool and her chat name: the four drinking-water classes, and a new or alternative supply. */
+/** The labels a project that already exists may have: the four drinking-water classes, and a new or alternative supply. */
 export const D3_TECHNOLOGIES = [...TECHNOLOGY_CLASSES, NEW_SUPPLY_TYPE] as const;
 export type D3Technology = (typeof D3_TECHNOLOGIES)[number];
 
-/** A kind of project, as the label list names it. */
+/** One of those, as the label list names it. */
 export function d3Technology(kind: D3Technology): NonNullable<GivenFacts["technology"]> {
   if (kind === NEW_SUPPLY_TYPE) return technologyOfFacts(kind, undefined)!;
   const { label, code } = technologyOfClass(kind);
   return { label, ...(code !== undefined ? { code } : {}) };
 }
 
-/** The kind of project and home use in an answer or a tool call, kept only where they are on their lists. */
-export function readKind(raw: unknown): { technology?: D3Technology; homeUse?: HomeUse } {
-  if (typeof raw !== "object" || raw === null) return {};
-  const o = raw as { technology?: unknown; homeUse?: unknown };
-  const technology = D3_TECHNOLOGIES.find((t) => t === o.technology);
-  const homeUse = HOME_USES.find((h) => h === o.homeUse);
-  return { ...(technology !== undefined ? { technology } : {}), ...(homeUse !== undefined ? { homeUse } : {}) };
+/** The facts about the source and the treatment, and home use, in an answer or a tool call, kept only where they hold. */
+export function readKind(raw: unknown): GivenKindFacts & { homeUse?: HomeUse } {
+  const homeUse = HOME_USES.find((h) => h === (raw as { homeUse?: unknown } | null)?.homeUse);
+  return { ...readKindFacts(raw), ...(homeUse !== undefined ? { homeUse } : {}) };
 }
 
-/** Project facts that hold only a kind of project and home use. */
-export function kindFacts(kind: { technology?: D3Technology; homeUse?: HomeUse }): ProjectFacts {
-  const source = { by: "person", note: "given to violet" } as const;
-  return {
-    ...(kind.technology !== undefined ? { technology: { ...d3Technology(kind.technology), source } } : {}),
-    ...(kind.homeUse !== undefined ? { homeUse: { value: kind.homeUse, source } } : {}),
-  };
+/** Project facts that hold only those, under today's rules. */
+export function kindFacts(kind: GivenKindFacts & { homeUse?: HomeUse }): ProjectFacts {
+  return { ...factsWithKind(kind), ...(kind.homeUse !== undefined ? { homeUse: { value: kind.homeUse, source: { by: "person", note: "given to violet" } } } : {}) };
 }
 
-/** Why she works out nothing for a project. The label is the one that is not covered yet. */
-export type D3Stop = { because: "not covered yet"; label: string | null } | { because: "another kind of project" } | { because: "home use not given" };
+/** Why she works out nothing for a project. "not covered yet" is held for now, and its label is the site's own. */
+export type D3Stop =
+  | { because: "not covered yet"; label: string | null }
+  | { because: "another kind of project" }
+  | { because: "home use not given" }
+  | { because: "fact not given"; fact: "waterSource" | "treatment" };
 
-/** Why she works out nothing for a project with these facts, or null: D-3 counts it, or the facts do not say its kind. */
+/** Why she works out nothing for a project with these facts, or null: D-3 counts it, or a project that already exists does not say. */
 export function d3Stop(facts: ProjectFacts): D3Stop | null {
+  if (underTodaysRules(facts)) {
+    const a = waterAnswer(facts);
+    if (a.says === "ask" && (a.fact === "waterSource" || a.fact === "treatment")) return { because: "fact not given", fact: a.fact };
+  }
   const supply = recordWaterSupply(facts);
   if (supply === "not covered yet") return { because: supply, label: waterNotCovered(facts) };
   if (supply === "another kind of project") return { because: supply };
   return needsHomeUse(facts) ? { because: "home use not given" } : null;
 }
 
-/** What her screen says then. Both sentences are ones Calvin's screen already shows. */
+/** True while one blank fact decides it: what the person says still fills her screen, and no figure shows. */
+export function d3Waits(stop: D3Stop | null): boolean {
+  return stop?.because === "home use not given" || stop?.because === "fact not given";
+}
+
+/** What her screen says then. Where no figure can show, the maintainer's one sentence (2026-11-25). */
 export function d3StopMessage(stop: D3Stop): string {
-  const words = "The calculator can't run for this project yet.";
-  return stop.because === "not covered yet" && stop.label !== null ? `${words} ${notCoveredYet(stop.label)}` : words;
+  return d3Waits(stop) ? "The calculator can't run for this project yet." : NO_CALCULATOR_YET;
 }

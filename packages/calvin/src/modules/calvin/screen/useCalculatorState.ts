@@ -148,8 +148,8 @@ export interface CalculatorState {
   /** See `CalculatorOptions.exAnteOnly`. A site that offers an ex-ante / ex-post switch hides it when this is true. */
   exAnteOnly: boolean;
   /**
-   * TRUE ONLY FOR A PROJECT CREDITED UNDER V1.0 (`CalvinProject.creditedUnderV1`, ruling 2026-09-21). Then the seat
-   * shows both versions and the transition. False: the V2.0-only view. The version stays V2.0, and nothing for
+   * TRUE ONLY FOR A PROJECT CREDITED UNDER V1.0 (`CalvinProject.creditedUnderV1`, ruling 2026-09-21), while the 2021 version
+   * counts it (`CalvinProject.answerV1`). Then the seat shows both versions and the transition. False: the V2.0-only view. The version stays V2.0, and nothing for
    * V1.0 is worked out or asked for: `legacyResult`, `waterfall` and `filedFnrbRefusal` stay null.
    */
   transition: boolean;
@@ -168,6 +168,7 @@ export interface CalculatorState {
    * with its own export puts these in it, under each kind's label.
    */
   noteLines: NoteLine[];
+
 
   /* ── Working inputs ─────────────────────────────────────────────────────── */
   /** The live input state. */
@@ -491,7 +492,7 @@ export function useCalculatorState(project: CalvinProject, options: CalculatorOp
   };
 
   const pageContext = () =>
-    calculatorPageContext({ projectName: project.name, state, missingFacts, activityAsk, missingMonitoring: monitoringAsk, outOfRange: refusedValues.map((r) => r.message), fnrbRefusal, filedFnrbRefusal, transition, result, legacyResult, paaResult, waterfall, recordProblems: calvinRecordProblems(project), ...(project.notCoveredYet !== undefined ? { notCoveredYet: project.notCoveredYet } : {}), ...(options.place !== undefined ? { place: options.place } : {}) });
+    calculatorPageContext({ projectName: project.name, state, missingFacts, activityAsk, missingMonitoring: monitoringAsk, outOfRange: refusedValues.map((r) => r.message), fnrbRefusal, filedFnrbRefusal, transition, result, legacyResult, paaResult, waterfall, recordProblems: calvinRecordProblems(project), ...(project.notCoveredYet !== undefined ? { notCoveredYet: project.notCoveredYet } : {}), ...(project.answer !== undefined ? { answer: project.answer } : {}), ...(project.creditedUnderV1 === true && project.answerV1 !== undefined ? { answerV1: project.answerV1 } : {}), ...(options.place !== undefined ? { place: options.place } : {}) });
 
   return {
     readOnly,
@@ -533,7 +534,7 @@ export function useCalculatorState(project: CalvinProject, options: CalculatorOp
     printAt,
     exportReport,
     fill,
-    asks: calvinAsks(state, { tables, transition, notCoveredYet: project.notCoveredYet }),
+    asks: calvinAsks(state, { tables, transition, notCoveredYet: project.notCoveredYet, answer: project.answer, ...(project.creditedUnderV1 === true ? { answerV1: project.answerV1 } : {}) }),
     kept: calvinKept(state, { sliders: showSliders(exAnteSliders, state), result: paaResult }),
     pageContext,
   };

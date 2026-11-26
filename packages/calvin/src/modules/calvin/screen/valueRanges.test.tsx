@@ -116,14 +116,14 @@ describe("a number that arrives another way is shown with its message, and no fi
 });
 
 describe("his tools refuse the same numbers, in the same words", () => {
-  const input = { version: "paa", technology: "CWS", countryIso: "KEN", populationMode: "people", populationCount: 1200, litresPerPersonPerDay: 4, operationalDays: 347 };
+  const input = { version: "paa", waterSource: "new", treatment: "none", sourceSafe: true, countryIso: "KEN", populationMode: "people", populationCount: 1200, litresPerPersonPerDay: 4, operationalDays: 347 };
   it.each([
     [{ populationCount: 0 }, "People served must be a whole number, 1 or more."],
     [{ populationCount: 1.5, populationMode: "households" }, "Households served must be a whole number, 1 or more."],
     [{ litresPerPersonPerDay: -1 }, "Litres per person a day must be 0 or more."],
     [{ operationalDays: 366 }, "Days of operation must be between 0 and 365."],
     [{ meteredVolumeL: -1 }, "Water produced in a year must be 0 or more."],
-    [{ technology: "HWT", deviceCapacityLPerHour: 0 }, "Device flow rate must be more than 0."],
+    [{ waterSource: "existing", treatment: "homes", deviceCapacityLPerHour: 0 }, "Device flow rate must be more than 0."],
     [{ fnrbOverride: 1.1 }, "fNRB must be between 0 and 1."],
     [{ fnrbFiledV1: -0.1 }, "fNRB must be between 0 and 1."],
     [{ etaOverride: 0 }, "Stove efficiency must be more than 0% and no more than 100%."],
@@ -140,9 +140,12 @@ describe("his tools refuse the same numbers, in the same words", () => {
   });
 });
 
+// The two tool tests and the screen's test below hold the words and the input of 2026-11-24. `kinds.test.tsx` holds what replaced
+// them: community level treatment is counted for carbon again, and the project's facts decide, not a technology label.
 describe("community level and institutional treatment are not counted yet (ruled 2026-11-23 and 24)", () => {
   const input = { version: "paa", countryIso: "KEN", populationMode: "people", populationCount: 1200, litresPerPersonPerDay: 4, operationalDays: 347 };
-  it.each([
+  // SWITCHED OFF 2026-11-25, never deleted: the tools take the project's facts, and community level treatment is counted again.
+  it.skip.each([
     ["CWT", "“Community level water treatment technologies” is not covered yet."],
     ["IWT", "“Institutional water treatment technologies” is not covered yet."],
   ])("his tools refuse %s", (technology, message) => {
@@ -151,18 +154,21 @@ describe("community level and institutional treatment are not counted yet (ruled
       for (const method of [1, 2]) expect(() => tool.execute({ ...input, technology, method })).toThrow(message);
     }
   });
-  it("a method alone does not get round it: the technology is needed, and the method follows it", () => {
+  // SWITCHED OFF 2026-11-25, never deleted: the tools take the project's facts, not a technology.
+  it.skip("a method alone does not get round it: the technology is needed, and the method follows it", () => {
     for (const method of [1, 2]) expect(() => computeScenarioTool.execute({ ...input, method })).toThrow(/technology is a project fact/);
     expect(() => computeScenarioTool.execute({ ...input, technology: "CWS", method: 2 })).toThrow(/method follows the technology/);
     expect(() => computeScenarioTool.execute({ ...input, technology: "HWT", preset: "institutional-wood-iwt" })).toThrow(/is not covered yet/);
   });
-  it("the same technology and method give the engine's own answer", async () => {
+  // SWITCHED OFF 2026-11-25, never deleted: the tools take the project's facts, not a technology.
+  it.skip("the same technology and method give the engine's own answer", async () => {
     for (const [technology, method] of [["CWS", 1], ["HWT", 2]] as const) {
       const run = await computeScenarioTool.execute({ ...input, technology });
       expect((run.output as { result: unknown }).result).toEqual(computeScenario({ ...input, method } as never).result);
     }
   });
-  it("his screen says the label is not covered yet, and asks for no technology", () => {
+  // SWITCHED OFF 2026-11-25, never deleted: community level treatment with its saved code gives a figure again.
+  it.skip("his screen says the label is not covered yet, and asks for no technology", () => {
     const record = emptyRecord();
     const by = { by: "site intake", note: "invented" } as const;
     record.facts.technology = { label: "Community level water treatment technologies", code: "CWS", source: by };

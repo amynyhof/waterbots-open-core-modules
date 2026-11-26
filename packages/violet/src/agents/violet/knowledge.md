@@ -13,8 +13,16 @@ What D-3 is, in our own words, with where to look:
   (VWBA 2.0, Appendix D, D-3, p.46).
 - The water must be safe for its use, and access reasonable (VWBA 2.0, Appendix D, D-3, p.45).
 - Each unit of water is counted once (VWBA 2.0, Step 3, p.21).
-- Treatment is named for D-3, but the guidebook does not say how to count water people already collected untreated
-  (VWBA 2.0, Appendix D, D-3, p.44 to 46). It is not covered yet.
+- New wells and piped systems are counted (VWBA 2.0, Appendix C, p.38; Appendix D, D-3, p.44). Reasonable access is given
+  as at least 20 litres a person a day within 1 km (p.45 to 46).
+- A restored or improved supply is named (p.38, p.44). The guidebook prints two sums: the general one takes off the water
+  before the project (p.45), and the one for household or community supply takes nothing off (p.46). It does not say
+  which holds. Taking the water off is WaterBots' reading.
+- Where a new supply also treats its water, the new supply's water is counted (p.44). The guidebook does not say what
+  happens when a supply and treatment come together.
+- Treatment is named for D-3 (p.18, p.38, p.44), but the guidebook gives no way to count treatment by itself. It is held
+  for now: WaterBots' choice.
+- D-3 also counts irrigation (p.45). Counting only water people use at home is WaterBots' scope for now.
 
 The guidebook: Volumetric Water Benefit Accounting 2.0, World Resources Institute, 2025,
 https://doi.org/10.46830/wrigb.23.00112 (CC BY 4.0).

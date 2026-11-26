@@ -3,15 +3,17 @@
 // (`@waterbots/core/chat`). Nothing here does a sum or calls a model: every figure is the engine's.
 
 import { ANSWER_FIELDS, CHAT_REPLY, chatContext, openAsks, openedTurn, readLeft, type Ask, type ChatSettings, type Kept } from "@waterbots/core/chat";
-import { rangeRefusal } from "@waterbots/core/ranges";
+import { askedOutOfRange, checkAnswerNumbers, returnToAgent, takenOut, type AnswerNumber } from "@waterbots/core/numberGuard";
+import { KIND_ASKS, KIND_FACTS, KIND_FACT_SCHEMA, NO_CALCULATOR_YET, askFor, knownKindFacts, FACT_LABEL } from "@waterbots/core/projectKinds";
+import { RANGES, rangeRefusal, type RangeKey, type RangeWords } from "@waterbots/core/ranges";
 import { readHandBack, type HandBack } from "@waterbots/core/reply";
 import { hasProjectRecord, type Place } from "@waterbots/core/places";
-import { HOME_USES, addGivenFacts, needsHomeUse, setAgentResults, type AddedFacts, type GivenFacts, type ProjectFacts, type ProjectRecord } from "@waterbots/core/record";
+import { HOME_USES, addGivenFacts, needsHomeUse, setAgentResults, underTodaysRules, waterAnswer, type AddedFacts, type GivenFacts, type ProjectFacts, type ProjectRecord } from "@waterbots/core/record";
 import { computeD3 } from "../d3/compute.js";
 import { D3_STATUS, type AccessLevel, type D3Input, type D3Option, type D3Result, type D3Value } from "../d3/types.js";
 import { D3_RANGES, d3Refusals, refuseD3, type D3NumberKey, type D3Refusal } from "../ranges.js";
 import { addVioletResults, violetGivenFacts } from "../record.js";
-import { D3_TECHNOLOGIES, d3Stop, d3Technology, readKind } from "../supply.js";
+import { d3Stop, d3Waits, readKind } from "../supply.js";
 
 /** The settings her chat runs on. The same as in `config.yaml`; a test keeps them so. */
 export const VIOLET_CHAT: ChatSettings = { model: "claude-opus-5", effort: "medium", maxOutputTokens: 16000, reply: CHAT_REPLY };
@@ -23,20 +25,6 @@ export const VIOLET_OPENED = openedTurn("Violet");
 
 /** Everything she may ask for. A project fact each time, or a monitored figure once the project runs. */
 const ASKS = {
-  technology: {
-    key: "technology",
-    about: "what kind of project it is: a community water supply, a new or alternative water supply, or one that treats water",
-    why: "it says whether the method can count the project",
-    from: "what the project builds",
-    needed: true,
-  },
-  homeUse: {
-    key: "homeUse",
-    about: "whether people use the water at home",
-    why: "a new or alternative supply can also be reuse or irrigation, and only water people use at home is counted",
-    from: "who the water is for, in the project's plan",
-    needed: true,
-  },
   option: {
     key: "option",
     about: "how the water can be counted: from what the system can supply, or from the people it serves (after the project runs, from meter readings too)",
@@ -81,24 +69,27 @@ const ASKS = {
 } as const satisfies Record<string, Ask>;
 
 /** Every key she may ask for, for reading an answer. */
-export const VIOLET_ASK_KEYS: readonly string[] = [...new Set(Object.values(ASKS).map((a) => a.key))];
+export const VIOLET_ASK_KEYS: readonly string[] = [...new Set([...KIND_FACTS, "homeUse", ...Object.values(ASKS).map((a) => a.key)])];
 
 /**
  * What is still missing, in the order she asks. The first one is her one question. `chosen` is true once the visitor has
  * said how the water can be counted; before that the screen only shows where it starts. With the project's facts, the
- * kind of project comes first, and she asks for nothing when D-3 does not count it.
+ * source and the treatment come first, and she asks for nothing when D-3 does not count it. Nobody is asked for a kind.
  */
 export function violetAsks(input: D3Input, chosen = false, facts?: ProjectFacts): Ask[] {
   const stop = facts === undefined ? null : d3Stop(facts);
-  if (stop !== null && stop.because !== "home use not given") return [];
+  if (stop !== null && !d3Waits(stop)) return [];
   const out: Ask[] = [];
   const pop = input.population;
   const ask = (blank: boolean, a: Ask): void => {
     if (blank) out.push(a);
   };
-  if (facts !== undefined) {
-    ask(facts.technology === undefined && facts.type === undefined, ASKS.technology);
-    ask(needsHomeUse(facts), ASKS.homeUse);
+  if (facts !== undefined && underTodaysRules(facts)) {
+    const a = waterAnswer(facts);
+    if (a.says === "ask") out.push(askFor(a));
+  } else if (facts !== undefined) {
+    ask(facts.technology === undefined && facts.type === undefined, KIND_ASKS.waterSource);
+    ask(needsHomeUse(facts), KIND_ASKS.homeUse);
   }
   ask(!chosen, ASKS.option);
   if (input.option === "beneficiaries") {
@@ -235,9 +226,9 @@ export const VIOLET_ANSWER_SCHEMA: Record<string, unknown> = {
     facts: {
       type: "object",
       additionalProperties: false,
-      description: "Project facts for the record, only what the visitor has just said.",
+      description: "Project facts for the record, only what the visitor has just said or changed.",
       properties: {
-        technology: { type: "string", enum: [...D3_TECHNOLOGIES], description: "The kind of project: CWS a community water supply, C-11 a new or alternative supply, HWT household, CWT community level and IWT institutional treatment." },
+        ...KIND_FACT_SCHEMA,
         homeUse: { type: "string", enum: [...HOME_USES], description: "Whether people use the water at home." },
       },
     },
@@ -269,7 +260,7 @@ export interface VioletReply {
   reply: string;
   handBack: HandBack;
   leftForNow: string[];
-  /** The kind of project and home use, for the record (`addVioletFacts`). In the Agent Commons, for her temporary record. */
+  /** The source, the treatment, the facts about them and home use, for the record (`addVioletFacts`). In the Agent Commons, for her temporary record. */
   facts: GivenFacts;
   values: VioletAnswer;
 }
@@ -279,12 +270,11 @@ export function readVioletAnswer(raw: unknown): VioletReply | null {
   if (typeof raw !== "object" || raw === null) return null;
   const o = raw as { reply?: unknown; handBack?: unknown; leftForNow?: unknown; facts?: unknown; values?: unknown };
   if (typeof o.reply !== "string" || o.reply.trim() === "") return null;
-  const { technology, homeUse } = readKind(o.facts);
   return {
     reply: o.reply.trim(),
     handBack: readHandBack(o.handBack),
     leftForNow: readLeft(o.leftForNow, VIOLET_ASK_KEYS),
-    facts: { ...(technology !== undefined ? { technology: d3Technology(technology) } : {}), ...(homeUse !== undefined ? { homeUse } : {}) },
+    facts: readKind(o.facts),
     values: typeof o.values === "object" && o.values !== null ? (o.values as VioletAnswer) : {},
   };
 }
@@ -302,6 +292,60 @@ export function addVioletAnswer(record: ProjectRecord, fill: VioletFill, done?: 
 /** Marks her part done on the record, or not done. */
 export function setVioletDone(record: ProjectRecord, done: boolean): ProjectRecord {
   return setAgentResults(record, "violet", { done });
+}
+
+// ── The guards on her numbers (2026-11-25) ───────────────────────────────────────────────────────────────────────
+
+export interface VioletGuardInput {
+  input: D3Input;
+  /** The visitor's own messages in this chat, oldest first. */
+  messages: readonly string[];
+  /** The key of the question just asked. */
+  asked?: string;
+}
+
+export interface GuardedVioletReply {
+  /** Her answer, with every number that did not pass taken out. */
+  reply: VioletReply;
+  /** Send this back to her once, in the same turn. Null: nothing to send. On the second answer, show `told` instead. */
+  returned: string | null;
+  /** What the visitor is told when a number is taken out. */
+  told: string | null;
+  /** The out-of-range message for the fact just asked, whether or not she sent the number. */
+  outOfRange: string | null;
+}
+
+/** Core's guards on her answer. The site calls it on each answer, and sends `returned` back once. */
+export function guardVioletReply(reply: VioletReply, { input, messages, asked }: VioletGuardInput): GuardedVioletReply {
+  const households: RangeWords = (reply.values.population?.mode ?? input.population?.mode) === "households" ? { name: "Households served" } : {};
+  const ranges: Record<string, { key: RangeKey; words?: RangeWords; value: number | null | undefined; held: number | undefined }> = {
+    ...Object.fromEntries((Object.keys(D3_RANGES) as D3NumberKey[]).map((k) => [k, { key: D3_RANGES[k], value: reply.values[k], held: input[k] }])),
+    "population.served": { key: "population.served", words: households, value: reply.values.population?.served, held: input.population?.served },
+    "population.householdSize": { key: "population.householdSize", value: reply.values.population?.householdSize, held: input.population?.householdSize },
+    litresPerPersonPerDay: { key: "lpcd", value: reply.values.litresPerPersonPerDay?.value, held: input.litresPerPersonPerDay?.value },
+  };
+  const numbers: AnswerNumber[] = Object.entries(ranges).flatMap(([id, r]) =>
+    typeof r.value === "number" ? [{ id, name: r.words?.name ?? RANGES[r.key].name, value: r.value, held: r.held, ask: id }] : [],
+  );
+  const { kept, faults } = checkAnswerNumbers(numbers, { messages, asked });
+  const out = new Set(numbers.map((n) => n.id).filter((id) => !kept.includes(id)));
+  const values: VioletAnswer = { ...reply.values };
+  for (const k of Object.keys(D3_RANGES) as D3NumberKey[]) if (out.has(k)) delete values[k];
+  if (out.has("litresPerPersonPerDay")) delete values.litresPerPersonPerDay;
+  if (values.population !== undefined) {
+    const population = { ...values.population };
+    if (out.has("population.served")) delete population.served;
+    if (out.has("population.householdSize")) delete population.householdSize;
+    if (Object.keys(population).length > 0) values.population = population;
+    else delete values.population;
+  }
+  const target = asked === undefined ? undefined : ranges[asked];
+  return {
+    reply: { ...reply, values },
+    returned: returnToAgent(faults),
+    told: takenOut(faults),
+    outOfRange: target === undefined ? null : askedOutOfRange(target.key, messages.at(-1) ?? "", target.words ?? {}),
+  };
 }
 
 // ── What she can see of her screen ───────────────────────────────────────────────────────────────────────────────
@@ -328,11 +372,11 @@ export function violetPageContext({ projectName, input, result, place, refusals 
   if (stop !== null) {
     const why =
       stop.because === "not covered yet"
-        ? `Its technology is ${stop.label === null ? "not known well enough" : `"${stop.label}"`}, which is not covered yet: the experts are being asked.`
+        ? `It is held for now${stop.label === null ? "" : ` ("${stop.label}")`}: WaterBots shows no figure until an open question is answered. The visitor reads: "${NO_CALCULATOR_YET}"`
         : stop.because === "another kind of project"
-          ? "It is another kind of project, and D-3 does not count it. Its water pathway stays in play."
-          : "Whether people use the water at home has not been said yet.";
-    return `The user is on the water-benefit calculator (VWBA 2.0, D-3) for project "${projectName}". ${why} There are NO figures on this screen${stop.because === "home use not given" ? "." : ", and the tool does not count it."}`;
+          ? `It is another kind of project. Rainwater, reuse, irrigation supply, leak repair and stream work are not set up yet: the guidebook has methods for them, and WaterBots has not built those types of project. Its water pathway stays in play. The visitor reads: "${NO_CALCULATOR_YET}"`
+          : `Still to be said: ${FACT_LABEL[stop.because === "fact not given" ? stop.fact : "homeUse"]}.`;
+    return `The user is on the water-benefit calculator (VWBA 2.0, D-3) for project "${projectName}". ${why} There are NO figures on this screen${d3Waits(stop) ? "." : ", and the tool does not count it."}`;
   }
   const ways: Record<D3Option, string> = { metered: "meter readings", capacity: "what the system can supply", beneficiaries: "the people served" };
   const lines = [
@@ -354,7 +398,8 @@ export function violetPageContext({ projectName, input, result, place, refusals 
 /** What the record already holds that she reads, as lines. */
 export function violetKnown(input: D3Input, facts?: ProjectFacts): string[] {
   const out: string[] = [];
-  if (facts?.technology !== undefined) out.push(`Kind of project: ${facts.technology.label}`);
+  if (facts !== undefined && underTodaysRules(facts)) out.push(...knownKindFacts(facts));
+  else if (facts?.technology !== undefined) out.push(`Kind of project: ${facts.technology.label}`);
   if (facts?.homeUse !== undefined) out.push(`People use the water at home: ${facts.homeUse.value}`);
   const pop = input.population;
   if (pop?.served !== undefined) out.push(`${pop.mode === "households" ? "Households" : pop.mode === "people" ? "People" : "People or households, not said which,"} served: ${pop.served.toLocaleString("en")}`);

@@ -30,7 +30,28 @@ VWBA is a way to count the water a project gives back.
 The water and carbon calculators sit side by side. They are never added together. Whether one project may claim
 both is an open question (N14 in `BUILD_PLAN.md`).
 
-## Changes in 0.7.0 (not released yet)
+## Changes in 0.8.0
+
+Violet accepts any `@waterbots/core` in the 0.4 series.
+
+- **The kind of project is worked out from its facts (decided 2026-11-25).** Core's one table says what is counted. She asks for
+  one plain fact at a time, and nobody is asked for a kind.
+- **A restored source is its own answer,** and takes off the water before the project. When the source changes, that water is
+  asked again.
+- **A project she does not count** shows the maintainer's one sentence. A blank fact shows no figure, and what is said
+  meanwhile still fills her screen.
+- **Her tool takes the project's facts, not a technology.** Where a site has a record, `violetToolsFor(facts)`: the record
+  decides, never the model. `VIOLET_TOOLS` are for a place with no record.
+- **The guards on her numbers:** `guardVioletReply`. `addVioletFacts` also changes a fact the visitor changes, and says which
+  figures came off.
+- A project that already exists keeps its answer. No sum changed.
+
+**What a site should change.** Register `violetToolsFor(record.facts)`. In the Agent Commons, start her temporary record with
+core's `newProjectRecord` and pass it as `record`: until the source and the treatment are on it, no figure shows. Call
+`state.fill(reply.values, reply.facts)`, so a source that changes clears the water before the project. Call
+`guardVioletReply` on each answer; send `returned` back once, then show `told`.
+
+## Changes in 0.7.0
 
 Violet accepts any `@waterbots/core` in the 0.3 series, so she can be released on her own.
 

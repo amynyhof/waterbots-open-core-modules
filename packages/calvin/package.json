@@ -1,6 +1,6 @@
 {
   "name": "@waterbots/calvin",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "private": true,
   "description": "WaterBots open core module: calvin (quantify: the carbon calculator). Arrived with the Calvin seed. Not published.",
   "license": "Apache-2.0",
@@ -49,7 +49,7 @@
     "build:agent-files": "node -e \"for (const f of ['prompt.md', 'knowledge.md', 'config.yaml']) require('node:fs').copyFileSync('src/agents/calvin/' + f, 'dist/' + f)\""
   },
   "dependencies": {
-    "@waterbots/core": "0.3.x"
+    "@waterbots/core": "0.4.x"
   },
   "peerDependencies": {
     "react": "19.3.1"

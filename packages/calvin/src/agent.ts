@@ -4,7 +4,7 @@
 // and writes the shared project record, his two choices in the Agent Commons, and what he can see of his screen.
 // Re-exports only; this file computes nothing. The build bundles it into one file, `dist/agent.js`.
 // `@waterbots/core` stays outside the bundle: the site installs it, and there is only ever one copy.
-export { computeScenarioTool, transitionWaterfallTool, GS4GG_CARBON_TOOLS, GS4GG_CALCULATOR_VERSION } from "./modules/calvin/agent/tools.js";
+export { computeScenarioTool, transitionWaterfallTool, GS4GG_CARBON_TOOLS, GS4GG_CALCULATOR_VERSION, calvinToolsFor } from "./modules/calvin/agent/tools.js";
 export {
   CALVIN_NEEDS,
   addCalvinFacts,
@@ -27,10 +27,11 @@ export {
   calvinKept,
   calvinKnown,
   fillCalvin,
+  guardCalvinReply,
   readCalvinAnswer,
   setCalvinDone,
 } from "./modules/calvin/agent/chat.js";
-export type { CalvinAnswer, CalvinAnswerValue, CalvinFill, CalvinReply, CalvinTurn } from "./modules/calvin/agent/chat.js";
+export type { CalvinAnswer, CalvinAnswerValue, CalvinFill, CalvinGuardInput, CalvinReply, CalvinTurn, GuardedCalvinReply } from "./modules/calvin/agent/chat.js";
 export { calculatorPageContext } from "./modules/calvin/agent/pageContext.js";
 export { calvinAgentNoteLines, calvinNoteFacts, calvinNoteText, calvinToolFacts } from "./modules/calvin/agent/exportNotes.js";
 export type { CalvinNoteView } from "./modules/calvin/agent/exportNotes.js";

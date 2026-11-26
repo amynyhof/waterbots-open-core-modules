@@ -11,13 +11,15 @@
  */
 import type { StandardId } from "@waterbots/core/standards";
 import {
-  addGivenFacts,
   blankFacts,
+  carbonAnswer,
+  changeFacts,
   checkEntry,
   entryMessage,
+  projectExists,
   recordTechnology,
   setAgentResults,
-  type AddedFacts,
+  type ChangedFacts,
   type EntryCheck,
   type FactKey,
   type GivenFacts,
@@ -36,7 +38,11 @@ export const CALVIN_NEEDS: readonly FactKey[] = ["technology", "country", "popul
 
 /** The facts Calvin needs that the record does not hold yet (agent rule 11: a needed fact left blank stays blank). */
 export function calvinNeeds(record: ProjectRecord): FactKey[] {
-  return blankFacts(record, CALVIN_NEEDS);
+  if (projectExists(record)) return blankFacts(record, CALVIN_NEEDS);
+  // A new project's kind is worked out from its facts: he needs the one that decides it (2026-11-25).
+  const a = carbonAnswer(record.facts);
+  const kind: FactKey[] = a.says === "ask" ? [a.fact] : [];
+  return [...kind, ...blankFacts(record, CALVIN_NEEDS.filter((k) => k !== "technology"))];
 }
 
 /** Calvin's project, read from the record. Nothing is filled in that the record does not hold. */
@@ -47,10 +53,19 @@ export function calvinProjectFromRecord(record: ProjectRecord): CalvinProject {
     return reading !== undefined && reading !== "unlikely";
   });
   const project: CalvinProject = { name: facts.name ?? "", standards };
-  // A label that is not covered yet has no code (ruled 2026-11-23), and the seat says so.
+  // Under today's rules the one table decides, and the seat says what it says (2026-11-25). The seat's figure is V2.0's,
+  // so its code is set only where the 2026 version counts the project. A project credited under V1.0 also gets the 2021
+  // version's answer: each version's figure stands on its own conditions. A project that already exists keeps its code;
+  // one whose label had none is still not covered.
   const technology = recordTechnology(record);
-  if (technology !== undefined) project.technology = technology;
-  else if (facts.technology !== undefined && technologyCoverage(facts.technology.label) === "not covered yet") project.notCoveredYet = facts.technology.label;
+  if (!projectExists(record)) {
+    project.answer = carbonAnswer(facts);
+    if (project.answer.says === "counted" && technology !== undefined) project.technology = technology;
+    if (facts.creditedUnderV1?.value === true) project.answerV1 = carbonAnswer(facts, "2021");
+  } else {
+    if (technology !== undefined) project.technology = technology;
+    else if (facts.technology !== undefined && technologyCoverage(facts.technology.label) !== "not known") project.notCoveredYet = facts.technology.label;
+  }
   if (place.country !== undefined) project.country = place.country.value;
   if (place.region !== undefined) project.region = place.region.value;
   if (facts.population !== undefined) project.population = { ...facts.population.value };
@@ -102,9 +117,13 @@ export function calvinGivenFacts(state: Pick<CalcState, "populationCount" | "pop
   return Object.keys(population).length > 0 ? { population } : {};
 }
 
-/** Adds the facts the person gave Calvin. Only blank facts are added, and each one counts as a question. */
-export function addCalvinFacts(record: ProjectRecord, given: GivenFacts): AddedFacts {
-  return addGivenFacts(record, "calvin", given);
+/**
+ * Adds the facts the person gave Calvin. Only blank facts are added, and each one counts as a question. A fact about the
+ * kind of project that the visitor changes is changed (core's `changeFacts`); on a saved project (`saved`) it stays, and
+ * `onRecordPage` names it.
+ */
+export function addCalvinFacts(record: ProjectRecord, given: GivenFacts, options: { saved?: boolean } = {}): ChangedFacts {
+  return changeFacts(record, "calvin", given, options);
 }
 
 /**

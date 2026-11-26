@@ -14,10 +14,12 @@
 import type { StandardId } from "./standards.js";
 import type { Door, Place } from "./places.js";
 // The ".js" lets the built file load in plain Node, such as a host serving an agent's tool through MCP.
-import { type AgentId, type ProjectFacts, type ProjectRecord, type Reading, type WaterSupply, AGENTS, emptyRecord, needsHomeUse, recordWaterSupply } from "./record.js";
+import type { Ask } from "./chat";
+import { KIND_ASKS } from "./projectKinds.js";
+import { type AgentId, type ProjectFacts, type ProjectRecord, type Reading, type WaterSupply, AGENTS, DRINKING_WATER_TYPE, NEW_SUPPLY_TYPE, emptyRecord, needsHomeUse, projectExists, recordCarbon, recordWaterSupply } from "./record.js";
 
 /** The map's version. A record notes the version it was last mapped with. */
-export const AGENT_MAP_VERSION = 2 as const;
+export const AGENT_MAP_VERSION = 3 as const;
 
 /** The four funding pathways, the four standards `core` lists. */
 export const PATHWAYS = ["carbon", "vwba", "wqba", "wash-ba"] as const satisfies readonly StandardId[];
@@ -35,7 +37,7 @@ export interface MethodEntry {
   transitioningOnly: boolean;
   what: string;
   /** Which projects it counts, from their facts. Left out: every project on its pathway. */
-  counts?: (facts: ProjectFacts) => WaterSupply;
+  counts?: (facts: ProjectFacts) => WaterSupply | "not set up yet";
 }
 
 /** One entry for each carbon method (was V6 and M3), and the water method. */
@@ -45,7 +47,9 @@ export const METHODS: readonly MethodEntry[] = [
     pathway: "carbon",
     agent: "calvin",
     transitioningOnly: false,
-    what: "The carbon method, V2.0: Method 1 for a community water supply, Method 2 for household water treatment.",
+    what: "The carbon method, V2.0: Method 1 for a community water supply or community water treatment, Method 2 for household water treatment.",
+    // The one table (`projectKinds.ts`, decided 2026-11-25). A project that already exists is as it was.
+    counts: recordCarbon,
   },
   {
     id: "carbon-v1.0",
@@ -53,6 +57,7 @@ export const METHODS: readonly MethodEntry[] = [
     agent: "calvin",
     transitioningOnly: true,
     what: "The legacy calculator: the carbon method, V1.0, for a project already credited under it.",
+    counts: recordCarbon,
   },
   {
     id: "carbon-transition",
@@ -60,6 +65,7 @@ export const METHODS: readonly MethodEntry[] = [
     agent: "calvin",
     transitioningOnly: true,
     what: "The transition: how a project's credits move from V1.0 to V2.0.",
+    counts: recordCarbon,
   },
   {
     id: "vwba-d3",
@@ -67,8 +73,8 @@ export const METHODS: readonly MethodEntry[] = [
     agent: "violet",
     transitioningOnly: false,
     what: "VWBA 2.0, D-3, the Volume Provided method.",
-    // Ruled by the maintainer on 2026-11-24: the supplies the guidebook lists for D-3 by name (VWBA 2.0, Appendix C,
-    // Table C-1, pp.37 to 39; Appendix D, D-3, pp.44 to 46). Anything not sure gets no calculator yet.
+    // The one table (`projectKinds.ts`, decided 2026-11-25): a new or restored source that gives people water at home.
+    // A project that already exists: the supplies the guidebook lists for D-3 by name (ruled 2026-11-24).
     counts: recordWaterSupply,
   },
 ];
@@ -94,7 +100,7 @@ export function methodsFor(pathway: StandardId, transitioning: boolean, facts?: 
 }
 
 /** Why a pathway has no method for this project. */
-export type NoMethod = "not covered yet" | "another kind of project" | "waiting for basic facts";
+export type NoMethod = "not covered yet" | "not set up yet" | "another kind of project" | "waiting for basic facts";
 
 /** Why no method of a pathway counts this project, or null when one does. A pathway nobody covers gives null too. */
 export function noMethodFor(pathway: StandardId, facts: ProjectFacts): NoMethod | null {
@@ -132,13 +138,24 @@ export const FACT_RULES: readonly FactRule[] = [
 // ── The basic facts ──────────────────────────────────────────────────────────────────────────────────────────────
 
 /** The facts Wellington gathers before the eligibility agent reads the pathways. */
-export const BASIC_FACTS = ["technology", "country"] as const;
-export type BasicFact = (typeof BASIC_FACTS)[number];
+export const BASIC_FACTS = ["waterSource", "treatment", "country"] as const;
+/** "technology" is only for a project that already exists and never had one. */
+export type BasicFact = (typeof BASIC_FACTS)[number] | "technology";
 /** A fact Wellington may be asked to gather: a basic fact, or the one thing a pathway in play still needs. */
 export type GatheredFact = BasicFact | "homeUse";
 
+/**
+ * NOBODY IS ASKED FOR A KIND (2026-11-25). A new project's basic facts are its source and its treatment, unless it is not a
+ * drinking-water project at all. A project that already exists is asked what it was asked before.
+ */
 function missingBasicFacts(record: ProjectRecord): BasicFact[] {
-  return BASIC_FACTS.filter((f) => (f === "technology" ? record.facts.technology === undefined : record.place.country === undefined));
+  const { facts, place } = record;
+  const country: BasicFact[] = place.country === undefined ? ["country"] : [];
+  if (projectExists(record)) return [...(facts.technology === undefined ? (["technology"] as const) : []), ...country];
+  const type = facts.type?.value;
+  const other = facts.technology?.code === "other" || (type !== undefined && type !== DRINKING_WATER_TYPE && type !== NEW_SUPPLY_TYPE);
+  const own = other ? [] : (["waterSource", "treatment"] as const).filter((f) => facts[f] === undefined);
+  return [...own, ...country];
 }
 
 // ── What the map gives back ──────────────────────────────────────────────────────────────────────────────────────
@@ -177,6 +194,8 @@ export type NotCalled =
   | "no pathway forward"
   /** In play, and the agent's method does not count this kind of project yet. */
   | "not covered yet"
+  /** In play, and WaterBots has not built this type of project for the agent's method. */
+  | "not set up yet"
   /** In play, and the agent's method is not for this kind of project. */
   | "another kind of project";
 
@@ -249,6 +268,17 @@ export interface AgentMap {
   tellVisitor: TellVisitor[];
   /** The one next step, for Wellington on the sites, or for the one agent working alone. */
   next: NextStep;
+  /**
+   * The one small question to ask now, when the next step is to gather a fact that says how the project is counted. The
+   * agent words it, and asks about that fact only. Null otherwise.
+   */
+  ask: Ask | null;
+}
+
+/** The question for the first fact to gather that has one. The country has none of its own here. */
+function askOf(next: NextStep): Ask | null {
+  const fact = next.step === "gather facts" ? next.facts[0] : undefined;
+  return fact === "waterSource" || fact === "treatment" || fact === "homeUse" ? KIND_ASKS[fact] : null;
 }
 
 /** An agent's step on this project's walk, or null when it has none (Wellington, who leads them all). */
@@ -286,6 +316,7 @@ function lobbyChat(input: MapInput): AgentMap {
     pathways: [],
     tellVisitor: [],
     next: { step: "answer questions", doors: [...LOBBY_DOORS] },
+    ask: null,
   };
 }
 
@@ -316,6 +347,7 @@ function alone(input: MapInput, place: "agent-commons" | "mcp"): AgentMap {
     pathways,
     tellVisitor: [],
     next: opened === undefined ? { step: "choose an agent" } : { step: "work alone", agent: opened },
+    ask: null,
   };
 }
 
@@ -427,5 +459,5 @@ function site(input: MapInput, place: "free-site" | "paid-site"): AgentMap {
               ? { step: "call", agent: nextAgent }
               : { step: "report or sign-up" };
 
-  return { mapVersion: AGENT_MAP_VERSION, place, agents, steps, pathways, tellVisitor, next };
+  return { mapVersion: AGENT_MAP_VERSION, place, agents, steps, pathways, tellVisitor, next, ask: askOf(next) };
 }

@@ -84,7 +84,8 @@ describe("rule 3: the eligibility agent is called once the basic facts are in, w
   test("with a basic fact blank, Phoebe waits and Wellington gathers it", () => {
     const map = agentMap({ place: "free-site", record: emptyRecord() });
     expect(call(map, "phoebe")).toEqual({ agent: "phoebe", called: false, because: "waiting for basic facts" });
-    expect(map.next).toEqual({ step: "gather facts", facts: ["technology", "country"] });
+    // Nobody is asked for a kind: the basic facts are the source, the treatment and the country (2026-11-25).
+    expect(map.next).toEqual({ step: "gather facts", facts: ["waterSource", "treatment", "country"] });
   });
   test("with the basic facts in and no readings, Phoebe is called next", () => {
     const map = agentMap({ place: "free-site", record: project() });

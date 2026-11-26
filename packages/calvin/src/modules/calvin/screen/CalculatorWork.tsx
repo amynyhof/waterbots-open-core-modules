@@ -16,6 +16,7 @@ import { enterMonitoring, isEntered, monitoringSource, monitoringValues, MONITOR
 import type { CalculatorState } from "./useCalculatorState";
 import { monitoringRange, refuseIn, type OutOfRange } from "./valueRanges";
 import { RangeMessage } from "@waterbots/core/rangedNumber";
+import { answerLabel } from "@waterbots/core/projectKinds";
 
 /**
  * CalculatorWork — the calculator's WORK SURFACE (OPEN #72 step 2).
@@ -133,14 +134,7 @@ function OutOfRangeRow({ r, state, patch }: { r: OutOfRange } & Pick<CalculatorS
   );
 }
 
-export default function CalculatorWork({
-  calc,
-  project,
-  appVersion,
-  tab,
-  otherTab,
-  report,
-}: {
+interface CalculatorWorkProps {
   calc: CalculatorState;
   project: CalvinProject;
   appVersion: string;
@@ -150,7 +144,28 @@ export default function CalculatorWork({
   tab: string;
   otherTab?: ReactNode;
   report?: ReportSlots;
-}) {
+}
+
+/**
+ * The work surface. A project credited under V1.0 whose V1.0 side waits on a fact or a condition of the 2021 version shows
+ * V2.0 on its own, under a short label for the V1.0 side (2026-11-25: each version's figure stands on its own conditions).
+ */
+export default function CalculatorWork(props: CalculatorWorkProps) {
+  const { project } = props;
+  const v1 = project.creditedUnderV1 === true && project.answerV1 !== undefined ? answerLabel(project.answerV1) : null;
+  return v1 !== null ? (
+    <>
+      <p className="t-caption text-fg-3" role="status" data-v1-waits="" style={{ fontSize: 12 }}>
+        V1.0 figure: {v1}
+      </p>
+      <WorkSurface {...props} />
+    </>
+  ) : (
+    <WorkSurface {...props} />
+  );
+}
+
+function WorkSurface({ calc, project, appVersion, tab, otherTab, report }: CalculatorWorkProps) {
   const {
     state,
     patch,
@@ -182,7 +197,9 @@ export default function CalculatorWork({
    * missing and where it is filled in, in the same words the paid site's record check uses. This
    * comes first because every figure, on every tab, depends on these facts.
    */
-  const factsPrompt = missingFactsPrompt(missingFacts, project.technology, project.notCoveredYet);
+  const factsPrompt = missingFactsPrompt(missingFacts, project.technology, project.notCoveredYet, project.answer);
+  /** False where nothing is missing: no figure can show for this project as it stands. */
+  const factsAsked = project.answer === undefined ? project.notCoveredYet === undefined : project.answer.says === "ask" || project.answer.says === "counted";
   if (factsPrompt) {
     return (
       <ReadOnlySeat readOnly={readOnly}>
@@ -191,7 +208,7 @@ export default function CalculatorWork({
           style={{ border: "1px solid var(--amber)", background: "color-mix(in oklab, var(--amber) 8%, transparent)" }}
           role="status"
         >
-          <span className="eyebrow warn">Project facts needed</span>
+          {factsAsked ? <span className="eyebrow warn">Project facts needed</span> : null}
           <p className="t-body mt-2 text-fg-1" style={{ fontSize: 13 }}>{factsPrompt}</p>
           {calc.recordRefusals.map((m) => <p key={m} className="mt-2"><RangeMessage message={m} /></p>)}
         </section>
