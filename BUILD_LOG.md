@@ -5,6 +5,11 @@ history keeps everything older and every longer entry.
 
 ---
 
+- 2026-11-26 — **Carry:** Bridget's words of 31 October, taken again from `carry-B-to-C-2026-11-25` (3 of 3 files checked match its packing list; name scan 0), for #64.
+- 2026-11-26 — **Release** `core-v0.4.0`, `calvin-v0.8.0`, `violet-v0.8.0`, `phoebe-v0.1.0`, `wellington-v0.1.0` and `bridget-v0.1.0` on `f517709`, one tag each (#61, #63). **Carry:** packed to the handoff folder.
+- 2026-11-26 — Phoebe, Wellington and Bridget: their first packages, with core's look-up fix, answer chips and project words (#63).
+- 2026-11-26 — Plan: the kinds of drinking-water project, and the questions still open (#62).
+- 2026-11-26 — The kinds of drinking-water project, worked out in core, with one table and the guards (#61).
 - 2026-11-25 — **Carry:** from the open site after its pull request 200 (`carry-B-to-C-2026-11-25`, 98 of 98 match, packing list matches; name scan 0), for Phoebe, Wellington and Bridget without map data. It replaces the carry of 23 November.
 - 2026-11-25 — **Release** `core-v0.3.0`, `calvin-v0.7.0` and `violet-v0.7.0` on `d59a385` (#56, #57). **Carry:** packed to the handoff folder.
 - 2026-11-25 — The J5 core step: both calculator chats, the map's order, and which projects call Violet (#57).
