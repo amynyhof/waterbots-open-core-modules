@@ -140,8 +140,8 @@ left is below. `[!]` waits on the maintainer.
       the record proposal. Until the maintainer rules them, the map uses only the eligibility readings and the two
       rules this repo can cite.
 - [ ] **J5.** Bridget's map, after the rights check on every one of her data files, and a ruling on the shared map key.
-      The rights check is done (the maintainer, 26 Nov; the open site's README credits both map sources), pending the
-      open site's confirmation. F7.1 keeps its own check. One calculator screen: each site passes the place, the Paid site saves the notes, and later calculator agents
+      The rights check is done (the maintainer, 26 Nov): the open site confirmed that its README credits all four map
+      data files (HydroBASINS, Aqueduct 4.0, and Natural Earth's public-domain country boxes). F7.1 keeps its own check. One calculator screen: each site passes the place, the Paid site saves the notes, and later calculator agents
       follow the same screen.
   - [!] Phoebe's, Wellington's and Bridget's rulings.
 - **J8.** Now in the paid site's plan, in its family 1 list.
