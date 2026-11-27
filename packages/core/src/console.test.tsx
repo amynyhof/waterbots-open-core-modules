@@ -1,13 +1,13 @@
 /// <reference types="node" />
 // Family 4, Console and surfaces: core's shared parts. Every project here is made up.
 import { readFileSync } from "node:fs";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { AGENT_COLOURS, agentColour, agentStyle } from "./agentColours";
 import { COMMONS_WORDS, commonsAgents, type AgentCard } from "./commons";
 import { BETA_NOTE, CONSOLE_STEPS, EXPORT_WORDS, KEEP_CHATTING, UNSAVED_WARNING, handoffLabel } from "./consoleWords";
 import { CREW } from "./crew";
-import { PRINTING_ATTRIBUTE, PRINT_ROOT_CLASS, printReport } from "./print";
+import { PRINTING_ATTRIBUTE, PRINT_ROOT_CLASS, PRINT_WAIT_MS, printReport } from "./print";
 import { REPORT_FRAME_WORDS, REPORT_SECTIONS, ReportFrame, reportFooterLine, reportStamp } from "./report";
 import { TAP_MIN, TAP_MIN_PX } from "./tap";
 import type { NoteLine } from "./noteFacts";
@@ -153,16 +153,36 @@ describe("one report frame (rule 14)", () => {
 
 // ── The print part, with a small stand-in for the page ───────────────────────────────────────────────────────────
 
+interface FakeStyle {
+  map: Map<string, string>;
+  readonly length: number;
+  item(i: number): string;
+  getPropertyValue(k: string): string;
+  setProperty(k: string, v: string): void;
+}
+function fakeStyle(init: Record<string, string> = {}): FakeStyle {
+  const map = new Map(Object.entries(init));
+  return {
+    map,
+    get length() { return map.size; },
+    item: (i) => [...map.keys()][i] ?? "",
+    getPropertyValue: (k) => map.get(k) ?? "",
+    setProperty: (k, v) => { map.set(k, v); },
+  };
+}
 interface FakeElement {
   className: string;
   children: FakeElement[];
   attrs: Map<string, string>;
   outerHTML: string;
   parent: FakeElement | null;
+  parentElement: FakeElement | null;
+  style: FakeStyle;
   appendChild(c: FakeElement): FakeElement;
   cloneNode(deep: boolean): FakeElement;
   remove(): void;
   setAttribute(k: string, v: string): void;
+  getAttribute(k: string): string | null;
   removeAttribute(k: string): void;
   hasAttribute(k: string): boolean;
   querySelector(sel: string): { textContent: string } | null;
@@ -174,28 +194,50 @@ function el(className = "", html = "<div></div>"): FakeElement {
     attrs: new Map(),
     outerHTML: html,
     parent: null,
+    parentElement: null,
+    style: fakeStyle(),
     appendChild(c) { c.parent = e; e.children.push(c); return c; },
     cloneNode() { return el(e.className, e.outerHTML); },
     remove() { if (e.parent) e.parent.children = e.parent.children.filter((c) => c !== e); e.parent = null; },
     setAttribute(k, v) { e.attrs.set(k, v); },
+    getAttribute(k) { return e.attrs.get(k) ?? null; },
     removeAttribute(k) { e.attrs.delete(k); },
     hasAttribute(k) { return e.attrs.has(k); },
     querySelector(sel) { return sel === "h1" ? { textContent: "A title" } : null; },
   };
   return e;
 }
-type Listener = () => void;
-function page(print: (fire: (type: string) => void) => void, opens = true) {
+type Listener = (e: { type: string }) => void;
+interface Sheet {
+  href: string | null;
+  disabled: boolean;
+  media: { mediaText: string };
+  cssRules: Array<{ cssText: string }>;
+  ownerNode: { textContent: string } | null;
+}
+interface PageOptions {
+  opens?: boolean;
+  sheets?: Sheet[];
+  tokens?: Record<string, string>;
+}
+/** A page whose `window.print()` does what `print` says. `fire` sends a page event, as the browser would. */
+function page(print: (fire: (type: string) => void) => void, { opens = true, sheets = [], tokens = {} }: PageOptions = {}) {
   const body = el("body");
   const html = el("html");
+  html.setAttribute("lang", "en");
   const listeners = new Map<string, Set<Listener>>();
-  const fire = (type: string) => { for (const l of [...(listeners.get(type) ?? [])]) l(); };
+  const fire = (type: string) => { for (const l of [...(listeners.get(type) ?? [])]) l({ type }); };
   const opened: string[] = [];
+  const blobs: string[] = [];
   const g = globalThis as Record<string, unknown>;
   g.document = {
     body,
     documentElement: html,
     title: "Page",
+    baseURI: "https://site.test/app/console",
+    visibilityState: "visible",
+    styleSheets: sheets,
+    adoptedStyleSheets: [],
     createElement: () => el(),
     querySelectorAll: (sel: string) => (sel.includes(PRINT_ROOT_CLASS) ? body.children.filter((c) => c.className === PRINT_ROOT_CLASS) : []),
   };
@@ -204,39 +246,180 @@ function page(print: (fire: (type: string) => void) => void, opens = true) {
     removeEventListener: (t: string, l: Listener) => listeners.get(t)?.delete(l),
     print: () => print(fire),
     open: (url: string) => { opened.push(url); return opens ? {} : null; },
-    setTimeout: () => 0,
+    setTimeout: (f: () => void, ms: number) => setTimeout(f, ms),
+    clearTimeout: (t: ReturnType<typeof setTimeout>) => clearTimeout(t),
   };
-  g.HTMLLinkElement = class {};
-  return { body, html, listeners, opened };
+  // The report sits in a shell that sets the tokens given here; `<html>` sets only --card.
+  g.getComputedStyle = (x: FakeElement) => fakeStyle(x === html ? { "--card": "#ffffff" } : { "--card": "#ffffff", ...tokens });
+  vi.spyOn(URL, "createObjectURL").mockImplementation((b) => {
+    void (b as Blob).text().then((t) => blobs.push(t));
+    return `blob:https://site.test/${opened.length}`;
+  });
+  vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => {});
+  return { body, html, listeners, opened, blobs, fire };
 }
-const saved = { document: globalThis.document, window: globalThis.window };
+const areas = (p: { body: FakeElement }) => p.body.children.filter((c) => c.className === PRINT_ROOT_CLASS).length;
+const listening = (p: { listeners: Map<string, Set<Listener>> }) => [...p.listeners.values()].reduce((n, s) => n + s.size, 0);
+const report = (html = "<div class=\"wb-report\"><h1>A title</h1></div>") => el("wb-report", html) as unknown as HTMLElement;
+const saved = { document: globalThis.document, window: globalThis.window, getComputedStyle: globalThis.getComputedStyle };
+beforeEach(() => {
+  vi.useFakeTimers();
+});
 afterEach(() => {
+  vi.useRealTimers();
+  vi.restoreAllMocks();
   Object.assign(globalThis as Record<string, unknown>, saved);
 });
 
 describe("the print part (rule 13)", () => {
-  it("prints a copy of the report from its own area under <body>, and empties it after the print", () => {
+  it("prints a copy of the report from its own area under <body>, and empties it after the print", async () => {
     let seen: { area: number; printing: boolean } | null = null;
     const p = page((fire) => {
       fire("beforeprint");
-      seen = { area: p.body.children.length, printing: p.html.hasAttribute(PRINTING_ATTRIBUTE) };
+      seen = { area: areas(p), printing: p.html.hasAttribute(PRINTING_ATTRIBUTE) };
       fire("afterprint");
     });
-    const report = el("wb-report", "<div class=\"wb-report\"><h1>A title</h1></div>");
-    expect(printReport(report as unknown as HTMLElement)).toBe("printed");
+    expect(await printReport(report())).toBe("printed");
     expect(seen).toEqual({ area: 1, printing: true });
-    expect(p.body.children).toHaveLength(0);
+    expect(areas(p)).toBe(0);
     expect(p.html.hasAttribute(PRINTING_ATTRIBUTE)).toBe(false);
     expect(p.opened).toEqual([]);
+    expect(listening(p)).toBe(0);
   });
-  it("when no print window opens, opens the report in its own tab and says so", () => {
+  it("when no print window opens, waits a moment, then opens the report in its own tab and says so", async () => {
     const p = page(() => {});
-    expect(printReport(el("wb-report") as unknown as HTMLElement)).toBe("in-tab");
+    const outcome = printReport(report());
+    await vi.advanceTimersByTimeAsync(PRINT_WAIT_MS - 1);
+    expect(p.opened).toHaveLength(0);
+    await vi.advanceTimersByTimeAsync(1);
+    expect(await outcome).toBe("in-tab");
     expect(p.opened).toHaveLength(1);
-    expect(p.body.children).toHaveLength(0);
+    expect(areas(p)).toBe(0);
+    expect(listening(p)).toBe(0);
   });
-  it("when the tab cannot open either, says that too", () => {
-    page(() => {}, false);
-    expect(printReport(el("wb-report") as unknown as HTMLElement)).toBe("failed");
+  it("when the tab cannot open either, says that too", async () => {
+    page(() => {}, { opens: false });
+    const outcome = printReport(report());
+    await vi.advanceTimersByTimeAsync(PRINT_WAIT_MS);
+    expect(await outcome).toBe("failed");
+  });
+
+  // Point 1 of the attack on #72: a print() that does not wait for the print window.
+  it("where print() returns at once and the print window opens a moment later, it prints, and opens no tab", async () => {
+    let seen = -1;
+    const p = page((fire) => {
+      setTimeout(() => { fire("beforeprint"); seen = areas(p); }, 120);
+      setTimeout(() => fire("afterprint"), 4000);
+    });
+    const outcome = printReport(report());
+    await vi.advanceTimersByTimeAsync(PRINT_WAIT_MS + 1000);
+    expect(await outcome).toBe("printed");
+    expect(seen).toBe(1);
+    expect(p.opened).toEqual([]);
+    expect(areas(p)).toBe(1); // the print window is still open
+    await vi.advanceTimersByTimeAsync(4000);
+    expect(areas(p)).toBe(0);
+    expect(p.html.hasAttribute(PRINTING_ATTRIBUTE)).toBe(false);
+    expect(listening(p)).toBe(0);
+  });
+
+  // Point 2: "beforeprint" and never "afterprint" (a cancelled window, some browsers built into apps).
+  it("where print() waits and no afterprint comes, the area still leaves the page when print() returns", async () => {
+    const p = page((fire) => fire("beforeprint"));
+    expect(await printReport(report())).toBe("printed");
+    expect(areas(p)).toBe(0);
+    expect(p.html.hasAttribute(PRINTING_ATTRIBUTE)).toBe(false);
+    expect(listening(p)).toBe(0);
+  });
+  it("where print() returns at once and no afterprint comes, the area leaves once the person is back on the page", async () => {
+    const p = page((fire) => { setTimeout(() => fire("beforeprint"), 50); });
+    const outcome = printReport(report());
+    await vi.advanceTimersByTimeAsync(5000);
+    expect(await outcome).toBe("printed");
+    expect(areas(p)).toBe(1);
+    p.fire("pointerdown");
+    expect(areas(p)).toBe(0);
+    expect(p.html.hasAttribute(PRINTING_ATTRIBUTE)).toBe(false);
+    expect(listening(p)).toBe(0);
+  });
+  it("a second export after a cancelled print prints the report, not a blank page", async () => {
+    let at = -1;
+    let print = (fire: (t: string) => void) => fire("beforeprint"); // the first: cancelled, no afterprint
+    const p = page((fire) => print(fire));
+    await printReport(report());
+    // The second: the first print's afterprint turns up late, then this print's own window opens.
+    print = (fire) => { fire("afterprint"); fire("beforeprint"); at = areas(p); fire("afterprint"); };
+    expect(await printReport(report())).toBe("printed");
+    expect(at).toBe(1);
+    expect(areas(p)).toBe(0);
+    expect(listening(p)).toBe(0);
+  });
+  it("a second export while the first's print window is still open ends the first, with its listeners", async () => {
+    const p = page((fire) => { setTimeout(() => fire("beforeprint"), 10); });
+    const first = printReport(report());
+    await vi.advanceTimersByTimeAsync(20);
+    expect(await first).toBe("printed");
+    const second = printReport(report());
+    expect(areas(p)).toBe(1);
+    await vi.advanceTimersByTimeAsync(20);
+    expect(await second).toBe("printed");
+    p.fire("afterprint");
+    expect(areas(p)).toBe(0);
+    expect(listening(p)).toBe(0);
+  });
+
+  // Point 3: the tab's report looks as it does on the page.
+  it("the tab reads relative addresses against the page, keeps rules a script added, and links linked sheets", async () => {
+    const sheets: Sheet[] = [
+      { href: "https://site.test/assets/site.css", disabled: false, media: { mediaText: "" }, cssRules: [], ownerNode: null },
+      {
+        href: null,
+        disabled: false,
+        media: { mediaText: "" },
+        cssRules: [{ cssText: "@font-face { font-family: Brand; src: url(\"fonts/brand.woff2\"); }" }, { cssText: ".added-by-script { color: rgb(1, 2, 3); }" }],
+        ownerNode: { textContent: "" },
+      },
+      { href: null, disabled: true, media: { mediaText: "" }, cssRules: [{ cssText: ".a-theme-turned-off { color: red; }" }], ownerNode: null },
+    ];
+    const p = page(() => {}, { sheets });
+    const outcome = printReport(report());
+    await vi.advanceTimersByTimeAsync(PRINT_WAIT_MS);
+    expect(await outcome).toBe("in-tab");
+    await vi.waitFor(() => expect(p.blobs).toHaveLength(1));
+    const tab = p.blobs[0]!;
+    expect(tab).toContain("<base href=\"https://site.test/app/console\">");
+    expect(tab).toContain("<link rel=\"stylesheet\" href=\"https://site.test/assets/site.css\">");
+    expect(tab).toContain("src: url(\"fonts/brand.woff2\")");
+    expect(tab).toContain(".added-by-script { color: rgb(1, 2, 3); }");
+    expect(tab).not.toContain("a-theme-turned-off");
+    expect(tab).toContain("<body class=\"wb-report-tab\">");
+  });
+
+  // Point 4: what the copy would lose by sitting outside the screen.
+  it("the copy carries the tokens the site sets around the screen, and leaves <html>'s own to <html>", async () => {
+    let copy: FakeElement | undefined;
+    const p = page((fire) => { fire("beforeprint"); copy = p.body.children[0]?.children[0]; }, { tokens: { "--fg-1": "rgb(1, 2, 3)", "--agent": "#0E8A94" } });
+    await printReport(report());
+    expect(copy?.style.getPropertyValue("--fg-1")).toBe("rgb(1, 2, 3)");
+    expect(copy?.style.getPropertyValue("--agent")).toBe("#0E8A94");
+    expect(copy?.style.getPropertyValue("--card")).toBe("");
+  });
+
+  // Point 5: nothing inside a report can clip it.
+  it("the print rules and the tab undo a fixed height, a clip, a scroll box or a transform inside the report", () => {
+    const css = read("./report.css");
+    const undo = [
+      "height: auto !important;",
+      "max-height: none !important;",
+      "overflow: visible !important;",
+      "transform: none !important;",
+      "clip-path: none !important;",
+      "contain: none !important;",
+    ];
+    const inside = ":not(svg, svg *, img, canvas, video, picture, iframe, .sr-only, .visually-hidden)";
+    const block = (selectors: string[], indent: string) =>
+      `${selectors.map((s) => indent + s).join(",\n")} {\n${undo.map((d) => `${indent}  ${d}`).join("\n")}\n${indent}}`;
+    expect(css).toContain(block(["html[data-wb-printing] .wb-print-root .wb-report", `html[data-wb-printing] .wb-print-root .wb-report ${inside}`], "  "));
+    expect(css).toContain(block(["body.wb-report-tab .wb-report", `body.wb-report-tab .wb-report ${inside}`], ""));
   });
 });

@@ -378,7 +378,8 @@ export default function D3Screen({
       return;
     }
     const report = document.getElementById(reportId);
-    setExportOutcome(report ? printReport(report) : "failed");
+    if (report) void printReport(report).then(setExportOutcome);
+    else setExportOutcome("failed");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [printRun]);
 

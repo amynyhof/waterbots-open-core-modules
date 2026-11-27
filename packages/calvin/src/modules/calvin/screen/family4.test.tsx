@@ -74,7 +74,7 @@ describe("one Export, the same words on both buttons (rule 13)", () => {
   });
   it("prints through core's print part, never with the page's own print", () => {
     const hook = read("./useCalculatorState.ts");
-    expect(hook).toContain("printReport(report)");
+    expect(hook).toContain("printReport(report).then(setExportOutcome)");
     expect(hook).not.toContain("window.print()");
   });
 });

@@ -412,7 +412,8 @@ export function useCalculatorState(project: CalvinProject, options: CalculatorOp
     const id = requestAnimationFrame(() => {
       if (exportListener.current) return exportListener.current();
       const report = document.getElementById(reportId);
-      setExportOutcome(report ? printReport(report) : "failed");
+      if (report) void printReport(report).then(setExportOutcome);
+      else setExportOutcome("failed");
     });
     return () => cancelAnimationFrame(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps

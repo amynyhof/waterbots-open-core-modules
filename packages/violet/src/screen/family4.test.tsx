@@ -67,7 +67,7 @@ describe("one Export (rule 13)", () => {
   });
   it("prints through core's print part, stamps the time in core's one way, also before a site's own export", () => {
     const screen = read("./D3Screen.tsx");
-    expect(screen).toContain("setExportOutcome(report ? printReport(report) : \"failed\")");
+    expect(screen).toContain("if (report) void printReport(report).then(setExportOutcome);");
     expect(screen).not.toContain("window.print()");
     expect(screen).toMatch(/function exportReport\(\) \{\n    setPrintAt\(reportStamp\(\)\);/);
     expect(screen).not.toContain("toISOString());\n  }");
