@@ -70,7 +70,7 @@ sites pin that file by its fingerprint. The first pinned version includes the sl
 | V14 | v1 proof and grading | The same-numbers check: a project saved by the screening, read back the way the paid site reads it, gives the same numbers, or a list of what changed and why. | J3, J4, J5. | A test passes here on invented projects. The private side runs it on both real filings with the pinned release and reports pass. |
 | V15 | v1 proof and grading | The v1 release: a GitHub release that both sites pin. | V8, V14; the maintainer's approval. | Both sites run the same pinned file. The maintainer confirms the whole journey on the live sites, and the average question count is reported. |
 
-**Where things stand (2026-11-26):** Family 1, Agent orchestration, closed on 2026-11-26. The latest release is core 0.5.0, Calvin 0.9.0, Violet 0.9.0, Phoebe 0.2.0, Wellington 0.2.0 and Bridget 0.2.0, one tag each on commit `56ddd21` (#64). Both sites installed it and walked the river case with the real model, and no fact was guessed on either. A package's number moves only when that package changes. What family 1 left open is in "Family 1: what is left". Finished steps are in the build log.
+**Where things stand (2026-11-27):** Family 1, Agent orchestration, closed on 2026-11-26. Family 4, Console and surfaces, is open: core's part is merged (#72). The latest release is core 0.6.0, Calvin 0.10.0, Violet 0.10.0, Phoebe 0.3.0, Wellington 0.3.0 and Bridget 0.3.0, one tag each on commit `a340a85` (#72). The sites' own family 4 work comes next. A package's number moves only when that package changes. What family 1 left open is in "Family 1: what is left". Finished steps are in the build log.
 
 **Sources still to find:** in the source sweep, M10.4.
 
@@ -207,7 +207,7 @@ Phoebe's cards are sealed. They change only on the maintainer's word.
 
 **Family 4, Console and surfaces** (the shared page first; both sites together)
 
-- [~] **F4.1** *v1 (coach, for the maintainer, 26 Nov).* (Core's part: open pull request #72, Phoebe 0.3.0.) Phoebe's tally leaves the chat for the left rail, which holds the progress of the current work. The
+- [~] **F4.1** *v1 (coach, for the maintainer, 26 Nov).* (Core's part released in Phoebe 0.3.0 on 2026-11-27, #72. The sites' rail is still to build.) Phoebe's tally leaves the chat for the left rail, which holds the progress of the current work. The
       shared page comes first and both sites build the rail. Core's part: Phoebe stops writing her tally in the chat
       once the rail shows it. Core releases first.
 
@@ -271,10 +271,10 @@ the litres check on the cap (N5). A step with no image yet has not started.
 - [ ] **M5.1** *Family: Console and surfaces.* Mockup from the captured image
 - [ ] **M5.2** *Family: Console and surfaces.* Built page; the litres slider's **default** and **cap** kept as two separate things
 - [~] **M5.3** *v1 (coach, for the maintainer, 26 Nov; the whole console is v1, the maintainer, 26 Nov).* *Family:
-      Console and surfaces.* (Open pull request #72, Calvin 0.10.0.) Calvin's question rows are big enough to tap on a phone. Done when a test checks their tap
+      Console and surfaces.* (Released in Calvin 0.10.0 on 2026-11-27, #72, with its test. The maintainer's check on a phone is still to come.) Calvin's question rows are big enough to tap on a phone. Done when a test checks their tap
       size and the maintainer checks them on a phone.
 - [~] **M5.4** *v1 (coach, for the maintainer, 26 Nov; the whole console is v1, the maintainer, 26 Nov).* *Family:
-      Console and surfaces.* (Open pull request #72, Calvin 0.10.0.) Calvin's color is Reef (`#0E8A94`) on his screens. Done when his screens use
+      Console and surfaces.* (Released in Calvin 0.10.0 on 2026-11-27, #72, from one token. The maintainer's check of the screen is still to come.) Calvin's color is Reef (`#0E8A94`) on his screens. Done when his screens use
       one Reef color token and the maintainer checks the screen.
 - [ ] **M5.5 (V2)** *Family: Console and surfaces.* The simple view (V4): it hides the advanced material until asked.
       Done when a test shows advanced parts are hidden at first and one control shows them, and the maintainer checks
@@ -411,7 +411,7 @@ the maintainer.
 Each finding from the family 1 sprint that is not family 1's own. Family 1's are in "Family 1: what is left".
 
 - *Family: Console and surfaces.* **F4.2 Wellington on the paid site.** Now the paid site's #314.
-- [~] *Family: Console and surfaces.* **F4.3 The Agent Commons does not read the installed packages.** *v1 (coach, for the maintainer, 26 Nov).* (Core's part: open pull request #72, the Commons reader and each package's card.) It shows its own
+- [~] *Family: Console and surfaces.* **F4.3 The Agent Commons does not read the installed packages.** *v1 (coach, for the maintainer, 26 Nov).* (Core's part released on 2026-11-27, #72: the Commons reader in core 0.6.0 and each package's card. The sites' Commons page is still to build.) It shows its own
       typed list. Calvin's and Violet's release notes ask for Commons changes that were not made. Both sites' work, the
       shared page first; core's part is J2.
 - *Family: Security and hygiene.* The missing copied-text check is listed under the Security and hygiene sprint above.
@@ -423,6 +423,10 @@ Written down and not chased. Each carries its family. `[!]` waits on the maintai
 - [!] *Family: Agent orchestration.* **F1.11 Bridget and the Agent Commons.** The crew list says Bridget works in the
       Commons; her own package says her chat runs on the two sites only. Her card follows her package, so the Commons lists
       her as installed but she does not open there. One of the two is wrong. v1 mark: open.
+- [!] *Family: Security and hygiene.* **#72's squash mixed two kinds of work.** It held a plan commit
+      (`Grant: neither`) between its code commits (`Grant: open`), so its one commit on `main`, `a340a85`, carries both
+      lines. CLAUDE.md says such a commit is split in two. Mending it would mean rewriting `main`, so it stays. From now
+      on plan lines go in their own docs pull request, and a pull request's `Grant:` lines are checked before a squash.
 
 ---
 

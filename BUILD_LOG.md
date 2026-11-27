@@ -5,6 +5,8 @@ history keeps everything older and every longer entry.
 
 ---
 
+- 2026-11-27 — **Release** `core-v0.6.0`, `calvin-v0.10.0`, `violet-v0.10.0`, `phoebe-v0.3.0`, `wellington-v0.3.0` and `bridget-v0.3.0` on `a340a85`, one tag each (#72). **Carry:** packed to the handoff folder.
+- 2026-11-27 — Family 4's core part: the console's shared parts in core, and every calculator export printing in full (#72).
 - 2026-11-26 — C-19's class sentence is left out of core's project words (#63).
 - 2026-11-26 — **Family 1, Agent orchestration, closed.** Its v1 scope was J1 to J9. What it left is in the build plan.
 - 2026-11-26 — **Release** `core-v0.5.0`, `calvin-v0.9.0`, `violet-v0.9.0`, `phoebe-v0.2.0`, `wellington-v0.2.0` and `bridget-v0.2.0` on `56ddd21`, one tag each (#64). **Carry:** packed to the handoff folder.
