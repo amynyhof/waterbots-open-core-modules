@@ -1,6 +1,7 @@
 "use client";
 
-import { NotesOnValues, type NoteLine } from "@waterbots/core/notes";
+import type { NoteLine } from "@waterbots/core/notes";
+import { ReportFrame } from "@waterbots/core/report";
 import type { ReactNode } from "react";
 
 import {
@@ -21,7 +22,8 @@ import { monitoringSource } from "./monitoring";
 
 /**
  * Print-only client deliverable — the "PAA Transition Analysis" (Slice 6, revision 3). Hidden on
- * screen; Print / Save-as-PDF reveals it (page setup: US Letter, portrait, 1" margins). Written to
+ * screen; Export prints it through core's print part (page setup: US Letter, portrait, 1" margins), on core's
+ * one report frame (family 4): the same header, sections, notes table and footer as every calculator's report. Written to
  * be read STANDALONE and to MIRROR the accepted Gold Standard filing presentation (structure studied
  * from registered project workbooks, which are not published, under the content-derivation policy —
  * convention adopted, never content).
@@ -62,7 +64,7 @@ const Row = ReportRow;
 
 /** A report section heading — exported so a host's own sections match (`ReportSlots`). */
 export function ReportHeading({ children }: { children: React.ReactNode }) {
-  return <h2 className="t-h4" style={{ fontSize: 13, marginTop: 16, marginBottom: 6 }}>{children}</h2>;
+  return <h2 className="wb-report-h2">{children}</h2>;
 }
 
 /** A report row — exported so a host's own rows match (`ReportSlots`). */
@@ -207,6 +209,7 @@ export default function ReportView({
   slots = {},
   tables,
   noteLines = [],
+  id,
 }: {
   project: CalvinProject;
   state: CalcState;
@@ -233,6 +236,8 @@ export default function ReportView({
    * assumed, each under its own label (`useCalculatorState`'s `noteLines`). Empty: nothing shows.
    */
   noteLines?: NoteLine[];
+  /** The report's element id, so the screen's Export can hand it to core's print part. */
+  id?: string;
 }) {
   const v2 = state.version === "paa";
   const basis: Basis = state.version;
@@ -383,466 +388,470 @@ export default function ReportView({
     : "Filter limit not checked (Eq. 7) — device capacity q_i (V2.0 SDWS 13) not entered; HN_p × QPW_p used";
 
   return (
-    <div className="print-report" style={{ color: "var(--fg-1)", background: "var(--card)", padding: 8 }}>
-      {/* Integrity self-check — the deliverable refuses to print a wrong number silently. */}
-      {!integrityOk ? (
-        <div data-integrity="fail" style={{ border: "2px solid var(--coral)", background: "color-mix(in oklab, var(--coral) 10%, transparent)", padding: 10, marginBottom: 10 }}>
-          <div className="t-h4" style={{ fontSize: 13, color: "var(--coral)" }}>⚠ INTEGRITY CHECK FAILED — do not rely on this document.</div>
-          <p className="t-caption" style={{ fontSize: 10, color: "var(--coral)", marginTop: 3 }}>
-            The transition steps do not reconcile with the reported delta and endpoints. This indicates a software
-            error — regenerate the report and report the issue before using any figure here.
+    <ReportFrame
+      agent="calvin"
+      agentName="Calvin"
+      {...(id !== undefined ? { id } : {})}
+      className="print-report"
+      kind={tr ? "PAA Transition Report" : "PAA V2.0 Report"}
+      /* THE STAGE, PRINTED WHERE A READER LOOKS FIRST — [#225](f). Read straight from the mode toggle (`state.mode`),
+         never inferred: an ex-ante report projects; an ex-post report reports what monitoring measured. */
+      stage={state.mode === "ex-ante" ? "Ex-ante estimate" : "Ex-post"}
+      title={tr ? "PAA Transition Analysis" : "PAA V2.0 Emission Reductions"}
+      projectName={project.name}
+      alerts={
+        <>
+          {/* Integrity self-check — the deliverable refuses to print a wrong number silently. */}
+          {!integrityOk ? (
+            <div data-integrity="fail" style={{ border: "2px solid var(--coral)", background: "color-mix(in oklab, var(--coral) 10%, transparent)", padding: 10, marginBottom: 10 }}>
+              <div className="t-h4" style={{ fontSize: 13, color: "var(--coral)" }}>⚠ INTEGRITY CHECK FAILED — do not rely on this document.</div>
+              <p className="t-caption" style={{ fontSize: 10, color: "var(--coral)", marginTop: 3 }}>
+                The transition steps do not reconcile with the reported delta and endpoints. This indicates a software
+                error — regenerate the report and report the issue before using any figure here.
+              </p>
+            </div>
+          ) : null}
+        </>
+      }
+      intro={
+        <>
+          {/* Orientation — client-facing, plain-English (pending practitioner review). */}
+          <p className="t-caption text-fg-2" style={{ fontSize: 11, marginTop: 8, lineHeight: 1.5 }}>
+            This report quantifies this project&rsquo;s emission reductions under Gold Standard&rsquo;s current PAA
+            methodology (GS4GG PAA M400-12 V2.0){tr ? (
+              <>
+                {" "}and compares what this issuance would credit under the legacy V1.0 rules against
+                the current PAA V2.0 requirement — <strong>same project, same period, two versions of the methodology.</strong>
+              </>
+            ) : (
+              <>. This is a new project, not credited under V1.0, so V2.0 is the only version of the methodology that applies and no comparison is made.</>
+            )} Every figure is
+            a deterministic output of the methodology&rsquo;s own equations; each parameter&rsquo;s value, unit, and
+            source is documented below. Figures are {basisWord}; final credited volumes depend on monitoring and
+            verification (see &ldquo;On the use of these figures&rdquo;).
           </p>
-        </div>
-      ) : null}
-
-      {/* ── Masthead: the WaterBots mark, and NOTHING ELSE ([#171], ruling 2026-09-02) ──
-          This corner used to print "Prepared with / Reviewed by —" and a partner organisation's name from a
-          repo-wide constant, on every report of every project — including one created a minute
-          earlier that no reviewer had ever seen. A partner's name is a claim that they reviewed
-          THIS report, and it renders only when a reviewer is a FACT ON THE RECORD. No such fact
-          exists yet (no project or org field names one), so the block is gone rather than
-          blanked, and a future reviewer is built on the record, never on a string here. */}
-      <div className="border-b-2 border-line pb-2">
-        <div className="flex items-start justify-between gap-4">
-          <span className="eyebrow tinted solo" style={{ fontSize: 11 }}>WaterBots.AI · {tr ? "PAA Transition Report" : "PAA V2.0 Report"}</span>
-          {/* THE STAGE, PRINTED WHERE A READER LOOKS FIRST — [#225](f). Read straight from the
-              mode toggle (`state.mode`), never inferred: an ex-ante report projects; an ex-post
-              report reports what monitoring measured. The two must never be mistaken for each
-              other, so the word is in the masthead, not only in the body paragraph below. */}
-          <span className="t-mono shrink-0" style={{ fontSize: 11, color: "var(--fg-2)" }}>
-            {state.mode === "ex-ante" ? "Ex-ante estimate" : "Ex-post"}
-          </span>
-        </div>
-
-        <h1 className="t-h3" style={{ fontSize: 20, marginTop: 6 }}>{tr ? "PAA Transition Analysis" : "PAA V2.0 Emission Reductions"}</h1>
-        <div className="t-mono text-fg-2" style={{ fontSize: 12, marginTop: 1 }}>{project.name}</div>
-
-        {/* Orientation — client-facing, plain-English (pending practitioner review). */}
-        <p className="t-caption text-fg-2" style={{ fontSize: 11, marginTop: 8, lineHeight: 1.5 }}>
-          This report quantifies this project&rsquo;s emission reductions under Gold Standard&rsquo;s current PAA
-          methodology (GS4GG PAA M400-12 V2.0){tr ? (
+        {warning ? (
+          <p className="t-caption" style={{ fontSize: 11, color: "var(--coral)", marginTop: 8 }}>Zero-credit notice — {warning}</p>
+        ) : null}
+        </>
+      }
+      details={
+        <>
+        <Row k="Project activity" v={project.name} />
+        {slots.afterName}
+        <Row k="Country · region" v={`${countryLabel || "—"}${project.region ? ` · ${project.region}` : ""}`} />
+        <Row k="Technology" v={project.technology ? methodLabel : `— (${methodLabel})`} />
+        {slots.afterTechnology}
+        <Row k={state.populationMode === "households" ? "Households served (N_p)" : "People served"} v={`${peopleServed(state).toLocaleString()} — entered`} />
+        {result.householdSizeUsed != null && state.method === 2 ? (
+          <>
+            <Row
+              k={state.populationMode === "households" ? "People served" : "Households served (N_p)"}
+              v={state.populationMode === "households"
+                ? `${fmt(result.people, 0)} — calculated`
+                : result.premises != null ? `${fmt(result.premises, Number.isInteger(result.premises) ? 0 : 1)} — calculated` : ""}
+              note={state.populationMode === "households"
+                ? `${peopleServed(state).toLocaleString()} households × ${fmt(result.householdSizeUsed, 2)} people/household`
+                : `${peopleServed(state).toLocaleString()} people ÷ ${fmt(result.householdSizeUsed, 2)} people/household`}
+            />
+            <Row k="Household size" v={`${fmt(result.householdSizeUsed, 2)} people/household — ${state.householdSizeOverride != null ? "entered" : "default"}`} note={srcHouseholdSize} />
+          </>
+        ) : null}
+        {slots.afterPopulation}
+        <Row k="Calculation version · generated" v={`Calculator v${GS4GG_CALCULATOR_VERSION} · app v${appVersion} · ${generatedAt || "—"}`} />
+        </>
+      }
+      result={{
+        title: "Emission reductions — result",
+        body: (
+          <>
+          {tr ? <Row k={`Selected basis — ${v2 ? "PAA V2.0" : "Legacy V1.0"} ER`} v={`${fmt(result.result.ER, 1)} tCO₂e/yr`} field="selectedER" /> : null}
+          {tr ? <Row k="Legacy V1.0 ER" v={`${fmt(tr.legacyER, 1)} tCO₂e/yr`} field="legacyER" /> : null}
+          <Row k="PAA V2.0 ER" v={`${fmt(paaER, 1)} tCO₂e/yr`} field="paaER" />
+          {tr ? (() => { const { delta, ru, waterfall } = tr; return (<>
+          <Row
+            k="Total difference (PAA − Legacy)"
+            v={`${delta >= 0 ? "+" : ""}${fmt(delta, 1)} tCO₂e/yr (${fmt((legacyER ? delta / legacyER : 0) * 100, 1)}%)`}
+            note={ru.impact != null
+              ? `Two parts, computed on identical project data: the ${ru.label} and the methodology transition (V1.0 → V2.0).`
+              : "Computed on identical project data. The fNRB rule update cannot be shown for this project until its filed V1.0 fNRB is entered; the whole difference here is the methodology transition."}
+            field="delta"
+          />
+          {ru.impact != null ? (
             <>
-              {" "}and compares what this issuance would credit under the legacy V1.0 rules against
-              the current PAA V2.0 requirement — <strong>same project, same period, two versions of the methodology.</strong>
+              <Row k={`— of which ${ru.label}`} v={`${ru.impact >= 0 ? "+" : ""}${fmt(ru.impact, 1)} tCO₂e/yr`} note="Applies under V1.0 and V2.0 alike — see the block below." field="ruleUpdate" />
+              <Row k="— of which methodology transition (V1.0 → V2.0)" v={`${waterfall.transitionDelta >= 0 ? "+" : ""}${fmt(waterfall.transitionDelta, 1)} tCO₂e/yr`} note="The rulebook change on its own. The same fNRB is used on both sides of this comparison, so the change in the fNRB value is reported as its own line below, rather than mixed in here." field="transitionDelta" />
+            </>
+          ) : null}
+          </>); })() : null}
+          {totalFirstCP != null ? (
+            <Row
+              k={`Total over 1st crediting period (${creditingPeriodYears} yr)`}
+              v={`${fmt(totalFirstCP, 0)} tCO₂e`}
+              note="Totals shown for the current crediting period only; renewals are not projected."
+              field="firstCP"
+            />
+          ) : null}
+
+          {/* THE TRANSITION SECTIONS: the fNRB rule update and the transition table. A transitioning project only;
+              a new project's report has neither (ruling 2026-09-21). */}
+          {tr ? (() => { const { ru, waterfall } = tr; return (<>
+          {/* ── The fNRB rule update — its own line, apart from the methodology transition (amended R1, 2026-09-21).
+              The year and the citation come from the fNRB data file, never from this component. With no filed
+              V1.0 value on the record the block prints the reason and no number — never an invented comparator. ── */}
+          <H>{ru.label}</H>
+          <p className="t-caption text-fg-2" style={{ fontSize: 10, lineHeight: 1.5 }}>
+            The share of firewood counted as unsustainably harvested (fNRB, &ldquo;fraction of non-renewable biomass&rdquo;)
+            is set by a standardised tool, and that tool&rsquo;s national values were revised in {ru.effective.slice(0, 4)}.
+            The revision is a rule update, not a methodology-version change: it applies to a project under V1.0 and under
+            V2.0 alike. It is therefore shown here on its own, and the methodology transition below holds fNRB equal on both
+            sides.
+          </p>
+          {ru.impact != null ? (
+            <>
+              <Row k="Filed V1.0 fNRB (project record)" v={fmt(ru.filedFnrb!, 4)} note="Entered — the value on the project's V1.0 filing (V1.0 SDWS 21)." field="ruleFiled" />
+              <Row k="Current standardised-tool fNRB" v={fmt(ru.currentFnrb, 4)} note={ru.cite} field="ruleCurrent" />
+              <Row k="Legacy V1.0 ER at the filed value" v={`${fmt(ru.legacyErFiled!, 1)} tCO₂e/yr`} field="ruleErFiled" />
+              <Row k="Legacy V1.0 ER at the current value" v={`${fmt(ru.legacyErCurrent, 1)} tCO₂e/yr`} field="ruleErCurrent" />
+              <Row k={`Effect of the ${ru.label}`} v={`${ru.impact >= 0 ? "+" : ""}${fmt(ru.impact, 1)} tCO₂e/yr`} note={ru.driver} field="ruleImpact" />
             </>
           ) : (
-            <>. This is a new project, not credited under V1.0, so V2.0 is the only version of the methodology that applies and no comparison is made.</>
-          )} Every figure is
-          a deterministic output of the methodology&rsquo;s own equations; each parameter&rsquo;s value, unit, and
-          source is documented below. Figures are {basisWord}; final credited volumes depend on monitoring and
-          verification (see &ldquo;On the use of these figures&rdquo;).
-        </p>
-      </div>
+            <Row k={`Effect of the ${ru.label}`} v="not shown" note={ru.driver} field="ruleImpact" />
+          )}
+          {/* No illustrative earlier-default line: the old-file hunt is closed (ruling (1), 2026-09-21) — a
+              transitioning project's fNRB is its filed value only, entered on the record, never estimated here. */}
+          <p className="t-caption text-fg-3" style={{ fontSize: 10, lineHeight: 1.5, marginTop: 4 }}>
+            A transitioning project&rsquo;s earlier fNRB is the value on its own filing. This report never estimates it from
+            an older tool; enter the filed value on the project record and the line above becomes project-exact.
+          </p>
 
-      {warning ? (
-        <p className="t-caption" style={{ fontSize: 11, color: "var(--coral)", marginTop: 8 }}>Zero-credit notice — {warning}</p>
-      ) : null}
+          {/* ── What changed — the methodology transition (evaluation layer); the same fNRB on both sides ── */}
+          <H>What changed — methodology transition (V1.0 → V2.0)</H>
+          <p className="t-caption text-fg-2" style={{ fontSize: 10, lineHeight: 1.5 }}>
+            Gold Standard aligned its safe-water methodology with the Paris Agreement (&ldquo;PAA&rdquo; = Paris Agreement
+            Aligned; {RULEBOOK.paa.long}). The update raises conservatism in key assumptions and adds new adjustments. The
+            table below shows what each change to the methodology does to this project&rsquo;s credits — applied one change at a
+            time, so the steps sum exactly to the methodology-transition difference. Same project, same period, same fNRB
+            on both sides; not a change over time.
+          </p>
+          <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed", fontSize: 10, marginTop: 6 }}>
+            <colgroup>
+              <col style={{ width: "22%" }} />
+              <col style={{ width: "50%" }} />
+              <col style={{ width: "14%" }} />
+              <col style={{ width: "14%" }} />
+            </colgroup>
+            <thead>
+              <tr className="text-fg-4" style={{ fontSize: 9, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                <th style={{ textAlign: "left", padding: "2px 6px 2px 0" }}>Change</th>
+                <th style={{ textAlign: "left", padding: "2px 6px" }}>Driver</th>
+                <th style={{ textAlign: "right", padding: "2px 6px" }}>Effect on credits (tCO₂e/yr)</th>
+                <th style={{ textAlign: "right", padding: "2px 0" }}>Running ER</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style={{ borderTop: "1px solid var(--line)", verticalAlign: "top" }}>
+                <td className="text-fg-2" style={{ padding: "3px 6px 3px 0" }}>Legacy V1.0 (start)</td>
+                <td className="text-fg-3" style={{ padding: "3px 6px" }}>{ru.impact != null
+                  ? `Baseline under the V1.0 methodology at the current fNRB (${fmt(ru.currentFnrb, 4)}) — the filed-value figure less the ${ru.label} above.`
+                  : "Baseline under the V1.0 methodology."}</td>
+                <td className="t-mono text-fg-4" style={{ textAlign: "right", padding: "3px 6px" }}>—</td>
+                <td className="t-mono text-fg-1" style={{ textAlign: "right", padding: "3px 0" }} data-wf-start>{fmt(waterfall.transitionStartER, 1)}</td>
+              </tr>
+              {waterfall.steps.map((s) => (
+                <tr key={s.key} style={{ borderTop: "1px solid var(--line)", verticalAlign: "top" }}>
+                  <td className="text-fg-2" style={{ padding: "3px 6px 3px 0" }}>{s.label}</td>
+                  <td className="text-fg-3" style={{ padding: "3px 6px" }}>{s.driver}</td>
+                  <td className="t-mono" style={{ textAlign: "right", padding: "3px 6px", whiteSpace: "nowrap", color: s.impact < 0 ? "var(--coral)" : "var(--mint)" }} data-wf-impact={s.key}>{s.impact >= 0 ? "+" : ""}{fmt(s.impact, 1)}</td>
+                  <td className="t-mono text-fg-1" style={{ textAlign: "right", padding: "3px 0" }} data-wf-running={s.key}>{fmt(s.runningER, 1)}</td>
+                </tr>
+              ))}
+              <tr style={{ borderTop: "2px solid var(--line)", verticalAlign: "top" }}>
+                <td className="text-fg-1" style={{ padding: "3px 6px 3px 0" }}><strong>PAA V2.0 (end)</strong></td>
+                <td className="text-fg-3" style={{ padding: "3px 6px" }}>Net methodology-transition effect.</td>
+                <td className="t-mono" style={{ textAlign: "right", padding: "3px 6px", whiteSpace: "nowrap", color: waterfall.transitionDelta < 0 ? "var(--coral)" : "var(--mint)" }} data-wf-transition-delta>{waterfall.transitionDelta >= 0 ? "+" : ""}{fmt(waterfall.transitionDelta, 1)}</td>
+                <td className="t-mono text-fg-1" style={{ textAlign: "right", padding: "3px 0" }}><strong>{fmt(waterfall.paaER, 1)}</strong></td>
+              </tr>
+            </tbody>
+          </table>
+          </>); })() : null}
 
-      {/* ── Project details (cover-page fields) ── */}
-      <H>Project details</H>
-      <Row k="Project activity" v={project.name} />
-      {slots.afterName}
-      <Row k="Country · region" v={`${countryLabel || "—"}${project.region ? ` · ${project.region}` : ""}`} />
-      <Row k="Technology" v={project.technology ? methodLabel : `— (${methodLabel})`} />
-      {slots.afterTechnology}
-      <Row k={state.populationMode === "households" ? "Households served (N_p)" : "People served"} v={`${peopleServed(state).toLocaleString()} — entered`} />
-      {result.householdSizeUsed != null && state.method === 2 ? (
-        <>
-          <Row
-            k={state.populationMode === "households" ? "People served" : "Households served (N_p)"}
-            v={state.populationMode === "households"
-              ? `${fmt(result.people, 0)} — calculated`
-              : result.premises != null ? `${fmt(result.premises, Number.isInteger(result.premises) ? 0 : 1)} — calculated` : ""}
-            note={state.populationMode === "households"
-              ? `${peopleServed(state).toLocaleString()} households × ${fmt(result.householdSizeUsed, 2)} people/household`
-              : `${peopleServed(state).toLocaleString()} people ÷ ${fmt(result.householdSizeUsed, 2)} people/household`}
-          />
-          <Row k="Household size" v={`${fmt(result.householdSizeUsed, 2)} people/household — ${state.householdSizeOverride != null ? "entered" : "default"}`} note={srcHouseholdSize} />
-        </>
-      ) : null}
-      {slots.afterPopulation}
-      <Row k="Calculation version · generated" v={`Calculator v${GS4GG_CALCULATOR_VERSION} · app v${appVersion} · ${generatedAt || "—"}`} />
+          {/* Bridge to the Transition Analysis — plain-English; no further judgment content here (#29). */}
+          <p className="t-caption text-fg-2" style={{ fontSize: 10, marginTop: 6, lineHeight: 1.5 }}>
+            <strong>Recovering value:</strong> where a conservative default is driving the reduction, a field measurement
+            can sometimes replace it with a higher, project-specific value and recover credits — for example a Water
+            Consumption Field Test (WCFT, V2.0 SDWS 29) for the volume of water people actually drink, or a Water Boiling Test
+            (WBT, V2.0 SDWS 11) for the efficiency of the stoves.{tr ? " These are assessed in the accompanying Transition Analysis." : ""}
+          </p>
+          </>
+        ),
+      }}
+      method={{
+        title: `Derivation — ${v2 ? "PAA V2.0" : "Legacy V1.0"} (computation order)`,
+        body: (
+          <>
 
-      {/* ── Headline result — both versions + transition delta ── */}
-      <H>Emission reductions — result</H>
-      {tr ? <Row k={`Selected basis — ${v2 ? "PAA V2.0" : "Legacy V1.0"} ER`} v={`${fmt(result.result.ER, 1)} tCO₂e/yr`} field="selectedER" /> : null}
-      {tr ? <Row k="Legacy V1.0 ER" v={`${fmt(tr.legacyER, 1)} tCO₂e/yr`} field="legacyER" /> : null}
-      <Row k="PAA V2.0 ER" v={`${fmt(paaER, 1)} tCO₂e/yr`} field="paaER" />
-      {tr ? (() => { const { delta, ru, waterfall } = tr; return (<>
-      <Row
-        k="Total difference (PAA − Legacy)"
-        v={`${delta >= 0 ? "+" : ""}${fmt(delta, 1)} tCO₂e/yr (${fmt((legacyER ? delta / legacyER : 0) * 100, 1)}%)`}
-        note={ru.impact != null
-          ? `Two parts, computed on identical project data: the ${ru.label} and the methodology transition (V1.0 → V2.0).`
-          : "Computed on identical project data. The fNRB rule update cannot be shown for this project until its filed V1.0 fNRB is entered; the whole difference here is the methodology transition."}
-        field="delta"
-      />
-      {ru.impact != null ? (
-        <>
-          <Row k={`— of which ${ru.label}`} v={`${ru.impact >= 0 ? "+" : ""}${fmt(ru.impact, 1)} tCO₂e/yr`} note="Applies under V1.0 and V2.0 alike — see the block below." field="ruleUpdate" />
-          <Row k="— of which methodology transition (V1.0 → V2.0)" v={`${waterfall.transitionDelta >= 0 ? "+" : ""}${fmt(waterfall.transitionDelta, 1)} tCO₂e/yr`} note="The rulebook change on its own. The same fNRB is used on both sides of this comparison, so the change in the fNRB value is reported as its own line below, rather than mixed in here." field="transitionDelta" />
-        </>
-      ) : null}
-      </>); })() : null}
-      {totalFirstCP != null ? (
-        <Row
-          k={`Total over 1st crediting period (${creditingPeriodYears} yr)`}
-          v={`${fmt(totalFirstCP, 0)} tCO₂e`}
-          note="Totals shown for the current crediting period only; renewals are not projected."
-          field="firstCP"
-        />
-      ) : null}
-
-      {/* THE TRANSITION SECTIONS: the fNRB rule update and the transition table. A transitioning project only;
-          a new project's report has neither (ruling 2026-09-21). */}
-      {tr ? (() => { const { ru, waterfall } = tr; return (<>
-      {/* ── The fNRB rule update — its own line, apart from the methodology transition (amended R1, 2026-09-21).
-          The year and the citation come from the fNRB data file, never from this component. With no filed
-          V1.0 value on the record the block prints the reason and no number — never an invented comparator. ── */}
-      <H>{ru.label}</H>
-      <p className="t-caption text-fg-2" style={{ fontSize: 10, lineHeight: 1.5 }}>
-        The share of firewood counted as unsustainably harvested (fNRB, &ldquo;fraction of non-renewable biomass&rdquo;)
-        is set by a standardised tool, and that tool&rsquo;s national values were revised in {ru.effective.slice(0, 4)}.
-        The revision is a rule update, not a methodology-version change: it applies to a project under V1.0 and under
-        V2.0 alike. It is therefore shown here on its own, and the methodology transition below holds fNRB equal on both
-        sides.
-      </p>
-      {ru.impact != null ? (
-        <>
-          <Row k="Filed V1.0 fNRB (project record)" v={fmt(ru.filedFnrb!, 4)} note="Entered — the value on the project's V1.0 filing (V1.0 SDWS 21)." field="ruleFiled" />
-          <Row k="Current standardised-tool fNRB" v={fmt(ru.currentFnrb, 4)} note={ru.cite} field="ruleCurrent" />
-          <Row k="Legacy V1.0 ER at the filed value" v={`${fmt(ru.legacyErFiled!, 1)} tCO₂e/yr`} field="ruleErFiled" />
-          <Row k="Legacy V1.0 ER at the current value" v={`${fmt(ru.legacyErCurrent, 1)} tCO₂e/yr`} field="ruleErCurrent" />
-          <Row k={`Effect of the ${ru.label}`} v={`${ru.impact >= 0 ? "+" : ""}${fmt(ru.impact, 1)} tCO₂e/yr`} note={ru.driver} field="ruleImpact" />
-        </>
-      ) : (
-        <Row k={`Effect of the ${ru.label}`} v="not shown" note={ru.driver} field="ruleImpact" />
-      )}
-      {/* No illustrative earlier-default line: the old-file hunt is closed (ruling (1), 2026-09-21) — a
-          transitioning project's fNRB is its filed value only, entered on the record, never estimated here. */}
-      <p className="t-caption text-fg-3" style={{ fontSize: 10, lineHeight: 1.5, marginTop: 4 }}>
-        A transitioning project&rsquo;s earlier fNRB is the value on its own filing. This report never estimates it from
-        an older tool; enter the filed value on the project record and the line above becomes project-exact.
-      </p>
-
-      {/* ── What changed — the methodology transition (evaluation layer); the same fNRB on both sides ── */}
-      <H>What changed — methodology transition (V1.0 → V2.0)</H>
-      <p className="t-caption text-fg-2" style={{ fontSize: 10, lineHeight: 1.5 }}>
-        Gold Standard aligned its safe-water methodology with the Paris Agreement (&ldquo;PAA&rdquo; = Paris Agreement
-        Aligned; {RULEBOOK.paa.long}). The update raises conservatism in key assumptions and adds new adjustments. The
-        table below shows what each change to the methodology does to this project&rsquo;s credits — applied one change at a
-        time, so the steps sum exactly to the methodology-transition difference. Same project, same period, same fNRB
-        on both sides; not a change over time.
-      </p>
-      <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed", fontSize: 10, marginTop: 6 }}>
-        <colgroup>
-          <col style={{ width: "22%" }} />
-          <col style={{ width: "50%" }} />
-          <col style={{ width: "14%" }} />
-          <col style={{ width: "14%" }} />
-        </colgroup>
-        <thead>
-          <tr className="text-fg-4" style={{ fontSize: 9, textTransform: "uppercase", letterSpacing: "0.06em" }}>
-            <th style={{ textAlign: "left", padding: "2px 6px 2px 0" }}>Change</th>
-            <th style={{ textAlign: "left", padding: "2px 6px" }}>Driver</th>
-            <th style={{ textAlign: "right", padding: "2px 6px" }}>Effect on credits (tCO₂e/yr)</th>
-            <th style={{ textAlign: "right", padding: "2px 0" }}>Running ER</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr style={{ borderTop: "1px solid var(--line)", verticalAlign: "top" }}>
-            <td className="text-fg-2" style={{ padding: "3px 6px 3px 0" }}>Legacy V1.0 (start)</td>
-            <td className="text-fg-3" style={{ padding: "3px 6px" }}>{ru.impact != null
-              ? `Baseline under the V1.0 methodology at the current fNRB (${fmt(ru.currentFnrb, 4)}) — the filed-value figure less the ${ru.label} above.`
-              : "Baseline under the V1.0 methodology."}</td>
-            <td className="t-mono text-fg-4" style={{ textAlign: "right", padding: "3px 6px" }}>—</td>
-            <td className="t-mono text-fg-1" style={{ textAlign: "right", padding: "3px 0" }} data-wf-start>{fmt(waterfall.transitionStartER, 1)}</td>
-          </tr>
-          {waterfall.steps.map((s) => (
-            <tr key={s.key} style={{ borderTop: "1px solid var(--line)", verticalAlign: "top" }}>
-              <td className="text-fg-2" style={{ padding: "3px 6px 3px 0" }}>{s.label}</td>
-              <td className="text-fg-3" style={{ padding: "3px 6px" }}>{s.driver}</td>
-              <td className="t-mono" style={{ textAlign: "right", padding: "3px 6px", whiteSpace: "nowrap", color: s.impact < 0 ? "var(--coral)" : "var(--mint)" }} data-wf-impact={s.key}>{s.impact >= 0 ? "+" : ""}{fmt(s.impact, 1)}</td>
-              <td className="t-mono text-fg-1" style={{ textAlign: "right", padding: "3px 0" }} data-wf-running={s.key}>{fmt(s.runningER, 1)}</td>
-            </tr>
-          ))}
-          <tr style={{ borderTop: "2px solid var(--line)", verticalAlign: "top" }}>
-            <td className="text-fg-1" style={{ padding: "3px 6px 3px 0" }}><strong>PAA V2.0 (end)</strong></td>
-            <td className="text-fg-3" style={{ padding: "3px 6px" }}>Net methodology-transition effect.</td>
-            <td className="t-mono" style={{ textAlign: "right", padding: "3px 6px", whiteSpace: "nowrap", color: waterfall.transitionDelta < 0 ? "var(--coral)" : "var(--mint)" }} data-wf-transition-delta>{waterfall.transitionDelta >= 0 ? "+" : ""}{fmt(waterfall.transitionDelta, 1)}</td>
-            <td className="t-mono text-fg-1" style={{ textAlign: "right", padding: "3px 0" }}><strong>{fmt(waterfall.paaER, 1)}</strong></td>
-          </tr>
-        </tbody>
-      </table>
-      </>); })() : null}
-
-      {/* Bridge to the Transition Analysis — plain-English; no further judgment content here (#29). */}
-      <p className="t-caption text-fg-2" style={{ fontSize: 10, marginTop: 6, lineHeight: 1.5 }}>
-        <strong>Recovering value:</strong> where a conservative default is driving the reduction, a field measurement
-        can sometimes replace it with a higher, project-specific value and recover credits — for example a Water
-        Consumption Field Test (WCFT, V2.0 SDWS 29) for the volume of water people actually drink, or a Water Boiling Test
-        (WBT, V2.0 SDWS 11) for the efficiency of the stoves.{tr ? " These are assessed in the accompanying Transition Analysis." : ""}
-      </p>
-
-      {/* ── Derivation — GS filing convention (section · plain-English intro · citation · equation · Where, table) ── */}
-      <H>Derivation — {v2 ? "PAA V2.0" : "Legacy V1.0"} (computation order)</H>
-
-      <EqBlock
-        section="Baseline Emission"
-        sectionIntro="Emissions avoided because people no longer make water safe through boiling."
-        cite={citeLong(basis, "se")}
-        eqNo="2" eq={<S basis={basis} k="SE" />} value={`${fmt(result.SE, 1)} kJ/L`}
-        rows={[
-          { sym: <span className="t-mono">360.83</span>, value: "360.83", source: `Methodology ${RULEBOOK[basis].version} default — ${v2 ? "§7.3.8 Eq. 2" : "§3.6.2 Eq. 2"} (first-principles energy approach)`, desc: "Energy to obtain 1 L of safe water through boiling (kJ/L)" },
-          { sym: <S basis={basis} k="eta" />, value: pct(state.etaOverride ?? result.etaWeighted), source: srcEta, desc: "Weighted thermal efficiency of the baseline stoves — how efficiently the specific types of stove turned fuel into heat" },
-        ]}
-      />
-      <EqBlock
-        cite={citeLong(basis, "efb")}
-        eqNo="1" eq={<S basis={basis} k="EFb" />} value={`${fmtExp(result.result.EF_b, 3)} tCO₂e/L`}
-        rows={[
-          { sym: <S basis={basis} k="SE" />, value: fmt(result.SE, 1), source: "Calculated as per Eq. 2", desc: "Specific energy to boil water (kJ/L) — from the stove efficiency above" },
-          { sym: <S basis={basis} k="EFco2" />, value: "112", source: `Methodology ${RULEBOOK[basis].version} default — ${sdwsRef(basis, "EFco2")} (IPCC 2006 Guidelines)`, desc: "CO₂ emission factor, firewood (tCO₂/TJ) — CO₂ per unit of firewood energy" },
-          { sym: <S basis={basis} k="EFnonco2" />, value: "9.46", source: `Methodology ${RULEBOOK[basis].version} default — ${sdwsRef(basis, "EFnonco2")} (IPCC AR5 GWP)`, desc: "Non-CO₂ emission factor, firewood (tCO₂e/TJ) — methane & N₂O from burning wood" },
-          { sym: <S basis={basis} k="fNRB" />, value: fmt(result.fNRB, 4), source: srcFnrb, desc: "Fractional non-renewability of woody biomass — how much of the firewood counts as unsustainably harvested", field: "fnrb" },
-        ]}
-      />
-      {m2 ? (
-        <EqBlock
-          cite={citeLong(basis, "qMethod2")}
-          eqNo="6" eq={v2 ? <S basis={basis} k="Qunadj" /> : <S basis={basis} k="Qy" />} value={`${ML(result.result.Q_y)}/yr`}
-          rows={[
-            { sym: <S basis={basis} k="Np" />, value: result.premises != null ? fmt(result.premises, 0) : "", source: srcNp, desc: "Households served — those with at least one treatment device", field: "premises" },
-            { sym: <S basis={basis} k="HN" />, value: result.individualsPerPremises != null ? fmt(result.individualsPerPremises, 2) : "", source: result.premises != null ? `Project record — people ÷ households (${sdwsRef(basis, "HN")})` : "—", desc: "People per household" },
-            { sym: <S basis={basis} k="QPW" />, value: fmt(result.qpwEffective, 2), source: srcQpw, desc: qpwDesc, field: "qpw" },
-            { sym: <S basis={basis} k="qi" />, value: state.deviceCapacityLPerHour != null ? `${fmt(state.deviceCapacityLPerHour, 2)} L/h` : "", source: state.deviceCapacityLPerHour != null ? "Entered — manufacturer specification (V2.0 SDWS 13)" : "", desc: "Device capacity — litres treated per hour, all units in the household" },
-            { sym: <S basis={basis} k="tp" />, value: deviceEvaluated ? `${fmt(state.usageHoursPerDay ?? 5, 1)} h/d` : "", source: deviceEvaluated ? (state.usageHoursPerDay != null ? "Entered — usage survey (V2.0 SDWS 35)" : "Methodology V2.0 default — V2.0 SDWS 35, Option 1 (5 h/day)") : "—", desc: "Hours a day the device is used" },
-            { sym: <S basis={basis} k="DN" />, value: deviceEvaluated ? fmt(state.devicesPerPremises ?? 1, 0) : "", source: deviceEvaluated ? (state.devicesPerPremises != null ? "Entered — sales / distribution records (V2.0 SDWS 37)" : "Assumed 1 — lowest, safest; enter your own (sales / distribution records, V2.0 SDWS 37)") : "—", desc: "Devices per household" },
-            { sym: <S basis={basis} k="QPWhh" />, value: result.qpwPerPremises != null ? fmt(result.qpwPerPremises, 1) : "", source: srcQpwHh, desc: "Per-household daily volume (L/household/day) — the smaller of device capacity and people × daily need (Eq. 7)", field: "qpwHh" },
-            ...(basis === "legacy"
-              ? [{ sym: <S basis={basis} k="Up" />, value: fmt(state.usageRate, 2), source: srcUp, desc: "Usage rate — folded into Eq. 6 under V1.0 (applied in Eq. 8 under V2.0)" }]
-              : []),
-            { sym: <S basis={basis} k="DP" />, value: fmt(state.operationalDays, 0), source: srcDays, desc: "Days in the year the device was present in the household" },
-          ]}
-        />
-      ) : (
-        <EqBlock
-          cite={citeLong(basis, "qMethod1")}
-          eqNo="4" eq={v2 ? <S basis={basis} k="Qunadj" /> : <S basis={basis} k="Qy" />} value={`${ML(result.result.Q_y)}/yr`}
-          rows={[
-            { sym: <span className="t-mono" style={{ fontSize: 11 }}>HH<sub style={{ fontSize: 8 }}>p,y</sub> × HN<sub style={{ fontSize: 8 }}>p,y</sub></span>, value: fmt(result.people, 0), source: srcPop, desc: "People served — households × people per household", field: "population" },
-            { sym: <S basis={basis} k="QPW" />, value: fmt(result.qpwEffective, 2), source: srcQpw, desc: qpwDesc, field: "qpw" },
-            { sym: <S basis={basis} k="DO" />, value: fmt(state.operationalDays, 0), source: srcDays, desc: "Days the system was operational for end-users" },
-            { sym: <S basis={basis} k="Qm" />, value: result.Q_m === null ? "— (none)" : ML(result.Q_m), source: `Flow meter or operation sensor (${sdwsRef(basis, "Qm")})`, desc: "Metered / planned supplied volume — the credited volume can't exceed what's delivered" },
-          ]}
-        />
-      )}
-
-      {v2 ? (
-        <>
           <EqBlock
-            section="Adjustments → crediting baseline"
-            sectionIntro="V2.0 trims the baseline in stages — first for real-world use (who actually drinks the water, and does it pass quality tests), then the ambition adjustment — producing the 'crediting baseline' that credits are actually issued against."
-            cite={citeLong(basis, "qadj")}
-            eqNo="8" eq={<S basis={basis} k="Qadj" />} value={`${ML(p.Q_adj)}/yr`}
+            section="Baseline Emission"
+            sectionIntro="Emissions avoided because people no longer make water safe through boiling."
+            cite={citeLong(basis, "se")}
+            eqNo="2" eq={<S basis={basis} k="SE" />} value={`${fmt(result.SE, 1)} kJ/L`}
             rows={[
-              { sym: <S basis={basis} k="Qunadj" />, value: ML(result.result.Q_y), source: m2 ? "Calculated as per Eq. 6" : "Calculated as per Eq. 4", desc: "Unadjusted water volume (L/yr) — from the step above" },
-              { sym: <S basis={basis} k="X" />, value: fmt(state.xCleanboil, 2), source: srcX, desc: "Share of end-users who still boil the safe water after the project — that boiling still burns fuel, so it is deducted" },
-              { sym: <S basis={basis} k="Mq" />, value: fmt(state.waterQualityFactor, 2), source: srcMq, desc: "Water-quality modifier — share of samples that pass at the point of use" },
-              { sym: <S basis={basis} k="Up" />, value: fmt(state.method === 2 ? state.usageRate : 1, 2), source: srcUp, desc: "Usage rate of the technology — how often it's actually used (Method 2 only)" },
+              { sym: <span className="t-mono">360.83</span>, value: "360.83", source: `Methodology ${RULEBOOK[basis].version} default — ${v2 ? "§7.3.8 Eq. 2" : "§3.6.2 Eq. 2"} (first-principles energy approach)`, desc: "Energy to obtain 1 L of safe water through boiling (kJ/L)" },
+              { sym: <S basis={basis} k="eta" />, value: pct(state.etaOverride ?? result.etaWeighted), source: srcEta, desc: "Weighted thermal efficiency of the baseline stoves — how efficiently the specific types of stove turned fuel into heat" },
             ]}
           />
           <EqBlock
-            cite={citeLong(basis, "beU")}
-            eqNo="9" eq={<S basis={basis} k="BEunc" />} value={`${fmt(p.BE_u, 1)} tCO₂e`}
+            cite={citeLong(basis, "efb")}
+            eqNo="1" eq={<S basis={basis} k="EFb" />} value={`${fmtExp(result.result.EF_b, 3)} tCO₂e/L`}
             rows={[
-              { sym: <S basis={basis} k="EFb" />, value: fmtExp(result.result.EF_b, 3), source: "Calculated as per Eq. 1", desc: "Baseline emission factor (tCO₂e/L) — emissions per litre boiled" },
-              { sym: <S basis={basis} k="Cb" />, value: fmt(state.cBaseline, 2), source: srcCb, desc: "Share already using safe water in the baseline — set aside, not credited" },
-              { sym: <S basis={basis} k="Qadj" />, value: ML(p.Q_adj), source: "Calculated as per Eq. 8", desc: "Adjusted water volume (L/yr) — after the real-world-use trim" },
+              { sym: <S basis={basis} k="SE" />, value: fmt(result.SE, 1), source: "Calculated as per Eq. 2", desc: "Specific energy to boil water (kJ/L) — from the stove efficiency above" },
+              { sym: <S basis={basis} k="EFco2" />, value: "112", source: `Methodology ${RULEBOOK[basis].version} default — ${sdwsRef(basis, "EFco2")} (IPCC 2006 Guidelines)`, desc: "CO₂ emission factor, firewood (tCO₂/TJ) — CO₂ per unit of firewood energy" },
+              { sym: <S basis={basis} k="EFnonco2" />, value: "9.46", source: `Methodology ${RULEBOOK[basis].version} default — ${sdwsRef(basis, "EFnonco2")} (IPCC AR5 GWP)`, desc: "Non-CO₂ emission factor, firewood (tCO₂e/TJ) — methane & N₂O from burning wood" },
+              { sym: <S basis={basis} k="fNRB" />, value: fmt(result.fNRB, 4), source: srcFnrb, desc: "Fractional non-renewability of woody biomass — how much of the firewood counts as unsustainably harvested", field: "fnrb" },
             ]}
           />
-          <EqBlock
-            cite={citeLong(basis, "beAdj")}
-            eqNo="10" eq={<S basis={basis} k="BEadj" />} value={`${fmt(p.BE_downadj, 1)} tCO₂e`}
-            rows={[
-              { sym: <S basis={basis} k="BEunc" />, value: fmt(p.BE_u, 1), source: "Calculated as per Eq. 9", desc: "Uncertainty-adjusted baseline emissions (tCO₂e) — before the ambition trim" },
-              { sym: <S basis={basis} k="DAF" />, value: fmt(result.DAF, 4), source: dafSiteSource ?? `Methodology V2.0 default — GS4GG Tool 05 (DAF Determination, doc 457), host country × 2026–2030 window${dafFallbackNote}`, desc: "Downward adjustment factor — the country-specific ambition trim" },
-            ]}
-          />
-          <EqBlock
-            cite={citeLong(basis, "bau")}
-            eqNo="11" eq={<S basis={basis} k="BAU" />} value={`${fmt(p.BE_BAU, 1)} tCO₂e`}
-            rows={[{ sym: <S basis={basis} k="BEunc" />, value: fmt(p.BE_u, 1), source: "Calculated as per Eq. 9", desc: "The conservative business-as-usual scenario keeps the compliance adjustments but not the ambition trim" }]}
-          />
-          <EqBlock
-            cite={citeLong(basis, "beY")}
-            eqNo="12" eq={<S basis={basis} k="BEy" />} value={`${fmt(p.BE_CB, 1)} tCO₂e`}
-            rows={[
-              { sym: <S basis={basis} k="BEadj" />, value: fmt(p.BE_downadj, 1), source: "Calculated as per Eq. 10", desc: "Downward-adjusted baseline" },
-              { sym: <S basis={basis} k="BAU" />, value: fmt(p.BE_BAU, 1), source: "Calculated as per Eq. 11", desc: "Conservative business-as-usual — the crediting baseline is the lower of the two" },
-            ]}
-          />
-          <EqBlock
-            cite={citeLong(basis, "delta")}
-            eqNo="13" eq={<S basis={basis} k="Delta" />} value={`${fmt(p.MC, 1)} tCO₂e`}
-            rows={[
-              { sym: <S basis={basis} k="BAU" />, value: fmt(p.BE_BAU, 1), source: "Calculated as per Eq. 11", desc: "Conservative business-as-usual" },
-              { sym: <S basis={basis} k="BEy" />, value: fmt(p.BE_CB, 1), source: "Calculated as per Eq. 12", desc: "Crediting baseline — the difference is the host country's own mitigation contribution, reported for transparency" },
-            ]}
-          />
-        </>
-      ) : (
-        <EqBlock
-          cite={citeLong(basis, "beLegacy")}
-          eqNo="3" eq={<S basis={basis} k="BEy" />} value={`${fmt(l.BE, 1)} tCO₂e`}
-          rows={[
-            { sym: <S basis={basis} k="EFb" />, value: fmtExp(result.result.EF_b, 3), source: "Calculated as per Eq. 1", desc: "Baseline emission factor (tCO₂e/L) — emissions per litre boiled" },
-            { sym: <S basis={basis} k="Cb" />, value: fmt(state.cBaseline, 2), source: srcCb, desc: "Share already using safe water — set aside, not credited" },
-            { sym: <S basis={basis} k="X" />, value: fmt(state.xCleanboil, 2), source: srcX, desc: "Share of end-users who still boil the safe water after the project — deducted" },
-            { sym: <S basis={basis} k="Qy" />, value: ML(result.result.Q_y), source: m2 ? "Calculated as per Eq. 6" : "Calculated as per Eq. 4", desc: "Credited water volume (L/yr)" },
-            { sym: <S basis={basis} k="Mq" />, value: fmt(state.waterQualityFactor, 2), source: srcMq, desc: "Water-quality modifier — share of samples passing" },
-          ]}
-        />
-      )}
-
-      <EqBlock
-        section={v2 ? "Activity Emissions" : "Project Emissions"}
-        sectionIntro="Emissions the water system itself causes — fuel for pumps or generators, grid electricity; zero for gravity or solar supply."
-        cite={citeLong(basis, "pe")}
-        eqNo={v2 ? "14" : "8"} eq={v2 ? <S basis={basis} k="AE" /> : <S basis={basis} k="PE" />} value={`${fmt(result.result.PE, 1)} tCO₂e`}
-        rows={v2
-          ? [
-              { sym: <S basis={basis} k="AEff" />, value: fmt(result.result.PE, 1), source: result.result.PE === 0 ? zeroPE("V2.0 SDWS 38") : "Entered — fuel purchase records (SDWS 38, 14, 15; Eq. 15)", desc: "Activity emissions from fossil fuel (backup generators)" },
-              { sym: <S basis={basis} k="AEec" />, value: fmt(0, 1), source: result.result.PE === 0 ? zeroPE("V2.0 SDWS 39") : "Entered — electricity bills or meters (SDWS 39, 16, 17; Eq. 16)", desc: "Activity emissions from electricity" },
-            ]
-          : [{ sym: <S basis={basis} k="PE" />, value: fmt(result.result.PE, 1), source: result.result.PE === 0 ? zeroPE("V1.0 SDWS 33, V1.0 SDWS 34") : "Entered — fuel and electricity records (V1.0 SDWS 33, V1.0 SDWS 34; Eq. 9–10)", desc: "Fuel + electricity emissions of the project" }]}
-      />
-      <EqBlock
-        section="Leakage"
-        sectionIntro="Emissions pushed elsewhere by the project, deducted to stay conservative."
-        cite={citeLong(basis, "le")}
-        eqNo={v2 ? "17" : "—"} eq={<S basis={basis} k="LE" />} value={`${fmt(result.result.LE, 1)} tCO₂e`}
-        rows={v2
-          ? [
-              { sym: <S basis={basis} k="LEemb" />, value: fmt(p.LE_embodied, 1),
-                source: p.warnings.some((w) => /embodied emissions not entered/.test(w))
-                  ? "V2.0 §9.2 deducts it once the device class and unit count are given: Table 10 default (V2.0 SDWS 21) × new units from sales / distribution records (V2.0 SDWS 41); Eq. 18 or 19"
-                  : "Methodology V2.0 default — Table 10 (V2.0 SDWS 21) × new units from sales / distribution records (V2.0 SDWS 41), Eq. 18 or 19",
-                desc: "Embodied emissions of the devices — once per new unit, upfront or spread over five years", field: "embodied" },
-              { sym: <S basis={basis} k="LEmarket" />, value: fmt(p.LE_market, 1),
-                source: p.leakageOption === 1 ? "Methodology V2.0 default — Option 1, §9.3.2, Eq. 20 (2% of net reductions; V2.0 SDWS 40)" : "Entered — detailed assessment (Option 2, §9.3.2, Eq. 21; SDWS 40)",
-                desc: "Market leakage — 2% of net emission reductions unless a detailed assessment replaces it", field: "leakage" },
-            ]
-          : [{ sym: <S basis={basis} k="LE" />, value: fmt(result.result.LE, 1), source: result.result.LE === 0 ? "Zero ex-ante — V1.0 §3.8 (V1.0 SDWS 35)" : "Entered — leakage assessment (V1.0 §3.8, SDWS 35)",
-              desc: "Non-renewable-biomass leakage — 0 by default ex-ante; a flat 5% can be elected (V1.0 §3.8.3)", field: "leakage" }]}
-      />
-      <EqBlock
-        section="Emission Reduction"
-        sectionIntro="The final credits: the baseline minus the project's own emissions and leakage."
-        cite={citeLong(basis, "er")}
-        eqNo={v2 ? "22" : "11"} eq={<S basis={basis} k="ER" />} value={`${fmt(result.result.ER, 1)} tCO₂e/yr`}
-        rows={[
-          { sym: <S basis={basis} k="BEy" />, value: fmt(v2 ? p.BE_CB : l.BE, 1), source: v2 ? "Calculated as per Eq. 12" : "Calculated as per Eq. 3", desc: v2 ? "Crediting baseline emissions (tCO₂e) — the emissions avoided" : "Baseline emissions (tCO₂e) — the emissions avoided" },
-          { sym: v2 ? <S basis={basis} k="AE" /> : <S basis={basis} k="PE" />, value: fmt(result.result.PE, 1), source: v2 ? "Calculated as per Eq. 14" : "Calculated as per Eq. 8", desc: v2 ? "Activity emissions (tCO₂e) — deducted" : "Project emissions (tCO₂e) — deducted" },
-          { sym: <S basis={basis} k="LE" />, value: fmt(result.result.LE, 1), source: v2 ? "Calculated as per Eq. 17" : "Leakage (above)", desc: "Leakage (tCO₂e) — deducted" },
-        ]}
-      />
-
-      {/* ── Parameters & Defaults appendix — GS filing five-column style ── */}
-      <H>Parameters &amp; defaults (appendix)</H>
-      <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed", fontSize: 10, marginBottom: 14 }}>
-        <colgroup>{APPX_COLS.map((w, i) => <col key={i} style={{ width: w }} />)}</colgroup>
-        <thead>
-          <tr className="text-fg-4" style={{ fontSize: 9, textTransform: "uppercase", letterSpacing: "0.06em" }}>
-            <th style={{ textAlign: "left", padding: "2px 6px 2px 0" }}>Parameter</th>
-            <th style={{ textAlign: "left", padding: "2px 6px" }}>Description</th>
-            <th style={{ textAlign: "left", padding: "2px 6px" }}>Unit</th>
-            <th style={{ textAlign: "right", padding: "2px 6px" }}>Value</th>
-            <th style={{ textAlign: "left", padding: "2px 0" }}>Source</th>
-          </tr>
-        </thead>
-        <tbody>
-          <AppxRow p={<S basis={basis} k="eta" />} d="Baseline stove efficiency — how efficiently the specific types of stove burned fuel" u="%" v={pct(state.etaOverride ?? result.etaWeighted)} s={srcEta} />
-          <AppxRow p={<S basis={basis} k="fNRB" />} d="Fractional non-renewable biomass — share of firewood unsustainably harvested" u="—" v={fmt(result.fNRB, 4)} s={srcFnrb} />
-          <AppxRow p={<S basis={basis} k="EFco2" />} d="CO₂ emission factor, firewood" u="tCO₂/TJ" v="112" s={`Methodology ${RULEBOOK[basis].version} default — ${sdwsRef(basis, "EFco2")} (IPCC 2006 Guidelines)`} />
-          <AppxRow p={<S basis={basis} k="EFnonco2" />} d="Non-CO₂ emission factor, firewood" u="tCO₂e/TJ" v="9.46" s={`Methodology ${RULEBOOK[basis].version} default — ${sdwsRef(basis, "EFnonco2")} (IPCC AR5 GWP)`} />
-          <AppxRow p={<S basis={basis} k="Mq" />} d="Water-quality modifier — share of samples passing" u="—" v={fmt(state.waterQualityFactor, 2)} s={srcMq} />
-          <AppxRow p={<S basis={basis} k="Cb" />} d="Already-safe share — people not credited" u="—" v={fmt(state.cBaseline, 2)} s={srcCb} />
-          <AppxRow p={<S basis={basis} k="X" />} d="Share still boiling the safe water" u="—" v={fmt(state.xCleanboil, 2)} s={srcX} />
-          {m2 ? <AppxRow p={<S basis={basis} k="Up" />} d="Usage rate — how often the technology is used" u="—" v={fmt(state.usageRate, 2)} s={srcUp} /> : null}
-          {v2 ? <AppxRow p={<S basis={basis} k="DAF" />} d="Downward adjustment factor — country-specific ambition trim" u="—" v={fmt(result.DAF, 4)} s={dafSiteSource ?? `Methodology V2.0 default — GS4GG Tool 05 (doc 457), host country × window${dafFallbackNote}`} /> : null}
-          <AppxRow p={<span className="t-mono" style={{ fontSize: 11 }}>HH<sub style={{ fontSize: 8 }}>p,y</sub> × HN<sub style={{ fontSize: 8 }}>p,y</sub></span>} d={state.populationMode === "households" ? "Households served (N_p)" : "People served"} u={state.populationMode === "households" ? "households" : "people"} v={peopleServed(state).toLocaleString()} s={srcPop} />
-          {m2 ? <AppxRow p={<S basis={basis} k="Np" />} d="Households served (N_p) — Eq.6" u="households" v={result.premises != null ? fmt(result.premises, 0) : ""} s={srcNp} /> : null}
-          {m2 ? <AppxRow p={<S basis={basis} k="qi" />} d="Device capacity" u="L/h" v={state.deviceCapacityLPerHour != null ? fmt(state.deviceCapacityLPerHour, 2) : ""} s={state.deviceCapacityLPerHour != null ? "Entered — manufacturer specification (V2.0 SDWS 13)" : ""} /> : null}
-          {m2 ? <AppxRow p={<S basis={basis} k="QPWhh" />} d="Per-household volume — Eq.7" u="L/hh·d" v={result.qpwPerPremises != null ? fmt(result.qpwPerPremises, 1) : ""} s={srcQpwHh} /> : null}
-          <AppxRow p={<S basis={basis} k="QPW" />} d={v2 && t9 ? "Litres per person per day — Table 9 age-weighted" : "Litres per person per day (cap 5.5)"} u="L/p/d" v={fmt(result.qpwEffective, 2)} s={srcQpw} />
-          {m2
-            ? <AppxRow p={<S basis={basis} k="DP" />} d="Days the device was present in the household" u="d" v={fmt(state.operationalDays, 0)} s={srcDays} />
-            : <AppxRow p={<S basis={basis} k="DO" />} d="Days the system was operational" u="d" v={fmt(state.operationalDays, 0)} s={srcDays} />}
-          {m2 ? null : <AppxRow p={<S basis={basis} k="Qm" />} d="Metered / planned volume" u="L/yr" v={result.Q_m === null ? "none" : ML(result.Q_m)} s={`Flow meter or operation sensor (${sdwsRef(basis, "Qm")})`} />}
-          {/* THE ROW NAMES THE MIX IT ASSUMED, AND SAYS *"screening preset, no source"*
-              (ruling (4), 2026-09-24). "ASSUMED, not surveyed" reads as *not confirmed yet*, which is
-              softer than the truth: nothing at all stands behind these shares. The mix is printed
-              from the values the engine actually used, never a second copy typed here. */}
-          {/* ENTERED SHARES ARE LABELLED ENTERED (ruling (1), 2026-09-26). The engine says
-              which half came from where (`result.baselineMix`); a half still on the preset keeps
-              the preset's own admission. */}
-          {result.baselineMix.stove === "preset" && result.baselineMix.fuel === "preset" ? (
-            <AppxRow p={<span className="t-mono">baseline profile</span>} d={`${preset.label} — the stoves & fuels replaced: ${presetMixSummary}`} u="—" v="assumed" s="Screening preset, no source yet — replaced by country data or your baseline survey. Nobody surveyed this project's stoves and fuels; a baseline survey (V2.0 SDWS 6 stove types, V2.0 SDWS 8 fuel shares; ≤ 3 years old, cross-checked) replaces it" wrap />
+          {m2 ? (
+            <EqBlock
+              cite={citeLong(basis, "qMethod2")}
+              eqNo="6" eq={v2 ? <S basis={basis} k="Qunadj" /> : <S basis={basis} k="Qy" />} value={`${ML(result.result.Q_y)}/yr`}
+              rows={[
+                { sym: <S basis={basis} k="Np" />, value: result.premises != null ? fmt(result.premises, 0) : "", source: srcNp, desc: "Households served — those with at least one treatment device", field: "premises" },
+                { sym: <S basis={basis} k="HN" />, value: result.individualsPerPremises != null ? fmt(result.individualsPerPremises, 2) : "", source: result.premises != null ? `Project record — people ÷ households (${sdwsRef(basis, "HN")})` : "—", desc: "People per household" },
+                { sym: <S basis={basis} k="QPW" />, value: fmt(result.qpwEffective, 2), source: srcQpw, desc: qpwDesc, field: "qpw" },
+                { sym: <S basis={basis} k="qi" />, value: state.deviceCapacityLPerHour != null ? `${fmt(state.deviceCapacityLPerHour, 2)} L/h` : "", source: state.deviceCapacityLPerHour != null ? "Entered — manufacturer specification (V2.0 SDWS 13)" : "", desc: "Device capacity — litres treated per hour, all units in the household" },
+                { sym: <S basis={basis} k="tp" />, value: deviceEvaluated ? `${fmt(state.usageHoursPerDay ?? 5, 1)} h/d` : "", source: deviceEvaluated ? (state.usageHoursPerDay != null ? "Entered — usage survey (V2.0 SDWS 35)" : "Methodology V2.0 default — V2.0 SDWS 35, Option 1 (5 h/day)") : "—", desc: "Hours a day the device is used" },
+                { sym: <S basis={basis} k="DN" />, value: deviceEvaluated ? fmt(state.devicesPerPremises ?? 1, 0) : "", source: deviceEvaluated ? (state.devicesPerPremises != null ? "Entered — sales / distribution records (V2.0 SDWS 37)" : "Assumed 1 — lowest, safest; enter your own (sales / distribution records, V2.0 SDWS 37)") : "—", desc: "Devices per household" },
+                { sym: <S basis={basis} k="QPWhh" />, value: result.qpwPerPremises != null ? fmt(result.qpwPerPremises, 1) : "", source: srcQpwHh, desc: "Per-household daily volume (L/household/day) — the smaller of device capacity and people × daily need (Eq. 7)", field: "qpwHh" },
+                ...(basis === "legacy"
+                  ? [{ sym: <S basis={basis} k="Up" />, value: fmt(state.usageRate, 2), source: srcUp, desc: "Usage rate — folded into Eq. 6 under V1.0 (applied in Eq. 8 under V2.0)" }]
+                  : []),
+                { sym: <S basis={basis} k="DP" />, value: fmt(state.operationalDays, 0), source: srcDays, desc: "Days in the year the device was present in the household" },
+              ]}
+            />
           ) : (
-            <AppxRow
-              p={<span className="t-mono">baseline profile</span>}
-              d={`The stoves & fuels replaced: ${presetMixSummary}`}
-              u="—"
-              v={baselineValueWord}
-              // Written in the report's source grammar so `tagForSource` tags it: any half on the
-              // preset reads "Assumption — …" (half of it has no source); any half entered reads
-              // "Entered — …"; country defaults alone read "Country default — …" (a cited default).
-              s={baselineSourceLine}
-              wrap
+            <EqBlock
+              cite={citeLong(basis, "qMethod1")}
+              eqNo="4" eq={v2 ? <S basis={basis} k="Qunadj" /> : <S basis={basis} k="Qy" />} value={`${ML(result.result.Q_y)}/yr`}
+              rows={[
+                { sym: <span className="t-mono" style={{ fontSize: 11 }}>HH<sub style={{ fontSize: 8 }}>p,y</sub> × HN<sub style={{ fontSize: 8 }}>p,y</sub></span>, value: fmt(result.people, 0), source: srcPop, desc: "People served — households × people per household", field: "population" },
+                { sym: <S basis={basis} k="QPW" />, value: fmt(result.qpwEffective, 2), source: srcQpw, desc: qpwDesc, field: "qpw" },
+                { sym: <S basis={basis} k="DO" />, value: fmt(state.operationalDays, 0), source: srcDays, desc: "Days the system was operational for end-users" },
+                { sym: <S basis={basis} k="Qm" />, value: result.Q_m === null ? "— (none)" : ML(result.Q_m), source: `Flow meter or operation sensor (${sdwsRef(basis, "Qm")})`, desc: "Metered / planned supplied volume — the credited volume can't exceed what's delivered" },
+              ]}
             />
           )}
-        </tbody>
-      </table>
 
-      {result.fallbacks.length > 0 ? (
+          {v2 ? (
+            <>
+              <EqBlock
+                section="Adjustments → crediting baseline"
+                sectionIntro="V2.0 trims the baseline in stages — first for real-world use (who actually drinks the water, and does it pass quality tests), then the ambition adjustment — producing the 'crediting baseline' that credits are actually issued against."
+                cite={citeLong(basis, "qadj")}
+                eqNo="8" eq={<S basis={basis} k="Qadj" />} value={`${ML(p.Q_adj)}/yr`}
+                rows={[
+                  { sym: <S basis={basis} k="Qunadj" />, value: ML(result.result.Q_y), source: m2 ? "Calculated as per Eq. 6" : "Calculated as per Eq. 4", desc: "Unadjusted water volume (L/yr) — from the step above" },
+                  { sym: <S basis={basis} k="X" />, value: fmt(state.xCleanboil, 2), source: srcX, desc: "Share of end-users who still boil the safe water after the project — that boiling still burns fuel, so it is deducted" },
+                  { sym: <S basis={basis} k="Mq" />, value: fmt(state.waterQualityFactor, 2), source: srcMq, desc: "Water-quality modifier — share of samples that pass at the point of use" },
+                  { sym: <S basis={basis} k="Up" />, value: fmt(state.method === 2 ? state.usageRate : 1, 2), source: srcUp, desc: "Usage rate of the technology — how often it's actually used (Method 2 only)" },
+                ]}
+              />
+              <EqBlock
+                cite={citeLong(basis, "beU")}
+                eqNo="9" eq={<S basis={basis} k="BEunc" />} value={`${fmt(p.BE_u, 1)} tCO₂e`}
+                rows={[
+                  { sym: <S basis={basis} k="EFb" />, value: fmtExp(result.result.EF_b, 3), source: "Calculated as per Eq. 1", desc: "Baseline emission factor (tCO₂e/L) — emissions per litre boiled" },
+                  { sym: <S basis={basis} k="Cb" />, value: fmt(state.cBaseline, 2), source: srcCb, desc: "Share already using safe water in the baseline — set aside, not credited" },
+                  { sym: <S basis={basis} k="Qadj" />, value: ML(p.Q_adj), source: "Calculated as per Eq. 8", desc: "Adjusted water volume (L/yr) — after the real-world-use trim" },
+                ]}
+              />
+              <EqBlock
+                cite={citeLong(basis, "beAdj")}
+                eqNo="10" eq={<S basis={basis} k="BEadj" />} value={`${fmt(p.BE_downadj, 1)} tCO₂e`}
+                rows={[
+                  { sym: <S basis={basis} k="BEunc" />, value: fmt(p.BE_u, 1), source: "Calculated as per Eq. 9", desc: "Uncertainty-adjusted baseline emissions (tCO₂e) — before the ambition trim" },
+                  { sym: <S basis={basis} k="DAF" />, value: fmt(result.DAF, 4), source: dafSiteSource ?? `Methodology V2.0 default — GS4GG Tool 05 (DAF Determination, doc 457), host country × 2026–2030 window${dafFallbackNote}`, desc: "Downward adjustment factor — the country-specific ambition trim" },
+                ]}
+              />
+              <EqBlock
+                cite={citeLong(basis, "bau")}
+                eqNo="11" eq={<S basis={basis} k="BAU" />} value={`${fmt(p.BE_BAU, 1)} tCO₂e`}
+                rows={[{ sym: <S basis={basis} k="BEunc" />, value: fmt(p.BE_u, 1), source: "Calculated as per Eq. 9", desc: "The conservative business-as-usual scenario keeps the compliance adjustments but not the ambition trim" }]}
+              />
+              <EqBlock
+                cite={citeLong(basis, "beY")}
+                eqNo="12" eq={<S basis={basis} k="BEy" />} value={`${fmt(p.BE_CB, 1)} tCO₂e`}
+                rows={[
+                  { sym: <S basis={basis} k="BEadj" />, value: fmt(p.BE_downadj, 1), source: "Calculated as per Eq. 10", desc: "Downward-adjusted baseline" },
+                  { sym: <S basis={basis} k="BAU" />, value: fmt(p.BE_BAU, 1), source: "Calculated as per Eq. 11", desc: "Conservative business-as-usual — the crediting baseline is the lower of the two" },
+                ]}
+              />
+              <EqBlock
+                cite={citeLong(basis, "delta")}
+                eqNo="13" eq={<S basis={basis} k="Delta" />} value={`${fmt(p.MC, 1)} tCO₂e`}
+                rows={[
+                  { sym: <S basis={basis} k="BAU" />, value: fmt(p.BE_BAU, 1), source: "Calculated as per Eq. 11", desc: "Conservative business-as-usual" },
+                  { sym: <S basis={basis} k="BEy" />, value: fmt(p.BE_CB, 1), source: "Calculated as per Eq. 12", desc: "Crediting baseline — the difference is the host country's own mitigation contribution, reported for transparency" },
+                ]}
+              />
+            </>
+          ) : (
+            <EqBlock
+              cite={citeLong(basis, "beLegacy")}
+              eqNo="3" eq={<S basis={basis} k="BEy" />} value={`${fmt(l.BE, 1)} tCO₂e`}
+              rows={[
+                { sym: <S basis={basis} k="EFb" />, value: fmtExp(result.result.EF_b, 3), source: "Calculated as per Eq. 1", desc: "Baseline emission factor (tCO₂e/L) — emissions per litre boiled" },
+                { sym: <S basis={basis} k="Cb" />, value: fmt(state.cBaseline, 2), source: srcCb, desc: "Share already using safe water — set aside, not credited" },
+                { sym: <S basis={basis} k="X" />, value: fmt(state.xCleanboil, 2), source: srcX, desc: "Share of end-users who still boil the safe water after the project — deducted" },
+                { sym: <S basis={basis} k="Qy" />, value: ML(result.result.Q_y), source: m2 ? "Calculated as per Eq. 6" : "Calculated as per Eq. 4", desc: "Credited water volume (L/yr)" },
+                { sym: <S basis={basis} k="Mq" />, value: fmt(state.waterQualityFactor, 2), source: srcMq, desc: "Water-quality modifier — share of samples passing" },
+              ]}
+            />
+          )}
+
+          <EqBlock
+            section={v2 ? "Activity Emissions" : "Project Emissions"}
+            sectionIntro="Emissions the water system itself causes — fuel for pumps or generators, grid electricity; zero for gravity or solar supply."
+            cite={citeLong(basis, "pe")}
+            eqNo={v2 ? "14" : "8"} eq={v2 ? <S basis={basis} k="AE" /> : <S basis={basis} k="PE" />} value={`${fmt(result.result.PE, 1)} tCO₂e`}
+            rows={v2
+              ? [
+                  { sym: <S basis={basis} k="AEff" />, value: fmt(result.result.PE, 1), source: result.result.PE === 0 ? zeroPE("V2.0 SDWS 38") : "Entered — fuel purchase records (SDWS 38, 14, 15; Eq. 15)", desc: "Activity emissions from fossil fuel (backup generators)" },
+                  { sym: <S basis={basis} k="AEec" />, value: fmt(0, 1), source: result.result.PE === 0 ? zeroPE("V2.0 SDWS 39") : "Entered — electricity bills or meters (SDWS 39, 16, 17; Eq. 16)", desc: "Activity emissions from electricity" },
+                ]
+              : [{ sym: <S basis={basis} k="PE" />, value: fmt(result.result.PE, 1), source: result.result.PE === 0 ? zeroPE("V1.0 SDWS 33, V1.0 SDWS 34") : "Entered — fuel and electricity records (V1.0 SDWS 33, V1.0 SDWS 34; Eq. 9–10)", desc: "Fuel + electricity emissions of the project" }]}
+          />
+          <EqBlock
+            section="Leakage"
+            sectionIntro="Emissions pushed elsewhere by the project, deducted to stay conservative."
+            cite={citeLong(basis, "le")}
+            eqNo={v2 ? "17" : "—"} eq={<S basis={basis} k="LE" />} value={`${fmt(result.result.LE, 1)} tCO₂e`}
+            rows={v2
+              ? [
+                  { sym: <S basis={basis} k="LEemb" />, value: fmt(p.LE_embodied, 1),
+                    source: p.warnings.some((w) => /embodied emissions not entered/.test(w))
+                      ? "V2.0 §9.2 deducts it once the device class and unit count are given: Table 10 default (V2.0 SDWS 21) × new units from sales / distribution records (V2.0 SDWS 41); Eq. 18 or 19"
+                      : "Methodology V2.0 default — Table 10 (V2.0 SDWS 21) × new units from sales / distribution records (V2.0 SDWS 41), Eq. 18 or 19",
+                    desc: "Embodied emissions of the devices — once per new unit, upfront or spread over five years", field: "embodied" },
+                  { sym: <S basis={basis} k="LEmarket" />, value: fmt(p.LE_market, 1),
+                    source: p.leakageOption === 1 ? "Methodology V2.0 default — Option 1, §9.3.2, Eq. 20 (2% of net reductions; V2.0 SDWS 40)" : "Entered — detailed assessment (Option 2, §9.3.2, Eq. 21; SDWS 40)",
+                    desc: "Market leakage — 2% of net emission reductions unless a detailed assessment replaces it", field: "leakage" },
+                ]
+              : [{ sym: <S basis={basis} k="LE" />, value: fmt(result.result.LE, 1), source: result.result.LE === 0 ? "Zero ex-ante — V1.0 §3.8 (V1.0 SDWS 35)" : "Entered — leakage assessment (V1.0 §3.8, SDWS 35)",
+                  desc: "Non-renewable-biomass leakage — 0 by default ex-ante; a flat 5% can be elected (V1.0 §3.8.3)", field: "leakage" }]}
+          />
+          <EqBlock
+            section="Emission Reduction"
+            sectionIntro="The final credits: the baseline minus the project's own emissions and leakage."
+            cite={citeLong(basis, "er")}
+            eqNo={v2 ? "22" : "11"} eq={<S basis={basis} k="ER" />} value={`${fmt(result.result.ER, 1)} tCO₂e/yr`}
+            rows={[
+              { sym: <S basis={basis} k="BEy" />, value: fmt(v2 ? p.BE_CB : l.BE, 1), source: v2 ? "Calculated as per Eq. 12" : "Calculated as per Eq. 3", desc: v2 ? "Crediting baseline emissions (tCO₂e) — the emissions avoided" : "Baseline emissions (tCO₂e) — the emissions avoided" },
+              { sym: v2 ? <S basis={basis} k="AE" /> : <S basis={basis} k="PE" />, value: fmt(result.result.PE, 1), source: v2 ? "Calculated as per Eq. 14" : "Calculated as per Eq. 8", desc: v2 ? "Activity emissions (tCO₂e) — deducted" : "Project emissions (tCO₂e) — deducted" },
+              { sym: <S basis={basis} k="LE" />, value: fmt(result.result.LE, 1), source: v2 ? "Calculated as per Eq. 17" : "Leakage (above)", desc: "Leakage (tCO₂e) — deducted" },
+            ]}
+          />
+          </>
+        ),
+      }}
+      values={{
+        title: "Parameters & defaults (appendix)",
+        body: (
+          <>
+          <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed", fontSize: 10, marginBottom: 14 }}>
+            <colgroup>{APPX_COLS.map((w, i) => <col key={i} style={{ width: w }} />)}</colgroup>
+            <thead>
+              <tr className="text-fg-4" style={{ fontSize: 9, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                <th style={{ textAlign: "left", padding: "2px 6px 2px 0" }}>Parameter</th>
+                <th style={{ textAlign: "left", padding: "2px 6px" }}>Description</th>
+                <th style={{ textAlign: "left", padding: "2px 6px" }}>Unit</th>
+                <th style={{ textAlign: "right", padding: "2px 6px" }}>Value</th>
+                <th style={{ textAlign: "left", padding: "2px 0" }}>Source</th>
+              </tr>
+            </thead>
+            <tbody>
+              <AppxRow p={<S basis={basis} k="eta" />} d="Baseline stove efficiency — how efficiently the specific types of stove burned fuel" u="%" v={pct(state.etaOverride ?? result.etaWeighted)} s={srcEta} />
+              <AppxRow p={<S basis={basis} k="fNRB" />} d="Fractional non-renewable biomass — share of firewood unsustainably harvested" u="—" v={fmt(result.fNRB, 4)} s={srcFnrb} />
+              <AppxRow p={<S basis={basis} k="EFco2" />} d="CO₂ emission factor, firewood" u="tCO₂/TJ" v="112" s={`Methodology ${RULEBOOK[basis].version} default — ${sdwsRef(basis, "EFco2")} (IPCC 2006 Guidelines)`} />
+              <AppxRow p={<S basis={basis} k="EFnonco2" />} d="Non-CO₂ emission factor, firewood" u="tCO₂e/TJ" v="9.46" s={`Methodology ${RULEBOOK[basis].version} default — ${sdwsRef(basis, "EFnonco2")} (IPCC AR5 GWP)`} />
+              <AppxRow p={<S basis={basis} k="Mq" />} d="Water-quality modifier — share of samples passing" u="—" v={fmt(state.waterQualityFactor, 2)} s={srcMq} />
+              <AppxRow p={<S basis={basis} k="Cb" />} d="Already-safe share — people not credited" u="—" v={fmt(state.cBaseline, 2)} s={srcCb} />
+              <AppxRow p={<S basis={basis} k="X" />} d="Share still boiling the safe water" u="—" v={fmt(state.xCleanboil, 2)} s={srcX} />
+              {m2 ? <AppxRow p={<S basis={basis} k="Up" />} d="Usage rate — how often the technology is used" u="—" v={fmt(state.usageRate, 2)} s={srcUp} /> : null}
+              {v2 ? <AppxRow p={<S basis={basis} k="DAF" />} d="Downward adjustment factor — country-specific ambition trim" u="—" v={fmt(result.DAF, 4)} s={dafSiteSource ?? `Methodology V2.0 default — GS4GG Tool 05 (doc 457), host country × window${dafFallbackNote}`} /> : null}
+              <AppxRow p={<span className="t-mono" style={{ fontSize: 11 }}>HH<sub style={{ fontSize: 8 }}>p,y</sub> × HN<sub style={{ fontSize: 8 }}>p,y</sub></span>} d={state.populationMode === "households" ? "Households served (N_p)" : "People served"} u={state.populationMode === "households" ? "households" : "people"} v={peopleServed(state).toLocaleString()} s={srcPop} />
+              {m2 ? <AppxRow p={<S basis={basis} k="Np" />} d="Households served (N_p) — Eq.6" u="households" v={result.premises != null ? fmt(result.premises, 0) : ""} s={srcNp} /> : null}
+              {m2 ? <AppxRow p={<S basis={basis} k="qi" />} d="Device capacity" u="L/h" v={state.deviceCapacityLPerHour != null ? fmt(state.deviceCapacityLPerHour, 2) : ""} s={state.deviceCapacityLPerHour != null ? "Entered — manufacturer specification (V2.0 SDWS 13)" : ""} /> : null}
+              {m2 ? <AppxRow p={<S basis={basis} k="QPWhh" />} d="Per-household volume — Eq.7" u="L/hh·d" v={result.qpwPerPremises != null ? fmt(result.qpwPerPremises, 1) : ""} s={srcQpwHh} /> : null}
+              <AppxRow p={<S basis={basis} k="QPW" />} d={v2 && t9 ? "Litres per person per day — Table 9 age-weighted" : "Litres per person per day (cap 5.5)"} u="L/p/d" v={fmt(result.qpwEffective, 2)} s={srcQpw} />
+              {m2
+                ? <AppxRow p={<S basis={basis} k="DP" />} d="Days the device was present in the household" u="d" v={fmt(state.operationalDays, 0)} s={srcDays} />
+                : <AppxRow p={<S basis={basis} k="DO" />} d="Days the system was operational" u="d" v={fmt(state.operationalDays, 0)} s={srcDays} />}
+              {m2 ? null : <AppxRow p={<S basis={basis} k="Qm" />} d="Metered / planned volume" u="L/yr" v={result.Q_m === null ? "none" : ML(result.Q_m)} s={`Flow meter or operation sensor (${sdwsRef(basis, "Qm")})`} />}
+              {/* THE ROW NAMES THE MIX IT ASSUMED, AND SAYS *"screening preset, no source"*
+                  (ruling (4), 2026-09-24). "ASSUMED, not surveyed" reads as *not confirmed yet*, which is
+                  softer than the truth: nothing at all stands behind these shares. The mix is printed
+                  from the values the engine actually used, never a second copy typed here. */}
+              {/* ENTERED SHARES ARE LABELLED ENTERED (ruling (1), 2026-09-26). The engine says
+                  which half came from where (`result.baselineMix`); a half still on the preset keeps
+                  the preset's own admission. */}
+              {result.baselineMix.stove === "preset" && result.baselineMix.fuel === "preset" ? (
+                <AppxRow p={<span className="t-mono">baseline profile</span>} d={`${preset.label} — the stoves & fuels replaced: ${presetMixSummary}`} u="—" v="assumed" s="Screening preset, no source yet — replaced by country data or your baseline survey. Nobody surveyed this project's stoves and fuels; a baseline survey (V2.0 SDWS 6 stove types, V2.0 SDWS 8 fuel shares; ≤ 3 years old, cross-checked) replaces it" wrap />
+              ) : (
+                <AppxRow
+                  p={<span className="t-mono">baseline profile</span>}
+                  d={`The stoves & fuels replaced: ${presetMixSummary}`}
+                  u="—"
+                  v={baselineValueWord}
+                  // Written in the report's source grammar so `tagForSource` tags it: any half on the
+                  // preset reads "Assumption — …" (half of it has no source); any half entered reads
+                  // "Entered — …"; country defaults alone read "Country default — …" (a cited default).
+                  s={baselineSourceLine}
+                  wrap
+                />
+              )}
+            </tbody>
+          </table>
+
+          {result.fallbacks.length > 0 ? (
+            <>
+              <H>Fallback dial selections (no country data)</H>
+              {result.fallbacks.map((fb) => (
+                <Row key={fb.parameter} k={`${fb.parameter} — "${fb.selectedStop}" stop (default 25th pct, conservative)`} v={`${fb.value} · ${fb.cite}`} />
+              ))}
+            </>
+          ) : null}
+          </>
+        ),
+      }}
+      site={slots.afterFallbacks}
+      noteLines={noteLines}
+      produced={
         <>
-          <H>Fallback dial selections (no country data)</H>
-          {result.fallbacks.map((fb) => (
-            <Row key={fb.parameter} k={`${fb.parameter} — "${fb.selectedStop}" stop (default 25th pct, conservative)`} v={`${fb.value} · ${fb.cite}`} />
-          ))}
+          {/* Credentials, process only. */}
+        <p className="t-caption text-fg-2" style={{ fontSize: 10.5, lineHeight: 1.55 }}>
+          Every figure is computed by WaterBots.AI&rsquo;s deterministic GS4GG calculator — software built line-by-line
+          from the methodology documents, with each equation cited to its section and page. {buildCheckSentence()} There is
+          no official tool for PAA V2.0; our V2.0 cases are worked out by hand from the methodology. Read every V2.0 figure here as a screening estimate. No figures are generated by AI.
+        </p>
         </>
-      ) : null}
-
-      {slots.afterFallbacks}
-
-      {/* ── Notes on values (J5) ── */}
-      <NotesOnValues lines={noteLines} agent="Calvin" />
-
-      {/* ── How these figures were produced — credentials, process only (before the footer) ── */}
-      <H>How these figures were produced</H>
-      <p className="t-caption text-fg-2" style={{ fontSize: 10.5, lineHeight: 1.55 }}>
-        Every figure is computed by WaterBots.AI&rsquo;s deterministic GS4GG calculator — software built line-by-line
-        from the methodology documents, with each equation cited to its section and page. {buildCheckSentence()} There is
-        no official tool for PAA V2.0; our V2.0 cases are worked out by hand from the methodology. Read every V2.0 figure here as a screening estimate. No figures are generated by AI.
-      </p>
-
-      {/* ── On the use of these figures — professional-posture closing note (the full issuance statement) ── */}
-      <H>On the use of these figures</H>
-      <p className="t-caption text-fg-2" style={{ fontSize: 10.5, lineHeight: 1.55 }}>
-        These calculations are tested against the test cases described above, and every input is labelled with
-        where it came from — a methodology default, a project value, or an assumption. A methodology calculation is one
-        input to an issuance, not the issuance itself. Final credited volumes are determined by
-        monitored field data, verification by an accredited auditor (VVB), and Gold Standard&rsquo;s registry review,
-        and can differ from any ex-ante calculation — ours included. We recommend engaging experienced practitioners
-        before making commercial decisions on these figures; this analysis is designed to support that work, not
-        replace it.
-      </p>
-
-      {/* ── Footer — one generation line only (no status stickers; caveats live in the note above) ── */}
-      <p className="t-caption text-fg-3" style={{ fontSize: 9, marginTop: 14, borderTop: "1px solid var(--line)", paddingTop: 6 }}>
-        Generated {generatedAt || "—"} · calculator v{GS4GG_CALCULATOR_VERSION} · WaterBots.AI v{appVersion} · GS4GG Emissions Calculator (Calvin).
-      </p>
-    </div>
+      }
+      use={
+        <>
+          {/* The professional-posture closing note (the full issuance statement). */}
+        <p className="t-caption text-fg-2" style={{ fontSize: 10.5, lineHeight: 1.55 }}>
+          These calculations are tested against the test cases described above, and every input is labelled with
+          where it came from — a methodology default, a project value, or an assumption. A methodology calculation is one
+          input to an issuance, not the issuance itself. Final credited volumes are determined by
+          monitored field data, verification by an accredited auditor (VVB), and Gold Standard&rsquo;s registry review,
+          and can differ from any ex-ante calculation — ours included. We recommend engaging experienced practitioners
+          before making commercial decisions on these figures; this analysis is designed to support that work, not
+          replace it.
+        </p>
+        </>
+      }
+      generatedAt={generatedAt}
+      versions={[`calculator v${GS4GG_CALCULATOR_VERSION}`, `WaterBots.AI v${appVersion}`, "GS4GG Emissions Calculator (Calvin)."]}
+    />
   );
 }

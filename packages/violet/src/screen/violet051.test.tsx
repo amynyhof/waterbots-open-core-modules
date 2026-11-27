@@ -54,12 +54,14 @@ describe("4. her stylesheet", () => {
   const css = readFileSync(new URL("../styles.css", import.meta.url), "utf8");
   const base = readFileSync(new URL("../../../core/src/base.css", import.meta.url), "utf8");
   const pkg = JSON.parse(readFileSync(new URL("../../package.json", import.meta.url), "utf8"));
-  it("ships with the package and is copied into the build", () => {
+  // SWITCHED OFF 2026-11-26, never deleted: it expects her stylesheet copied as it is. The build now puts core's report frame at its top (family 4). `family4.test.tsx` holds the new test.
+  it.skip("ships with the package and is copied into the build", () => {
     expect(pkg.exports["./styles.css"]).toBe("./dist/styles.css");
     expect(pkg.scripts.build).toContain("build:css");
     expect(pkg.scripts["build:css"]).toContain("'src/styles.css', 'dist/styles.css'");
   });
-  it("uses only core's tokens and her own Orchid", () => {
+  // SWITCHED OFF 2026-11-26, never deleted: it expects her own --orchid token. Her colour comes from core's one list now (family 4). `family4.test.tsx` holds the new test.
+  it.skip("uses only core's tokens and her own Orchid", () => {
     const defined = new Set([...`${base}\n${css}`.matchAll(/(--[a-z0-9-]+)\s*:/g)].map((m) => m[1]));
     const used = [...css.matchAll(/var\((--[a-z0-9-]+)/g)].map((m) => m[1]);
     expect(used.length).toBeGreaterThan(0);

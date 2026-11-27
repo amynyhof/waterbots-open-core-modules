@@ -30,6 +30,32 @@ VWBA is a way to count the water a project gives back.
 The water and carbon calculators sit side by side. They are never added together. Whether one project may claim
 both is an open question (N14 in `BUILD_PLAN.md`).
 
+## Changes in 0.10.0
+
+Family 4, Console and surfaces. It needs `@waterbots/core` in the 0.6 series. No sum changed.
+
+- **Her report is on core's one report frame**, with the same header, sections, notes table and footer as Calvin's. Her
+  words in each section are unchanged; the frame adds its shared section names ("Project details", "How these figures
+  were produced", "On the use of these figures") and a result section, "Volumetric water benefit — result".
+- **Her export prints in full inside any console**, through core's print part. Before, inside a console, it printed
+  shifted, clipped and cut off after the first page. When no print window opens, the report opens in its own tab, and
+  her screen says so.
+- **One Export:** "Export report (PDF)", with the line that says to choose "Save as PDF" (`SCREEN_WORDS.export` is
+  core's word now).
+- **One time stamp:** core's `reportStamp`, in place of a UTC time code. It is set before a site's own `onExport`
+  too; before, that export had no date.
+- **Every note the person wrote** is in her export, as in Calvin's: a note on a value her report no longer shows is kept,
+  named by the label the note kept.
+- **Her colour** is set from core's colour list (Orchid, `#A457D4`) on her screen's root. Her own `--orchid` token is
+  gone; her stylesheet reads `var(--agent)`.
+- **Big enough to tap:** on a phone, her buttons, boxes and folds are at least 44 pixels (they were 36).
+- **Her card** for the Agent Commons: `AGENT_CARD` and `VERSION` from the main entry. Her `config.yaml` version is
+  the package's own now.
+
+**What a site should change.** Install core 0.6.0 with it. Keep importing `@waterbots/violet/styles.css`: it now
+carries core's report frame and print rules at its top. Remove any print or export workaround of your own. A site that
+set `--orchid` sets nothing now; her colour comes from core's list.
+
 ## Changes in 0.9.0
 
 Violet needs `@waterbots/core` in the 0.5 series.

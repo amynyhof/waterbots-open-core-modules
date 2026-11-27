@@ -8,6 +8,8 @@ import { describe, expect, it } from "vitest";
 const pkgs = fileURLToPath(new URL("../../../../../", import.meta.url));
 const base = readFileSync(join(pkgs, "core/src/base.css"), "utf8");
 const calvin = readFileSync(join(pkgs, "calvin/src/modules/calvin/styles.css"), "utf8");
+// Core's report frame (family 4): its stylesheet sits at the top of Calvin's built one.
+const report = readFileSync(join(pkgs, "core/src/report.css"), "utf8");
 
 /** Class names used in the screens' markup: plain strings, template text and string parts of expressions. */
 function usedClasses(): Set<string> {
@@ -51,7 +53,7 @@ describe("the base styles", () => {
     expect(used.size).toBeGreaterThan(50);
   });
   it("define every class the screens use", () => {
-    expect([...used].filter((c) => !defined(base, c) && !defined(calvin, c)).sort()).toEqual([]);
+    expect([...used].filter((c) => !defined(base, c) && !defined(calvin, c) && !defined(report, c)).sort()).toEqual([]);
   });
   it("set every token the screens read, with no weight, so a site's own value wins", () => {
     const tokens = new Set<string>();

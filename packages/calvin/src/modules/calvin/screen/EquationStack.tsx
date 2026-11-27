@@ -127,7 +127,7 @@ export function TagLegend() {
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="inline-flex items-center gap-1 rounded-sm t-caption text-fg-3 outline-none hover:text-fg-1 focus-visible:ring-2 focus-visible:ring-tide"
+        className="inline-flex items-center gap-1 rounded-sm t-caption text-fg-3 outline-none hover:text-fg-1 calvin-focus-agent"
         style={{ fontSize: 11 }}
       >
         <InfoIcon />
@@ -420,7 +420,7 @@ function Param({ label, sdwsRef, value, onChange, refuse, range, step, unit, bas
         <span className="t-caption min-w-0 flex-1 text-fg-2" style={{ overflowWrap: "anywhere" }}><WithEqNums text={label} /></span>
         {/* The tags, pencil, box and unit move together when the row wraps on a narrow screen. */}
         <span className="inline-flex min-w-0 flex-wrap items-baseline gap-2">
-          <span className="t-mono shrink-0 rounded-sm px-1" style={{ fontSize: 8, letterSpacing: "0.06em", color: "var(--fg-1)", background: "color-mix(in oklab, var(--tide) 12%, transparent)", boxShadow: "inset 0 0 0 1px color-mix(in oklab, var(--tide) 40%, transparent)" }}>{sdwsRef}</span>
+          <span className="t-mono shrink-0 rounded-sm px-1" style={{ fontSize: 8, letterSpacing: "0.06em", color: "var(--fg-1)", background: "color-mix(in oklab, var(--agent) 12%, transparent)", boxShadow: "inset 0 0 0 1px color-mix(in oklab, var(--agent) 40%, transparent)" }}>{sdwsRef}</span>
           <StateBadge state={changed ? "entered" : resting} tip={tip} mark={rowMark(baselineSdws, monitor)} />
           {/* The pencil removes itself on a read-only seat — see `EditGlyph` ([#97]). */}
           <EditGlyph title={range} />
@@ -488,7 +488,7 @@ export function InRowNum({ value, onChange, onClear, optional = false, step = 1,
       // a contributor's whole allowance is reading and exporting, and a disabled number input
       // greys its own text. This blocks the edit without dimming the fact.
       readOnly={readOnlySeat}
-      className="t-mono shrink-0 rounded-sm border border-line bg-card text-right text-fg-1 outline-none focus:border-tide focus:ring-2 focus:ring-tide"
+      className="t-mono shrink-0 rounded-sm border border-line bg-card text-right text-fg-1 outline-none calvin-focus-agent"
       style={{ fontSize: 11, width, padding: "1px 6px" }}
     />
     {showMessage ? <RangeMessage message={box.message} /> : null}
@@ -498,7 +498,7 @@ export function InRowNum({ value, onChange, onClear, optional = false, step = 1,
 
 function LiveRow({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mt-2 rounded-sm px-2 py-1 t-mono" style={{ fontSize: 11, background: "color-mix(in oklab, var(--tide) 6%, transparent)", color: "var(--fg-3)" }}>
+    <div className="mt-2 rounded-sm px-2 py-1 t-mono" style={{ fontSize: 11, background: "color-mix(in oklab, var(--agent) 6%, transparent)", color: "var(--fg-3)" }}>
       {children}
     </div>
   );
@@ -528,7 +528,7 @@ interface RowProps {
 function EqRow({ eqNum, symbol, title, formula, value, oneLiner, binding, open, onToggle, children, editable, cite, flag }: RowProps) {
   return (
     <div className="border-t border-line">
-      <button type="button" onClick={onToggle} className="flex w-full flex-wrap items-baseline gap-2 rounded-sm py-2 pl-1 pr-1 text-left outline-none transition-colors duration-fast hover:bg-paper focus-visible:ring-2 focus-visible:ring-tide">
+      <button type="button" onClick={onToggle} className="flex w-full flex-wrap items-baseline gap-2 rounded-sm py-2 pl-1 pr-1 text-left outline-none transition-colors duration-fast hover:bg-paper calvin-focus-agent">
         <span className="self-center text-fg-4"><Chevron open={open} /></span>
         <span className="t-mono shrink-0 text-fg-1" style={{ minWidth: 54, paddingRight: 4, fontWeight: 700 }}>{symbol}</span>
         <span className="t-caption flex-1 text-fg-2" style={{ minWidth: "7rem", overflowWrap: "anywhere" }}>
@@ -825,7 +825,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
           <span className="t-caption flex-1 text-fg-2">age split — share of people, %</span>
           {/* The controls move together when the row wraps on a narrow screen. */}
           <span className="inline-flex min-w-0 flex-wrap items-baseline gap-2">
-          <span className="t-mono shrink-0 rounded-sm px-1" style={{ fontSize: 8, letterSpacing: "0.06em", color: "var(--fg-1)", background: "color-mix(in oklab, var(--tide) 12%, transparent)", boxShadow: "inset 0 0 0 1px color-mix(in oklab, var(--tide) 40%, transparent)" }}>V2.0 SDWS 30</span>
+          <span className="t-mono shrink-0 rounded-sm px-1" style={{ fontSize: 8, letterSpacing: "0.06em", color: "var(--fg-1)", background: "color-mix(in oklab, var(--agent) 12%, transparent)", boxShadow: "inset 0 0 0 1px color-mix(in oklab, var(--agent) 40%, transparent)" }}>V2.0 SDWS 30</span>
           <StateBadge mark={{ kind: "baseline", sdws: "V2.0 SDWS 30" }}
             state={entered ? "entered" : "default"}
             tip={entered
@@ -911,7 +911,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
     );
     const clearButton = (what: string, onClear: () => void) =>
       readOnlySeat ? null : (
-        <button type="button" onClick={onClear} className="t-caption text-fg-3 underline outline-none focus-visible:ring-2 focus-visible:ring-tide" style={{ fontSize: 10 }}>
+        <button type="button" onClick={onClear} className="t-caption text-fg-3 underline outline-none calvin-focus-agent" style={{ fontSize: 10 }}>
           back to the preset&rsquo;s {what}
         </button>
       );
@@ -1003,7 +1003,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
                 value={charcoalChosen ?? ""}
                 disabled={readOnlySeat}
                 onChange={(e) => patch({ charcoalConvention: (e.target.value || undefined) as CharcoalConvention | undefined })}
-                className="t-mono rounded-sm border border-line bg-card text-fg-1 outline-none focus:border-tide focus:ring-2 focus:ring-tide"
+                className="t-mono rounded-sm border border-line bg-card text-fg-1 outline-none calvin-focus-agent"
                 style={{ fontSize: 11, padding: "1px 4px" }}
               >
                 <option value="">choose…</option>
@@ -1162,7 +1162,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
       {populationRow}
       {qpwParam}
       {doParam}
-      <LiveRow><span className="text-fg-1">{fmt(result.people, 0)}</span> · <span className="text-fg-1">{fmt(result.qpwEffective, 1)}</span> · <span className="text-fg-1">{fmt(state.operationalDays, 0)}</span> = <span style={{ color: "var(--tide)" }}>{ML(result.Q_pop)}/yr</span></LiveRow>
+      <LiveRow><span className="text-fg-1">{fmt(result.people, 0)}</span> · <span className="text-fg-1">{fmt(result.qpwEffective, 1)}</span> · <span className="text-fg-1">{fmt(state.operationalDays, 0)}</span> = <span style={{ color: "var(--agent)" }}>{ML(result.Q_pop)}/yr</span></LiveRow>
     </EqRow>
   );
   const method2Quantity = (
@@ -1175,7 +1175,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
         {npInput}
         {qpwParam}
         {deviceInputs}
-        <LiveRow>HN_p = <span className="text-fg-1">{result.individualsPerPremises != null ? fmt(result.individualsPerPremises, 1) : ""}</span> · QPW_p <span className="text-fg-1">{fmt(result.qpwEffective, 1)}</span>{result.deviceLimitEvaluated ? <> vs device <span className="text-fg-1">{fmt(result.deviceCapacityLPerDay ?? 0, 1)}</span></> : null} = <span style={{ color: "var(--tide)" }}>{qpwHhStr}</span></LiveRow>
+        <LiveRow>HN_p = <span className="text-fg-1">{result.individualsPerPremises != null ? fmt(result.individualsPerPremises, 1) : ""}</span> · QPW_p <span className="text-fg-1">{fmt(result.qpwEffective, 1)}</span>{result.deviceLimitEvaluated ? <> vs device <span className="text-fg-1">{fmt(result.deviceCapacityLPerDay ?? 0, 1)}</span></> : null} = <span style={{ color: "var(--agent)" }}>{qpwHhStr}</span></LiveRow>
       </EqRow>
       <EqRow eqNum="6" symbol="Q_pop" title="Clean water all premises use / yr" formula={v2 ? "N_p · QPW_hh · DP_p" : "N_p · U_p · QPW_hh · DP_p"} value={ML(result.Q_pop) + "/yr"}
         oneLiner="The clean water all served premises use in a year — premises times per-premises volume times operating days. Serving more water avoids more boiling."
@@ -1192,7 +1192,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
           <Param monitor={mon("Up", "usage survey")} label="U_p,y — usage rate" sdwsRef={sdwsRef(basis, "Up")} value={state.usageRate} changed={state.usageRateEntered} onChange={(v) => patch(enterMonitoring("usage", v))} refuse={refuseIn("usageRate")} range="Type a value between 0 and 1" step={0.01} unit="" resting="assumed" note={monitoringSource(state, "usage")} baseline="1.0 (full use)" tip="Under V1.0, U_p is folded into Eq.6 (Q_pop). Fraction of the time the device is actually used." />
         )}
         {doParam}
-        <LiveRow><span className="text-fg-1">{result.premises != null ? fmt(result.premises, 0) : fmt(result.people, 0)}</span>{v2 ? "" : ` · U_p ${fmt(state.usageRate, 2)}`} · QPW_hh · DP_p <span className="text-fg-1">{fmt(state.operationalDays, 0)}</span> = <span style={{ color: "var(--tide)" }}>{ML(result.Q_pop)}/yr</span></LiveRow>
+        <LiveRow><span className="text-fg-1">{result.premises != null ? fmt(result.premises, 0) : fmt(result.people, 0)}</span>{v2 ? "" : ` · U_p ${fmt(state.usageRate, 2)}`} · QPW_hh · DP_p <span className="text-fg-1">{fmt(state.operationalDays, 0)}</span> = <span style={{ color: "var(--agent)" }}>{ML(result.Q_pop)}/yr</span></LiveRow>
       </EqRow>
     </>
   );
@@ -1266,7 +1266,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
         oneLiner="Energy to safely boil one litre on a baseline stove. A more efficient stove burns less fuel, so higher efficiency means fewer credits."
         open={open.has("se")} onToggle={() => toggle("se")} editable cite={citeShort(basis, "se")}>
         {etaParam}
-        <LiveRow>η = <span className="text-fg-1">{fmt(etaPct, 0)}%</span> → SE = <span style={{ color: "var(--tide)" }}>{fmt(result.SE, 1)} kJ/L</span></LiveRow>
+        <LiveRow>η = <span className="text-fg-1">{fmt(etaPct, 0)}%</span> → SE = <span style={{ color: "var(--agent)" }}>{fmt(result.SE, 1)} kJ/L</span></LiveRow>
       </EqRow>
 
       <EqRow eqNum="1" symbol="EF_b" title="Emissions per litre boiled (baseline)" formula="SE · (EF_CO₂ · fNRB + EF_nonCO₂) / 10⁹" value={`${fmtExp(result.result.EF_b, 3)} tCO₂e/L`}
@@ -1338,7 +1338,7 @@ export default function EquationStack({ result, state, patch, canonPopulation, s
             </div>
           ) : null}
         </div>
-        <LiveRow>fNRB = <span className="text-fg-1">{fmt(result.fNRB, 2)}</span>, SE = <span className="text-fg-1">{fmt(result.SE, 0)}</span> → EF_b = <span style={{ color: "var(--tide)" }}>{fmtExp(result.result.EF_b, 3)}</span></LiveRow>
+        <LiveRow>fNRB = <span className="text-fg-1">{fmt(result.fNRB, 2)}</span>, SE = <span className="text-fg-1">{fmt(result.SE, 0)}</span> → EF_b = <span style={{ color: "var(--agent)" }}>{fmtExp(result.result.EF_b, 3)}</span></LiveRow>
       </EqRow>
 
       {m2 ? method2Quantity : method1Quantity}
@@ -1475,7 +1475,7 @@ function DafRow({ result, countryIso, open, onToggle }: { result: ScenarioResult
   const prov = result.provenance.find((x) => x.field === "DAF");
   return (
     <div className="py-1" data-daf-row="">
-      <button type="button" onClick={onToggle} aria-expanded={open} className="flex w-full items-baseline gap-2 rounded-sm text-left outline-none focus-visible:ring-2 focus-visible:ring-tide">
+      <button type="button" onClick={onToggle} aria-expanded={open} className="flex w-full items-baseline gap-2 rounded-sm text-left outline-none calvin-focus-agent">
         <span className="self-center text-fg-4"><Chevron open={open} /></span>
         <span className="t-caption min-w-0 flex-1 text-fg-3" style={{ overflowWrap: "anywhere" }}>DAF — downward adjustment factor, how it is found</span>
         <span className="t-mono shrink-0 text-fg-1" style={{ fontSize: 11 }}>{shown}</span>

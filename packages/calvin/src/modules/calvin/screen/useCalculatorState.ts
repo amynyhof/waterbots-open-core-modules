@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 
 import { describeSaveFailure, type RecordSaveState, type SaveOutcome } from "../../core/saveOutcome";
 import {
@@ -21,6 +21,8 @@ import type { Place } from "@waterbots/core/places";
 import { exportNoteLines, labelledNoteLines, notesAt, type NoteLine, type NotesKind } from "@waterbots/core/notes";
 import { withNote, type ValueNotes } from "@waterbots/core/record";
 import { calvinAgentNoteLines } from "../agent/exportNotes";
+import { printReport, type ExportOutcome } from "@waterbots/core/print";
+import { reportStamp } from "@waterbots/core/report";
 import type { SavedAnalysis } from "./analysis";
 import {
   missingProjectFacts,
@@ -81,7 +83,7 @@ export interface CalculatorOptions {
   onSave?: (analysis: SavedAnalysis) => Promise<SaveOutcome>;
   /** Told whenever the working inputs start or stop differing from the last save (seam S2). */
   onDirtyChange?: (dirty: boolean) => void;
-  /** Replaces the default `window.print()` when the user exports the report. */
+  /** Replaces the default export (core's `printReport`) when the user exports the report. The time stamp is set first. */
   onExport?: () => void;
   /**
    * The first crediting period's length in years, from the host's cited crediting rules. Absent
@@ -243,9 +245,16 @@ export interface CalculatorState {
   creditingPeriodYears?: number;
 
   /* ── Export ─────────────────────────────────────────────────────────────── */
-  /** Stamped when an export is requested; drives the print-once effect. */
+  /** Stamped when an export is requested, in core's one time stamp (`reportStamp`). */
   printAt: string | null;
   exportReport: () => void;
+  /** The report's element id: Export hands that element to core's print part (family 4). */
+  reportId: string;
+  /**
+   * What the last export did (`printReport`): the print window opened, the report opened in its own tab because no
+   * print window opened, or neither. Null before an export, and when the site runs its own (`onExport`).
+   */
+  exportOutcome: ExportOutcome | null;
 
   /* ── Chat host ──────────────────────────────────────────────────────────── */
   /**
@@ -384,19 +393,30 @@ export function useCalculatorState(project: CalvinProject, options: CalculatorOp
     }
   }
 
-  // Export: stamp the report's generated-at, then print once the DOM has it.
+  // Export: stamp the report's generated-at, then print once the DOM has it, through core's print part (family 4): it
+  // prints the report from its own area under <body>, so no console's layout can clip it. A site's own export
+  // (`onExport`) runs in its place, after the stamp.
+  const reportId = `calvin-report-${useId()}`;
   const [printAt, setPrintAt] = useState<string | null>(null);
+  const [printRun, setPrintRun] = useState(0);
+  const [exportOutcome, setExportOutcome] = useState<ExportOutcome | null>(null);
   function exportReport() {
-    setPrintAt(new Date().toLocaleString());
+    setPrintAt(reportStamp());
+    setExportOutcome(null);
+    setPrintRun((n) => n + 1);
   }
   const exportListener = useRef(onExport);
   exportListener.current = onExport;
   useEffect(() => {
-    if (printAt) {
-      const id = requestAnimationFrame(() => (exportListener.current ? exportListener.current() : window.print()));
-      return () => cancelAnimationFrame(id);
-    }
-  }, [printAt]);
+    if (printRun === 0) return;
+    const id = requestAnimationFrame(() => {
+      if (exportListener.current) return exportListener.current();
+      const report = document.getElementById(reportId);
+      setExportOutcome(report ? printReport(report) : "failed");
+    });
+    return () => cancelAnimationFrame(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [printRun]);
 
   // A MISSING PROJECT FACT, NO FIGURES. Every figure depends on the
   // technology, the country and the count, and a fact nobody provided is not this project's. So
@@ -533,6 +553,8 @@ export function useCalculatorState(project: CalvinProject, options: CalculatorOp
     creditingPeriodYears,
     printAt,
     exportReport,
+    reportId,
+    exportOutcome,
     fill,
     asks: calvinAsks(state, { tables, transition, notCoveredYet: project.notCoveredYet, answer: project.answer, ...(project.creditedUnderV1 === true ? { answerV1: project.answerV1 } : {}) }),
     kept: calvinKept(state, { sliders: showSliders(exAnteSliders, state), result: paaResult }),

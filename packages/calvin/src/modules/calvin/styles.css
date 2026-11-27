@@ -1,36 +1,32 @@
-/* Calvin's stylesheet — the rules the calculator needs that are not utility classes.
-   The report's print rules belong to the module, so every host that mounts the calculator gets
-   the same export. Every site
-   imports it: `import "@waterbots/calvin/styles.css"`. The design tokens and the classes the
+/* Calvin's stylesheet — the rules the calculator needs that are not utility classes. The build puts core's report
+   frame and print rules at the top (family 4), so every host that mounts the calculator gets the same export. Every
+   site imports it: `import "@waterbots/calvin/styles.css"`. The design tokens and the classes the
    screens use are in `@waterbots/core/base.css`, for a site without a design system of its own. */
 
-/* Report export — hidden on screen; the browser's Print / Save-as-PDF reveals only the
-   report (Slice 6 export, with the full Sources & Assumptions trail). */
+/* Calvin's report: hidden on screen, and shown on the report tab (M9.4). Its print rules, its width, its font and its
+   notes table are core's one report frame (`@waterbots/core/report.css`, family 4), which the build puts at the top of
+   this file. Export prints it through core's print part, from a print area of its own, so no console can clip it. */
 .print-report { display: none; }
-/* Report tab preview (M9.4): reveal the normally print-only report on-screen inside the tab.
-   Higher specificity than `.print-report{display:none}`, so the single ReportView instance
-   serves both the on-screen preview and the print target without duplicating. */
+/* Higher specificity than `.print-report{display:none}`, so the one ReportView serves the preview and the print. */
 .report-preview .print-report { display: block; }
-@media print {
-  html, body { height: auto; background: white; }
-  body * { visibility: hidden !important; }
-  .print-report { display: block !important; position: absolute; left: 0; top: 0; width: 100%; }
-  .print-report, .print-report * { visibility: visible !important; }
-  /* Pagination hygiene — keep table rows and headings intact across page breaks so nothing
-     overlaps (fixes the appendix "baseline profile" row bleeding into the closing text). */
-  .print-report table { break-inside: auto; }
-  .print-report tr, .print-report th, .print-report td { break-inside: avoid; }
-  .print-report h2 { break-after: avoid; break-inside: avoid; }
-  .print-report p { orphans: 2; widows: 2; }
-  /* Default export target: US Letter, portrait, 1" margins. Page numbers via CSS paged media —
-     honoured by standards-compliant PDF engines and Firefox. NOTE: Chrome/Safari print-to-PDF
-     ignore @page margin-boxes, so enable the print dialog's "Headers and footers" there (or wire
-     a paged-media / server PDF renderer for guaranteed CSS-controlled numbering). */
-  @page {
-    size: letter portrait;
-    margin: 1in;
-    @bottom-center { content: "Page " counter(page) " of " counter(pages); font-size: 9px; }
-  }
+
+/* Calvin's colour (M5.4): one token, `--agent`, set from core's colour list on the root of each of his screens
+   (`CalvinSeat`). The focus ring and the hover edge use it too. */
+.calvin-screen .calvin-focus-agent:focus-visible { outline: 2px solid var(--agent); outline-offset: 1px; }
+.calvin-screen .calvin-hover-agent:hover { border-color: var(--agent); }
+
+/* The tap size (M5.3; family 4, rule 8): on a phone, everything a visitor taps on his screens is at least 44 pixels. */
+@media (max-width: 639px), (pointer: coarse) {
+  .calvin-screen button,
+  .calvin-screen select,
+  .calvin-screen textarea,
+  .calvin-screen summary,
+  .calvin-screen [role="button"],
+  .calvin-screen [role="tab"],
+  .calvin-screen input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]) { min-height: var(--wb-tap, 44px); }
+  .calvin-screen button, .calvin-screen [role="button"], .calvin-screen [role="tab"] { min-width: var(--wb-tap, 44px); }
+  .calvin-screen input[type="checkbox"], .calvin-screen input[type="radio"] { width: 24px; height: 24px; margin: 10px; }
+  .calvin-screen .calvin-row { min-height: var(--wb-tap, 44px); align-items: center; }
 }
 
 /* The pinned header (0.5.0). The main credit figures stay at the top of the scrolling area while the reader
@@ -38,9 +34,7 @@
    --calvin-pin-bg to its own page colour. Sticky needs every element between the header and the scrolling area to
    leave overflow visible. */
 .calvin-pin {
-  /* THE AGENT'S COLOUR (J5, one calculator screen). Every calculator screen sets --agent to its agent's own token:
-     Tide for Calvin now, Reef when Reef ships. It shows as a thin top edge and a faint wash on the header. */
-  --agent: var(--tide, #0e7c86);
+  /* The agent's colour shows as a thin top edge and a faint wash on the header. `--agent` comes from the screen's root. */
   --calvin-pin-wash: linear-gradient(180deg, color-mix(in oklab, var(--agent) 7%, var(--calvin-pin-bg, var(--card, #fff))) 0, var(--calvin-pin-bg, var(--card, #fff)) 64px);
   position: sticky;
   top: var(--calvin-pin-top, 0px);
@@ -88,7 +82,7 @@
 }
 .calvin-fold[open] > .calvin-fold-title::before { transform: rotate(45deg); }
 .calvin-fold[open] > .calvin-fold-title { margin-bottom: 8px; }
-.calvin-fold > .calvin-fold-title:focus-visible { outline: 2px solid var(--tide, #0e7c86); outline-offset: 2px; border-radius: 4px; }
+.calvin-fold > .calvin-fold-title:focus-visible { outline: 2px solid var(--agent); outline-offset: 2px; border-radius: 4px; }
 
 /* A value row: its label, then its tags, box and unit (0.5.0). When the label would get narrower than 9rem, the
    tags and box move to a line of their own, on the right, instead of squeezing the label. */

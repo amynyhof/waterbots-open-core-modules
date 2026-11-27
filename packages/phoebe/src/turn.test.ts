@@ -9,7 +9,7 @@ import { addPhoebeResults, classFor, creditedUnderV1, pathwayReading } from "./r
 import { needCardsSoFar, replySoFar } from "./stream";
 import { OPENED_TURN, RECORD_HEADING, WORKSHEET_HEADING, openedAnswer, phoebeDoorBlock, phoebeTurn, readPhoebeAnswer, recordBlock } from "./turn";
 import { PHOEBE_REPLY_LIMIT, cardWordsIn, isLongPhoebeReply } from "./words";
-import { EMPTY_SHEET, applyUpdates, nothingLeftToAsk, onePathDone, phoebeDone, sheetFromRecord, withSheet, worksheetCaption, type Sheet } from "./worksheet";
+import { EMPTY_SHEET, applyUpdates, nothingLeftToAsk, onePathDone, phoebeDone, sheetFromRecord, withSheet, worksheetTally, type Sheet } from "./worksheet";
 
 const W = "vwba-2.0";
 const C = "gs-paa-v2.0";
@@ -139,7 +139,8 @@ describe("her worksheet and her readings", () => {
     expect(sheet.sorts[C]).toEqual(["transitioning"]);
     expect(applyUpdates(EMPTY_SHEET, { sorts: [{ pack: C, value: "cws" }, { pack: C, value: "hwt" }, { pack: C, value: "unknown" }] }).sorts[C]).toEqual(["hwt", "unknown"]);
     expect(creditedUnderV1(sheet)).toBe(true);
-    expect(worksheetCaption(sheet, [{ pack: W }])).toBe("Worksheet — The water pathway: 1 Met");
+    // Her tally is data for the left rail now, never a line under her turn (family 4, F4.1).
+    expect(worksheetTally(sheet, [{ pack: W }]).map((l) => [l.name, l.states.map((s) => `${s.count} ${s.label}`)])).toEqual([["The water pathway", ["1 Met"]]]);
   });
   test("likely once every row she asks is met; unlikely once a path is closed; nothing while she is still on it", () => {
     const done = applyUpdates(EMPTY_SHEET, { pathways: waterApplies, rows: met(W, ["1", "2", "4"]) });

@@ -58,6 +58,12 @@ markers. A site that wants one hands it in `siteLines`.
 
 ## Versions
 
+- 0.3.0 (family 4): it needs `@waterbots/core` in the 0.6 series. **Her tally is data for the left rail**
+  (`worksheetTally`): each pathway with the states it holds, their counts, words and colours, and how many rows she has
+  looked at. Progress sits in the rail, never in the chat, so `worksheetCaption`, the line a site showed under her
+  turn, is gone. **What a site should change:** draw `worksheetTally(sheet, packs)` in the left rail, and stop showing a
+  line under her turns. Her card for the Agent Commons is `AGENT_CARD` and `VERSION`; her `config.yaml` version is
+  the package's own now.
 - 0.2.0: it needs `@waterbots/core` in the 0.5 series. When a fact her readings rest on changes, such as the source or
   the treatment, core takes the readings off and calls her again, and her turn tells her to work every reading out
   again. Pass the record with its `agents`. The door's plain facts reach her turn as `doorFacts`.

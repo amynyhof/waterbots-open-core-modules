@@ -162,16 +162,35 @@ export function applyUpdates(sheet: Sheet, updates: Verdicts): Sheet {
   return { rows, sorts };
 }
 
-/** The shown line under a turn that moved a row: what the worksheet now holds, drawn from her verdicts, never her prose. */
-export function worksheetCaption(sheet: Sheet, packs: { pack: string; context?: RowContext }[]): string {
-  const parts: string[] = [];
+/** One pathway's line of the tally: its name, and each state it holds with its count, its word and its colour. */
+export interface TallyLine {
+  pack: string;
+  /** The pathway's name, as her tool file names its section. */
+  name: string;
+  /** The states with at least one row, in the worksheet's order. */
+  states: { state: RowStateId; count: number; label: string; colour: string }[];
+  /** How many of the pathway's rows she has looked at, and how many there are. */
+  looked: number;
+  rows: number;
+}
+
+/**
+ * HER TALLY, AS DATA FOR THE LEFT RAIL (F4.1; shared console page, family 4, rule 2). Progress sits in the left rail,
+ * not in the chat, so the tally is never a line under her turn: a site draws these lines in its rail. They are drawn
+ * from her verdicts, never her prose. A pathway with no row looked at yet is left out.
+ */
+export function worksheetTally(sheet: Sheet, packs: { pack: string; context?: RowContext }[]): TallyLine[] {
+  const lines: TallyLine[] = [];
   for (const { pack, context } of packs) {
     const tally = counts(sheet, pack, context ?? {});
-    const said = (["met", "fixable", "unknown", "blocked"] as RowStateId[]).filter((state) => tally[state] > 0).map((state) => `${tally[state]} ${STATE_LABEL[state]}`);
-    if (said.length === 0) continue;
-    parts.push(`${section(pack)?.sectionName ?? pack}: ${said.join(" · ")}`);
+    const states = (["met", "fixable", "unknown", "blocked"] as RowStateId[])
+      .filter((state) => tally[state] > 0)
+      .map((state) => ({ state, count: tally[state], label: STATE_LABEL[state] ?? state, colour: stateColour(state) }));
+    if (states.length === 0) continue;
+    const rows = verdictRows(pack, context ?? {}).length;
+    lines.push({ pack, name: section(pack)?.sectionName ?? pack, states, looked: rows - tally.unchecked, rows });
   }
-  return parts.length ? `Worksheet — ${parts.join(" — ")}` : "";
+  return lines;
 }
 
 // ── When her part is done ───────────────────────────────────────────────────────────────────────────────────────────

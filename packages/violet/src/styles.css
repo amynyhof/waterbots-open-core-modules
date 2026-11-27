@@ -1,21 +1,17 @@
 /* Violet's screen styles (0.5.1). A site that installs Violet imports this file, so her screen is styled:
      import "@waterbots/violet/styles.css";
-   It uses the tokens in `@waterbots/core/base.css`, as Calvin's screens do, and adds one of its own: Orchid,
-   Violet's accent (#A457D4, ruling 2026-10-31). The token is set with :where(:root), which has no weight, so a site
-   that defines --orchid keeps its own value. Every rule sits under .violet-d3, so nothing reaches the rest of a page. */
-
-:where(:root) {
-  --orchid: #a457d4;
-}
+   It uses the tokens in `@waterbots/core/base.css`, as Calvin's screens do. Her accent, Orchid (#A457D4, ruling
+   2026-10-31), is `--agent`, set from core's one colour list on her screen's root (family 4). Every rule here sits
+   under .violet-d3, so nothing reaches the rest of a page. */
 
 .violet-d3 { display: flex; flex-direction: column; gap: 12px; min-width: 0; padding: 16px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-lg); color: var(--fg-1); font-family: var(--font-sans); font-size: 14px; line-height: 1.5; }
 .violet-d3 h2 { margin: 0; font-size: 18px; line-height: 1.3; font-weight: 600; }
-.violet-d3 [data-status] { align-self: flex-start; margin: 0; padding: 1px 10px; border-radius: var(--radius-pill); background: color-mix(in oklab, var(--orchid) 12%, transparent); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--orchid) 40%, transparent); color: var(--fg-2); font-size: 11px; font-weight: 600; }
+.violet-d3 [data-status] { align-self: flex-start; margin: 0; padding: 1px 10px; border-radius: var(--radius-pill); background: color-mix(in oklab, var(--agent) 12%, transparent); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--agent) 40%, transparent); color: var(--fg-2); font-size: 11px; font-weight: 600; }
 
 /* Choices: the view, the option, full or limited access. The chosen one carries the accent. */
 .violet-d3 [role="group"] { display: flex; flex-wrap: wrap; gap: 6px; }
 .violet-d3 button { min-height: 36px; padding: 6px 10px; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--card); color: var(--fg-2); font: inherit; font-size: 13px; text-align: left; cursor: pointer; }
-.violet-d3 button[aria-pressed="true"] { border-color: var(--orchid); background: color-mix(in oklab, var(--orchid) 10%, var(--card)); color: var(--fg-1); }
+.violet-d3 button[aria-pressed="true"] { border-color: var(--agent); background: color-mix(in oklab, var(--agent) 10%, var(--card)); color: var(--fg-1); }
 .violet-d3 button:disabled { cursor: default; opacity: 0.6; }
 
 /* Project facts, anticipated performance and monitoring data. */
@@ -23,7 +19,7 @@
 .violet-d3 legend { padding: 0 4px; color: var(--fg-3); font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
 .violet-d3 label { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; color: var(--fg-2); font-size: 13px; }
 .violet-d3 input[type="number"] { width: 8rem; max-width: 100%; padding: 4px 6px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--card); color: var(--fg-1); font-family: var(--font-mono); font-size: 13px; }
-.violet-d3 input[type="range"] { flex: 1 1 10rem; min-width: 0; accent-color: var(--orchid); }
+.violet-d3 input[type="range"] { flex: 1 1 10rem; min-width: 0; accent-color: var(--agent); }
 .violet-d3 [data-slider] { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
 .violet-d3 [data-slider] > label { flex: 1 1 16rem; min-width: 0; }
 .violet-d3 [data-label] { color: var(--fg-3); font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; }
@@ -41,7 +37,7 @@
 .violet-d3 [data-origin] { color: var(--fg-3); font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; }
 .violet-d3 [data-source], .violet-d3 [data-note] { color: var(--fg-3); }
 .violet-d3 ol, .violet-d3 ul { margin: 8px 0 0; padding-left: 20px; color: var(--fg-2); font-size: 12px; }
-.violet-d3 [data-vwb] { margin: 10px 0 0; padding-top: 8px; border-top: 2px solid var(--orchid); font-weight: 600; }
+.violet-d3 [data-vwb] { margin: 10px 0 0; padding-top: 8px; border-top: 2px solid var(--agent); font-weight: 600; }
 .violet-d3 [data-result] > p:last-child { color: var(--fg-3); font-size: 12px; }
 
 /* A phone: each value is a short block, with no header row. */
@@ -57,12 +53,11 @@
 
 /* ── ONE CALCULATOR SCREEN (J5, ruling 2026-11-23) ─────────────────────────────────────────────────────────────────
    The same parts as Calvin's screen, with the same look. --agent is the one shared name for the screen's agent
-   colour: Orchid here, Tide on Calvin's. A site with a fixed bar of its own at the top sets --wb-pin-top to that
+   colour, from core's colour list: Orchid here, Reef on Calvin's. A site with a fixed bar of its own at the top sets --wb-pin-top to that
    bar's height, so the header card stops under it. */
 :where(:root) {
   --wb-pin-top: 0px;
 }
-.violet-d3 { --agent: var(--orchid); }
 
 /* The header card: it stays at the top. A thin top edge and a faint wash in the agent's colour. */
 .violet-d3 [data-pinned-header] { position: sticky; top: var(--wb-pin-top); z-index: 10; display: flex; flex-direction: column; gap: 8px; padding: 8px; border-top: 3px solid var(--agent); border-radius: var(--radius-lg) var(--radius-lg) 0 0; background: linear-gradient(180deg, color-mix(in oklab, var(--agent) 7%, var(--card)) 0, var(--card) 64px); box-shadow: 0 1px 0 var(--line); }
@@ -111,20 +106,19 @@
 .violet-d3 [data-foot] { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
 .violet-d3 [data-foot] > p { margin: 0; color: var(--fg-3); font-size: 12px; }
 
-/* Her report: on the page, hidden. "Export (PDF)" marks the page while it prints, and then only her report shows. */
-.violet-d3 .violet-report { display: none; color: var(--fg-1); font-size: 11px; line-height: 1.5; }
-.violet-d3 .violet-report h2 { font-size: 16px; }
-.violet-d3 .violet-report h3 { margin: 14px 0 4px; font-size: 12px; }
-.violet-d3 .violet-report table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
-.violet-d3 .violet-report th, .violet-d3 .violet-report td { padding: 3px 6px; border-top: 1px solid var(--line); text-align: left; vertical-align: top; }
-.violet-d3 .violet-report small { display: block; color: var(--fg-3); }
-/* In the report, only the values table keeps the screen's number column; the facts and the notes read as text. */
-.violet-d3 .violet-report [data-report-facts] tbody td:nth-child(2), .violet-d3 .violet-report [data-notes-on-values] tbody td:nth-child(2) { font-family: var(--font-sans); text-align: left; white-space: normal; }
-@media print {
-  :where(:root)[data-wb-print="violet"] body * { visibility: hidden !important; }
-  :where(:root)[data-wb-print="violet"] .print-report { display: none !important; }
-  :where(:root)[data-wb-print="violet"] .violet-d3 .violet-report, :where(:root)[data-wb-print="violet"] .violet-d3 .violet-report * { visibility: visible !important; }
-  :where(:root)[data-wb-print="violet"] .violet-d3 .violet-report { display: block !important; position: absolute; top: 0; left: 0; width: 100%; }
+/* Her report: core's one report frame (`@waterbots/core/report.css`, family 4), which the build puts at the top of this
+   file. It is hidden on the page; Export prints it through core's print part, from a print area of its own. */
+
+/* The tap size (family 4, rule 8): on a phone, everything a visitor taps on her screen is at least 44 pixels. */
+@media (max-width: 639px), (pointer: coarse) {
+  .violet-d3 button,
+  .violet-d3 select,
+  .violet-d3 textarea,
+  .violet-d3 summary,
+  .violet-d3 [role="button"],
+  .violet-d3 [role="tab"],
+  .violet-d3 input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]) { min-height: var(--wb-tap, 44px); }
+  .violet-d3 button, .violet-d3 [role="button"], .violet-d3 [role="tab"] { min-width: var(--wb-tap, 44px); }
 }
 
 /* On a phone only the tile stays at the top, so the header never fills the screen. */

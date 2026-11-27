@@ -1,6 +1,6 @@
 {
   "name": "@waterbots/core",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
   "description": "WaterBots open core module: core (what every module shares: the project shape, standards list, save outcome, agent contract). Arrived with the Calvin seed. Not published.",
   "license": "Apache-2.0",
@@ -19,6 +19,7 @@
     "./base.css": "./dist/base.css",
     "./agent-rules.md": "./dist/agent-rules.md",
     "./roster.yaml": "./dist/roster.yaml",
+    "./report.css": "./dist/report.css",
     "./*": {
       "types": "./dist/*.d.ts",
       "default": "./dist/*.js"
@@ -33,7 +34,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "build": "tsc -p tsconfig.build.json && npm run build:css && npm run build:rules && npm run build:roster",
-    "build:css": "node -e \"require('node:fs').copyFileSync('src/base.css', 'dist/base.css')\"",
+    "build:css": "node -e \"for (const f of ['base.css', 'report.css']) require('node:fs').copyFileSync('src/' + f, 'dist/' + f)\"",
     "build:rules": "node -e \"require('node:fs').copyFileSync('src/agent-rules.md', 'dist/agent-rules.md')\"",
     "build:roster": "node -e \"require('node:fs').copyFileSync('src/roster.yaml', 'dist/roster.yaml')\""
   },

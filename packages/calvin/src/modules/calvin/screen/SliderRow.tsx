@@ -76,7 +76,7 @@ export default function SliderRow({ spec, state, result, patch }: {
         onChange={(e) => change(Number(e.target.value))}
         disabled={readOnly}
         className="mt-1 w-full"
-        style={{ accentColor: "var(--tide)" }}
+        style={{ accentColor: "var(--agent)" }}
       />
       <div className="flex justify-between gap-4 t-caption text-fg-4" style={{ fontSize: 9.5 }}>
         <span data-end="floor">{shownValue(spec, spec.floor.value)}</span>

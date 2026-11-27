@@ -2,7 +2,7 @@
 # eligibility worksheet, from her two knowledge packs: the water pathway (VWBA 2.0) and the carbon pathway (the safe
 # drinking water carbon method). Status is draft: nothing here claims a grade or a credential.
 agent: phoebe
-version: 0.1.0 # 2026-11-25 (J5): her first package, from the open site's agent at commit 0f16957
+version: 0.3.0 # the package's own version from now on (family 4: a test keeps them the same). 2026-11-26: her worksheet's tally as data for the rail, not a line in the chat; until now this line counted on its own, apart from the package: 0.1.0 2026-11-25 (J5): her first package, from the open site's agent at commit 0f16957
 persona: phoebe
 model: claude-opus-5 # the same as Calvin and Violet (the maintainer, 2026-11-25); the open site's own setting did not travel with the carry
 effort: medium
