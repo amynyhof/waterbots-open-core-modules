@@ -281,7 +281,9 @@ describe("at MCP his tools return the facts", () => {
 });
 
 describe("his colour and his sums", () => {
-  it("the header card carries his colour through the one shared name, Tide for now", () => {
+  // SWITCHED OFF 2026-11-26, never deleted: it expects Tide on the header card. His colour is Reef now, from core's list on
+  // his screens' root (M5.4). `family4.test.tsx` holds the new test.
+  it.skip("the header card carries his colour through the one shared name, Tide for now", () => {
     const css = readFileSync(new URL("../styles.css", import.meta.url), "utf8");
     expect(css).toMatch(/\.calvin-pin \{[^}]*--agent: var\(--tide, #0e7c86\);[^}]*border-top: 3px solid var\(--agent\);/);
   });

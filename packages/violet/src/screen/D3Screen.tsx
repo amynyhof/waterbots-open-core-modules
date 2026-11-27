@@ -14,12 +14,16 @@
 //
 // Water only. This screen never shows a carbon figure, and never a total of water and carbon (open item N14).
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import type { ModuleProject } from "@waterbots/core/project";
 import type { Place } from "@waterbots/core/places";
 import { withNote, type ProjectRecord, type ValueNotes } from "@waterbots/core/record";
 import { RangeMessage, useRangedNumber } from "@waterbots/core/rangedNumber";
-import { exportNoteLines, notesAt, personNoteLines, RowNote, ValueNotesProvider, type NoteLine } from "@waterbots/core/notes";
+import { exportNoteLines, labelledNoteLines, notesAt, personNoteLines, RowNote, ValueNotesProvider, type NoteLine } from "@waterbots/core/notes";
+import { agentStyle } from "@waterbots/core/agentColours";
+import { printReport, type ExportOutcome } from "@waterbots/core/print";
+import { ExportControl, reportStamp } from "@waterbots/core/report";
+import { EXPORT_WORDS } from "@waterbots/core/consoleWords";
 import { refuseD3, type D3NumberKey } from "../ranges.js";
 import { violetAgentNoteLines } from "../exportNotes.js";
 import { d3StopMessage } from "../supply.js";
@@ -61,7 +65,8 @@ export const SCREEN_WORDS = {
   /** Over the typed boxes, where a site shows no sliders (the Paid site). */
   boxes: "For a planned project, type the figure you expect. Until you do, the assumed value is used.",
   calculation: "The calculation, step by step",
-  export: "Export (PDF)",
+  /** The one Export name on every screen and both sites (family 4, rule 13): core's. */
+  export: EXPORT_WORDS.button,
 } as const;
 
 /** Shows a number the engine returned. Display only. A missing value is blank, with no label (0.5.1). */
@@ -357,21 +362,26 @@ export default function D3Screen({
   const notesKind = notesAt(place);
   const [notes, setNotes] = useState<ValueNotes>(() => givenNotes ?? record?.agents.violet?.notes ?? {});
   const [printAt, setPrintAt] = useState<string | null>(null);
+  const [printRun, setPrintRun] = useState(0);
+  const [exportOutcome, setExportOutcome] = useState<ExportOutcome | null>(null);
+  const reportId = `violet-report-${useId()}`;
   const sliders = exAnteSliders ?? place !== "paid-site";
 
-  // THE EXPORT PRINTS HER REPORT ALONE (J5). The page is marked while it prints, so her stylesheet shows only her
-  // report, and the mark is taken off after.
+  // THE EXPORT PRINTS HER REPORT ALONE (J5), through core's print part (family 4): from a print area of its own under
+  // <body>, so no console's layout can clip it. The time stamp is set first, also when a site runs its own export.
+  const exportListener = useRef(onExport);
+  exportListener.current = onExport;
   useEffect(() => {
-    if (printAt === null || typeof window === "undefined") return;
-    const root = document.documentElement;
-    root.dataset.wbPrint = "violet";
-    const done = () => {
-      delete root.dataset.wbPrint;
-      window.removeEventListener("afterprint", done);
-    };
-    window.addEventListener("afterprint", done);
-    window.print();
-  }, [printAt]);
+    if (printRun === 0 || typeof window === "undefined") return;
+    if (exportListener.current) {
+      exportListener.current();
+      return;
+    }
+    const report = document.getElementById(reportId);
+    if (report) void printReport(report).then(setExportOutcome);
+    else setExportOutcome("failed");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [printRun]);
 
   const box = (range: D3NumberKey): BoxProps => ({ range, disabled: readOnly, input, restore: update });
 
@@ -383,14 +393,15 @@ export default function D3Screen({
   }
 
   function exportReport() {
-    if (onExport) onExport();
-    else setPrintAt(new Date().toISOString());
+    setPrintAt(reportStamp());
+    setExportOutcome(null);
+    setPrintRun((n) => n + 1);
   }
 
   // A PROJECT D-3 DOES NOT COUNT: no figure and nothing to fill in, as on Calvin's screen (ruled 2026-11-24).
   if (stop !== null) {
     return (
-      <section className="violet-d3" data-place={place} data-stopped={stop.because} aria-label="Water benefit, VWBA 2.0 D-3">
+      <section className="violet-d3" data-place={place} data-stopped={stop.because} aria-label="Water benefit, VWBA 2.0 D-3" style={agentStyle("violet") as CSSProperties}>
         <h2>Water provided (VWBA 2.0, D-3)</h2>
         <p data-record-ask="" role="status">{d3StopMessage(stop)}</p>
       </section>
@@ -406,7 +417,12 @@ export default function D3Screen({
   const showsPersonNotes = notesKind === "person";
   const noteLines: NoteLine[] = exportNoteLines(
     notesKind,
-    personNoteLines(notes, result.values.map((v) => ({ key: v.key, label: v.label, amount: amountOf(v) }))),
+    // Every note the person wrote, as Calvin's report keeps them (family 4): a note on a value the report no longer
+    // shows is kept too, named by the label the note kept.
+    [
+      ...personNoteLines(notes, result.values.map((v) => ({ key: v.key, label: v.label, amount: amountOf(v) }))),
+      ...labelledNoteLines(Object.fromEntries(Object.entries(notes).filter(([k]) => !result.values.some((v) => v.key === k)))),
+    ],
     violetAgentNoteLines(result),
   );
   const headline = (
@@ -445,7 +461,7 @@ export default function D3Screen({
   );
 
   const screen = (
-    <section className="violet-d3" data-view={input.view} data-place={place} aria-label="Water benefit, VWBA 2.0 D-3">
+    <section className="violet-d3" data-view={input.view} data-place={place} aria-label="Water benefit, VWBA 2.0 D-3" style={agentStyle("violet") as CSSProperties}>
       <h2>Water provided (VWBA 2.0, D-3)</h2>
 
       {/* THE HEADER CARD (J5). It stays at the top while the reader scrolls. On a phone only the tile stays. */}
@@ -579,14 +595,11 @@ export default function D3Screen({
 
       <div data-foot="">
         <p>This is an estimate, not a checked result. Only an independent auditor checks a claim.</p>
-        {hideExportButton ? null : (
-          <button type="button" data-export="" onClick={exportReport}>
-            {SCREEN_WORDS.export}
-          </button>
-        )}
+        {hideExportButton ? null : <ExportControl compact onExport={exportReport} outcome={exportOutcome} />}
       </div>
 
       <D3Report
+        id={reportId}
         projectName={project?.name ?? ""}
         input={input}
         result={result}

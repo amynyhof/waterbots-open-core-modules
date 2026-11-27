@@ -4,7 +4,8 @@ import type { ReactNode } from "react";
 
 import { saveNotice } from "../../core/saveOutcome";
 import SaveNoticeBox from "../../core/SaveNotice";
-import { ReadOnlySeat } from "../../core/readOnly";
+import CalvinSeat from "./CalvinSeat";
+import { ExportControl } from "@waterbots/core/report";
 
 import type { CalculatorState } from "./useCalculatorState";
 
@@ -47,7 +48,7 @@ export default function CalculatorLens({
   const { dirty, saving, saveState, save, canSave, exportReport, exportButton, readOnly } = calc;
 
   return (
-    <ReadOnlySeat readOnly={readOnly}>
+    <CalvinSeat readOnly={readOnly}>
       {/* Only the host's own top of the lens sits here (0.5.0: the lens adds no note of its own). */}
       {header ? (
         <div className="min-h-0 flex-1 overflow-y-auto p-3">
@@ -83,7 +84,7 @@ export default function CalculatorLens({
               type="button"
               onClick={save}
               disabled={!dirty || saving}
-              className={`w-full rounded-md px-3 py-2 text-caption font-medium outline-none focus-visible:ring-2 focus-visible:ring-tide ${
+              className={`w-full rounded-md px-3 py-2 text-caption font-medium outline-none calvin-focus-agent ${
                 dirty && !saving ? "btn-primary" : "border border-line text-fg-4"
               }`}
             >
@@ -99,17 +100,16 @@ export default function CalculatorLens({
             exactly two allowances — "asking agents questions, and exporting reports" — so
             removing this alongside Save would take away half of what the role is FOR. */}
         {/* A site can turn it off (`hideExportButton`). */}
+        {/* Core's one Export control (family 4, rule 13): one name on both sites, the line that says to choose "Save as
+            PDF", and what happened when no print window opened. */}
         {exportButton ? (
-        <button
-          type="button"
-          onClick={exportReport}
-          className="w-full rounded-md border border-line px-3 py-2 text-caption text-fg-1 outline-none transition-colors duration-base hover:border-tide focus-visible:ring-2 focus-visible:ring-tide"
-          title="Export the report (print / save as PDF) with the full Sources & Assumptions"
-        >
-          Export report (PDF)
-        </button>
+          <ExportControl
+            onExport={exportReport}
+            outcome={calc.exportOutcome}
+            className="w-full rounded-md border border-line px-3 py-2 text-caption text-fg-1 outline-none transition-colors duration-base calvin-hover-agent calvin-focus-agent"
+          />
         ) : null}
       </div>
-    </ReadOnlySeat>
+    </CalvinSeat>
   );
 }

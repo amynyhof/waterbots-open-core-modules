@@ -18,6 +18,7 @@ import type { Place } from "./places.js";
 import type { NoteBy, NoteLine } from "./noteFacts.js";
 import { NOTE_LIMIT, NOTE_TOO_LONG, type ValueNotes } from "./record.js";
 import { useReadOnlySeat } from "./readOnly.js";
+import { TAP_MIN } from "./tap.js";
 
 export type { AgentNoteFact, NoteBy, NoteLine, NoteStanding } from "./noteFacts.js";
 
@@ -160,6 +161,8 @@ export function RowNote({ noteKey, label }: { noteKey: string; label: string }) 
 }
 
 const noteButton = {
+  minHeight: TAP_MIN,
+  minWidth: TAP_MIN,
   padding: "1px 6px",
   border: "1px dashed var(--line)",
   borderRadius: "var(--radius-sm)",

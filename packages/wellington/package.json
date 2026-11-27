@@ -1,6 +1,6 @@
 {
   "name": "@waterbots/wellington",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "WaterBots open core module: wellington (the Team Lead). His instructions, the project types, the checks on what he heard, and his reading of the agent map. Not published.",
   "license": "Apache-2.0",
@@ -36,6 +36,6 @@
     "build:agent-files": "node -e \"for (const f of ['prompt.md', 'primer.md', 'free-site.md', 'paid-site.md', 'lobby-chat.md', 'config.yaml']) require('node:fs').copyFileSync('src/agents/wellington/' + f, 'dist/' + f)\""
   },
   "dependencies": {
-    "@waterbots/core": "0.5.x"
+    "@waterbots/core": "0.6.x"
   }
 }

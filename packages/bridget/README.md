@@ -44,6 +44,9 @@ data, and saving.
 
 ## Notes
 
+- Version 0.3.0 (family 4): her card for the Agent Commons, `AGENT_CARD` and `VERSION`, from the main entry. Her
+  `config.yaml` version is the package's own now (it said 0.1.0 in the 0.2.0 package). Nothing she says changed. It
+  needs `@waterbots/core` in the 0.6 series.
 - Version 0.2.0: the maintainer's words of 31 October are back, as the meaning she keeps when asked what else she does.
   `turnBlocks` takes the door's plain facts. It needs `@waterbots/core` in the 0.5 series.
 - Version 0.1.0: her first release in this repo. Not published. Nothing in this repo goes to npm yet; the package is marked

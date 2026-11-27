@@ -2,7 +2,8 @@
 
 import type { ReactNode } from "react";
 
-import { ReadOnlySeat } from "../../core/readOnly";
+import CalvinSeat from "./CalvinSeat";
+import { ExportControl } from "@waterbots/core/report";
 import { ValueNotesProvider } from "@waterbots/core/notes";
 import EquationStack from "./EquationStack";
 import ExAntePanel from "./ExAntePanel";
@@ -202,7 +203,7 @@ function WorkSurface({ calc, project, appVersion, tab, otherTab, report }: Calcu
   const factsAsked = project.answer === undefined ? project.notCoveredYet === undefined : project.answer.says === "ask" || project.answer.says === "counted";
   if (factsPrompt) {
     return (
-      <ReadOnlySeat readOnly={readOnly}>
+      <CalvinSeat readOnly={readOnly}>
         <section
           className="rounded-lg p-4"
           style={{ border: "1px solid var(--amber)", background: "color-mix(in oklab, var(--amber) 8%, transparent)" }}
@@ -212,14 +213,14 @@ function WorkSurface({ calc, project, appVersion, tab, otherTab, report }: Calcu
           <p className="t-body mt-2 text-fg-1" style={{ fontSize: 13 }}>{factsPrompt}</p>
           {calc.recordRefusals.map((m) => <p key={m} className="mt-2"><RangeMessage message={m} /></p>)}
         </section>
-      </ReadOnlySeat>
+      </CalvinSeat>
     );
   }
 
   /** A NUMBER OUTSIDE ITS RANGE, NO FIGURES. The number is shown with its message, never used (`valueRanges.ts`). */
   if (calc.outOfRange.length > 0) {
     return (
-      <ReadOnlySeat readOnly={readOnly}>
+      <CalvinSeat readOnly={readOnly}>
         <section
           className="rounded-lg p-4"
           style={{ border: "1px solid var(--amber)", background: "color-mix(in oklab, var(--amber) 8%, transparent)" }}
@@ -231,7 +232,7 @@ function WorkSurface({ calc, project, appVersion, tab, otherTab, report }: Calcu
             {calc.outOfRange.map((r) => <OutOfRangeRow key={r.value.id} r={r} state={state} patch={patch} />)}
           </div>
         </section>
-      </ReadOnlySeat>
+      </CalvinSeat>
     );
   }
 
@@ -241,7 +242,7 @@ function WorkSurface({ calc, project, appVersion, tab, otherTab, report }: Calcu
    */
   if (calc.activityAsk) {
     return (
-      <ReadOnlySeat readOnly={readOnly}>
+      <CalvinSeat readOnly={readOnly}>
         <section
           className="rounded-lg p-4"
           style={{ border: "1px solid var(--amber)", background: "color-mix(in oklab, var(--amber) 8%, transparent)" }}
@@ -262,7 +263,7 @@ function WorkSurface({ calc, project, appVersion, tab, otherTab, report }: Calcu
             </span>
           </div>
         </section>
-      </ReadOnlySeat>
+      </CalvinSeat>
     );
   }
 
@@ -274,7 +275,7 @@ function WorkSurface({ calc, project, appVersion, tab, otherTab, report }: Calcu
   if (calc.missingMonitoring.length > 0) {
     const missing = new Set(calc.missingMonitoring.map((m) => m.key));
     return (
-      <ReadOnlySeat readOnly={readOnly}>
+      <CalvinSeat readOnly={readOnly}>
         <section
           className="rounded-lg p-4"
           style={{ border: "1px solid var(--amber)", background: "color-mix(in oklab, var(--amber) 8%, transparent)" }}
@@ -303,7 +304,7 @@ function WorkSurface({ calc, project, appVersion, tab, otherTab, report }: Calcu
             ))}
           </div>
         </section>
-      </ReadOnlySeat>
+      </CalvinSeat>
     );
   }
 
@@ -326,7 +327,7 @@ function WorkSurface({ calc, project, appVersion, tab, otherTab, report }: Calcu
    */
   if (filedFnrbRefusal) {
     return (
-      <ReadOnlySeat readOnly={readOnly}>
+      <CalvinSeat readOnly={readOnly}>
         <section
           className="rounded-lg p-4"
           style={{ border: "1px solid var(--amber)", background: "color-mix(in oklab, var(--amber) 8%, transparent)" }}
@@ -363,13 +364,13 @@ function WorkSurface({ calc, project, appVersion, tab, otherTab, report }: Calcu
             </span>
           </div>
         </section>
-      </ReadOnlySeat>
+      </CalvinSeat>
     );
   }
 
   if (fnrbRefusal || !result || !paaResult || (transition && !comparison)) {
     return (
-      <ReadOnlySeat readOnly={readOnly}>
+      <CalvinSeat readOnly={readOnly}>
         <section
           className="rounded-lg p-4"
           style={{ border: "1px solid var(--amber)", background: "color-mix(in oklab, var(--amber) 8%, transparent)" }}
@@ -385,7 +386,7 @@ function WorkSurface({ calc, project, appVersion, tab, otherTab, report }: Calcu
           </p>
           <p className="t-caption mt-2 text-fg-4" style={{ fontSize: 10 }}>{fnrbRefusal?.cite}</p>
         </section>
-      </ReadOnlySeat>
+      </CalvinSeat>
     );
   }
 
@@ -438,7 +439,7 @@ function WorkSurface({ calc, project, appVersion, tab, otherTab, report }: Calcu
   );
 
   return (
-    <ReadOnlySeat readOnly={readOnly}>
+    <CalvinSeat readOnly={readOnly}>
       {/* ── Calculator tab ── */}
       {tab === "calculator" ? withNotes(
         <>
@@ -501,13 +502,14 @@ function WorkSurface({ calc, project, appVersion, tab, otherTab, report }: Calcu
           <div className="flex items-baseline gap-3">
             <span className="eyebrow solo">{comparison ? "PAA Transition Report" : "PAA V2.0 Report"} — preview</span>
             {calc.exportButton ? (
-            <button
-              type="button"
-              onClick={exportReport}
-              className="ml-auto rounded-md border border-line px-3 py-1 text-caption text-fg-1 outline-none transition-colors duration-base hover:border-tide focus-visible:ring-2 focus-visible:ring-tide"
-            >
-              Export (PDF)
-            </button>
+              <div className="ml-auto">
+                <ExportControl
+                  compact
+                  onExport={exportReport}
+                  outcome={calc.exportOutcome}
+                  className="rounded-md border border-line px-3 py-1 text-caption text-fg-1 outline-none transition-colors duration-base calvin-hover-agent calvin-focus-agent"
+                />
+              </div>
             ) : null}
           </div>
           <p className="t-caption text-fg-4" style={{ fontSize: 10 }}>
@@ -530,6 +532,7 @@ function WorkSurface({ calc, project, appVersion, tab, otherTab, report }: Calcu
           waterfall={comparison?.waterfall}
           warning={warning}
           generatedAt={printAt ?? ""}
+          id={calc.reportId}
           appVersion={appVersion}
           canonPopulation={project.population?.served}
           creditingPeriodYears={creditingPeriodYears}
@@ -538,6 +541,6 @@ function WorkSurface({ calc, project, appVersion, tab, otherTab, report }: Calcu
           noteLines={calc.noteLines}
         />
       </div>
-    </ReadOnlySeat>
+    </CalvinSeat>
   );
 }

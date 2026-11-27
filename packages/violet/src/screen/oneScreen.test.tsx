@@ -32,7 +32,8 @@ const render = (props: D3ScreenProps, readOnly = false) =>
   );
 /** The screen without her hidden report, and the report alone. */
 const parts = (html: string) => {
-  const at = html.indexOf('class="violet-report"');
+  // Her report's root is core's report frame now (family 4).
+  const at = html.lastIndexOf("<div", html.indexOf('data-wb-report="violet"'));
   return { screen: html.slice(0, at), report: html.slice(at) };
 };
 
@@ -182,7 +183,8 @@ describe("the engine's own notes sit under the source", () => {
 });
 
 describe("her report", () => {
-  it("holds the project, the method, her figure, her values, the steps, the conditions and the versions", () => {
+  // SWITCHED OFF 2026-11-26, never deleted: it expects the title line "Water benefit report — …". Her report is on core's one frame now (family 4), with the kind in the WaterBots line and the method as the title. `family4.test.tsx` holds the new test.
+  it.skip("holds the project, the method, her figure, her values, the steps, the conditions and the versions", () => {
     const { report } = parts(render({ record: made(), place: "paid-site", view: "ex-ante" }));
     expect(report).toContain(`${REPORT_WORDS.title} — VWBA 2.0 D-3 Volume Provided`);
     expect(report).toContain("Draft — pending expert review");
@@ -197,7 +199,8 @@ describe("her report", () => {
     expect(render({ record: made(), hideExportButton: true })).not.toContain(SCREEN_WORDS.export);
   });
 
-  it("prints alone, and only while her export marks the page", () => {
+  // SWITCHED OFF 2026-11-26, never deleted: it expects her own print rules. Core's print part prints every report now (family 4). `family4.test.tsx` holds the new test.
+  it.skip("prints alone, and only while her export marks the page", () => {
     const css = readFileSync(new URL("../styles.css", import.meta.url), "utf8");
     expect(css).toMatch(/\.violet-d3 \.violet-report \{ display: none;/);
     expect(css).toMatch(/@media print \{\s*:where\(:root\)\[data-wb-print="violet"\] body \* \{ visibility: hidden !important; \}/);
@@ -205,7 +208,8 @@ describe("her report", () => {
 });
 
 describe("her colour", () => {
-  it("Orchid, through the one shared name, on the header card", () => {
+  // SWITCHED OFF 2026-11-26, never deleted: it expects her own --orchid token. Her colour comes from core's one list on her screen's root now (family 4). `family4.test.tsx` holds the new test.
+  it.skip("Orchid, through the one shared name, on the header card", () => {
     const css = readFileSync(new URL("../styles.css", import.meta.url), "utf8");
     expect(css).toContain(".violet-d3 { --agent: var(--orchid); }");
     expect(css).toMatch(/\.violet-d3 \[data-pinned-header\] \{[^}]*border-top: 3px solid var\(--agent\);[^}]*color-mix\(in oklab, var\(--agent\) 7%, var\(--card\)\)/);

@@ -5,6 +5,8 @@
  * chips on screen, and saving.
  */
 export const moduleName = "phoebe" as const;
+// Its card for the Agent Commons (family 4): its own version and the places it works.
+export { AGENT_CARD, VERSION } from "./card.js";
 
 export * from "./instructions.js";
 export * from "./turn.js";

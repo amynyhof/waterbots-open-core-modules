@@ -78,7 +78,7 @@ export default function HelpTip({
         aria-expanded={open}
         aria-label={label}
         title={text}
-        className="inline-flex items-center rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-tide"
+        className="inline-flex items-center rounded-sm outline-none calvin-focus-agent"
         style={{ cursor: "help" }}
       >
         {children}

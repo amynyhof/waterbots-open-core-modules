@@ -4,6 +4,8 @@
  * its key, the daily limits, the buttons, the map screen and saving stay with each site.
  */
 export const moduleName = "bridget" as const;
+// Her card for the Agent Commons (family 4): her own version and the places she works.
+export { AGENT_CARD, VERSION } from "./card.js";
 
 export * from "./answer.js";
 export * from "./gps.js";

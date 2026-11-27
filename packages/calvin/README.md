@@ -86,6 +86,29 @@ A site tells the screens where Calvin is working with `place` (`"free-site"`, `"
 The build bundles the entry into `dist/agent.js`, beside the screen. The two share one copy of the engine and its data, in `dist/chunks/`. `@waterbots/core` stays outside them.
 `scripts/check-screen-entry.mjs` loads it from the packed files and runs his tool there.
 
+## Changes in 0.10.0
+
+Family 4, Console and surfaces. It needs `@waterbots/core` in the 0.6 series. No sum changed.
+
+- **His report is on core's one report frame.** The same header, the same sections in the same order, the same notes
+  table and footer as every calculator's report. His words in each section are unchanged. The report now fits the page:
+  before, about one character of its right edge was cut on every page. His notes table prints in the report's font.
+- **Both exports print in full inside any console.** Export prints through core's print part, from a print area of its
+  own under `<body>`, so a console's fixed-height, scrolling panel can no longer clip it. Before, inside a console, the
+  calculator tab's export printed blank pages and the report tab's printed shifted, clipped and cut off after about a
+  page. When no print window opens, the report opens in its own tab, and the screen says so (`calc.exportOutcome`).
+- **One Export.** Both buttons read "Export report (PDF)", with the line that says to choose "Save as PDF".
+- **One time stamp:** core's `reportStamp`, such as "26 Nov 2026, 19:24 GMT-5".
+- **M5.4: Reef.** His colour is Reef (`#0E8A94`), set from core's colour list on the root of each of his screens. Every
+  colour on his screens reads `var(--agent)`; none reads Tide any more.
+- **M5.3: big enough to tap.** On a phone, his rows, buttons, boxes, tabs and folds are at least 44 pixels.
+- **His card** for the Agent Commons: `AGENT_CARD` and `VERSION` from the main entry.
+
+**What a site should change.** Install core 0.6.0 with it. Keep importing `@waterbots/calvin/styles.css`: it now
+carries core's report frame and print rules at its top. Remove any print or export workaround of your own. Read
+`calc.exportOutcome` only if you draw your own Export; core's control already says what happened. A site with its own
+`onExport` keeps it; the time stamp is set first.
+
 ## Changes in 0.9.0
 
 Calvin needs `@waterbots/core` in the 0.5 series.

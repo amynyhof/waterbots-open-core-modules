@@ -30,21 +30,21 @@ function VerTab({
       onClick={onClick}
       disabled={disabled}
       aria-pressed={active}
-      className={`flex shrink-0 flex-col items-start gap-1 rounded-t-md border px-3 py-2 text-left outline-none transition-colors duration-fast focus-visible:ring-2 focus-visible:ring-tide${disabled ? " cursor-default" : ""}`}
+      className={`flex shrink-0 flex-col items-start gap-1 rounded-t-md border px-3 py-2 text-left outline-none transition-colors duration-fast calvin-focus-agent${disabled ? " cursor-default" : ""}`}
       style={{
-        borderColor: active ? "var(--tide)" : "var(--line)",
+        borderColor: active ? "var(--agent)" : "var(--line)",
         background: active ? "var(--card)" : "transparent",
-        boxShadow: active ? "inset 0 -2px 0 var(--tide)" : "none",
+        boxShadow: active ? "inset 0 -2px 0 var(--agent)" : "none",
       }}
     >
       <span
         className="t-mono rounded-pill px-1"
-        style={{ fontSize: 8, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--fg-1)", background: "color-mix(in oklab, var(--tide) 12%, transparent)", boxShadow: "inset 0 0 0 1px color-mix(in oklab, var(--tide) 40%, transparent)" }}
+        style={{ fontSize: 8, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--fg-1)", background: "color-mix(in oklab, var(--agent) 12%, transparent)", boxShadow: "inset 0 0 0 1px color-mix(in oklab, var(--agent) 40%, transparent)" }}
       >
         Carbon
       </span>
       <span className="t-h4" style={{ fontSize: 13, color: active ? "var(--fg-1)" : "var(--fg-3)" }}>{name}</span>
-      <span className="t-mono" style={{ fontSize: 13, fontWeight: 700, color: active ? "var(--tide)" : "var(--ink-4)" }}>{total}</span>
+      <span className="t-mono" style={{ fontSize: 13, fontWeight: 700, color: active ? "var(--agent)" : "var(--ink-4)" }}>{total}</span>
     </button>
   );
 }

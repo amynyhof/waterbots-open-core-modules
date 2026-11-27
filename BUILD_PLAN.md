@@ -207,7 +207,7 @@ Phoebe's cards are sealed. They change only on the maintainer's word.
 
 **Family 4, Console and surfaces** (the shared page first; both sites together)
 
-- [ ] **F4.1** *v1 (coach, for the maintainer, 26 Nov).* Phoebe's tally leaves the chat for the left rail, which holds the progress of the current work. The
+- [~] **F4.1** *v1 (coach, for the maintainer, 26 Nov).* (Core's part: open pull request #72, Phoebe 0.3.0.) Phoebe's tally leaves the chat for the left rail, which holds the progress of the current work. The
       shared page comes first and both sites build the rail. Core's part: Phoebe stops writing her tally in the chat
       once the rail shows it. Core releases first.
 
@@ -270,11 +270,11 @@ the litres check on the cap (N5). A step with no image yet has not started.
 
 - [ ] **M5.1** *Family: Console and surfaces.* Mockup from the captured image
 - [ ] **M5.2** *Family: Console and surfaces.* Built page; the litres slider's **default** and **cap** kept as two separate things
-- [ ] **M5.3** *v1 (coach, for the maintainer, 26 Nov; the whole console is v1, the maintainer, 26 Nov).* *Family:
-      Console and surfaces.* Calvin's question rows are big enough to tap on a phone. Done when a test checks their tap
+- [~] **M5.3** *v1 (coach, for the maintainer, 26 Nov; the whole console is v1, the maintainer, 26 Nov).* *Family:
+      Console and surfaces.* (Open pull request #72, Calvin 0.10.0.) Calvin's question rows are big enough to tap on a phone. Done when a test checks their tap
       size and the maintainer checks them on a phone.
-- [ ] **M5.4** *v1 (coach, for the maintainer, 26 Nov; the whole console is v1, the maintainer, 26 Nov).* *Family:
-      Console and surfaces.* Calvin's color is Reef (`#0E8A94`) on his screens. Done when his screens use
+- [~] **M5.4** *v1 (coach, for the maintainer, 26 Nov; the whole console is v1, the maintainer, 26 Nov).* *Family:
+      Console and surfaces.* (Open pull request #72, Calvin 0.10.0.) Calvin's color is Reef (`#0E8A94`) on his screens. Done when his screens use
       one Reef color token and the maintainer checks the screen.
 - [ ] **M5.5 (V2)** *Family: Console and surfaces.* The simple view (V4): it hides the advanced material until asked.
       Done when a test shows advanced parts are hidden at first and one control shows them, and the maintainer checks
@@ -411,10 +411,18 @@ the maintainer.
 Each finding from the family 1 sprint that is not family 1's own. Family 1's are in "Family 1: what is left".
 
 - *Family: Console and surfaces.* **F4.2 Wellington on the paid site.** Now the paid site's #314.
-- [ ] *Family: Console and surfaces.* **F4.3 The Agent Commons does not read the installed packages.** *v1 (coach, for the maintainer, 26 Nov).* It shows its own
+- [~] *Family: Console and surfaces.* **F4.3 The Agent Commons does not read the installed packages.** *v1 (coach, for the maintainer, 26 Nov).* (Core's part: open pull request #72, the Commons reader and each package's card.) It shows its own
       typed list. Calvin's and Violet's release notes ask for Commons changes that were not made. Both sites' work, the
       shared page first; core's part is J2.
 - *Family: Security and hygiene.* The missing copied-text check is listed under the Security and hygiene sprint above.
+
+## Found in the Console and surfaces sprint (family 4, open)
+
+Written down and not chased. Each carries its family. `[!]` waits on the maintainer.
+
+- [!] *Family: Agent orchestration.* **F1.11 Bridget and the Agent Commons.** The crew list says Bridget works in the
+      Commons; her own package says her chat runs on the two sites only. Her card follows her package, so the Commons lists
+      her as installed but she does not open there. One of the two is wrong. v1 mark: open.
 
 ---
 

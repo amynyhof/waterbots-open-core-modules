@@ -43,7 +43,7 @@ export default function FallbackDial({
               type="button"
               onClick={() => onChange(s.stop)}
               disabled={readOnly}
-              className={`min-w-0 flex-1 rounded-sm px-1 py-1 transition-colors duration-fast outline-none focus-visible:ring-2 focus-visible:ring-tide ${
+              className={`min-w-0 flex-1 rounded-sm px-1 py-1 transition-colors duration-fast outline-none calvin-focus-agent ${
                 active ? "btn-primary font-medium" : "text-fg-3 hover:text-fg-1"
               } ${readOnly ? "cursor-default" : ""}`}
               aria-pressed={active}

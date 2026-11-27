@@ -1,6 +1,8 @@
 // Package entry: `@waterbots/violet`. Violet, the water-benefit agent, and the VWBA 2.0 D-n methods she hosts.
 // Each D-n method has its own folder under `src/`. D-3, Volume Provided, is the first.
 export const moduleName = "violet" as const;
+// Its card for the Agent Commons (family 4): its own version and the places it works.
+export { AGENT_CARD, VERSION } from "./card.js";
 /** Violet's colour, Orchid (ruling 2026-10-31). */
 export const VIOLET_COLOUR = "#A457D4" as const;
 /** The D-n methods Violet hosts. More join as they are built. */

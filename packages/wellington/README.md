@@ -47,6 +47,12 @@ is counted. He never asks for a kind or a class.
 **Remove:** your own copy of his instructions, his answer's checks, the project types and classes, the map's reading,
 the step notes and the route guards; any question for a class, and the class field in his answer.
 
+## Versions
+
+- 0.3.0 (family 4): it needs `@waterbots/core` in the 0.6 series. His card for the Agent Commons, `AGENT_CARD` and
+  `VERSION`, from the main entry. His `config.yaml` version is the package's own now (it said 0.1.0 in the 0.2.0
+  package). Nothing he says changed.
+
 ## What stays with each site
 
 The call to the model and its key, the daily limits, the buttons and chips on screen, saving, the report, logging and

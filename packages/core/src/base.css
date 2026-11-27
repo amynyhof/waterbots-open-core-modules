@@ -54,6 +54,8 @@
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --duration-fast: 120ms;
   --duration-base: 200ms;
+  /* The tap size: everything a visitor taps is at least this big on a phone (family 4, rule 8). */
+  --wb-tap: 44px;
 }
 
 /* Type */

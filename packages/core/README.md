@@ -45,10 +45,34 @@ What is in `src/`:
   code. A test keeps the two the same. Not part of the seed.
 - `agent-rules.md`: the foundational agent rules, rules 1 to 21 of `AGENT_RULES.md` at the root of this repo, word for word. Every agent reads them before its own files. A host reads them as `@waterbots/core/agent-rules.md`. A test keeps them the same as the page. Not part of the seed.
 - `base.css`: the design tokens and the classes the module screens use. A site without a design system of its own imports it: `import "@waterbots/core/base.css"`. The paid site does not; its own design system styles the screens. Every colour is a starting point that a site can set for itself. Not part of the seed.
+- The console's shared parts (family 4, Console and surfaces; the shared console page of 26 Nov 2026). Not part of the seed.
+  - `print.ts`: the print part. On export, the report is copied into a print area of its own under `<body>`, and only
+    that area prints, so a report prints in full inside any console. When no print window opens, the report opens in
+    its own tab, and the outcome says which happened. `printReport` returns a promise of the outcome, because some
+    browsers open the print window only after `window.print()` returns. The print area leaves the page however the
+    print ends, also when the window is cancelled, so a second export prints in full.
+  - `report.tsx` and `report.css`: the one report frame for every calculator: one header, the sections in one order,
+    one footer, one width, one notes table and one time stamp (`reportStamp`). Calvin's and Violet's stylesheets carry
+    `report.css` at the top, so a site that imports either has it. A site's own report page imports
+    `@waterbots/core/report.css`.
+  - `agentColours.ts`: the agents' one colour list. Calvin is Reef (`#0E8A94`) and Violet is Orchid (`#A457D4`).
+    Wellington, Phoebe and Bridget keep the sites' current colours until the maintainer rules.
+  - `tap.ts`: the tap size, 44 pixels, also the `--wb-tap` token.
+  - `consoleWords.ts`: the console's words: the six steps, the hand-off button, the beta note, the export's words,
+    "Keep chatting" and the unsaved-work warning.
+  - `commons.ts`: the Agent Commons reader. It takes each installed package's card and lists the installed agents,
+    then every other seat as coming.
 
 Since the seed landed, this repo is its home. Changes are made here, by pull request. `scripts/check-seed.mjs` proves what arrived against the commit where the seed landed, so later changes are allowed.
 
-- React is an optional peer. Only `SaveNotice.tsx`, `readOnly.tsx`, `notes.tsx` and `rangedNumber.tsx` use it.
+- React is an optional peer. Only `SaveNotice.tsx`, `readOnly.tsx`, `notes.tsx`, `rangedNumber.tsx` and `report.tsx` use it.
+- Version 0.6.0: **the console's shared parts** (family 4): the print part, the one report frame, the colour list, the
+  tap size, the console's words and the Agent Commons reader. Nothing in 0.5.0 changed its meaning; the note
+  buttons are now 44 pixels at the least. **What a site should change:** install core 0.6.0 with the agent packages
+  of the same release. Show `BETA_NOTE` above every typing box, the steps and hand-offs from `consoleWords.ts`, and the
+  agents' colours from `AGENT_COLOURS` (a `null` colour keeps the site's own for now). The Agent Commons passes each
+  installed package's `AGENT_CARD` to `commonsAgents`. A site's own report export uses `printReport`, waits for the outcome
+  it returns, and tells the person what it was (`EXPORT_WORDS`).
 - Version 0.5.0: **a fact is filled only when the person gave it** (`factGuard.ts`). Every agent's facts are checked against the visitor's own messages, as its numbers are: a fact the agent asks about in the same reply is refused; a yes-or-no fact and home use are taken only as the answer to the question just asked; any other fact only with the visitor's own words (`heard`). A fact that fails goes back to the agent once, then stays blank, so no figure rests on it. **A door's plain facts** (`DoorFacts` in `places.ts`): whether the project is saved, when a change is kept, whether there is a Project Record page, and the site's own values, which an agent reads instead of the package's. The chat block shows each ask's key, and tells an agent on its first turn that it has not talked with the visitor before. **When the source or the treatment changes, every reading is worked out again** (`changeFacts`): the pathway readings come off, Phoebe is called again with her rows kept (`factsChanged`), and the old line for what the project does comes off. `noFigureWords` gives the crew list the same sentence as a desk with no figure. Nothing is removed.
 - Version 0.4.0: it adds the look-up fix and the answer chips (`lookUp.ts`, `chips.ts`), the kinds of project and the one table, the guards on an agent's numbers, `changeFacts`, and the save ticket's kind facts (`kindTicket`, `addKindTicket`). Community level treatment is counted for carbon again. **A site starts a new project with `newProjectRecord`.** A screening that already exists is one whose record has no `facts.rules`: it keeps its answers and gets no new question. An update never changes a screening. Working a project out again is a new screening (`newScreening`), with its own number, date, and agents and package versions, and the site keeps the earlier one beside it. Under the carbon method, a project credited under V1.0 gets an answer under each version (`carbonAnswers`), and each figure stands on its own version's conditions. The method's conditions are facts with their source and page (`METHOD_CONDITIONS`), for an agent to explain in its own words. The map's basic facts are now the source, the treatment and the country. 0.3.0: it adds the value ranges, the chat, the checks on a reply, the crew list, the rest of the open site's facts, Phoebe's rows and Bridget's basin, and a limit and a writer on each note. The agent map calls a later agent only when the agent before it has finished, gives each agent its step, and asks only about the pathways a site reads. Three kinds of project have no technology code yet. Each label also says whether Violet's D-3 counts it (`waterCoverage`). A new or alternative supply is asked first whether people use the water at home (`homeUse`): the map's next step asks Wellington to gather it. Nothing is removed. 0.2.0: it adds the shared project record and its fact check, the label list, the places, the agent map, and notes on values. `base.css` adds `--agent`, the colour of the agent whose screen it is. Nothing is removed. 0.1.2 shipped `agent-rules.md`, the agent rules file. Not published. Nothing in this repo goes to npm yet; the package is marked `private`.
 - Apache License 2.0. See `LICENSE` and `NOTICE` in this folder.
