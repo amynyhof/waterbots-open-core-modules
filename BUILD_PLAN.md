@@ -80,7 +80,7 @@ sites pin that file by its fingerprint. The first pinned version includes the sl
 - *Family: v1 proof and grading.* Benchmarks and pass rates. This is v2.
 - *Family: Security and hygiene.* M2.3 linting.
 - *Family: Calculators and methods.* M4 openings and labels.
-- *Family: Console and surfaces.* M5 the friendly view, beyond the sliders (released) and its items marked **(V1)**.
+- *Family: Console and surfaces.* M5 the friendly view, beyond the sliders (released) and M5.3 and M5.4, which are v1.
 - *Family: Console and surfaces.* The simple view (V4, M5.5). This is v2.
 - *Family: Agent orchestration.* M9.2 Bridget's map. Its tap size is now in the sites' plans.
 - *Family: Calculators and methods.* M6 the fuel-mix floor.
@@ -121,7 +121,8 @@ left is below. `[!]` waits on the maintainer.
 - [ ] **F1.6** *v1 (coach, for the maintainer, 26 Nov).* Calvin's list of missing facts still names "technology", which no site asks for any more. The open
       site's line "Still needed: technology. Tell Wellington." (S37) is the same job: core releases first, then the
       open site.
-- [ ] **F1.7** *After v1 (coach, for the maintainer, 26 Nov).* A stray "(ref)" showed twice in Calvin's reply on the open site.
+- [ ] **F1.7** *v1 (coach, for the maintainer, 26 Nov).* A stray "(ref)" showed twice in Calvin's reply on the open
+      site. It breaks agent rule 8: a (ref) marker points only to a source in the agent's own knowledge pack.
 - [ ] **F1.8** Stale wording in code this sprint touched, left for the next pull request in these files: Wellington's
       `answer.ts` still says, in its header and beside `HIS_KIND_FACTS`, that the other yes-or-no facts are kept only
       when the map asked for them. Core's guard on facts now decides that.
@@ -139,7 +140,8 @@ left is below. `[!]` waits on the maintainer.
       the record proposal. Until the maintainer rules them, the map uses only the eligibility readings and the two
       rules this repo can cite.
 - [ ] **J5.** Bridget's map, after the rights check on every one of her data files, and a ruling on the shared map key.
-      One calculator screen: each site passes the place, the Paid site saves the notes, and later calculator agents
+      The rights check is done (the maintainer, 26 Nov; the open site's README credits both map sources), pending the
+      open site's confirmation. F7.1 keeps its own check. One calculator screen: each site passes the place, the Paid site saves the notes, and later calculator agents
       follow the same screen.
   - [!] Phoebe's, Wellington's and Bridget's rulings.
 - **J8.** Now in the paid site's plan, in its family 1 list.
@@ -268,9 +270,11 @@ the litres check on the cap (N5). A step with no image yet has not started.
 
 - [ ] **M5.1** *Family: Console and surfaces.* Mockup from the captured image
 - [ ] **M5.2** *Family: Console and surfaces.* Built page; the litres slider's **default** and **cap** kept as two separate things
-- [ ] **M5.3 (V1)** *Family: Console and surfaces.* Calvin's question rows are big enough to tap on a phone. Done when a test checks their tap size
-      and the maintainer checks them on a phone.
-- [ ] **M5.4 (V1)** *Family: Console and surfaces.* Calvin's color is Reef (`#0E8A94`) on his screens. Done when his screens use
+- [ ] **M5.3** *v1 (coach, for the maintainer, 26 Nov; the whole console is v1, the maintainer, 26 Nov).* *Family:
+      Console and surfaces.* Calvin's question rows are big enough to tap on a phone. Done when a test checks their tap
+      size and the maintainer checks them on a phone.
+- [ ] **M5.4** *v1 (coach, for the maintainer, 26 Nov; the whole console is v1, the maintainer, 26 Nov).* *Family:
+      Console and surfaces.* Calvin's color is Reef (`#0E8A94`) on his screens. Done when his screens use
       one Reef color token and the maintainer checks the screen.
 - [ ] **M5.5 (V2)** *Family: Console and surfaces.* The simple view (V4): it hides the advanced material until asked.
       Done when a test shows advanced parts are hidden at first and one control shows them, and the maintainer checks
@@ -389,15 +393,18 @@ the maintainer.
       still says "reference case" for the made-up test cases. Left as it is: a name in code.
 - [!] *Family: Security and hygiene.* **F8.2 No copied-text check.** *After v1 (coach, for the maintainer, 26 Nov).* `RULINGS.md` section 1 says every release is checked for
       copied text. This repo's release check has none. A new check needs the maintainer's yes. Seen again at the
-      family 1 close: two releases went out on 2026-11-26 without one.
+      family 1 close: two releases went out on 2026-11-26 without one. After v1 is for an automatic check. Until it
+      exists, every release is checked for copied text by hand, as RULINGS section 1 requires.
 - [!] *Family: Security and hygiene.* **Merged branches stay on GitHub** (23 besides `main`). GitHub's setting to
       delete a branch when its pull request merges would stop new ones.
 - [!] *Family: Security and hygiene.* **Three rules wait in `CLAUDE.md`** ("Waiting for the maintainer"): the Grant
       line, the engine does every sum, and the three kinds of value. The maintainer places or drops each.
 - [!] *Family: Calculators and methods.* **F2.4 A value stands in for a missing one.** *v1 (coach, for the maintainer, 26 Nov).* Calvin counts embodied emissions
-      as 0 when they are not entered, with a warning. `RULINGS.md` section 2 says a missing fact never counts as zero.
-      Devices per household is 1 when not given, as Calvin's own rulings say. Changing either changes a sum. Goes with
-      J9 (rule 11).
+      as 0 when they are not entered, with a warning, and devices per household as 1 when not given. `RULINGS.md`
+      section 2 says a missing fact never counts as zero. The paid session's reading of the book: embodied emissions
+      are mandatory, with default deductions (§5.2.2 e, p.17; §9.2 and Table 10, p.36); devices per premises come from
+      sales records, with no default (SDWS 37, p.72). "Devices per household is 1" is in Calvin's rulings, so the fix
+      needs the maintainer's word in family 2's sprint. Changing either changes a sum. Goes with J9 (rule 11).
 
 ## Found in the Agent orchestration sprint (closed 2026-11-26)
 
